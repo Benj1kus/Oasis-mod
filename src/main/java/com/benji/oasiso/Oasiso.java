@@ -107,7 +107,7 @@ public class Oasiso {
             () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
                     .requiresCorrectToolForDrops()));
-
+    // AHUI
     public static final RegistryObject<Item> SANDSTONE_CORNER_ITEM = ITEMS.register("sandstone_corner",
             () -> new BlockItem(SANDSTONE_CORNER.get(), new Item.Properties()));
 
