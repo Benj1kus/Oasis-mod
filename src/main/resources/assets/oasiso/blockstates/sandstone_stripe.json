@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "oasiso:block/sandstone_stripe"
+    },
+    "axis=x": {
+      "model": "oasiso:block/sandstone_stripe",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "oasiso:block/sandstone_stripe",
+      "x": 90
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "oasiso:block/sandstone_corner"
+    },
+    "facing=east": {
+      "model": "oasiso:block/sandstone_corner",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "oasiso:block/sandstone_corner",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oasiso:block/sandstone_corner",
+      "y": 270
+    }
+  }
+}

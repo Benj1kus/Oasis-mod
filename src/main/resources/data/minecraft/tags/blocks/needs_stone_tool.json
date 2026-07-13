@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "oasiso:sandstone_tiles",
+    "oasiso:sandstone_roof",
+    "oasiso:sandstone_floorb",
+    "oasiso:sandstone_polished",
+    "oasiso:sandstone_bricked",
+    "oasiso:sandstone_column",
+    "oasiso:sandstone_colored",
+    "oasiso:sandstone_stripe",
+    "oasiso:sandstone_corner",
+    "oasiso:sandstone_line"
+  ]
+}
