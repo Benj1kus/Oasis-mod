@@ -168,6 +168,7 @@ public class Oasiso {
         ITEMS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
         ENTITIES.register(modEventBus);
+        ModSounds.SOUNDS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
 
