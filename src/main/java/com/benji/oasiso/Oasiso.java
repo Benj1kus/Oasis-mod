@@ -1,9 +1,12 @@
 package com.benji.oasiso;
 
+import com.benji.oasiso.common.block.CactuloBlock;
 import com.benji.oasiso.common.block.DirectionalPatternBlock;
+import com.benji.oasiso.common.block.OasisoFlowerBlock;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
@@ -37,6 +40,7 @@ public class Oasiso {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
 
+// BLOCKS
 
     public static final RegistryObject<Block> SANDSTONE_TILES = BLOCKS.register("sandstone_tiles",
             () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
@@ -107,7 +111,7 @@ public class Oasiso {
             () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
                     .requiresCorrectToolForDrops()));
-    // AHUI
+
     public static final RegistryObject<Item> SANDSTONE_CORNER_ITEM = ITEMS.register("sandstone_corner",
             () -> new BlockItem(SANDSTONE_CORNER.get(), new Item.Properties()));
 
@@ -120,17 +124,25 @@ public class Oasiso {
             () -> new BlockItem(SANDSTONE_LINE.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> FLOWERY = BLOCKS.register("flowery",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS)
-                    .instabreak()
-                    .noOcclusion()));
+            () -> new OasisoFlowerBlock(
+                    MobEffects.SATURATION,
+                    1,
+                    BlockBehaviour.Properties.copy(Blocks.DANDELION)
+                            .instabreak()
+                            .noOcclusion()
+            ));
 
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery",
             () -> new BlockItem(FLOWERY.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> CACTULO = BLOCKS.register("cactulo",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS)
-                    .instabreak()
-                    .noOcclusion()));
+            () -> new CactuloBlock(
+                    MobEffects.SATURATION,
+                    1,
+                    BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)
+                            .instabreak()
+                            .noOcclusion()
+            ));
 
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo",
             () -> new BlockItem(CACTULO.get(), new Item.Properties()));
@@ -146,6 +158,8 @@ public class Oasiso {
                     })
                     .build()
     );
+
+    //============================
 
     public Oasiso (FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
