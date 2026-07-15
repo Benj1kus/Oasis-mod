@@ -1,14 +1,20 @@
 package com.benji.oasiso;
 
+import com.benji.oasiso.client.renderer.MonkiRenderer;
 import com.benji.oasiso.common.block.CactuloBlock;
 import com.benji.oasiso.common.block.DirectionalPatternBlock;
 import com.benji.oasiso.common.block.GenDecorateBlock;
 import com.benji.oasiso.common.block.OasisoFlowerBlock;
+import com.benji.oasiso.common.entity.MonkiBigEntity;
+import com.benji.oasiso.common.entity.MonkiEntity;
+import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,7 +25,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -191,8 +199,27 @@ public class Oasiso {
             () -> new BlockItem(STAT.get(), new Item.Properties()));
 
     //============================
+    // ENTITIES
+    public static final RegistryObject<EntityType<MonkiEntity>> MONKI = ENTITIES.register("monki",
+            () -> EntityType.Builder.of(MonkiEntity::new, MobCategory.MONSTER)
+                    .sized(0.625F, 1.25F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "monki").toString()));
 
-    public Oasiso (FMLJavaModLoadingContext context) {
+    public static final RegistryObject<EntityType<DesertBallEntity>> DESERT_BALL = ENTITIES.register("desertball",
+            () -> EntityType.Builder.<DesertBallEntity>of(DesertBallEntity::new, MobCategory.MISC)
+                    .sized(0.2F, 0.2F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "desertball").toString()));
+
+    public static final RegistryObject<EntityType<MonkiBigEntity>> MONKI_BIG = ENTITIES.register("monki_big",
+            () -> EntityType.Builder.of(MonkiBigEntity::new, MobCategory.MONSTER)
+                    .sized(1.75F, 3.75F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "monki_big").toString()));
+
+    //=====================
+
+    public Oasiso(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
 
         BLOCKS.register(modEventBus);
@@ -207,6 +234,7 @@ public class Oasiso {
 
         MinecraftForge.EVENT_BUS.register(this);
     }
+
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS || event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(SANDSTONE_BRICKED_ITEM);
@@ -226,6 +254,15 @@ public class Oasiso {
             event.accept(GEN_VASE_ITEM);
             event.accept(STAT_LANTERN_ITEM);
             event.accept(STAT);
+        }
+    }
+
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class ModEvents {
+        @SubscribeEvent
+        public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(MONKI.get(), MonkiEntity.createAttributes().build());
+            event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
         }
     }
 }
