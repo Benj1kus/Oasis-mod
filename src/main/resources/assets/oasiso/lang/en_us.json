@@ -13,9 +13,13 @@
   "block.oasiso.stat": "Statue of Krombul",
   "block.oasiso.stat_lantern": "Luminary Statue of Krombul",
 
-
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
+  "entity.oasiso.monki": "Monki",
+  "entity.oasiso.monki_big": "Big Monki",
+  "entity.oasiso.titana": "Titana the Hammerer",
+  "entity.oasiso.sand_hand": "Sand hand",
+  "entity.oasiso.desertball": "Sand ball",
 
-  "creativetab.oasiso_tab": "Oasis'o:Ruins"
+  "creativetab.oasiso_tab": "Oasis'o: Ruins"
 }
