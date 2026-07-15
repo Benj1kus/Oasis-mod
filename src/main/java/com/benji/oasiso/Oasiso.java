@@ -2,6 +2,7 @@ package com.benji.oasiso;
 
 import com.benji.oasiso.common.block.CactuloBlock;
 import com.benji.oasiso.common.block.DirectionalPatternBlock;
+import com.benji.oasiso.common.block.GenDecorateBlock;
 import com.benji.oasiso.common.block.OasisoFlowerBlock;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -159,6 +161,35 @@ public class Oasiso {
                     .build()
     );
 
+    public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase",
+            () -> new GenDecorateBlock(
+                    BlockBehaviour.Properties.copy(Blocks.DECORATED_POT)
+                            .sound(SoundType.DECORATED_POT)
+                            .instabreak()
+                            .noOcclusion()
+            ));
+
+    public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase",
+            () -> new BlockItem(GEN_VASE.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> STAT_LANTERN = BLOCKS.register("stat_lantern",
+            () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .lightLevel(state -> 10)
+                    .requiresCorrectToolForDrops()
+                    .strength(2.0F)
+                    .noOcclusion()));
+
+    public static final RegistryObject<Item> STAT_LANTERN_ITEM = ITEMS.register("stat_lantern",
+            () -> new BlockItem(STAT_LANTERN.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> STAT = BLOCKS.register("stat",
+            () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .strength(2.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> STAT_ITEM = ITEMS.register("stat",
+            () -> new BlockItem(STAT.get(), new Item.Properties()));
+
     //============================
 
     public Oasiso (FMLJavaModLoadingContext context) {
@@ -190,6 +221,11 @@ public class Oasiso {
             event.accept(FLOWERY_ITEM);
             event.accept(CACTULO_ITEM);
 
+        }
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(GEN_VASE_ITEM);
+            event.accept(STAT_LANTERN_ITEM);
+            event.accept(STAT);
         }
     }
 }
