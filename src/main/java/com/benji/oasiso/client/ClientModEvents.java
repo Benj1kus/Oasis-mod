@@ -40,10 +40,14 @@ public class ClientModEvents {
                 TitanaRenderer::new
         );
 
-
         event.registerEntityRenderer(
                 Oasiso.SAND_HAND.get(),
                 SandHandRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                Oasiso.DASHER.get(),
+                DasherRenderer::new
         );
 
     }

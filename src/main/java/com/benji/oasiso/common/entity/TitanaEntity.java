@@ -35,11 +35,10 @@ public class TitanaEntity extends Monster implements GeoEntity, GlowmaskEntity {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(TitanaEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MODEL_STATE = SynchedEntityData.defineId(TitanaEntity.class, EntityDataSerializers.INT);
 
-    // Логика Песочной Руки (только на сервере)
-    public int handCooldown = 0; // Основной кулдаун (40 сек)
-    public int handStrikesLeft = 0; // Сколько ударов осталось сделать
-    public int nextStrikeTimer = 0; // Таймер до следующего удара
-    public int returnHandTimer = 0; // Таймер возврата руки с партиклами
+    public int handCooldown = 0;
+    public int handStrikesLeft = 0;
+    public int nextStrikeTimer = 0;
+    public int returnHandTimer = 0;
 
     public TitanaEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -49,7 +48,7 @@ public class TitanaEntity extends Monster implements GeoEntity, GlowmaskEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(STATE, 0);       // 0=Idle/Walk, 1=Hammer1, 2=Hammer2, 3=SandCast
-        this.entityData.define(MODEL_STATE, 0); // 0=С рукой, 1=Без руки
+        this.entityData.define(MODEL_STATE, 0);
     }
 
     public int getAnimState() { return this.entityData.get(STATE); }
@@ -70,8 +69,8 @@ public class TitanaEntity extends Monster implements GeoEntity, GlowmaskEntity {
     @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false, false));
-        this.goalSelector.addGoal(1, new TitanaSandHandGoal(this)); // Приоритет магии
-        this.goalSelector.addGoal(2, new TitanaMeleeGoal(this));    // Приоритет мили
+        this.goalSelector.addGoal(1, new TitanaSandHandGoal(this));
+        this.goalSelector.addGoal(2, new TitanaMeleeGoal(this));
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.8D));
     }
 
@@ -82,12 +81,10 @@ public class TitanaEntity extends Monster implements GeoEntity, GlowmaskEntity {
         if (!this.level().isClientSide) {
             if (this.handCooldown > 0) this.handCooldown--;
 
-            // Логика выскакивающих рук под игроком
             if (this.handStrikesLeft > 0) {
                 if (this.nextStrikeTimer > 0) {
                     this.nextStrikeTimer--;
                 } else {
-                    // Спавним руку под таргетом
                     if (this.getTarget() != null) {
                         SandHandEntity hand = Oasiso.SAND_HAND.get().create(this.level());
                         if (hand != null) {
@@ -98,32 +95,28 @@ public class TitanaEntity extends Monster implements GeoEntity, GlowmaskEntity {
                     this.handStrikesLeft--;
 
                     if (this.handStrikesLeft > 0) {
-                        // Рандомно от 2 до 10 секунд (40 - 200 тиков) до следующего удара
                         this.nextStrikeTimer = 40 + this.getRandom().nextInt(160);
                     } else {
-                        // Если это был последний удар, запускаем таймер возврата руки (2 сек = 40 тиков)
                         this.returnHandTimer = 40;
                     }
                 }
             }
 
-            // Возврат руки
             if (this.returnHandTimer > 0) {
                 this.returnHandTimer--;
-                spawnLeftParticles(); // Партиклы восстановления 2 сек
+                spawnLeftParticles();
 
                 if (this.returnHandTimer == 0) {
-                    this.setModelState(0); // Возвращаем модель с рукой
+                    this.setModelState(0);
                 }
             }
         }
     }
 
-    // Вычисляем позицию "чуть левее от центра" и спавним песок
     public void spawnLeftParticles() {
         if (this.level() instanceof ServerLevel serverLevel) {
             Vec3 forward = Vec3.directionFromRotation(0, this.yBodyRot);
-            Vec3 left = forward.yRot((float) Math.PI / 2); // Вектор влево
+            Vec3 left = forward.yRot((float) Math.PI / 2); // left
 
             double px = this.getX() + left.x * 0.8;
             double pz = this.getZ() + left.z * 0.8;

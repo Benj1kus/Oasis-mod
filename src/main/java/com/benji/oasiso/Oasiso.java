@@ -5,10 +5,7 @@ import com.benji.oasiso.common.block.CactuloBlock;
 import com.benji.oasiso.common.block.DirectionalPatternBlock;
 import com.benji.oasiso.common.block.GenDecorateBlock;
 import com.benji.oasiso.common.block.OasisoFlowerBlock;
-import com.benji.oasiso.common.entity.MonkiBigEntity;
-import com.benji.oasiso.common.entity.MonkiEntity;
-import com.benji.oasiso.common.entity.SandHandEntity;
-import com.benji.oasiso.common.entity.TitanaEntity;
+import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
@@ -229,6 +226,11 @@ public class Oasiso {
                     .sized(1.5F, 2.0F)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "sand_hand").toString()));
 
+    public static final RegistryObject<EntityType<DasherEntity>> DASHER = ENTITIES.register("dasher",
+            () -> EntityType.Builder.of(DasherEntity::new, MobCategory.MONSTER)
+                    .sized(1.25F, 5.0F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "dasher").toString()));
+
     //=====================
 
     public Oasiso(FMLJavaModLoadingContext context) {
@@ -277,6 +279,7 @@ public class Oasiso {
             event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
             event.put(TITANA.get(), TitanaEntity.createAttributes().build());
             event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
+            event.put(DASHER.get(), DasherEntity.createAttributes().build());
         }
     }
 }
