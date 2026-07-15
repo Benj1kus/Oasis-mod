@@ -10,6 +10,7 @@
   "block.oasiso.sandstone_corner": "Corner Sandstone Pattern",
   "block.oasiso.sandstone_line": "Linear Sandstone Pattern",
   "block.oasiso.gen_vase": "Ancient Vase",
+  "block.oasiso.sanded_chest": "Sanded Chest",
   "block.oasiso.stat": "Statue of Krombul",
   "block.oasiso.stat_lantern": "Luminary Statue of Krombul",
 
@@ -21,6 +22,7 @@
   "entity.oasiso.titana": "Titana the Hammerer",
   "entity.oasiso.sand_hand": "Sand hand",
   "entity.oasiso.desertball": "Sand ball",
+  "entity.oasiso.dasher": "Dasher",
 
   "creativetab.oasiso_tab": "Oasis'o: Ruins"
 }

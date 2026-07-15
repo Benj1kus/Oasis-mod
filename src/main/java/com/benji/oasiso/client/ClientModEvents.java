@@ -50,5 +50,15 @@ public class ClientModEvents {
                 DasherRenderer::new
         );
 
+        event.registerBlockEntityRenderer(
+                Oasiso.STAT_BE.get(),
+                StatBlockEntityRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                Oasiso.SANDED_CHEST_BE.get(),
+                SandedChestRenderer::new
+        );
+
     }
 }

@@ -1,12 +1,12 @@
 package com.benji.oasiso;
 
 import com.benji.oasiso.client.renderer.MonkiRenderer;
-import com.benji.oasiso.common.block.CactuloBlock;
-import com.benji.oasiso.common.block.DirectionalPatternBlock;
-import com.benji.oasiso.common.block.GenDecorateBlock;
-import com.benji.oasiso.common.block.OasisoFlowerBlock;
+import com.benji.oasiso.common.block.*;
+import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
+import com.benji.oasiso.common.block.entity.StatBlockEntity;
 import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
+import com.benji.oasiso.common.item.GeoBlockItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -190,13 +190,35 @@ public class Oasiso {
             () -> new BlockItem(STAT_LANTERN.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> STAT = BLOCKS.register("stat",
-            () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+            () -> new StatBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
                     .strength(2.0F)
                     .requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Item> STAT_ITEM = ITEMS.register("stat",
             () -> new BlockItem(STAT.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> SANDED_CHEST = BLOCKS.register("sanded_chest",
+            () -> new SandedChestBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)
+                    .strength(2.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> SANDED_CHEST_ITEM = ITEMS.register("sanded_chest",
+            () -> new GeoBlockItem(
+                    SANDED_CHEST.get(),
+                    new Item.Properties(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "geo/sanded_chest.geo.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/sanded_chest.png"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "animations/sanded_chest.animation.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
+            ));
+
+    //BLOCK ENTITIES
+
+    public static final RegistryObject<BlockEntityType<StatBlockEntity>> STAT_BE = BLOCK_ENTITIES.register("stat",
+            () -> BlockEntityType.Builder.of(StatBlockEntity::new, STAT.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<SandedChestBlockEntity>> SANDED_CHEST_BE = BLOCK_ENTITIES.register("sanded_chest",
+            () -> BlockEntityType.Builder.of(SandedChestBlockEntity::new, SANDED_CHEST.get()).build(null));
     //============================
     // ENTITIES
     public static final RegistryObject<EntityType<MonkiEntity>> MONKI = ENTITIES.register("monki",
@@ -268,6 +290,7 @@ public class Oasiso {
             event.accept(GEN_VASE_ITEM);
             event.accept(STAT_LANTERN_ITEM);
             event.accept(STAT);
+            event.accept(SANDED_CHEST_ITEM);
         }
     }
 
