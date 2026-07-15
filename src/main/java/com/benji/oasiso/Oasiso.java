@@ -1,10 +1,12 @@
 package com.benji.oasiso;
 
+import com.benji.oasiso.client.renderer.CactoRenderer;
 import com.benji.oasiso.client.renderer.MonkiRenderer;
 import com.benji.oasiso.common.block.*;
 import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
 import com.benji.oasiso.common.entity.*;
+import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.benji.oasiso.common.item.GeoBlockItem;
 import com.mojang.logging.LogUtils;
@@ -233,6 +235,13 @@ public class Oasiso {
                     .updateInterval(10)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "desertball").toString()));
 
+    public static final RegistryObject<EntityType<CactoProjEntity>> CACTO_PROJ = ENTITIES.register("cacto_proj",
+            () -> EntityType.Builder.<CactoProjEntity>of(CactoProjEntity::new, MobCategory.MISC)
+                    .sized(0.125F, 0.125F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "cacto_proj").toString()));
+
     public static final RegistryObject<EntityType<MonkiBigEntity>> MONKI_BIG = ENTITIES.register("monki_big",
             () -> EntityType.Builder.of(MonkiBigEntity::new, MobCategory.MONSTER)
                     .sized(1.75F, 3.75F)
@@ -252,6 +261,11 @@ public class Oasiso {
             () -> EntityType.Builder.of(DasherEntity::new, MobCategory.MONSTER)
                     .sized(1.25F, 5.0F)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "dasher").toString()));
+
+    public static final RegistryObject<EntityType<CactoEntity>> CACTO = ENTITIES.register("cacto",
+            () -> EntityType.Builder.of(CactoEntity::new, MobCategory.MONSTER)
+                    .sized(0.625F, 1.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "cacto").toString()));
 
     //=====================
 
@@ -303,6 +317,7 @@ public class Oasiso {
             event.put(TITANA.get(), TitanaEntity.createAttributes().build());
             event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
             event.put(DASHER.get(), DasherEntity.createAttributes().build());
+            event.put(CACTO.get(), CactoEntity.createAttributes().build());
         }
     }
 }

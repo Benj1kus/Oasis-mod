@@ -43,37 +43,31 @@ public class SandedChestBlockEntity extends BlockEntity implements GeoBlockEntit
         return isBrushing;
     }
 
-    // Этот метод вызывается каждый тик сервером
     public static void tick(Level level, BlockPos pos, BlockState state, SandedChestBlockEntity entity) {
         if (!entity.isBrushing) return;
 
         entity.brushingTicks++;
 
         if (level instanceof ServerLevel serverLevel) {
-            // Партиклы песка каждый тик
             serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
                     pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5,
                     3, 0.3, 0.2, 0.3, 0.05);
 
-            // Звук очистки кистью каждые 10 тиков (полсекунды)
             if (entity.brushingTicks % 10 == 0) {
                 level.playSound(null, pos, SoundEvents.BRUSH_SAND, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
 
-            // На 40-й тик (2 секунды) превращаем в сундук
             if (entity.brushingTicks >= 40) {
                 Direction facing = state.getValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING);
 
-                // Ставим ванильный сундук с тем же направлением
                 level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 3);
 
-                // Присваиваем лут-таблицу новому сундуку
+                //loot table
                 BlockEntity newBe = level.getBlockEntity(pos);
                 if (newBe instanceof ChestBlockEntity chestBe) {
                     chestBe.setLootTable(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "chests/sanded_chest_loot"), level.random.nextLong());
                 }
 
-                // Звук завершения
                 level.playSound(null, pos, SoundEvents.BRUSH_SAND_COMPLETED, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
         }
@@ -81,7 +75,6 @@ public class SandedChestBlockEntity extends BlockEntity implements GeoBlockEntit
 
     @Override
     public boolean triggerEvent(int id, int type) {
-        // Ловим сигнал от блока на клиенте и запускаем анимацию
         if (id == 1) {
             this.triggerAnim("controller", "try");
             return true;
@@ -92,7 +85,6 @@ public class SandedChestBlockEntity extends BlockEntity implements GeoBlockEntit
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, event -> PlayState.STOP)
-                // Регистрируем анимацию, которая будет запускаться по триггеру
                 .triggerableAnim("try", RawAnimation.begin().thenPlay("try"))
         );
     }

@@ -23,6 +23,8 @@
   "entity.oasiso.sand_hand": "Sand hand",
   "entity.oasiso.desertball": "Sand ball",
   "entity.oasiso.dasher": "Dasher",
+  "entity.oasiso.cacto": "Cacto",
+  "entity.oasiso.cacto_proj": "Cacto",
 
   "creativetab.oasiso_tab": "Oasis'o: Ruins"
 }

@@ -31,6 +31,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                Oasiso.CACTO_PROJ.get(),
+                CactoProjRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.MONKI_BIG.get(),
                 MonkiBigRenderer::new
         );
@@ -48,6 +53,12 @@ public class ClientModEvents {
         event.registerEntityRenderer(
                 Oasiso.DASHER.get(),
                 DasherRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
+                Oasiso.CACTO.get(),
+                CactoRenderer::new
         );
 
         event.registerBlockEntityRenderer(
