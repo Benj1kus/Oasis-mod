@@ -80,6 +80,6 @@ public class DasherMagneticGoal extends Goal {
         if (this.mob.getAnimState() == 5) {
             this.mob.setAnimState(0);
         }
-        this.mob.magneticCooldown = 200;
+        this.mob.magneticCooldown = 100;
     }
 }

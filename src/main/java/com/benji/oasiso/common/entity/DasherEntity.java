@@ -39,6 +39,10 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
     private int changeTimer = 0;
     private int defenceTimer = 0;
 
+    public boolean forceDash = false;
+    private int hitCounter = 0;
+    private int hitResetTimer = 0;
+
     public DasherEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
     }
@@ -93,11 +97,27 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
         boolean wasHurt = super.hurt(source, amount);
 
-        if (wasHurt && !this.level().isClientSide && !this.isMagnetic() && this.getHealth() <= this.getMaxHealth() / 2.0F) {
-            this.setAnimState(4);
-            this.changeTimer = 80;
-            this.setDashing(false);
-            this.getNavigation().stop();
+        // Если урон прошел успешно, и это не снаряд, и мы не в процессе рывка
+        if (wasHurt && !this.level().isClientSide && this.getAnimState() != 2) {
+
+            // Если здоровье упало ниже 50%, переходим в магнитную фазу
+            if (!this.isMagnetic() && this.getHealth() <= this.getMaxHealth() / 2.0F) {
+                this.setAnimState(4);
+                this.changeTimer = 80;
+                this.setDashing(false);
+                this.getNavigation().stop();
+                this.hitCounter = 0; // Сбрасываем счетчик ударов при смене фазы
+            }
+            // Иначе считаем удары для контрудара
+            else if (this.getAnimState() != 4 && source.getDirectEntity() instanceof Player) {
+                this.hitCounter++;
+                this.hitResetTimer = 60; // Даем игроку 3 секунды, чтобы счетчик сбросился
+
+                if (this.hitCounter >= 3) {
+                    this.forceDash = true; // Даем сигнал ИИ начать рывок
+                    this.hitCounter = 0;   // Обнуляем счетчик
+                }
+            }
         }
 
         return wasHurt;
@@ -124,6 +144,14 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
                 if (this.changeTimer == 0) {
                     this.setMagnetic(true);
                     this.setAnimState(0);
+                }
+            }
+
+            // Таймер сброса счетчика ударов
+            if (this.hitResetTimer > 0) {
+                this.hitResetTimer--;
+                if (this.hitResetTimer == 0) {
+                    this.hitCounter = 0;
                 }
             }
         }

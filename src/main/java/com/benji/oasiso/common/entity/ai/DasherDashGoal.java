@@ -19,19 +19,29 @@ public class DasherDashGoal extends Goal {
 
     public DasherDashGoal(DasherEntity mob) {
         this.mob = mob;
-        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+        // Добавили Goal.Flag.TARGET, чтобы ИИ мог прервать другие атаки
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.TARGET));
     }
 
     @Override
     public boolean canUse() {
         this.target = this.mob.getTarget();
-        return this.target != null && this.mob.dashCooldown <= 0 && this.mob.getAnimState() == 0 && this.mob.getRandom().nextInt(40) == 0;
+        if (this.target == null || this.mob.getAnimState() == 4) return false;
+
+        // Либо срабатывает обычный рандом (если нет кулдауна и он стоит/ходит)
+        boolean randomTrigger = this.mob.dashCooldown <= 0 && this.mob.getAnimState() == 0 && this.mob.getRandom().nextInt(40) == 0;
+
+        // Либо срабатывает принудительно из-за полученных ударов
+        boolean forceTrigger = this.mob.forceDash;
+
+        return randomTrigger || forceTrigger;
     }
 
     @Override
     public void start() {
         this.dashCount = 0;
         this.timer = 0;
+        this.mob.forceDash = false; // Выключаем триггер, так как рывок уже начался
         this.mob.setAnimState(2);
     }
 
@@ -78,7 +88,6 @@ public class DasherDashGoal extends Goal {
             }
         }
 
-
         if (this.timer == 33) {
             this.mob.setDashing(false);
             this.mob.setDeltaMovement(0, this.mob.getDeltaMovement().y, 0);
@@ -102,6 +111,7 @@ public class DasherDashGoal extends Goal {
     public void stop() {
         this.mob.setDashing(false);
         this.mob.setMaxUpStep(0.6F);
+        this.mob.forceDash = false;
 
         if (this.mob.getAnimState() == 2 || this.mob.getAnimState() == 0) {
             if (this.mob.getAnimState() != 4) {
