@@ -1,0 +1,24 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, -0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "sandhand",
+					"pivot": [-0.5, 12, -1],
+					"cubes": [
+						{"origin": [-6, -26, -6.5], "size": [11, 24, 11], "pivot": [-0.5, -1, -1], "rotation": [0, 0, 180], "uv": [0, 0]}
+					]
+				}
+			]
+		}
+	]
+}

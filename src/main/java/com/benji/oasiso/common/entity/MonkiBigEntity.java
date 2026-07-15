@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,7 +29,7 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class MonkiBigEntity extends Monster implements GeoEntity {
+public class MonkiBigEntity extends Monster implements GeoEntity, GlowmaskEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(MonkiBigEntity.class, EntityDataSerializers.INT);
@@ -149,5 +150,14 @@ public class MonkiBigEntity extends Monster implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Override
+    public ResourceLocation getGlowmaskTexture() {
+
+        return ResourceLocation.fromNamespaceAndPath(
+                Oasiso.MODID,
+                "textures/entity/emissive/monki_big_emissive.png"
+        );
     }
 }

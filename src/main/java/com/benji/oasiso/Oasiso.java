@@ -7,6 +7,8 @@ import com.benji.oasiso.common.block.GenDecorateBlock;
 import com.benji.oasiso.common.block.OasisoFlowerBlock;
 import com.benji.oasiso.common.entity.MonkiBigEntity;
 import com.benji.oasiso.common.entity.MonkiEntity;
+import com.benji.oasiso.common.entity.SandHandEntity;
+import com.benji.oasiso.common.entity.TitanaEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
@@ -217,6 +219,16 @@ public class Oasiso {
                     .sized(1.75F, 3.75F)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "monki_big").toString()));
 
+    public static final RegistryObject<EntityType<TitanaEntity>> TITANA = ENTITIES.register("titana",
+            () -> EntityType.Builder.of(TitanaEntity::new, MobCategory.MONSTER)
+                    .sized(2.5F, 3.75F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "titana").toString()));
+
+    public static final RegistryObject<EntityType<SandHandEntity>> SAND_HAND = ENTITIES.register("sand_hand",
+            () -> EntityType.Builder.<SandHandEntity>of(SandHandEntity::new, MobCategory.MISC)
+                    .sized(1.5F, 2.0F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "sand_hand").toString()));
+
     //=====================
 
     public Oasiso(FMLJavaModLoadingContext context) {
@@ -263,6 +275,8 @@ public class Oasiso {
         public static void registerAttributes(EntityAttributeCreationEvent event) {
             event.put(MONKI.get(), MonkiEntity.createAttributes().build());
             event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
+            event.put(TITANA.get(), TitanaEntity.createAttributes().build());
+            event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
         }
     }
 }

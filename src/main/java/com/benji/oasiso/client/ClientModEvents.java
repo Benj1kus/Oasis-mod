@@ -1,9 +1,7 @@
 package com.benji.oasiso.client;
 
 import com.benji.oasiso.Oasiso;
-import com.benji.oasiso.client.renderer.DesertBallRenderer;
-import com.benji.oasiso.client.renderer.MonkiBigRenderer;
-import com.benji.oasiso.client.renderer.MonkiRenderer;
+import com.benji.oasiso.client.renderer.*;
 
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,6 +33,17 @@ public class ClientModEvents {
         event.registerEntityRenderer(
                 Oasiso.MONKI_BIG.get(),
                 MonkiBigRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                Oasiso.TITANA.get(),
+                TitanaRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
+                Oasiso.SAND_HAND.get(),
+                SandHandRenderer::new
         );
 
     }
