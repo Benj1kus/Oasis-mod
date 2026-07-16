@@ -45,8 +45,12 @@ public class DasherMeleeGoal extends Goal {
         this.attackTimer++;
         if (this.target != null) {
             this.mob.getLookControl().setLookAt(this.target, 30F, 30F);
+        }
 
-            if (this.attackTimer == 8 && this.mob.distanceToSqr(this.target) <= 25.0D) {
+        if (this.attackTimer == 8) {
+            this.mob.playSound(com.benji.oasiso.ModSounds.DASHER_ATTACK.get(), 1.0F, 1.0F);
+
+            if (this.target != null && this.mob.distanceToSqr(this.target) <= 25.0D) {
                 this.target.hurt(this.mob.damageSources().mobAttack(this.mob), (float) this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE));
             }
         }

@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.renderer.DasherTrailRenderer;
 import com.benji.oasiso.common.entity.ai.DasherDashGoal;
@@ -11,6 +12,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -97,25 +99,22 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
         boolean wasHurt = super.hurt(source, amount);
 
-        // Если урон прошел успешно, и это не снаряд, и мы не в процессе рывка
         if (wasHurt && !this.level().isClientSide && this.getAnimState() != 2) {
 
-            // Если здоровье упало ниже 50%, переходим в магнитную фазу
             if (!this.isMagnetic() && this.getHealth() <= this.getMaxHealth() / 2.0F) {
                 this.setAnimState(4);
                 this.changeTimer = 80;
                 this.setDashing(false);
                 this.getNavigation().stop();
-                this.hitCounter = 0; // Сбрасываем счетчик ударов при смене фазы
+                this.hitCounter = 0;
             }
-            // Иначе считаем удары для контрудара
             else if (this.getAnimState() != 4 && source.getDirectEntity() instanceof Player) {
                 this.hitCounter++;
-                this.hitResetTimer = 60; // Даем игроку 3 секунды, чтобы счетчик сбросился
+                this.hitResetTimer = 60;
 
                 if (this.hitCounter >= 3) {
-                    this.forceDash = true; // Даем сигнал ИИ начать рывок
-                    this.hitCounter = 0;   // Обнуляем счетчик
+                    this.forceDash = true;
+                    this.hitCounter = 0;
                 }
             }
         }
@@ -147,7 +146,6 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
                 }
             }
 
-            // Таймер сброса счетчика ударов
             if (this.hitResetTimer > 0) {
                 this.hitResetTimer--;
                 if (this.hitResetTimer == 0) {
@@ -191,6 +189,39 @@ public class DasherEntity extends Monster implements GeoEntity, GlowmaskEntity {
             }
             return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
         }));
+    }
+
+    @Override
+    public void playAmbientSound() {
+        SoundEvent sound = getAmbientSound();
+
+        if (sound != null) {
+            this.playSound(sound, 0.2F, 1.0F);
+        }
+    }
+
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {
+                ModSounds.DASHER1.get(),
+                ModSounds.DASHER2.get(),
+                ModSounds.DASHER3.get()
+        };
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.DASHER_HIT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.DASHER_DEATH.get();
     }
 
     @Override

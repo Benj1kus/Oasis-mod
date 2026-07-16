@@ -11,5 +11,34 @@
   "flowery10": { "sounds": [ "oasiso:flowery10" ] },
   "flowery11": { "sounds": [ "oasiso:flowery11" ] },
   "flowery12": { "sounds": [ "oasiso:flowery12" ] },
-  "flowery13": { "sounds": [ "oasiso:flowery13" ] }
+  "flowery13": { "sounds": [ "oasiso:flowery13" ] },
+
+  "monki1": { "sounds": [ "oasiso:monki1" ] },
+  "monki2": { "sounds": [ "oasiso:monki2" ] },
+  "monki3": { "sounds": [ "oasiso:monki3" ] },
+  "monki_hit": { "sounds": [ "oasiso:monki_hit" ] },
+  "monki_death": { "sounds": [ "oasiso:monki_death" ] },
+
+  "cacto1": { "sounds": [ "oasiso:cacto1" ] },
+  "cacto2": { "sounds": [ "oasiso:cacto2" ] },
+  "cacto3": { "sounds": [ "oasiso:cacto3" ] },
+  "cacto_hit": { "sounds": [ "oasiso:cacto_hit" ] },
+  "cacto_death": { "sounds": [ "oasiso:cacto_death" ] },
+
+  "dasher1": { "sounds": [ "oasiso:dasher1" ] },
+  "dasher2": { "sounds": [ "oasiso:dasher2" ] },
+  "dasher3": { "sounds": [ "oasiso:dasher3" ] },
+  "dasher_hit": { "sounds": [ "oasiso:dasher_hit" ] },
+  "dasher_attack": { "sounds": [ "oasiso:dasher_attack" ] },
+  "dash": { "sounds": [ "oasiso:dash" ] },
+  "dasher_death": { "sounds": [ "oasiso:dasher_death" ] },
+
+  "titana1": { "sounds": [ "oasiso:titana1" ] },
+  "titana2": { "sounds": [ "oasiso:titana2" ] },
+  "titana3": { "sounds": [ "oasiso:titana3" ] },
+  "titana_hit": { "sounds": [ "oasiso:titana_hit" ] },
+  "titana_attack": { "sounds": [ "oasiso:titana_attack" ] },
+  "desert_hand": { "sounds": [ "oasiso:desert_hand" ] },
+  "titana_step": { "sounds": [ "oasiso:titana_step" ] },
+  "titana_death": { "sounds": [ "oasiso:titana_death" ] }
 }

@@ -57,6 +57,7 @@ public class TitanaMeleeGoal extends Goal {
             if (this.attackAnimTimer == 12) {
                 if (distSqr <= reachSqr + 9.0D) {
                     boolean didHit = this.target.hurt(this.mob.damageSources().mobAttack(this.mob), (float) this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    this.mob.playSound(com.benji.oasiso.ModSounds.TITANA_ATTACK.get(), 1.0F, 1.0F);
 
                     if (didHit && !this.mob.level().isClientSide) {
                         createDenseShockwave();

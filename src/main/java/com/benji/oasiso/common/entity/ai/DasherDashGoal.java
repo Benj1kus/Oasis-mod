@@ -69,6 +69,7 @@ public class DasherDashGoal extends Goal {
             this.mob.setDashing(true);
             this.mob.setDeltaMovement(this.dashVector.x, 0, this.dashVector.z);
             this.mob.setMaxUpStep(2.0F);
+            this.mob.playSound(com.benji.oasiso.ModSounds.DASH.get(), 1.0F, 1.0F);
         }
 
         if (this.mob.isDashing()) {

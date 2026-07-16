@@ -3,6 +3,7 @@ package com.benji.oasiso.common.entity.ai;
 import com.benji.oasiso.common.entity.DasherEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -47,12 +48,14 @@ public class DasherMagneticGoal extends Goal {
         }
 
         if (this.attackTimer == 10) {
+            this.mob.playSound(com.benji.oasiso.ModSounds.DASHER_ATTACK.get(), 1.0F, 1.0F);
             createShockwave();
         }
     }
 
     private void createShockwave() {
         if (this.mob.level() instanceof ServerLevel sl) {
+            this.mob.playSound(SoundEvents.ANVIL_LAND, 1.0F, 1.8F);
             double px = this.mob.getX();
             double py = this.mob.getY() + 0.1;
             double pz = this.mob.getZ();

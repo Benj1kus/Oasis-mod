@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.CactoAttackGoal;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
@@ -8,6 +9,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -108,6 +111,37 @@ public class CactoEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
             return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
         }));
+    }
+
+    @Override
+    public void playAmbientSound() {
+        SoundEvent sound = getAmbientSound();
+
+        if (sound != null) {
+            this.playSound(sound, 0.2F, 1.0F);
+        }
+    }
+    
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {
+                ModSounds.CACTO1.get(),
+                ModSounds.CACTO2.get(),
+                ModSounds.CACTO3.get()
+        };
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.CACTO_HIT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.CACTO_DEATH.get();
     }
 
     @Override

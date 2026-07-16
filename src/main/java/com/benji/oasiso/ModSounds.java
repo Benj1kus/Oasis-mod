@@ -8,6 +8,39 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Oasiso.MODID);
 
+
+    //monki
+    public static final RegistryObject<SoundEvent> MONKI1 = registerSoundEvent("monki1");
+    public static final RegistryObject<SoundEvent> MONKI2 = registerSoundEvent("monki2");
+    public static final RegistryObject<SoundEvent> MONKI3 = registerSoundEvent("monki3");
+    public static final RegistryObject<SoundEvent> MONKI_HIT = registerSoundEvent("monki_hit");
+    public static final RegistryObject<SoundEvent> MONKI_DEATH = registerSoundEvent("monki_death");
+
+    //dasher
+    public static final RegistryObject<SoundEvent> DASHER1 = registerSoundEvent("dasher1");
+    public static final RegistryObject<SoundEvent> DASHER2 = registerSoundEvent("dasher2");
+    public static final RegistryObject<SoundEvent> DASHER3 = registerSoundEvent("dasher3");
+    public static final RegistryObject<SoundEvent> DASH = registerSoundEvent("dash");
+    public static final RegistryObject<SoundEvent> DASHER_HIT = registerSoundEvent("dasher_hit");
+    public static final RegistryObject<SoundEvent> DASHER_ATTACK = registerSoundEvent("dasher_attack");
+    public static final RegistryObject<SoundEvent> DASHER_DEATH = registerSoundEvent("dasher_death");
+
+    //titana
+    public static final RegistryObject<SoundEvent> TITANA1 = registerSoundEvent("titana1");
+    public static final RegistryObject<SoundEvent> TITANA2 = registerSoundEvent("titana2");
+    public static final RegistryObject<SoundEvent> TITANA3 = registerSoundEvent("titana3");
+    public static final RegistryObject<SoundEvent> TITANA_HIT = registerSoundEvent("titana_hit");
+    public static final RegistryObject<SoundEvent> TITANA_STEP = registerSoundEvent("titana_step");
+    public static final RegistryObject<SoundEvent> TITANA_ATTACK = registerSoundEvent("titana_attack");
+    public static final RegistryObject<SoundEvent> TITANA_DEATH = registerSoundEvent("titana_death");
+
+    //cacto
+    public static final RegistryObject<SoundEvent> CACTO1 = registerSoundEvent("cacto1");
+    public static final RegistryObject<SoundEvent> CACTO2 = registerSoundEvent("cacto2");
+    public static final RegistryObject<SoundEvent> CACTO3 = registerSoundEvent("cacto3");
+    public static final RegistryObject<SoundEvent> CACTO_HIT = registerSoundEvent("cacto_hit");
+    public static final RegistryObject<SoundEvent> CACTO_DEATH = registerSoundEvent("cacto_death");
+
     public static final RegistryObject<SoundEvent> FLOWERY1 = registerSoundEvent("flowery1");
     public static final RegistryObject<SoundEvent> FLOWERY2 = registerSoundEvent("flowery2");
     public static final RegistryObject<SoundEvent> FLOWERY3 = registerSoundEvent("flowery3");

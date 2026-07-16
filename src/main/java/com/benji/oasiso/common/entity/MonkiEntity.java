@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.MonkiMergeGoal;
 import com.benji.oasiso.common.entity.ai.MonkiSpecialAttackGoal;
@@ -8,6 +9,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -81,6 +84,28 @@ public class MonkiEntity extends Monster implements GeoEntity, GlowmaskEntity {
         if (this.mergeCooldown > 0) {
             this.mergeCooldown--;
         }
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {
+                ModSounds.MONKI1.get(),
+                ModSounds.MONKI2.get(),
+                ModSounds.MONKI3.get()
+        };
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.MONKI_HIT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.MONKI_DEATH.get();
     }
 
     @Nullable
