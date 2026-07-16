@@ -5,6 +5,7 @@ import com.benji.oasiso.client.renderer.MonkiRenderer;
 import com.benji.oasiso.common.block.*;
 import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
+import com.benji.oasiso.common.block.entity.StatueBlockEntity;
 import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
@@ -50,6 +51,10 @@ public class Oasiso {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
+    //HITBOXES
+    private static final net.minecraft.world.phys.shapes.VoxelShape MONKI_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 20.0D, 13.0D);
+    private static final net.minecraft.world.phys.shapes.VoxelShape DASHER_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 50.0D, 16.0D);
+    private static final net.minecraft.world.phys.shapes.VoxelShape TITANA_SHAPE = Block.box(-6.0D, 0.0D, -6.0D, 22.0D, 40.0D, 22.0D);
 
 // BLOCKS
 
@@ -214,10 +219,63 @@ public class Oasiso {
                     ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
             ));
 
+    public static final RegistryObject<Block> DASHER_STATUE = BLOCKS.register("dasher_statue",
+            () -> new StatueBlock(DASHER_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .strength(200.0F)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
+    public static final RegistryObject<Item> DASHER_STATUE_ITEM = ITEMS.register("dasher_statue",
+            () -> new GeoBlockItem(
+                    DASHER_STATUE.get(),
+                    new Item.Properties(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "geo/dasher_statue.geo.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/dasher_statue.png"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "animations/empty.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
+            ));
+
+    public static final RegistryObject<Block> MONKI_STATUE = BLOCKS.register("monki_statue",
+            () -> new StatueBlock(MONKI_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .strength(100.0F)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
+    public static final RegistryObject<Item> MONKI_STATUE_ITEM = ITEMS.register("monki_statue",
+            () -> new GeoBlockItem(
+                    MONKI_STATUE.get(),
+                    new Item.Properties(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "geo/monki_statue.geo.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/monki_statue.png"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "animations/empty.animation.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
+            ));
+
+    public static final RegistryObject<Block> TITANA_STATUE = BLOCKS.register("titana_statue",
+            () -> new StatueBlock(TITANA_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .strength(300.0F)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
+
+    public static final RegistryObject<Item> TITANA_STATUE_ITEM = ITEMS.register("titana_statue",
+            () -> new GeoBlockItem(
+                    TITANA_STATUE.get(),
+                    new Item.Properties(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "geo/titana_statue.geo.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/titana_statue.png"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "animations/empty.animation.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
+            ));
+
     //BLOCK ENTITIES
 
     public static final RegistryObject<BlockEntityType<StatBlockEntity>> STAT_BE = BLOCK_ENTITIES.register("stat",
             () -> BlockEntityType.Builder.of(StatBlockEntity::new, STAT.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<StatueBlockEntity>> STATUE_BE = BLOCK_ENTITIES.register("statue",
+            () -> BlockEntityType.Builder.of(StatueBlockEntity::new,
+                    MONKI_STATUE.get(), DASHER_STATUE.get(), TITANA_STATUE.get()
+            ).build(null));
 
     public static final RegistryObject<BlockEntityType<SandedChestBlockEntity>> SANDED_CHEST_BE = BLOCK_ENTITIES.register("sanded_chest",
             () -> BlockEntityType.Builder.of(SandedChestBlockEntity::new, SANDED_CHEST.get()).build(null));
@@ -338,6 +396,9 @@ public class Oasiso {
             event.accept(STAT_LANTERN_ITEM);
             event.accept(STAT);
             event.accept(SANDED_CHEST_ITEM);
+            event.accept(DASHER_STATUE_ITEM);
+            event.accept(TITANA_STATUE_ITEM);
+            event.accept(MONKI_STATUE_ITEM);
         }
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(CACTO_SPAWN_EGG);

@@ -12,6 +12,9 @@
     "oasiso:sandstone_corner",
     "oasiso:sandstone_line",
     "oasiso:stat_lantern",
-    "oasiso:stat"
+    "oasiso:stat",
+    "oasiso:dasher_statue",
+    "oasiso:titana_statue",
+    "oasiso:monki_statue"
   ]
 }

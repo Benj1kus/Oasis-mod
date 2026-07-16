@@ -13,7 +13,7 @@ public class SandedChestModel extends GeoModel<SandedChestBlockEntity> {
 
     @Override
     public ResourceLocation getTextureResource(SandedChestBlockEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/block/sanded_chest.png"); // Обрати внимание, я положил в папку block
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/block/sanded_chest.png");
     }
 
     @Override

@@ -1,5 +1,8 @@
 {
   "replace": false,
   "values": [
+    "oasiso:dasher_statue",
+    "oasiso:titana_statue",
+    "oasiso:monki_statue"
   ]
 }

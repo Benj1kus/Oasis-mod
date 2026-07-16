@@ -67,6 +67,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                Oasiso.STATUE_BE.get(),
+                StatueRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 Oasiso.SANDED_CHEST_BE.get(),
                 SandedChestRenderer::new
         );

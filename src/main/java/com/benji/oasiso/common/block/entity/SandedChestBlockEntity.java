@@ -62,10 +62,18 @@ public class SandedChestBlockEntity extends BlockEntity implements GeoBlockEntit
 
                 level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 3);
 
-                //loot table
+                // loot table
                 BlockEntity newBe = level.getBlockEntity(pos);
                 if (newBe instanceof ChestBlockEntity chestBe) {
                     chestBe.setLootTable(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "chests/sanded_chest_loot"), level.random.nextLong());
+                }
+
+                int radius = 15;
+                for (BlockPos targetPos : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
+                    BlockEntity targetBe = level.getBlockEntity(targetPos);
+                    if (targetBe instanceof StatueBlockEntity statue) {
+                        statue.startActivation();
+                    }
                 }
 
                 level.playSound(null, pos, SoundEvents.BRUSH_SAND_COMPLETED, SoundSource.BLOCKS, 1.0F, 1.0F);
