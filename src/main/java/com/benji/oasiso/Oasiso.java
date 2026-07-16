@@ -268,6 +268,39 @@ public class Oasiso {
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "cacto").toString()));
 
     //=====================
+    //SPAWN EGGS:
+    public static final RegistryObject<Item> MONKI_SPAWN_EGG = ITEMS.register("monki_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    MONKI,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> TITANA_SPAWN_EGG = ITEMS.register("titana_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    TITANA,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> CACTO_SPAWN_EGG = ITEMS.register("cacto_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    CACTO,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> DASHER_SPAWN_EGG = ITEMS.register("dasher_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    DASHER,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+//============================================
 
     public Oasiso(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
@@ -305,6 +338,13 @@ public class Oasiso {
             event.accept(STAT_LANTERN_ITEM);
             event.accept(STAT);
             event.accept(SANDED_CHEST_ITEM);
+        }
+        if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(CACTO_SPAWN_EGG);
+            event.accept(MONKI_SPAWN_EGG);
+            event.accept(TITANA_SPAWN_EGG);
+            event.accept(DASHER_SPAWN_EGG);
+
         }
     }
 

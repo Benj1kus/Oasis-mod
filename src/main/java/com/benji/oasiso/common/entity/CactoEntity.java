@@ -121,7 +121,7 @@ public class CactoEntity extends Monster implements GeoEntity, GlowmaskEntity {
             this.playSound(sound, 0.2F, 1.0F);
         }
     }
-    
+
     @Override
     protected SoundEvent getAmbientSound() {
 

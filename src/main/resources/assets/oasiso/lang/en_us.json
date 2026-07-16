@@ -17,12 +17,17 @@
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
 
+  "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
+  "item.oasiso.titana_spawn_egg": "Beetan the Hammerer Spawn Egg",
+  "item.oasiso.monki_spawn_egg": "Monki Spawn Egg",
+  "item.oasiso.dasher_spawn_egg": "D-asher Spawn Egg",
+
   "entity.oasiso.monki": "Monki",
   "entity.oasiso.monki_big": "Big Monki",
-  "entity.oasiso.titana": "Titana the Hammerer",
+  "entity.oasiso.titana": "Beetan the Hammerer",
   "entity.oasiso.sand_hand": "Sand hand",
   "entity.oasiso.desertball": "Sand ball",
-  "entity.oasiso.dasher": "Dasher",
+  "entity.oasiso.dasher": "D-asher",
   "entity.oasiso.cacto": "Cacto",
   "entity.oasiso.cacto_proj": "Cacto",
 
