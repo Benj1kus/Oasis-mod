@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID)
 public class SuperGoldAbilityHandler {
-    
+
     @SubscribeEvent
     public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
         handleAbilityTrigger(event.getEntity(), event.getHand());
@@ -82,15 +82,16 @@ public class SuperGoldAbilityHandler {
 
             for (LivingEntity target : sl.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(5.0D))) {
                 if (target != player) {
-                    target.setDeltaMovement(target.getDeltaMovement().add(0, 1.0D, 0));
+                    target.setDeltaMovement(target.getDeltaMovement().add(0, 3.0D, 0));
                     target.hasImpulse = true;
                     target.hurtMarked = true;
 
-                    target.hurt(sl.damageSources().playerAttack(player), 15.0F);
+                    target.hurt(sl.damageSources().playerAttack(player), 30.0F);
                 }
             }
         }
     }
+
     @SubscribeEvent
     public static void onPlayerTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
         if (event.phase == net.minecraftforge.event.TickEvent.Phase.END && event.player.level().isClientSide) {
@@ -100,11 +101,11 @@ public class SuperGoldAbilityHandler {
                 net.minecraft.world.item.Item chestItem = player.getItemBySlot(EquipmentSlot.CHEST).getItem();
 
                 boolean isCurrentlyOnCooldown = player.getCooldowns().isOnCooldown(chestItem);
-
                 boolean wasOnCooldown = player.getPersistentData().getBoolean("SuperGoldAbilityCooldown");
 
                 if (wasOnCooldown && !isCurrentlyOnCooldown) {
                     player.playSound(com.benji.oasiso.ModSounds.YES.get(), 1.0F, 1.0F);
+                    SuperGoldShockwaveRenderer.spawnSmallSandShockwave(player);
                 }
 
                 if (isCurrentlyOnCooldown != wasOnCooldown) {

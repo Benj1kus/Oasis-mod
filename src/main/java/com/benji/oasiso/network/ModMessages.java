@@ -24,7 +24,6 @@ public class ModMessages {
 
         INSTANCE = net;
 
-        // Регистрируем наш пакет ударной волны
         net.messageBuilder(SuperGoldShockwavePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(SuperGoldShockwavePacket::new)
                 .encoder(SuperGoldShockwavePacket::toBytes)

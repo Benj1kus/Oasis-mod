@@ -24,6 +24,15 @@
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
 
+  "item.oasiso.super_gold_helmet": "Karakol-um Helmet",
+  "item.oasiso.super_gold_chestplate": "Karakol-um Chestplate",
+  "item.oasiso.super_gold_leggings": "Karakol-um Leggings",
+  "item.oasiso.super_gold_boots": "Karakol-um Boots",
+
+  "item.oasiso.karakolit_ingot": "Karakolit Ingot",
+  "item.oasiso.nephritis": "Nephritis",
+  "item.oasiso.nephritis_core": "Nephritis Core",
+
   "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
   "item.oasiso.titana_spawn_egg": "Beetan the Hammerer Spawn Egg",
   "item.oasiso.monki_spawn_egg": "Monki Spawn Egg",

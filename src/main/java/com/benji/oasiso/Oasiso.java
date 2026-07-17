@@ -166,18 +166,6 @@ public class Oasiso {
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo",
             () -> new BlockItem(CACTULO.get(), new Item.Properties()));
 
-    public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(FLOWERY_ITEM.get()))
-                    .title(Component.translatable("creativetab.oasiso_tab"))
-                    .displayItems((parameters, output) -> {
-                        for (RegistryObject<Item> item : ITEMS.getEntries()) {
-                            output.accept(item.get());
-                        }
-                    })
-                    .build()
-    );
-
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase",
             () -> new GenDecorateBlock(
                     BlockBehaviour.Properties.copy(Blocks.DECORATED_POT)
@@ -277,6 +265,16 @@ public class Oasiso {
 
     public static final RegistryObject<Item> CACTOS_ITEM = ITEMS.register("cactos",
             () -> new BlockItem(CACTOS.get(), new Item.Properties()));
+//ITEMS:
+
+    public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot",
+            () -> new Item(new Item.Properties().stacksTo(64)));
+
+    public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis",
+            () -> new Item(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core",
+            () -> new Item(new Item.Properties().stacksTo(1)));
 
 //ARMOR:
 
@@ -386,6 +384,19 @@ public class Oasiso {
             ));
 //============================================
 
+    public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab",
+            () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(NEPHRITIS_CORE.get()))
+                    .title(Component.translatable("creativetab.oasiso_tab"))
+                    .displayItems((parameters, output) -> {
+                        for (RegistryObject<Item> item : ITEMS.getEntries()) {
+                            output.accept(item.get());
+                        }
+                    })
+                    .build()
+    );
+
+
     public Oasiso(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
 
@@ -446,6 +457,9 @@ public class Oasiso {
             event.accept(SUPER_GOLD_HELMET);
             event.accept(SUPER_GOLD_CHESTPLATE);
             event.accept(SUPER_GOLD_LEGGINGS);
+            event.accept(NEPHRITIS);
+            event.accept(NEPHRITIS_CORE);
+            event.accept(KARAKOLIT_INGOT);
         }
     }
 

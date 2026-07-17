@@ -38,14 +38,21 @@ public class SuperGoldShockwaveRenderer {
 
     private static final List<SandShockwave> SHOCKWAVES = new ArrayList<>();
 
-    // Вызываем этот метод для спавна 3-х кругов
     public static void spawnSandShockwave(Player player) {
-        Vec3 center = player.position().add(0, 0.1D, 0); // Чуть выше земли
+        Vec3 center = player.position().add(0, 0.1D, 0);
 
-        // Спавним 3 круга: первый сразу, второй через 3 тика, третий через 6 тиков
         SHOCKWAVES.add(new SandShockwave(center, 0, 5.0F));
         SHOCKWAVES.add(new SandShockwave(center, 3, 4.0F));
         SHOCKWAVES.add(new SandShockwave(center, 6, 3.0F));
+    }
+
+
+    public static void spawnSmallSandShockwave(Player player) {
+        Vec3 center = player.position().add(0, 0.1D, 0);
+
+        SHOCKWAVES.add(new SandShockwave(center, 0, 2.5F));
+        SHOCKWAVES.add(new SandShockwave(center, 3, 2.0F));
+        SHOCKWAVES.add(new SandShockwave(center, 6, 1.5F));
     }
 
     @SubscribeEvent
@@ -60,7 +67,7 @@ public class SuperGoldShockwaveRenderer {
             while (iterator.hasNext()) {
                 SandShockwave wave = iterator.next();
                 if (wave.delay > 0) {
-                    wave.delay--; // Ждем, пока пройдет задержка
+                    wave.delay--;
                 } else {
                     wave.age++;
                     if (wave.age >= wave.maxAge) {
@@ -105,20 +112,19 @@ public class SuperGoldShockwaveRenderer {
     }
 
     private static void drawSandRing(BufferBuilder buffer, Matrix4f matrix, SandShockwave wave, float partialTick) {
-        if (wave.delay > 0) return; // Не рисуем, если кольцо еще "в задержке"
+        if (wave.delay > 0) return;
 
         float progress = (wave.age + partialTick) / (float) wave.maxAge;
         if (progress > 1.0F) return;
 
-        float currentOuterRadius = wave.targetRadius * Math.min(1.0F, progress * 1.5F); // Быстрое расширение
-        float thickness = 1.0F * (1.0F - progress); // Кольцо становится тоньше со временем
+        float currentOuterRadius = wave.targetRadius * Math.min(1.0F, progress * 1.5F);
+        float thickness = 1.0F * (1.0F - progress);
         float currentInnerRadius = Math.max(0.0F, currentOuterRadius - thickness);
 
-        float heightOffset = progress * 1.5F; // Плавно поднимается на 1.5 блока вверх
+        float heightOffset = progress * 1.5F;
 
-        int alpha = (int) (200 * (1.0F - progress)); // Плавно исчезает
+        int alpha = (int) (200 * (1.0F - progress));
 
-        // Песчаные цвета (Градиент)
         int innerR = 237, innerG = 216, innerB = 148;
         int outerR = 210, outerG = 190, outerB = 120;
 
@@ -132,7 +138,6 @@ public class SuperGoldShockwaveRenderer {
             double cos = Math.cos(angle);
             double sin = Math.sin(angle);
 
-            // Кольцо лежит горизонтально в плоскости XZ
             Vec3 dirVec = new Vec3(cos, 0, sin);
 
             Vec3 innerPos = centerPos.add(dirVec.scale(currentInnerRadius));
