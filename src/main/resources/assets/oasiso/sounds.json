@@ -13,6 +13,8 @@
   "flowery12": { "sounds": [ "oasiso:flowery12" ] },
   "flowery13": { "sounds": [ "oasiso:flowery13" ] },
 
+  "yes": { "sounds": [ "oasiso:yes" ] },
+
   "monki1": { "sounds": [ "oasiso:monki1" ] },
   "monki2": { "sounds": [ "oasiso:monki2" ] },
   "monki3": { "sounds": [ "oasiso:monki3" ] },

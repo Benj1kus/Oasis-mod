@@ -41,6 +41,9 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> CACTO_HIT = registerSoundEvent("cacto_hit");
     public static final RegistryObject<SoundEvent> CACTO_DEATH = registerSoundEvent("cacto_death");
 
+
+    public static final RegistryObject<SoundEvent> YES = registerSoundEvent("yes");
+
     public static final RegistryObject<SoundEvent> FLOWERY1 = registerSoundEvent("flowery1");
     public static final RegistryObject<SoundEvent> FLOWERY2 = registerSoundEvent("flowery2");
     public static final RegistryObject<SoundEvent> FLOWERY3 = registerSoundEvent("flowery3");

@@ -10,6 +10,8 @@ import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.benji.oasiso.common.item.GeoBlockItem;
+import com.benji.oasiso.common.item.SuperGoldArmorItem;
+import com.benji.oasiso.network.ModMessages;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -31,6 +33,7 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -275,6 +278,20 @@ public class Oasiso {
     public static final RegistryObject<Item> CACTOS_ITEM = ITEMS.register("cactos",
             () -> new BlockItem(CACTOS.get(), new Item.Properties()));
 
+//ARMOR:
+
+    public static final RegistryObject<Item> SUPER_GOLD_HELMET = ITEMS.register("super_gold_helmet",
+            () -> new SuperGoldArmorItem(ArmorItem.Type.HELMET, new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> SUPER_GOLD_CHESTPLATE = ITEMS.register("super_gold_chestplate",
+            () -> new SuperGoldArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> SUPER_GOLD_LEGGINGS = ITEMS.register("super_gold_leggings",
+            () -> new SuperGoldArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> SUPER_GOLD_BOOTS = ITEMS.register("super_gold_boots",
+            () -> new SuperGoldArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1)));
+
 
     //BLOCK ENTITIES
 
@@ -380,9 +397,16 @@ public class Oasiso {
         CREATIVE_MODE_TABS.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
 
+        modEventBus.addListener(this::setup);
         modEventBus.addListener(this::addCreative);
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private void setup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            ModMessages.register();
+        });
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -416,6 +440,12 @@ public class Oasiso {
             event.accept(TITANA_SPAWN_EGG);
             event.accept(DASHER_SPAWN_EGG);
 
+        }
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(SUPER_GOLD_BOOTS);
+            event.accept(SUPER_GOLD_HELMET);
+            event.accept(SUPER_GOLD_CHESTPLATE);
+            event.accept(SUPER_GOLD_LEGGINGS);
         }
     }
 
