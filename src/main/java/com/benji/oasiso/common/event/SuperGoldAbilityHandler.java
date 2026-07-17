@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.event;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.renderer.SuperGoldShockwaveRenderer;
 import com.benji.oasiso.common.item.SuperGoldArmorItem;
@@ -63,7 +64,7 @@ public class SuperGoldAbilityHandler {
     public static void executeServerShockwave(Player player) {
         if (player.level() instanceof ServerLevel sl) {
 
-            sl.playSound(null, player.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1.0F, 1.8F);
+            sl.playSound(null, player.blockPosition(), ModSounds.TITANA_STEP.get(), SoundSource.PLAYERS, 30.0F, 1.8F);
 
             double px = player.getX();
             double py = player.getY() + 0.1;
@@ -104,7 +105,7 @@ public class SuperGoldAbilityHandler {
                 boolean wasOnCooldown = player.getPersistentData().getBoolean("SuperGoldAbilityCooldown");
 
                 if (wasOnCooldown && !isCurrentlyOnCooldown) {
-                    player.playSound(com.benji.oasiso.ModSounds.YES.get(), 1.0F, 1.0F);
+                    player.playSound(ModSounds.DASHER3.get(), 1.0F, 1.0F);
                     SuperGoldShockwaveRenderer.spawnSmallSandShockwave(player);
                 }
 

@@ -109,6 +109,23 @@ public class Oasiso {
     public static final RegistryObject<Item> SANDSTONE_FLOORB_ITEM = ITEMS.register("sandstone_floorb",
             () -> new BlockItem(SANDSTONE_FLOORB.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> KARAKOLIT_BLOCK = BLOCKS.register("karakolit_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)
+                    .strength(5.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> KARAKOLIT_BLOCK_ITEM = ITEMS.register("karakolit_block",
+            () -> new BlockItem(KARAKOLIT_BLOCK.get(), new Item.Properties()));
+
+
+    public static final RegistryObject<Block> NEPHRITIS_BLOCK = BLOCKS.register("nephritis_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_GOLD_BLOCK)
+                    .strength(5.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> NEPHRITIS_BLOCK_ITEM = ITEMS.register("nephritis_block",
+            () -> new BlockItem(NEPHRITIS_BLOCK.get(), new Item.Properties()));
+
     public static final RegistryObject<Block> SANDSTONE_ROOF = BLOCKS.register("sandstone_roof",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
@@ -434,6 +451,8 @@ public class Oasiso {
             event.accept(FLOWERY_ITEM);
             event.accept(CACTULO_ITEM);
             event.accept(CACTOS_ITEM);
+            event.accept(NEPHRITIS_BLOCK_ITEM);
+            event.accept(KARAKOLIT_BLOCK_ITEM);
 
         }
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
