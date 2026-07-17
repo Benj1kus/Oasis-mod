@@ -267,6 +267,15 @@ public class Oasiso {
                     ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
             ));
 
+    public static final RegistryObject<Block> CACTOS = BLOCKS.register("cactos",
+            () -> new CactosBlock(BlockBehaviour.Properties.copy(Blocks.CACTUS)
+                    .noOcclusion()
+                    .instabreak()));
+
+    public static final RegistryObject<Item> CACTOS_ITEM = ITEMS.register("cactos",
+            () -> new BlockItem(CACTOS.get(), new Item.Properties()));
+
+
     //BLOCK ENTITIES
 
     public static final RegistryObject<BlockEntityType<StatBlockEntity>> STAT_BE = BLOCK_ENTITIES.register("stat",
@@ -389,6 +398,7 @@ public class Oasiso {
             event.accept(SANDSTONE_COLUMN_ITEM);
             event.accept(FLOWERY_ITEM);
             event.accept(CACTULO_ITEM);
+            event.accept(CACTOS_ITEM);
 
         }
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {

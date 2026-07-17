@@ -1,6 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
 import com.benji.oasiso.common.entity.DasherEntity;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.EnumSet;
 
@@ -64,7 +66,20 @@ public class DasherMagneticGoal extends Goal {
                 double rad = Math.toRadians(i);
                 double dx = Math.cos(rad) * 3.5;
                 double dz = Math.sin(rad) * 3.5;
-                sl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, px + dx, py, pz + dz, 2, dx * 0.1, 0.1, dz * 0.1, 0.05);
+                sl.sendParticles(
+                        new BlockParticleOption(
+                                ParticleTypes.FALLING_DUST,
+                                Blocks.SAND.defaultBlockState()
+                        ),
+                        px + dx,
+                        py,
+                        pz + dz,
+                        2,
+                        dx * 0.1,
+                        0,
+                        dz * 0.1,
+                        0.05
+                );
             }
 
             for (LivingEntity e : this.mob.level().getEntitiesOfClass(LivingEntity.class, this.mob.getBoundingBox().inflate(6.0D))) {
