@@ -108,7 +108,7 @@ public class CactosBlock extends Block {
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        entity.hurt(level.damageSources().cactus(), 1.0F);
+        entity.hurt(level.damageSources().cactus(), 5.0F);
     }
 
     @Override

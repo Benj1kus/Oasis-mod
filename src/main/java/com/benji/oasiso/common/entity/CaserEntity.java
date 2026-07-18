@@ -47,7 +47,7 @@ public class CaserEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
     public static final EntityDataAccessor<Integer> SPIN_TICKS = SynchedEntityData.defineId(CaserEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<ItemStack> REWARD_ITEM = SynchedEntityData.defineId(CaserEntity.class, EntityDataSerializers.ITEM_STACK);
-    
+
     public static final EntityDataAccessor<Float> FIXED_YAW = SynchedEntityData.defineId(CaserEntity.class, EntityDataSerializers.FLOAT);
 
     private boolean hasFloated = false;

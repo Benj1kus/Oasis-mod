@@ -480,11 +480,14 @@ public class Oasiso {
             event.accept(DASHER_SPAWN_EGG);
 
         }
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(SUPER_GOLD_BOOTS);
             event.accept(SUPER_GOLD_HELMET);
             event.accept(SUPER_GOLD_CHESTPLATE);
             event.accept(SUPER_GOLD_LEGGINGS);
+            event.accept(TITANA_HAMMER);
+        }
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(NEPHRITIS);
             event.accept(NEPHRITIS_CORE);
             event.accept(KARAKOLIT_INGOT);

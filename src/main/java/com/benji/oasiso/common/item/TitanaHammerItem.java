@@ -66,7 +66,6 @@ public class TitanaHammerItem extends SwordItem implements GeoItem {
                 }
             }
 
-            // Сохраняем счетчик обратно в предмет
             stack.getOrCreateTag().putInt("TitanaHits", hits);
         }
         return super.hurtEnemy(stack, target, attacker);
