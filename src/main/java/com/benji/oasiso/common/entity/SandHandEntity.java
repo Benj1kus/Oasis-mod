@@ -18,10 +18,16 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 public class SandHandEntity extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private int lifeTicks = 0;
+    
+    private LivingEntity owner;
 
     public SandHandEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
         this.noPhysics = true;
+    }
+
+    public void setOwner(LivingEntity owner) {
+        this.owner = owner;
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -39,15 +45,19 @@ public class SandHandEntity extends PathfinderMob implements GeoEntity {
 
         if (this.lifeTicks == 5 && !this.level().isClientSide) {
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.5D))) {
-                if (entity instanceof Player player && !player.isCreative()) {
 
-                    boolean hit = player.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                if (entity == this || entity == this.owner) continue;
 
-                    if (hit) {
-                        player.setDeltaMovement(player.getDeltaMovement().add(0, 0.5D, 0));
-                        player.hurtMarked = true;
-                        player.hasImpulse = true;
-                    }
+                if (this.owner == null && !(entity instanceof Player)) continue;
+
+                if (entity instanceof Player player && player.isCreative()) continue;
+
+                boolean hit = entity.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+
+                if (hit) {
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0.5D, 0));
+                    entity.hurtMarked = true;
+                    entity.hasImpulse = true;
                 }
             }
         }

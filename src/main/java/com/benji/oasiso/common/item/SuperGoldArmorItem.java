@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.item;
 
+import com.benji.oasiso.Oasiso;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -36,7 +37,7 @@ public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
 
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(net.minecraft.world.item.Items.NETHERITE_INGOT) || super.isValidRepairItem(toRepair, repair);
+        return repair.is(Oasiso.KARAKOLIT_INGOT.get()) || super.isValidRepairItem(toRepair, repair);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.benji.oasiso.common.item.GeoBlockItem;
 import com.benji.oasiso.common.item.SuperGoldArmorItem;
+import com.benji.oasiso.common.item.TitanaHammerItem;
 import com.benji.oasiso.network.ModMessages;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
@@ -292,6 +293,9 @@ public class Oasiso {
 
     public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core",
             () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> TITANA_HAMMER = ITEMS.register("titana_hammer",
+            () -> new TitanaHammerItem(new Item.Properties().stacksTo(1)));
 
 //ARMOR:
 
