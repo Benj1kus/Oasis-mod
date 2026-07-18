@@ -64,7 +64,7 @@ public class SuperGoldAbilityHandler {
     public static void executeServerShockwave(Player player) {
         if (player.level() instanceof ServerLevel sl) {
 
-            sl.playSound(null, player.blockPosition(), ModSounds.TITANA_STEP.get(), SoundSource.PLAYERS, 30.0F, 1.8F);
+            sl.playSound(null, player.blockPosition(), ModSounds.MAGNETIC.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
             double px = player.getX();
             double py = player.getY() + 0.1;

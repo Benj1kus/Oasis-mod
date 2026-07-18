@@ -15,6 +15,8 @@
 
   "yes": { "sounds": [ "oasiso:yes" ] },
 
+  "magnetic": { "sounds": [ "oasiso:magnetic" ] },
+
   "monki1": { "sounds": [ "oasiso:monki1" ] },
   "monki2": { "sounds": [ "oasiso:monki2" ] },
   "monki3": { "sounds": [ "oasiso:monki3" ] },

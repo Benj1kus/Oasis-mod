@@ -741,7 +741,7 @@
 							"vector": [0, 0, 0]
 						},
 						"0.375": {
-							"vector": [0, 0, 2.5],
+							"vector": [0, 0, 0],
 							"easing": "easeInOutSine"
 						},
 						"0.4167": {

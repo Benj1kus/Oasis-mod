@@ -8,6 +8,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Oasiso.MODID);
 
+    public static final RegistryObject<SoundEvent> MAGNETIC = registerSoundEvent("magnetic");
+
 
     //monki
     public static final RegistryObject<SoundEvent> MONKI1 = registerSoundEvent("monki1");
