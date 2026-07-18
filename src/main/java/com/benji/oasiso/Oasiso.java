@@ -143,6 +143,14 @@ public class Oasiso {
     public static final RegistryObject<Item> SANDSTONE_BRICKED_ITEM = ITEMS.register("sandstone_bricked",
             () -> new BlockItem(SANDSTONE_BRICKED.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> SANDSTONE_AZAZEL = BLOCKS.register("sandstone_azazel",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
+                    .strength(2.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> SANDSTONE_AZAZEL_ITEM = ITEMS.register("sandstone_azazel",
+            () -> new BlockItem(SANDSTONE_AZAZEL.get(), new Item.Properties()));
+
 
     public static final RegistryObject<Block> SANDSTONE_CORNER = BLOCKS.register("sandstone_corner",
             () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
@@ -194,6 +202,16 @@ public class Oasiso {
 
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase",
             () -> new BlockItem(GEN_VASE.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue",
+            () -> new GenericDecorateBlock(
+                    BlockBehaviour.Properties.copy(Blocks.STONE)
+                            .sound(SoundType.NETHER_BRICKS)
+                            .strength(2.0F)
+                            .noOcclusion()));
+
+    public static final RegistryObject<Item> AZAZEL_DESERTSTATUE_ITEM = ITEMS.register("azazel_desertstatue",
+            () -> new BlockItem(AZAZEL_DESERTSTATUE.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> STAT_LANTERN = BLOCKS.register("stat_lantern",
             () -> new GenericDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
@@ -451,6 +469,7 @@ public class Oasiso {
             event.accept(SANDSTONE_BRICKED_ITEM);
             event.accept(SANDSTONE_LINE_ITEM);
             event.accept(SANDSTONE_CORNER_ITEM);
+            event.accept(SANDSTONE_AZAZEL_ITEM);
             event.accept(SANDSTONE_ROOF_ITEM);
             event.accept(SANDSTONE_FLOORB_ITEM);
             event.accept(SANDSTONE_TILES_ITEM);
@@ -471,6 +490,7 @@ public class Oasiso {
             event.accept(SANDED_CHEST_ITEM);
             event.accept(DASHER_STATUE_ITEM);
             event.accept(TITANA_STATUE_ITEM);
+            event.accept(AZAZEL_DESERTSTATUE_ITEM);
             event.accept(MONKI_STATUE_ITEM);
         }
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {

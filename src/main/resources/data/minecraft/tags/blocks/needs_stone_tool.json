@@ -12,6 +12,8 @@
     "oasiso:sandstone_corner",
     "oasiso:sandstone_line",
     "oasiso:stat_lantern",
-    "oasiso:stat"
+    "oasiso:stat",
+    "oasiso:sandstone_azazel",
+    "oasiso:azazel_desertstatue"
   ]
 }
