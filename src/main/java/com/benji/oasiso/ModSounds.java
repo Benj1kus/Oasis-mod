@@ -11,6 +11,15 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> MAGNETIC = registerSoundEvent("magnetic");
 
 
+    //caser
+    public static final RegistryObject<SoundEvent> CASER1 = registerSoundEvent("caser1");
+    public static final RegistryObject<SoundEvent> CASER2 = registerSoundEvent("caser2");
+    public static final RegistryObject<SoundEvent> CASER3 = registerSoundEvent("caser3");
+    public static final RegistryObject<SoundEvent> CASER_HIT = registerSoundEvent("caser_hit");
+    public static final RegistryObject<SoundEvent> CASER_DEFAULT= registerSoundEvent("caser_default");
+    public static final RegistryObject<SoundEvent> CASER_SUCCESS= registerSoundEvent("caser_success");
+    public static final RegistryObject<SoundEvent> CASER_SPIN= registerSoundEvent("caser_spin");
+
     //monki
     public static final RegistryObject<SoundEvent> MONKI1 = registerSoundEvent("monki1");
     public static final RegistryObject<SoundEvent> MONKI2 = registerSoundEvent("monki2");
@@ -61,6 +70,6 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> FLOWERY13 = registerSoundEvent("flowery13");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Oasiso.MODID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, name)));
     }
 }

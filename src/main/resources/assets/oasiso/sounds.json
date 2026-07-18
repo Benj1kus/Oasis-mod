@@ -17,6 +17,14 @@
 
   "magnetic": { "sounds": [ "oasiso:magnetic" ] },
 
+  "caser1": { "sounds": [ "oasiso:caser1" ] },
+  "caser2": { "sounds": [ "oasiso:caser2" ] },
+  "caser3": { "sounds": [ "oasiso:caser3" ] },
+  "caser_hit": { "sounds": [ "oasiso:caser_hit" ] },
+  "caser_default": { "sounds": [ "oasiso:caser_default" ] },
+  "caser_spin": { "sounds": [ "oasiso:caser_spin" ] },
+  "caser_success": { "sounds": [ "oasiso:caser_success" ] },
+
   "monki1": { "sounds": [ "oasiso:monki1" ] },
   "monki2": { "sounds": [ "oasiso:monki2" ] },
   "monki3": { "sounds": [ "oasiso:monki3" ] },

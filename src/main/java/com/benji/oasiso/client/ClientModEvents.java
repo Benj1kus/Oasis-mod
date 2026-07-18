@@ -46,6 +46,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                Oasiso.CASER.get(),
+                CaserRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.SAND_HAND.get(),
                 SandHandRenderer::new
         );

@@ -1,0 +1,166 @@
+{
+  "type": "minecraft:generic",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:titana_hammer",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:super_gold_helmet",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:super_gold_chestplate",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:super_gold_leggings",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:super_gold_boots",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherite_ingot",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:karakolit_ingot",
+          "weight": 8,
+          "functions": [{ "function": "minecraft:set_count", "count": 6 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:nephritis_core",
+          "weight": 6,
+          "functions": [{ "function": "minecraft:set_count", "count": 2 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:titana_statue",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:monki_statue",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:dasher_statue",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond",
+          "weight": 15,
+          "functions": [{ "function": "minecraft:set_count", "count": 5 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald",
+          "weight": 15,
+          "functions": [{ "function": "minecraft:set_count", "count": 3 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond_sword",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_sword",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_ingot",
+          "weight": 20,
+          "functions": [{ "function": "minecraft:set_count", "count": 16 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_ingot",
+          "weight": 20,
+          "functions": [{ "function": "minecraft:set_count", "count": 5 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:ender_pearl",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:obsidian",
+          "weight": 20,
+          "functions": [{ "function": "minecraft:set_count", "count": 2 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:flowery",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:cactulo",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "name": "oasiso:cactos",
+          "weight": 20,
+          "functions": [{ "function": "minecraft:set_count", "count": 8 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:dead_bush",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:sand",
+          "weight": 35,
+          "functions": [{ "function": "minecraft:set_count", "count": 10 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:spider_eye",
+          "weight": 35
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:rotten_flesh",
+          "weight": 35,
+          "functions": [{ "function": "minecraft:set_count", "count": 6 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:glass_bottle",
+          "weight": 35
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:stick",
+          "weight": 40,
+          "functions": [{ "function": "minecraft:set_count", "count": 12 }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:dandelion",
+          "weight": 35
+        }
+      ]
+    }
+  ]
+}
