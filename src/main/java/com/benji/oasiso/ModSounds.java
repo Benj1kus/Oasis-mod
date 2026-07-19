@@ -52,6 +52,14 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> CACTO_HIT = registerSoundEvent("cacto_hit");
     public static final RegistryObject<SoundEvent> CACTO_DEATH = registerSoundEvent("cacto_death");
 
+    //sandgolem
+
+    public static final RegistryObject<SoundEvent> SANDGOLEM1 = registerSoundEvent("sandgolem1");
+    public static final RegistryObject<SoundEvent> SANDGOLEM2 = registerSoundEvent("sandgolem2");
+    public static final RegistryObject<SoundEvent> SANDGOLEM3 = registerSoundEvent("sandgolem3");
+    public static final RegistryObject<SoundEvent> SANDGOLEM_HIT = registerSoundEvent("sandgolem_hit");
+    public static final RegistryObject<SoundEvent> SANDGOLEM_STEP = registerSoundEvent("sandgolem_step");
+
 
     public static final RegistryObject<SoundEvent> YES = registerSoundEvent("yes");
 

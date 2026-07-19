@@ -97,7 +97,7 @@ public class SandGolemEvents {
             }
         }
     }
-    
+
     private static boolean isSandstone(BlockState state) {
         return state.is(Blocks.SANDSTONE) || state.is(Blocks.CHISELED_SANDSTONE) || state.is(Blocks.CUT_SANDSTONE) || state.is(Blocks.SMOOTH_SANDSTONE);
     }

@@ -45,6 +45,12 @@
   "dash": { "sounds": [ "oasiso:dash" ] },
   "dasher_death": { "sounds": [ "oasiso:dasher_death" ] },
 
+  "sandgolem1": { "sounds": [ "oasiso:sandgolem1" ] },
+  "sandgolem2": { "sounds": [ "oasiso:sandgolem2" ] },
+  "sandgolem3": { "sounds": [ "oasiso:sandgolem3" ] },
+  "sandgolem_hit": { "sounds": [ "oasiso:sandgolem_hit" ] },
+  "sandgolem_step": { "sounds": [ "oasiso:sandgolem_step" ] },
+
   "titana1": { "sounds": [ "oasiso:titana1" ] },
   "titana2": { "sounds": [ "oasiso:titana2" ] },
   "titana3": { "sounds": [ "oasiso:titana3" ] },

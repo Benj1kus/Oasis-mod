@@ -30,6 +30,8 @@ public class ClientModEvents {
                 SandGolemRenderer::new
         );
 
+        event.registerEntityRenderer(net.minecraft.world.entity.EntityType.WANDERING_TRADER, com.benji.oasiso.client.renderer.DesertWanderingTraderRenderer::new);
+
         event.registerEntityRenderer(
                 Oasiso.DESERT_BALL.get(),
                 DesertBallRenderer::new
