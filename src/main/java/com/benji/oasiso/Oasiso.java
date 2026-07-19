@@ -373,6 +373,11 @@ public class Oasiso {
                     .sized(2.5F, 3.75F)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "titana").toString()));
 
+    public static final RegistryObject<EntityType<SandGolemEntity>> SAND_GOLEM = ENTITIES.register("sand_golem",
+            () -> EntityType.Builder.of(SandGolemEntity::new, MobCategory.MONSTER)
+                    .sized(2.5F, 3.75F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "sand_golem").toString()));
+
     public static final RegistryObject<EntityType<CaserEntity>> CASER = ENTITIES.register("caser",
             () -> EntityType.Builder.of(CaserEntity::new, MobCategory.CREATURE)
                     .sized(2.5F, 3.75F)
@@ -519,6 +524,7 @@ public class Oasiso {
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
             event.put(MONKI.get(), MonkiEntity.createAttributes().build());
+            event.put(SAND_GOLEM.get(), SandGolemEntity.createAttributes().build());
             event.put(CASER.get(), CaserEntity.createAttributes().build());
             event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
             event.put(TITANA.get(), TitanaEntity.createAttributes().build());

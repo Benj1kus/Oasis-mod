@@ -26,6 +26,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                Oasiso.SAND_GOLEM.get(),
+                SandGolemRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.DESERT_BALL.get(),
                 DesertBallRenderer::new
         );
