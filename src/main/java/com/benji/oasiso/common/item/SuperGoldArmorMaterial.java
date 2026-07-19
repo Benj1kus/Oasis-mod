@@ -15,7 +15,7 @@ public class SuperGoldArmorMaterial implements ArmorMaterial {
 
     @Override
     public int getDurabilityForType(ArmorItem.Type type) {
-        return HEALTH_PER_SLOT[type.ordinal()] * 45;
+        return HEALTH_PER_SLOT[type.ordinal()] * 35;
     }
 
     @Override
@@ -29,13 +29,20 @@ public class SuperGoldArmorMaterial implements ArmorMaterial {
     }
 
     @Override
-    public int getEnchantmentValue() { return 15; }
+    public int getEnchantmentValue() {
+
+        return 15;
+    }
 
     @Override
-    public SoundEvent getEquipSound() { return SoundEvents.ARMOR_EQUIP_LEATHER; }
+    public SoundEvent getEquipSound() {
+        return SoundEvents.ARMOR_EQUIP_GOLD;
+    }
 
     @Override
-    public Ingredient getRepairIngredient() { return Ingredient.of(Items.GOLD_INGOT); }
+    public Ingredient getRepairIngredient() {
+        return Ingredient.of((Oasiso.KARAKOLIT_INGOT.get()));
+    }
 
     @Override
     public String getName() {
@@ -44,9 +51,11 @@ public class SuperGoldArmorMaterial implements ArmorMaterial {
 
     @Override
     public float getToughness() {
-        return 5.0F;
+        return 2.5F;
     }
 
     @Override
-    public float getKnockbackResistance() { return 0.1F; }
+    public float getKnockbackResistance() {
+        return 0.05F;
+    }
 }
