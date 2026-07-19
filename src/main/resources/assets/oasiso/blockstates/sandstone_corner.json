@@ -1,19 +1,10 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "oasiso:block/sandstone_corner"
-    },
-    "facing=east": {
-      "model": "oasiso:block/sandstone_corner",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "oasiso:block/sandstone_corner",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "oasiso:block/sandstone_corner",
-      "y": 270
-    }
+    "facing=up":    { "model": "oasiso:block/sandstone_corner" },
+    "facing=down":  { "model": "oasiso:block/sandstone_corner", "x": 180 },
+    "facing=north": { "model": "oasiso:block/sandstone_corner", "x": 90 },
+    "facing=east":  { "model": "oasiso:block/sandstone_corner", "x": 90, "y": 90 },
+    "facing=south": { "model": "oasiso:block/sandstone_corner", "x": 90, "y": 180 },
+    "facing=west":  { "model": "oasiso:block/sandstone_corner", "x": 90, "y": 270 }
   }
 }

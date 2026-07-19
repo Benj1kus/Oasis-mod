@@ -153,7 +153,7 @@ public class Oasiso {
 
 
     public static final RegistryObject<Block> SANDSTONE_CORNER = BLOCKS.register("sandstone_corner",
-            () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
+            () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
                     .requiresCorrectToolForDrops()));
 
@@ -161,7 +161,7 @@ public class Oasiso {
             () -> new BlockItem(SANDSTONE_CORNER.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> SANDSTONE_LINE = BLOCKS.register("sandstone_line",
-            () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
+            () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
                     .requiresCorrectToolForDrops()));
 
