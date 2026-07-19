@@ -58,6 +58,10 @@ public class MonkiBigTornadoGoal extends Goal {
         this.mob.yBodyRot = this.lockedRot;
         this.mob.yHeadRot = this.lockedRot;
 
+        if (this.timer > 40) {
+            this.moveDir = this.moveDir.scale(0.85D);
+        }
+
         this.mob.setDeltaMovement(this.moveDir.x, this.mob.getDeltaMovement().y, this.moveDir.z);
     }
 
