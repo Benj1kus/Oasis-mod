@@ -55,7 +55,7 @@ public class AzazelDecorateBlock extends HorizontalDirectionalBlock {
         if (!state.is(newState.getBlock())) {
 
             if (!level.isClientSide) {
-                int radius = 15; // Тот же радиус в 15 блоков
+                int radius = 15;
 
                 for (BlockPos targetPos : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
                     BlockEntity targetBe = level.getBlockEntity(targetPos);
