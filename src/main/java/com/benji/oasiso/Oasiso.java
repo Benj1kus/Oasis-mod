@@ -204,7 +204,7 @@ public class Oasiso {
             () -> new BlockItem(GEN_VASE.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue",
-            () -> new GenericDecorateBlock(
+            () -> new AzazelDecorateBlock(
                     BlockBehaviour.Properties.copy(Blocks.STONE)
                             .sound(SoundType.NETHER_BRICKS)
                             .strength(2.0F)
