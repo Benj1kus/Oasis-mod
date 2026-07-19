@@ -149,7 +149,6 @@ public class StatBlockEntityRenderer implements BlockEntityRenderer<StatBlockEnt
         String path = id.getPath();
         String namespace = id.getNamespace();
 
-        // 1. Проверка на моды (Все предметы из сторонних модов)
         if (!namespace.equals("minecraft") && !namespace.equals("oasiso")) {
             return new GlowColor(255, 30, 30, 255, 180, 0); // Красно-Золотистый
         }

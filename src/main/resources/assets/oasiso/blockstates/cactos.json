@@ -8,17 +8,17 @@
     "axis=y,type=cross":      { "model": "oasiso:block/cactos_connector" },
 
     "axis=x,type=straight":   { "model": "oasiso:block/cactos", "x": 90, "y": 90 },
-    "axis=x,type=corner_0":   { "model": "oasiso:block/cactos_corner", "x": 90, "y": 90 },
+    "axis=x,type=corner_0":   { "model": "oasiso:block/cactos_corner", "x": 270, "y": 90 },
     "axis=x,type=corner_90":  { "model": "oasiso:block/cactos_corner", "x": 90, "y": 90 },
     "axis=x,type=corner_180": { "model": "oasiso:block/cactos_corner", "x": 90, "y": 270 },
-    "axis=x,type=corner_270": { "model": "oasiso:block/cactos_corner", "x": 90, "y": 0 },
+    "axis=x,type=corner_270": { "model": "oasiso:block/cactos_corner", "x": 270, "y": 270 },
     "axis=x,type=cross":      { "model": "oasiso:block/cactos_connector", "x": 90, "y": 90 },
 
     "axis=z,type=straight":   { "model": "oasiso:block/cactos", "x": 90 },
-    "axis=z,type=corner_0":   { "model": "oasiso:block/cactos_corner", "x": 90, "y": 0 },
+    "axis=z,type=corner_0":   { "model": "oasiso:block/cactos_corner", "x": 270 },
     "axis=z,type=corner_90":  { "model": "oasiso:block/cactos_corner", "x": 90 },
     "axis=z,type=corner_180": { "model": "oasiso:block/cactos_corner", "x": 90, "y": 180 },
-    "axis=z,type=corner_270": { "model": "oasiso:block/cactos_corner", "x": 90, "y": 270 },
+    "axis=z,type=corner_270": { "model": "oasiso:block/cactos_corner", "x": 270, "y": 180 },
     "axis=z,type=cross":      { "model": "oasiso:block/cactos_connector", "x": 90 }
   }
 }
