@@ -431,6 +431,22 @@ public class Oasiso {
                     0xFFFFFF,
                     new Item.Properties()
             ));
+
+    public static final RegistryObject<Item> CASER_SPAWN_EGG = ITEMS.register("caser_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    CASER,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> SAND_GOLEM_SPAWN_EGG = ITEMS.register("sand_golem_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    SAND_GOLEM,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
 //============================================
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab",
@@ -503,6 +519,8 @@ public class Oasiso {
             event.accept(MONKI_SPAWN_EGG);
             event.accept(TITANA_SPAWN_EGG);
             event.accept(DASHER_SPAWN_EGG);
+            event.accept(SAND_GOLEM_SPAWN_EGG);
+            event.accept(CASER_SPAWN_EGG);
 
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
