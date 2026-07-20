@@ -92,9 +92,8 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
     @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Monster.class, false, false));
         this.goalSelector.addGoal(2, new SandGolemAttackGoal(this));
-
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.8D));
     }
 
