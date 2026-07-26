@@ -96,6 +96,24 @@ public class CaserEntity extends Monster implements GeoEntity, GlowmaskEntity {
     }
 
     @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    protected void doPush(net.minecraft.world.entity.Entity entity) {
+    }
+
+    @Override
+    public void push(double x, double y, double z) {
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
+    }
+
+    @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
