@@ -1,5 +1,6 @@
 package com.benji.oasiso.client.renderer;
 
+import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.block.GenDecorateBlock;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -113,13 +114,11 @@ public class StatBlockEntityRenderer implements BlockEntityRenderer<StatBlockEnt
             float x2 = (float) Math.cos(angle2) * radius;
             float z2 = (float) Math.sin(angle2) * radius;
 
-            // Нижний сегмент: от прозрачного (Color1) на дне к плотному среднему цвету (ColorMid) по центру
             addVertex(buffer, matrix, x1, -height, z1, color.r1, color.g1, color.b1, 0);
             addVertex(buffer, matrix, x2, -height, z2, color.r1, color.g1, color.b1, 0);
             addVertex(buffer, matrix, x2, 0, z2, rMid, gMid, bMid, 140);
             addVertex(buffer, matrix, x1, 0, z1, rMid, gMid, bMid, 140);
 
-            // Верхний сегмент: от плотного среднего цвета (ColorMid) по центру к прозрачному (Color2) на вершине
             addVertex(buffer, matrix, x1, 0, z1, rMid, gMid, bMid, 140);
             addVertex(buffer, matrix, x2, 0, z2, rMid, gMid, bMid, 140);
             addVertex(buffer, matrix, x2, height, z2, color.r2, color.g2, color.b2, 0);
@@ -135,53 +134,55 @@ public class StatBlockEntityRenderer implements BlockEntityRenderer<StatBlockEnt
         buffer.vertex(matrix, x, y, z).color(r, g, b, a).endVertex();
     }
 
-    // Определяем цвета в зависимости от предмета
-// Определяем цвета в зависимости от предмета
     private GlowColor getGlowColor(ItemStack stack) {
-        // ИСПОЛЬЗУЕМ FORGE РЕГИСТР ДЛЯ 1.20.1
         ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
 
-        // На всякий случай делаем проверку на null, чтобы избежать крашей
         if (id == null) {
-            return new GlowColor(240, 240, 240, 120, 120, 130); // Бело-Серый по умолчанию
+            return new GlowColor(240, 240, 240, 120, 120, 130); // COMMON
         }
 
         String path = id.getPath();
         String namespace = id.getNamespace();
 
         if (!namespace.equals("minecraft") && !namespace.equals("oasiso")) {
-            return new GlowColor(255, 30, 30, 255, 180, 0); // Красно-Золотистый
+            return new GlowColor(255, 30, 30, 255, 180, 0); // MOD ITEMS
         }
 
-        // 2. Розово-Фиолетовый (Эпические / Легендарные / Незерит)
+        // LEGENDARY
         if (stack.is(Items.GOLDEN_APPLE) ||
                 stack.is(Items.ENCHANTED_GOLDEN_APPLE) ||
                 stack.is(Items.GOLDEN_CARROT) ||
                 stack.is(Items.TOTEM_OF_UNDYING) ||
                 stack.is(Items.END_CRYSTAL) ||
                 stack.is(Items.ELYTRA) ||
+                stack.is(Oasiso.SUPER_GOLD_HELMET.get()) ||
+                stack.is(Oasiso.SUPER_GOLD_BOOTS.get()) ||
+                stack.is(Oasiso.SUPER_GOLD_CHESTPLATE.get()) ||
+                stack.is(Oasiso.SUPER_GOLD_LEGGINGS.get()) ||
+                stack.is(Oasiso.TITANA_HAMMER.get()) ||
+                stack.is(Oasiso.KARAKOLIT_INGOT.get()) ||
+                stack.is(Oasiso.NEPHRITIS_CORE.get()) ||
                 stack.is(Items.TRIDENT) ||
                 path.contains("netherite")) {
-            return new GlowColor(230, 50, 230, 100, 30, 255); // Розово-Фиолетовый
+            return new GlowColor(230, 50, 230, 100, 30, 255);
         }
 
-        // 3. Желто-Оранжевый (Золотые инструменты и броня)
+        // GOLD
         if (path.contains("golden_") || path.startsWith("gold_")) {
-            // Исключаем золотые блоки и слитки, красим только экипировку/инструменты
             if (path.contains("sword") || path.contains("pickaxe") || path.contains("axe") ||
                     path.contains("shovel") || path.contains("hoe") || path.contains("helmet") ||
                     path.contains("chestplate") || path.contains("leggings") || path.contains("boots") ||
                     path.contains("horse_armor")) {
-                return new GlowColor(255, 180, 0, 255, 80, 0); // Желто-Оранжевый
+                return new GlowColor(255, 180, 0, 255, 80, 0);
             }
         }
 
-        // 4. Голубо-Синий (Алмазная броня и инструменты)
+        // DIAMOND
         if (path.contains("diamond")) {
-            return new GlowColor(0, 230, 255, 0, 50, 255); // Голубо-Синий
+            return new GlowColor(0, 230, 255, 0, 50, 255);
         }
 
-        // 5. По умолчанию: Бело-Серый (Обычные предметы)
-        return new GlowColor(240, 240, 240, 120, 120, 130); // Бело-Серый
+        // COMMON
+        return new GlowColor(240, 240, 240, 120, 120, 130);
     }
 }
