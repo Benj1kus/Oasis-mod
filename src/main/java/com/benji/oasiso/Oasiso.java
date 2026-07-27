@@ -21,10 +21,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -191,6 +188,25 @@ public class Oasiso {
 
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo",
             () -> new BlockItem(CACTULO.get(), new Item.Properties()));
+
+    //FLOWER POT
+    public static final RegistryObject<Block> POTTED_FLOWERY = BLOCKS.register("potted_flowery",
+            () -> new FlowerPotBlock(
+                    () -> (FlowerPotBlock) Blocks.FLOWER_POT,
+                    FLOWERY,
+                    BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION)
+                            .instabreak()
+                            .noOcclusion()
+            ));
+
+    public static final RegistryObject<Block> POTTED_CACTULO = BLOCKS.register("potted_cactulo",
+            () -> new FlowerPotBlock(
+                    () -> (FlowerPotBlock) Blocks.FLOWER_POT,
+                    CACTULO,
+                    BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION)
+                            .instabreak()
+                            .noOcclusion()
+            ));
 
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase",
             () -> new GenDecorateBlock(
@@ -482,6 +498,9 @@ public class Oasiso {
     private void setup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             ModMessages.register();
+
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(FLOWERY.getId(), POTTED_FLOWERY);
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(CACTULO.getId(), POTTED_CACTULO);
         });
     }
 
