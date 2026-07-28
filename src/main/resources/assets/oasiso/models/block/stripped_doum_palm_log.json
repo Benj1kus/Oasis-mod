@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "oasiso:block/stripped_doum_palm_log_top",
+    "side": "oasiso:block/stripped_doum_palm_log"
+  }
+}

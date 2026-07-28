@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "oasiso:entity/signs/doum_palm"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oasiso:entity/signs/hanging/doum_palm"
+    }
+  ]
+}

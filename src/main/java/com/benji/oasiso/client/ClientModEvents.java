@@ -16,13 +16,22 @@ import net.minecraftforge.fml.common.Mod;
 )
 public class ClientModEvents {
 
-
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
 
         event.registerEntityRenderer(
                 Oasiso.MONKI.get(),
                 MonkiRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                Oasiso.DOUM_PALM_SIGN_BE.get(),
+                net.minecraft.client.renderer.blockentity.SignRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                Oasiso.DOUM_PALM_HANGING_SIGN_BE.get(),
+                net.minecraft.client.renderer.blockentity.HangingSignRenderer::new
         );
 
         event.registerEntityRenderer(
@@ -35,6 +44,16 @@ public class ClientModEvents {
         event.registerEntityRenderer(
                 Oasiso.DESERT_BALL.get(),
                 DesertBallRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                Oasiso.DOUM_PALM_BOAT.get(),
+                context -> new DoumPalmBoatRenderer(context, false)
+        );
+
+        event.registerEntityRenderer(
+                Oasiso.DOUM_PALM_CHEST_BOAT.get(),
+                context -> new DoumPalmBoatRenderer(context, true)
         );
 
         event.registerEntityRenderer(

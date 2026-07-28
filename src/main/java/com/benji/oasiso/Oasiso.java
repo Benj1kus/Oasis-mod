@@ -9,6 +9,7 @@ import com.benji.oasiso.common.block.entity.StatueBlockEntity;
 import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
+import com.benji.oasiso.common.item.DoumPalmBoatItem;
 import com.benji.oasiso.common.item.GeoBlockItem;
 import com.benji.oasiso.common.item.SuperGoldArmorItem;
 import com.benji.oasiso.common.item.TitanaHammerItem;
@@ -51,6 +52,16 @@ public class Oasiso {
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
+
+    public static final net.minecraft.world.level.block.state.properties.BlockSetType DOUM_PALM_SET_TYPE =
+            net.minecraft.world.level.block.state.properties.BlockSetType.register(
+                    new net.minecraft.world.level.block.state.properties.BlockSetType(Oasiso.MODID + ":doum_palm")
+            );
+
+    public static final net.minecraft.world.level.block.state.properties.WoodType DOUM_PALM_WOOD_TYPE =
+            net.minecraft.world.level.block.state.properties.WoodType.register(
+                    new net.minecraft.world.level.block.state.properties.WoodType(Oasiso.MODID + ":doum_palm", DOUM_PALM_SET_TYPE)
+            );
 
     //HITBOXES
     private static final net.minecraft.world.phys.shapes.VoxelShape MONKI_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 20.0D, 13.0D);
@@ -463,6 +474,154 @@ public class Oasiso {
                     0xFFFFFF,
                     new Item.Properties()
             ));
+
+
+    // NEW WOOD TYPE:
+
+    // BLOCKS DOUM PALM
+    public static final RegistryObject<Block> DOUM_PALM_LOG = BLOCKS.register("doum_palm_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
+
+    public static final RegistryObject<Block> DOUM_PALM_WOOD = BLOCKS.register("doum_palm_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WOOD)));
+
+    public static final RegistryObject<Block> STRIPPED_DOUM_PALM_LOG = BLOCKS.register("stripped_doum_palm_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_LOG)));
+
+    public static final RegistryObject<Block> STRIPPED_DOUM_PALM_WOOD = BLOCKS.register("stripped_doum_palm_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_WOOD)));
+
+    public static final RegistryObject<Block> DOUM_PALM_PLANKS = BLOCKS.register("doum_palm_planks",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.JUNGLE_PLANKS)));
+
+    public static final RegistryObject<Block> DOUM_PALM_SLAB = BLOCKS.register("doum_palm_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_SLAB)));
+
+    public static final RegistryObject<Block> DOUM_PALM_STAIRS = BLOCKS.register("doum_palm_stairs",
+            () -> new StairBlock(
+                    () -> DOUM_PALM_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(Blocks.JUNGLE_STAIRS)
+            ));
+
+
+    public static final RegistryObject<Block> DOUM_PALM_LEAVES = BLOCKS.register("doum_palm_leaves",
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LEAVES).noOcclusion()));
+
+    public static final RegistryObject<Block> DOUM_PALM_SAPLING = BLOCKS.register("doum_palm_sapling",
+            () -> new SaplingBlock(
+                    new net.minecraft.world.level.block.grower.JungleTreeGrower(),
+                    BlockBehaviour.Properties.copy(Blocks.JUNGLE_SAPLING)
+            ));
+
+    public static final RegistryObject<Block> DOUM_PALM_DOOR = BLOCKS.register("doum_palm_door",
+            () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_DOOR), net.minecraft.world.level.block.state.properties.BlockSetType.JUNGLE));
+
+    public static final RegistryObject<Block> DOUM_PALM_TRAPDOOR = BLOCKS.register("doum_palm_trapdoor",
+            () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_TRAPDOOR), net.minecraft.world.level.block.state.properties.BlockSetType.JUNGLE));
+
+    public static final RegistryObject<Block> DOUM_PALM_FENCE = BLOCKS.register("doum_palm_fence",
+            () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_FENCE)));
+
+    public static final RegistryObject<Block> DOUM_PALM_FENCE_GATE = BLOCKS.register("doum_palm_fence_gate",
+            () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_FENCE_GATE), Oasiso.DOUM_PALM_WOOD_TYPE));
+
+    public static final RegistryObject<Block> DOUM_PALM_BUTTON = BLOCKS.register("doum_palm_button",
+            () -> new ButtonBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_BUTTON),
+                    net.minecraft.world.level.block.state.properties.BlockSetType.JUNGLE, 30, true));
+
+    public static final RegistryObject<Block> DOUM_PALM_PRESSURE_PLATE = BLOCKS.register("doum_palm_pressure_plate",
+            () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,
+                    BlockBehaviour.Properties.copy(Blocks.JUNGLE_PRESSURE_PLATE),
+                    net.minecraft.world.level.block.state.properties.BlockSetType.JUNGLE));
+
+    public static final RegistryObject<Block> DOUM_PALM_SIGN = BLOCKS.register("doum_palm_sign",
+            () -> new StandingSignBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_SIGN), Oasiso.DOUM_PALM_WOOD_TYPE) {
+                @Override
+                public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+                    return new com.benji.oasiso.common.block.entity.DoumPalmSignBlockEntity(pos, state);
+                }
+            });
+
+    public static final RegistryObject<Block> DOUM_PALM_WALL_SIGN = BLOCKS.register("doum_palm_wall_sign",
+            () -> new WallSignBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WALL_SIGN), Oasiso.DOUM_PALM_WOOD_TYPE) {
+                @Override
+                public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+                    return new com.benji.oasiso.common.block.entity.DoumPalmSignBlockEntity(pos, state);
+                }
+            });
+
+    public static final RegistryObject<Block> DOUM_PALM_HANGING_SIGN = BLOCKS.register("doum_palm_hanging_sign",
+            () -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_HANGING_SIGN), Oasiso.DOUM_PALM_WOOD_TYPE) {
+                @Override
+                public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+                    return new com.benji.oasiso.common.block.entity.DoumPalmHangingSignBlockEntity(pos, state);
+                }
+            });
+
+    public static final RegistryObject<Block> DOUM_PALM_WALL_HANGING_SIGN = BLOCKS.register("doum_palm_wall_hanging_sign",
+            () -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WALL_HANGING_SIGN), Oasiso.DOUM_PALM_WOOD_TYPE) {
+                @Override
+                public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+                    return new com.benji.oasiso.common.block.entity.DoumPalmHangingSignBlockEntity(pos, state);
+                }
+            });
+
+
+    // ITEMS DOUM PALM
+    public static final RegistryObject<Item> DOUM_PALM_SIGN_ITEM = ITEMS.register("doum_palm_sign",
+            () -> new SignItem(new Item.Properties().stacksTo(16), DOUM_PALM_SIGN.get(), DOUM_PALM_WALL_SIGN.get()));
+
+    public static final RegistryObject<Item> DOUM_PALM_HANGING_SIGN_ITEM = ITEMS.register("doum_palm_hanging_sign",
+            () -> new HangingSignItem(DOUM_PALM_HANGING_SIGN.get(), DOUM_PALM_WALL_HANGING_SIGN.get(), new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<BlockEntityType<com.benji.oasiso.common.block.entity.DoumPalmSignBlockEntity>> DOUM_PALM_SIGN_BE = BLOCK_ENTITIES.register("doum_palm_sign",
+            () -> BlockEntityType.Builder.of(com.benji.oasiso.common.block.entity.DoumPalmSignBlockEntity::new, DOUM_PALM_SIGN.get(), DOUM_PALM_WALL_SIGN.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<com.benji.oasiso.common.block.entity.DoumPalmHangingSignBlockEntity>> DOUM_PALM_HANGING_SIGN_BE = BLOCK_ENTITIES.register("doum_palm_hanging_sign",
+            () -> BlockEntityType.Builder.of(com.benji.oasiso.common.block.entity.DoumPalmHangingSignBlockEntity::new, DOUM_PALM_HANGING_SIGN.get(), DOUM_PALM_WALL_HANGING_SIGN.get()).build(null));
+
+    public static final RegistryObject<Item> DOUM_PALM_BUTTON_ITEM = ITEMS.register("doum_palm_button",
+            () -> new BlockItem(DOUM_PALM_BUTTON.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> DOUM_PALM_PRESSURE_PLATE_ITEM = ITEMS.register("doum_palm_pressure_plate",
+            () -> new BlockItem(DOUM_PALM_PRESSURE_PLATE.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> DOUM_PALM_SLAB_ITEM = ITEMS.register("doum_palm_slab", () -> new BlockItem(DOUM_PALM_SLAB.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_STAIRS_ITEM = ITEMS.register("doum_palm_stairs", () -> new BlockItem(DOUM_PALM_STAIRS.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> DOUM_PALM_WOOD_ITEM = ITEMS.register("doum_palm_wood", () -> new BlockItem(DOUM_PALM_WOOD.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STRIPPED_DOUM_PALM_WOOD_ITEM = ITEMS.register("stripped_doum_palm_wood", () -> new BlockItem(STRIPPED_DOUM_PALM_WOOD.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_LOG_ITEM = ITEMS.register("doum_palm_log", () -> new BlockItem(DOUM_PALM_LOG.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STRIPPED_DOUM_PALM_LOG_ITEM = ITEMS.register("stripped_doum_palm_log", () -> new BlockItem(STRIPPED_DOUM_PALM_LOG.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_PLANKS_ITEM = ITEMS.register("doum_palm_planks", () -> new BlockItem(DOUM_PALM_PLANKS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_LEAVES_ITEM = ITEMS.register("doum_palm_leaves", () -> new BlockItem(DOUM_PALM_LEAVES.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_SAPLING_ITEM = ITEMS.register("doum_palm_sapling", () -> new BlockItem(DOUM_PALM_SAPLING.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_DOOR_ITEM = ITEMS.register("doum_palm_door", () -> new BlockItem(DOUM_PALM_DOOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_TRAPDOOR_ITEM = ITEMS.register("doum_palm_trapdoor", () -> new BlockItem(DOUM_PALM_TRAPDOOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_FENCE_ITEM = ITEMS.register("doum_palm_fence", () -> new BlockItem(DOUM_PALM_FENCE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DOUM_PALM_FENCE_GATE_ITEM = ITEMS.register("doum_palm_fence_gate", () -> new BlockItem(DOUM_PALM_FENCE_GATE.get(), new Item.Properties()));
+
+
+
+    //BOAT
+
+    public static final RegistryObject<EntityType<DoumPalmBoatEntity>> DOUM_PALM_BOAT = ENTITIES.register("doum_palm_boat",
+            () -> EntityType.Builder.<DoumPalmBoatEntity>of(DoumPalmBoatEntity::new, MobCategory.MISC)
+                    .sized(1.375F, 0.5625F)
+                    .clientTrackingRange(10)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "doum_palm_boat").toString()));
+
+    public static final RegistryObject<EntityType<DoumPalmChestBoatEntity>> DOUM_PALM_CHEST_BOAT = ENTITIES.register("doum_palm_chest_boat",
+            () -> EntityType.Builder.<DoumPalmChestBoatEntity>of(DoumPalmChestBoatEntity::new, MobCategory.MISC)
+                    .sized(1.375F, 0.5625F)
+                    .clientTrackingRange(10)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "doum_palm_chest_boat").toString()));
+
+    public static final RegistryObject<Item> DOUM_PALM_BOAT_ITEM = ITEMS.register("doum_palm_boat",
+            () -> new DoumPalmBoatItem(false, new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> DOUM_PALM_CHEST_BOAT_ITEM = ITEMS.register("doum_palm_chest_boat",
+            () -> new DoumPalmBoatItem(true, new Item.Properties().stacksTo(1)));
 //============================================
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab",
@@ -476,7 +635,6 @@ public class Oasiso {
                     })
                     .build()
     );
-
 
     public Oasiso(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
@@ -498,7 +656,6 @@ public class Oasiso {
     private void setup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             ModMessages.register();
-
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(FLOWERY.getId(), POTTED_FLOWERY);
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(CACTULO.getId(), POTTED_CACTULO);
         });
@@ -568,6 +725,23 @@ public class Oasiso {
             event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
             event.put(DASHER.get(), DasherEntity.createAttributes().build());
             event.put(CACTO.get(), CactoEntity.createAttributes().build());
+        }
+    }
+
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ForgeEvents {
+        @SubscribeEvent
+        public static void onToolModification(net.minecraftforge.event.level.BlockEvent.BlockToolModificationEvent event) {
+            if (event.getToolAction() == net.minecraftforge.common.ToolActions.AXE_STRIP) {
+                if (event.getState().is(DOUM_PALM_LOG.get())) {
+                    event.setFinalState(STRIPPED_DOUM_PALM_LOG.get().defaultBlockState()
+                            .setValue(RotatedPillarBlock.AXIS, event.getState().getValue(RotatedPillarBlock.AXIS)));
+                }
+                else if (event.getState().is(DOUM_PALM_WOOD.get())) {
+                    event.setFinalState(STRIPPED_DOUM_PALM_WOOD.get().defaultBlockState()
+                            .setValue(RotatedPillarBlock.AXIS, event.getState().getValue(RotatedPillarBlock.AXIS)));
+                }
+            }
         }
     }
 }

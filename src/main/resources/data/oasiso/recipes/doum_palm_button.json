@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "wooden_button",
+  "ingredients": [
+    {
+      "item": "oasiso:doum_palm_planks"
+    }
+  ],
+  "result": {
+    "item": "oasiso:doum_palm_button"
+  }
+}

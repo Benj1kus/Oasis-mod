@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "oasiso:block/doum_palm_slab"
+    },
+    "type=double": {
+      "model": "oasiso:block/doum_palm_planks"
+    },
+    "type=top": {
+      "model": "oasiso:block/doum_palm_slab_top"
+    }
+  }
+}
