@@ -25,6 +25,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                Oasiso.LIE_BLOCK_BE.get(),
+                com.benji.oasiso.client.renderer.LieBlockRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 Oasiso.DOUM_PALM_SIGN_BE.get(),
                 net.minecraft.client.renderer.blockentity.SignRenderer::new
         );

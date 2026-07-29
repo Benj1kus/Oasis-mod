@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "mimicking=false": { "model": "oasiso:block/lie_block" },
+    "mimicking=true": { "model": "oasiso:block/lie_block" }
+  }
+}

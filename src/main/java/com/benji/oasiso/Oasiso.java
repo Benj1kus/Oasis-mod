@@ -70,6 +70,17 @@ public class Oasiso {
 
 // BLOCKS
 
+    public static final RegistryObject<Block> LIE_BLOCK = BLOCKS.register("lie_block",
+            () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_BRICKS)
+                    .strength(2.0F)
+                    .noOcclusion()
+                    .dynamicShape()
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> LIE_BLOCK_ITEM = ITEMS.register("lie_block",
+            () -> new BlockItem(LIE_BLOCK.get(), new Item.Properties()));
+
+
     public static final RegistryObject<Block> SANDSTONE_TILES = BLOCKS.register("sandstone_tiles",
             () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
@@ -367,6 +378,9 @@ public class Oasiso {
                     MONKI_STATUE.get(), DASHER_STATUE.get(), TITANA_STATUE.get()
             ).build(null));
 
+    public static final RegistryObject<BlockEntityType<com.benji.oasiso.common.block.entity.LieBlockEntity>> LIE_BLOCK_BE = BLOCK_ENTITIES.register("lie_block",
+            () -> BlockEntityType.Builder.of(com.benji.oasiso.common.block.entity.LieBlockEntity::new, LIE_BLOCK.get()).build(null));
+
     public static final RegistryObject<BlockEntityType<SandedChestBlockEntity>> SANDED_CHEST_BE = BLOCK_ENTITIES.register("sanded_chest",
             () -> BlockEntityType.Builder.of(SandedChestBlockEntity::new, SANDED_CHEST.get()).build(null));
     //============================
@@ -502,7 +516,6 @@ public class Oasiso {
                     () -> DOUM_PALM_PLANKS.get().defaultBlockState(),
                     BlockBehaviour.Properties.copy(Blocks.JUNGLE_STAIRS)
             ));
-
 
     public static final RegistryObject<Block> DOUM_PALM_LEAVES = BLOCKS.register("doum_palm_leaves",
             () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LEAVES).noOcclusion()));
