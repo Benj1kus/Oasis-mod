@@ -93,9 +93,6 @@ public class LieBlock extends BaseEntityBlock {
                 }
 
                 Block.popResource(level, pos, new ItemStack(lieBE.getMimicState().getBlock()));
-                if (lieBE.isPhasing()) {
-                    Block.popResource(level, pos, new ItemStack(Oasiso.NEPHRITIS_CORE.get()));
-                }
 
                 lieBE.setMimicState(null);
                 lieBE.setPhasing(false);
