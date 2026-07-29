@@ -71,7 +71,7 @@ public class Oasiso {
 // BLOCKS
 
     public static final RegistryObject<Block> LIE_BLOCK = BLOCKS.register("lie_block",
-            () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_BRICKS)
+            () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.CALCITE)
                     .strength(2.0F)
                     .noOcclusion()
                     .dynamicShape()

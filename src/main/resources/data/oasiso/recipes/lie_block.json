@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#=#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "oasiso:karakolit_ingot"
+    },
+    "=":{
+      "item": "oasiso:doum_palm_wood"
+    }
+  },
+  "result": {
+    "item": "oasiso:lie_block"
+  }
+}

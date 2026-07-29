@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:lantern"
+    },
+    {
+      "item": "oasiso:stat"
+    }
+  ],
+  "result": {
+    "item": "oasiso:stat_lantern"
+  }
+}
