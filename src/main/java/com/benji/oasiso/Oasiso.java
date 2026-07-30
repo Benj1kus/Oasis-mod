@@ -241,6 +241,18 @@ public class Oasiso {
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase",
             () -> new BlockItem(GEN_VASE.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> BALL_CACTUS = BLOCKS.register("ball_cactus",
+            () -> new com.benji.oasiso.common.block.BallCactusBlock( // <--- Полный путь здесь!
+                    BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)
+                            .sound(SoundType.WOOL )
+                            .instabreak()
+                            .noOcclusion()
+                            .randomTicks()
+            ));
+
+    public static final RegistryObject<Item> BALL_CACTUS_ITEM = ITEMS.register("ball_cactus",
+            () -> new BlockItem(BALL_CACTUS.get(), new Item.Properties()));
+
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue",
             () -> new AzazelDecorateBlock(
                     BlockBehaviour.Properties.copy(Blocks.STONE)
@@ -521,7 +533,7 @@ public class Oasiso {
             () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LEAVES).noOcclusion()));
 
     public static final RegistryObject<Block> DOUM_PALM_SAPLING = BLOCKS.register("doum_palm_sapling",
-            () -> new SaplingBlock(
+            () -> new com.benji.oasiso.common.block.DoumPalmSaplingBlock(
                     new net.minecraft.world.level.block.grower.JungleTreeGrower(),
                     BlockBehaviour.Properties.copy(Blocks.JUNGLE_SAPLING)
             ));
