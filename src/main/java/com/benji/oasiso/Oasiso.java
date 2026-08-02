@@ -6,13 +6,11 @@ import com.benji.oasiso.common.block.*;
 import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
 import com.benji.oasiso.common.block.entity.StatueBlockEntity;
+import com.benji.oasiso.common.effect.BombulBuffEffect;
 import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
-import com.benji.oasiso.common.item.DoumPalmBoatItem;
-import com.benji.oasiso.common.item.GeoBlockItem;
-import com.benji.oasiso.common.item.SuperGoldArmorItem;
-import com.benji.oasiso.common.item.TitanaHammerItem;
+import com.benji.oasiso.common.item.*;
 import com.benji.oasiso.network.ModMessages;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
@@ -83,8 +81,26 @@ public class Oasiso {
     public static final RegistryObject<MobEffect> ENTROPY_EFFECT =
             MOB_EFFECTS.register("entropy", EntropyEffect::new);
 
+    public static final RegistryObject<MobEffect> BOMBUL_BUFF_EFFECT =
+            MOB_EFFECTS.register(
+                    "bombul_buff",
+                    BombulBuffEffect::new
+            );
+
     public static final RegistryObject<SimpleParticleType> PURPLE_STARS =
             PARTICLES.register("purple_stars", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> GOLDEN_STARS =
+            PARTICLES.register(
+                    "golden_stars",
+                    () -> new SimpleParticleType(false)
+            );
+
+    public static final RegistryObject<SimpleParticleType> GOLDEN_HEART =
+            PARTICLES.register(
+                    "golden_heart",
+                    () -> new SimpleParticleType(false)
+            );
 
 // BLOCKS
 
@@ -399,6 +415,22 @@ public class Oasiso {
     public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> BOMBUL_BOTTLE =
+            ITEMS.register(
+                    "bombul_bottle",
+                    () -> new BombulBottleItem(
+                            new Item.Properties().stacksTo(1)
+                    )
+            );
+
+    public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY =
+            ITEMS.register(
+                    "bombul_bottle_empty",
+                    () -> new Item(
+                            new Item.Properties().stacksTo(16)
+                    )
+            );
+
     public static final RegistryObject<Item> TITANA_HAMMER = ITEMS.register("titana_hammer",
             () -> new TitanaHammerItem(new Item.Properties().stacksTo(1)));
 
@@ -482,6 +514,11 @@ public class Oasiso {
             () -> EntityType.Builder.of(DasherEntity::new, MobCategory.MONSTER)
                     .sized(1.25F, 5.0F)
                     .build(ResourceLocation.fromNamespaceAndPath(MODID, "dasher").toString()));
+
+    public static final RegistryObject<EntityType<BombulEntity>> BOMBUL = ENTITIES.register("bombul",
+            () -> EntityType.Builder.of(BombulEntity::new, MobCategory.MONSTER)
+                    .sized(1.25F, 3.0F)
+                    .build(ResourceLocation.fromNamespaceAndPath(MODID, "bombul").toString()));
 
     public static final RegistryObject<EntityType<CactoEntity>> CACTO = ENTITIES.register("cacto",
             () -> EntityType.Builder.of(CactoEntity::new, MobCategory.MONSTER)
@@ -787,6 +824,7 @@ public class Oasiso {
             event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
             event.put(TITANA.get(), TitanaEntity.createAttributes().build());
             event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
+            event.put(BOMBUL.get(), BombulEntity.createAttributes().build());
             event.put(DASHER.get(), DasherEntity.createAttributes().build());
             event.put(CACTO.get(), CactoEntity.createAttributes().build());
         }

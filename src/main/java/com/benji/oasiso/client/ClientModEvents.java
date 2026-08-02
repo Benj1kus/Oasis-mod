@@ -4,6 +4,8 @@ import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.renderer.*;
 import com.benji.oasiso.client.particle.PurpleStarsParticle;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import com.benji.oasiso.client.particle.GoldenHeartParticle;
+import com.benji.oasiso.client.particle.GoldenStarsParticle;
 
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,6 +27,15 @@ public class ClientModEvents {
         event.registerSpriteSet(
                 Oasiso.PURPLE_STARS.get(),
                 PurpleStarsParticle.Provider::new
+        );
+        event.registerSpriteSet(
+                Oasiso.GOLDEN_STARS.get(),
+                GoldenStarsParticle.Provider::new
+        );
+
+        event.registerSpriteSet(
+                Oasiso.GOLDEN_HEART.get(),
+                GoldenHeartParticle.Provider::new
         );
     }
 
@@ -91,6 +102,12 @@ public class ClientModEvents {
         event.registerEntityRenderer(
                 Oasiso.CASER.get(),
                 CaserRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
+                Oasiso.BOMBUL.get(),
+                BombulRenderer::new
         );
 
         event.registerEntityRenderer(
