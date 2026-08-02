@@ -233,6 +233,13 @@ public class BombulEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
         if (heldStack.is(Oasiso.BOMBUL_BOTTLE_EMPTY.get())) {
             if (!this.level().isClientSide) {
+
+
+                if (this.getAnimState() != STATE_SLEEP
+                        || this.forcedSleepTicks <= 0) {
+                    return InteractionResult.CONSUME;
+                }
+
                 spawnGoldenBurst(45);
 
                 player.setItemInHand(
