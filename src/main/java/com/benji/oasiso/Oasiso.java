@@ -37,6 +37,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import com.benji.oasiso.common.effect.EntropyEffect;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.effect.MobEffect;
 import org.slf4j.Logger;
 
 @Mod(Oasiso.MODID)
@@ -49,6 +53,12 @@ public class Oasiso {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
             DeferredRegister.create(net.minecraft.core.registries.Registries.STRUCTURE_TYPE, MODID);
+
+    public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+            DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, MODID);
+
+    public static final DeferredRegister<ParticleType<?>> PARTICLES =
+            DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, MODID);
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
@@ -67,6 +77,14 @@ public class Oasiso {
     private static final net.minecraft.world.phys.shapes.VoxelShape MONKI_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 20.0D, 13.0D);
     private static final net.minecraft.world.phys.shapes.VoxelShape DASHER_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 50.0D, 16.0D);
     private static final net.minecraft.world.phys.shapes.VoxelShape TITANA_SHAPE = Block.box(-6.0D, 0.0D, -6.0D, 22.0D, 40.0D, 22.0D);
+
+    //EFFECT & PARTICLES
+
+    public static final RegistryObject<MobEffect> ENTROPY_EFFECT =
+            MOB_EFFECTS.register("entropy", EntropyEffect::new);
+
+    public static final RegistryObject<SimpleParticleType> PURPLE_STARS =
+            PARTICLES.register("purple_stars", () -> new SimpleParticleType(false));
 
 // BLOCKS
 
@@ -170,6 +188,25 @@ public class Oasiso {
     public static final RegistryObject<Item> SANDSTONE_AZAZEL_ITEM = ITEMS.register("sandstone_azazel",
             () -> new BlockItem(SANDSTONE_AZAZEL.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block",
+            () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK)
+                    .lightLevel(state -> 10)
+                    .strength(10.0F)
+                    .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block",
+            () -> new BlockItem(ENTROPY_BLOCK.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein",
+            () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN)
+                    .sound(SoundType.SMALL_AMETHYST_BUD )
+                    .noCollission()
+                    .noOcclusion()
+                    .replaceable()
+                    .strength(0.2F)));
+
+    public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein",
+            () -> new BlockItem(ENTROPY_VEIN.get(), new Item.Properties()));
 
     public static final RegistryObject<Block> SANDSTONE_CORNER = BLOCKS.register("sandstone_corner",
             () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
@@ -671,6 +708,8 @@ public class Oasiso {
         ModSounds.SOUNDS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
+        MOB_EFFECTS.register(modEventBus);
+        PARTICLES.register(modEventBus);
 
         modEventBus.addListener(this::setup);
         modEventBus.addListener(this::addCreative);

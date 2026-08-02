@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "facing=north,stage=0": { "model": "oasiso:block/entropy_vein_infect" },
+    "facing=east,stage=0":  { "model": "oasiso:block/entropy_vein_infect", "y": 90 },
+    "facing=south,stage=0": { "model": "oasiso:block/entropy_vein_infect", "y": 180 },
+    "facing=west,stage=0":  { "model": "oasiso:block/entropy_vein_infect", "y": 270 },
+
+    "facing=north,stage=1": { "model": "oasiso:block/entropy_vein_full" },
+    "facing=east,stage=1":  { "model": "oasiso:block/entropy_vein_full", "y": 90 },
+    "facing=south,stage=1": { "model": "oasiso:block/entropy_vein_full", "y": 180 },
+    "facing=west,stage=1":  { "model": "oasiso:block/entropy_vein_full", "y": 270 }
+  }
+}

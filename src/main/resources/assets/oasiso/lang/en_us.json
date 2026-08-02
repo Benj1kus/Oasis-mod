@@ -43,6 +43,8 @@
   "block.oasiso.doum_palm_slab": "Doum Palm Slab",
   "block.oasiso.doum_palm_stairs": "Doum Palm Stairs",
   "block.oasiso.doum_palm_trapdoor": "Doum Palm Trapdoor",
+  "block.oasiso.entropy_block": "Block of Entropy",
+  "block.oasiso.entropy_vein": "Entropy vein",
 
 
 
@@ -80,5 +82,6 @@
   "entity.oasiso.sand_golem": "Sandstone Golem",
   "entity.oasiso.cacto_proj": "Cacto",
 
+  "effect.oasiso.entropy": "Entropy",
   "creativetab.oasiso_tab": "Oasis'o: Ruins"
 }

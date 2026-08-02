@@ -2,6 +2,8 @@ package com.benji.oasiso.client;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.renderer.*;
+import com.benji.oasiso.client.particle.PurpleStarsParticle;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,6 +17,16 @@ import net.minecraftforge.fml.common.Mod;
         value = Dist.CLIENT
 )
 public class ClientModEvents {
+
+    @SubscribeEvent
+    public static void registerParticleProviders(
+            RegisterParticleProvidersEvent event
+    ) {
+        event.registerSpriteSet(
+                Oasiso.PURPLE_STARS.get(),
+                PurpleStarsParticle.Provider::new
+        );
+    }
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
