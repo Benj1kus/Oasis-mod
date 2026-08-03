@@ -11,6 +11,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -66,6 +69,10 @@ public class EntropyBlock extends Block {
 
         applyEntropyAura(level, sourcePos);
 
+        if (random.nextInt(100) == 0) {
+            playRandomEntropySound(level, sourcePos, random);
+        }
+
         if (random.nextInt(5) == 0) {
             for (int i = 0; i < 2; i++) {
                 trySpread(level, sourcePos, random);
@@ -73,6 +80,30 @@ public class EntropyBlock extends Block {
         }
 
         level.scheduleTick(sourcePos, this, 2);
+    }
+
+    private void playRandomEntropySound(
+            ServerLevel level,
+            BlockPos pos,
+            RandomSource random
+    ) {
+        SoundEvent[] sounds = {
+                ModSounds.ENTROPY1.get(),
+                ModSounds.ENTROPY2.get(),
+                ModSounds.ENTROPY3.get()
+        };
+
+        SoundEvent selectedSound =
+                sounds[random.nextInt(sounds.length)];
+
+        level.playSound(
+                null,
+                pos,
+                selectedSound,
+                SoundSource.BLOCKS,
+                0.8F,
+                0.9F + random.nextFloat() * 0.2F
+        );
     }
 
     private void applyEntropyAura(ServerLevel level, BlockPos sourcePos) {

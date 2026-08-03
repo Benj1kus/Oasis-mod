@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
@@ -33,42 +34,105 @@ public class TitanaHammerItem extends SwordItem implements GeoItem {
     }
 
     @Override
-    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (!target.level().isClientSide() && attacker instanceof Player player) {
+    public boolean hurtEnemy(
+            ItemStack stack,
+            LivingEntity target,
+            LivingEntity attacker
+    ) {
+        if (!target.level().isClientSide()
+                && attacker instanceof Player player) {
 
-            int hits = stack.getOrCreateTag().getInt("TitanaHits") + 1;
+            boolean hasHammerPower =
+                    EnchantmentHelper.getItemEnchantmentLevel(
+                            Oasiso.HAMMER_POWER.get(),
+                            stack
+                    ) > 0;
 
-            if (hits >= 5) {
+            int requiredHits =
+                    hasHammerPower ? 3 : 5;
+
+            double attackRadius =
+                    hasHammerPower ? 20.0D : 10.0D;
+
+            int hits = stack.getOrCreateTag()
+                    .getInt("TitanaHits") + 1;
+
+            if (hits >= requiredHits) {
                 hits = 0;
 
-                ServerLevel sl = (ServerLevel) target.level();
+                ServerLevel serverLevel =
+                        (ServerLevel) target.level();
 
-                sl.playSound(null, attacker.blockPosition(), SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.PLAYERS, 1.0F, 0.8F);
+                serverLevel.playSound(
+                        null,
+                        attacker.blockPosition(),
+                        SoundEvents.EVOKER_PREPARE_SUMMON,
+                        SoundSource.PLAYERS,
+                        1.0F,
+                        0.8F
+                );
 
-                List<LivingEntity> entities = sl.getEntitiesOfClass(LivingEntity.class, attacker.getBoundingBox().inflate(10.0D));
+                double attackRadiusSqr =
+                        attackRadius * attackRadius;
 
-                for (LivingEntity e : entities) {
-                    if (e != attacker && e.isAlive() && !e.isSpectator()) {
+                List<LivingEntity> entities =
+                        serverLevel.getEntitiesOfClass(
+                                LivingEntity.class,
+                                attacker.getBoundingBox()
+                                        .inflate(attackRadius),
+                                entity ->
+                                        entity != attacker
+                                                && entity.isAlive()
+                                                && !entity.isSpectator()
+                                                && entity.distanceToSqr(attacker)
+                                                <= attackRadiusSqr
+                        );
 
-                        SandHandEntity hand = Oasiso.SAND_HAND.get().create(sl);
-                        if (hand != null) {
-                            hand.moveTo(e.getX(), e.getY(), e.getZ());
-                            hand.setOwner(attacker);
-                            sl.addFreshEntity(hand);
+                for (LivingEntity entity : entities) {
+                    SandHandEntity hand =
+                            Oasiso.SAND_HAND.get()
+                                    .create(serverLevel);
 
-                            sl.sendParticles(
-                                    new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.SAND.defaultBlockState()),
-                                    e.getX(), e.getY() + 0.1, e.getZ(),
-                                    20, 0.4, 0, 0.4, 0.1
-                            );
-                        }
+                    if (hand == null) {
+                        continue;
                     }
+
+                    hand.moveTo(
+                            entity.getX(),
+                            entity.getY(),
+                            entity.getZ()
+                    );
+
+                    hand.setOwner(attacker);
+
+                    serverLevel.addFreshEntity(hand);
+
+                    serverLevel.sendParticles(
+                            new BlockParticleOption(
+                                    ParticleTypes.FALLING_DUST,
+                                    Blocks.SAND.defaultBlockState()
+                            ),
+                            entity.getX(),
+                            entity.getY() + 0.1D,
+                            entity.getZ(),
+                            20,
+                            0.4D,
+                            0.0D,
+                            0.4D,
+                            0.1D
+                    );
                 }
             }
 
-            stack.getOrCreateTag().putInt("TitanaHits", hits);
+            stack.getOrCreateTag()
+                    .putInt("TitanaHits", hits);
         }
-        return super.hurtEnemy(stack, target, attacker);
+
+        return super.hurtEnemy(
+                stack,
+                target,
+                attacker
+        );
     }
 
     @Override

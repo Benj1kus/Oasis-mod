@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.support.BombulBuffHandler;
 import net.minecraft.nbt.CompoundTag;
@@ -7,6 +8,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -19,6 +22,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -171,6 +175,12 @@ public class BombulEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
             this.setAnimState(STATE_SUPPORT);
             this.stateTimer = SUPPORT_ANIMATION_TIME;
+
+            this.playSound(
+                    ModSounds.SUPPORT.get(),
+                    1.0F,
+                    1.0F
+            );
         }
     }
 
@@ -399,6 +409,14 @@ public class BombulEntity extends Monster implements GeoEntity, GlowmaskEntity {
                 )
         );
     }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.BOMBUL_HURT.get();
+    }
+
+    @Nullable
+    @Override protected SoundEvent getAmbientSound() { return ModSounds.BOMBUL_IDLE.get(); }
 
     @Override
     public ResourceLocation getGlowmaskTexture() {

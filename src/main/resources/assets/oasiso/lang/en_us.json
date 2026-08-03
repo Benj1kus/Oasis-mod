@@ -85,6 +85,10 @@
   "entity.oasiso.sand_golem": "Sandstone Golem",
   "entity.oasiso.cacto_proj": "Cacto",
 
+  "item.oasiso.enchanted_book_hammer": "Enchanted Book",
+  "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
+  "enchantment.oasiso.hammer_power": "Sand Hand",
+
   "effect.oasiso.entropy": "Entropy",
   "creativetab.oasiso_tab": "Oasis'o: Ruins"
 }

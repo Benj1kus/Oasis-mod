@@ -13,6 +13,17 @@
   "flowery12": { "sounds": [ "oasiso:flowery12" ] },
   "flowery13": { "sounds": [ "oasiso:flowery13" ] },
 
+  "entropy1": { "sounds": [ "oasiso:entropy1" ] },
+  "entropy2": { "sounds": [ "oasiso:entropy2" ] },
+  "entropy3": { "sounds": [ "oasiso:entropy3" ] },
+
+  "voices": { "sounds": [ "oasiso:voices" ] },
+  "white_flash": { "sounds": [ "oasiso:white_flash" ] },
+  "support": { "sounds": [ "oasiso:support" ] },
+
+  "bombul_idle": { "sounds": [ "oasiso:bombul_idle" ] },
+  "bombul_hurt": { "sounds": [ "oasiso:bombul_hurt" ] },
+
   "yes": { "sounds": [ "oasiso:yes" ] },
 
   "magnetic": { "sounds": [ "oasiso:magnetic" ] },

@@ -3,6 +3,8 @@ package com.benji.oasiso;
 import com.benji.oasiso.client.renderer.CactoRenderer;
 import com.benji.oasiso.client.renderer.MonkiRenderer;
 import com.benji.oasiso.common.block.*;
+import com.benji.oasiso.common.enchantment.HammerPowerEnchantment;
+import net.minecraft.world.item.enchantment.Enchantment;
 import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
 import com.benji.oasiso.common.block.entity.StatueBlockEntity;
@@ -39,6 +41,7 @@ import com.benji.oasiso.common.effect.EntropyEffect;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.effect.MobEffect;
+import com.benji.oasiso.common.item.HammerEnchantmentBookItem;
 import org.slf4j.Logger;
 
 @Mod(Oasiso.MODID)
@@ -51,6 +54,12 @@ public class Oasiso {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
             DeferredRegister.create(net.minecraft.core.registries.Registries.STRUCTURE_TYPE, MODID);
+
+    public static final DeferredRegister<Enchantment> ENCHANTMENTS =
+            DeferredRegister.create(
+                    ForgeRegistries.ENCHANTMENTS,
+                    MODID
+            );
 
     public static final DeferredRegister<MobEffect> MOB_EFFECTS =
             DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, MODID);
@@ -69,6 +78,13 @@ public class Oasiso {
     public static final net.minecraft.world.level.block.state.properties.WoodType DOUM_PALM_WOOD_TYPE =
             net.minecraft.world.level.block.state.properties.WoodType.register(
                     new net.minecraft.world.level.block.state.properties.WoodType(Oasiso.MODID + ":doum_palm", DOUM_PALM_SET_TYPE)
+            );
+
+    //ENCHANTMENTS
+    public static final RegistryObject<Enchantment> HAMMER_POWER =
+            ENCHANTMENTS.register(
+                    "hammer_power",
+                    HammerPowerEnchantment::new
             );
 
     //HITBOXES
@@ -206,7 +222,7 @@ public class Oasiso {
 
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block",
             () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK)
-                    .lightLevel(state -> 10)
+                    .lightLevel(state -> 20)
                     .strength(10.0F)
                     .requiresCorrectToolForDrops()));
 
@@ -216,6 +232,7 @@ public class Oasiso {
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein",
             () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN)
                     .sound(SoundType.SMALL_AMETHYST_BUD )
+                    .lightLevel(state -> 10)
                     .noCollission()
                     .noOcclusion()
                     .replaceable()
@@ -414,6 +431,16 @@ public class Oasiso {
 
     public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core",
             () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> ENCHANTED_BOOK_HAMMER =
+            ITEMS.register(
+                    "enchanted_book_hammer",
+                    () -> new HammerEnchantmentBookItem(
+                            new Item.Properties()
+                                    .stacksTo(1)
+                                    .rarity(Rarity.UNCOMMON)
+                    )
+            );
 
     public static final RegistryObject<Item> BOMBUL_BOTTLE =
             ITEMS.register(
@@ -745,6 +772,7 @@ public class Oasiso {
         ModSounds.SOUNDS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);
+        ENCHANTMENTS.register(modEventBus);
         MOB_EFFECTS.register(modEventBus);
         PARTICLES.register(modEventBus);
 

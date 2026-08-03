@@ -10,6 +10,18 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> MAGNETIC = registerSoundEvent("magnetic");
 
+    //BOMBUL
+
+    public static final RegistryObject<SoundEvent> BOMBUL_HURT = registerSoundEvent("bombul_hurt");
+    public static final RegistryObject<SoundEvent> BOMBUL_IDLE = registerSoundEvent("bombul_idle");
+    public static final RegistryObject<SoundEvent> SUPPORT = registerSoundEvent("support");
+
+    public static final RegistryObject<SoundEvent> VOICES = registerSoundEvent("voices");
+    public static final RegistryObject<SoundEvent> WHITE_FLASH = registerSoundEvent("white_flash");
+
+    public static final RegistryObject<SoundEvent> ENTROPY1 = registerSoundEvent("entropy1");
+    public static final RegistryObject<SoundEvent> ENTROPY2 = registerSoundEvent("entropy2");
+    public static final RegistryObject<SoundEvent> ENTROPY3 = registerSoundEvent("entropy3");
 
     //caser
     public static final RegistryObject<SoundEvent> CASER1 = registerSoundEvent("caser1");

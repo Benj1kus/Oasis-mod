@@ -7,6 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import com.benji.oasiso.client.sound.EntropyVoicesSound;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -35,6 +38,7 @@ public final class EntropyOverlayEvents {
 
     private static final int TEXTURE_WIDTH = 1920;
     private static final int TEXTURE_HEIGHT = 1080;
+    private static EntropyVoicesSound voicesSound;
 
     private static final RandomSource RANDOM =
             RandomSource.create();
@@ -54,12 +58,21 @@ public final class EntropyOverlayEvents {
             return;
         }
 
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (minecraft.isPaused()) {
+            return;
+        }
+
         boolean active = hasEntropyEffect();
 
         if (!active) {
             flashAlpha = 0.0F;
             nextFlashTimer = 0;
             wasActive = false;
+
+            stopVoicesSound();
+
             return;
         }
 
@@ -68,24 +81,70 @@ public final class EntropyOverlayEvents {
 
             nextFlashTimer =
                     40 + RANDOM.nextInt(81);
+
+            startVoicesSound();
+        }
+
+        if (voicesSound == null
+                || voicesSound.isStopped()) {
+            startVoicesSound();
         }
 
         if (nextFlashTimer > 0) {
             nextFlashTimer--;
         } else if (flashAlpha <= 0.0F) {
-
             flashAlpha = 1.0F;
 
+            playWhiteFlashSound();
 
             nextFlashTimer =
                     60 + RANDOM.nextInt(121);
         }
 
-
         if (flashAlpha > 0.0F) {
             flashAlpha =
                     Math.max(0.0F, flashAlpha - 0.05F);
         }
+    }
+
+    private static void startVoicesSound() {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (voicesSound != null
+                && !voicesSound.isStopped()) {
+            return;
+        }
+
+        voicesSound = new EntropyVoicesSound();
+
+        minecraft.getSoundManager().play(
+                voicesSound
+        );
+    }
+
+    private static void stopVoicesSound() {
+        if (voicesSound == null) {
+            return;
+        }
+
+        Minecraft.getInstance()
+                .getSoundManager()
+                .stop(voicesSound);
+
+        voicesSound = null;
+    }
+
+
+    private static void playWhiteFlashSound() {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        minecraft.getSoundManager().play(
+                SimpleSoundInstance.forUI(
+                        ModSounds.WHITE_FLASH.get(),
+                        1.0F,
+                        1.0F
+                )
+        );
     }
 
     @SubscribeEvent
