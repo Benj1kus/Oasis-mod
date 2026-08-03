@@ -300,6 +300,11 @@ public class BombulEntity extends Monster implements GeoEntity, GlowmaskEntity {
     }
 
     @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
+    }
+
+    @Override
     public void die(DamageSource source) {
         super.die(source);
 

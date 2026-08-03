@@ -31,7 +31,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:netherite_ingot",
+          "name": "oasiso:entropy_block",
           "weight": 5
         },
         {
