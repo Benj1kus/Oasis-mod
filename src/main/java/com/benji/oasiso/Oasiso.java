@@ -122,8 +122,9 @@ public class Oasiso {
 
     public static final RegistryObject<Block> LIE_BLOCK = BLOCKS.register("lie_block",
             () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.CALCITE)
-                    .strength(2.0F)
+                    .strength(80.0F)
                     .noOcclusion()
+                    .explosionResistance(3_600_000.0F)
                     .dynamicShape()
                     .requiresCorrectToolForDrops()));
 
@@ -189,7 +190,7 @@ public class Oasiso {
 
 
     public static final RegistryObject<Block> NEPHRITIS_BLOCK = BLOCKS.register("nephritis_block",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_GOLD_BLOCK)
+            () -> new NephritisBlock(BlockBehaviour.Properties.copy(Blocks.RAW_GOLD_BLOCK)
                     .strength(5.0F)
                     .requiresCorrectToolForDrops()));
 

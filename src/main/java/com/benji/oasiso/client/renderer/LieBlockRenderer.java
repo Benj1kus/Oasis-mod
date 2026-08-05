@@ -14,6 +14,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import com.benji.oasiso.common.block.LieBlock;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.client.model.data.ModelData;
 
 public class LieBlockRenderer implements BlockEntityRenderer<LieBlockEntity> {
@@ -44,8 +46,36 @@ public class LieBlockRenderer implements BlockEntityRenderer<LieBlockEntity> {
 
         if (be.isPhasing() && !hasArmor) {
             if (player != null) {
-                double dist = Math.sqrt(player.distanceToSqr(be.getBlockPos().getX() + 0.5, be.getBlockPos().getY() + 0.5, be.getBlockPos().getZ() + 0.5));
-                alpha = (float) Mth.clamp((dist - 2.0) / 3.0, 0.0, 1.0);
+                BlockPos fadeOrigin =
+                        be.getFadeOriginPos();
+
+                double distance = Math.sqrt(
+                        player.distanceToSqr(
+                                fadeOrigin.getX() + 0.5D,
+                                fadeOrigin.getY() + 0.5D,
+                                fadeOrigin.getZ() + 0.5D
+                        )
+                );
+
+                double multiplier =
+                        be.hasNephritisSource()
+                                ? LieBlock.NEPHRITIS_RANGE_MULTIPLIER
+                                : 1.0D;
+
+                double invisibleDistance =
+                        LieBlock.NORMAL_INVISIBLE_DISTANCE
+                                * multiplier;
+
+                double fadeDistance =
+                        LieBlock.NORMAL_FADE_DISTANCE
+                                * multiplier;
+
+                alpha = (float) Mth.clamp(
+                        (distance - invisibleDistance)
+                                / fadeDistance,
+                        0.0D,
+                        1.0D
+                );
             }
         }
 

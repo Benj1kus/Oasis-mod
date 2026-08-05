@@ -31,6 +31,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class LieBlock extends BaseEntityBlock {
     public static final BooleanProperty MIMICKING = BooleanProperty.create("mimicking");
 
+    public static final double NORMAL_INVISIBLE_DISTANCE = 2.0D;
+    public static final double NORMAL_FADE_DISTANCE = 3.0D;
+    public static final double NORMAL_COLLISION_DISTANCE = 3.5D;
+
+    public static final double NEPHRITIS_RANGE_MULTIPLIER = 10.0D;
+
     public LieBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(MIMICKING, false));
@@ -147,23 +153,58 @@ public class LieBlock extends BaseEntityBlock {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (state.getValue(MIMICKING) && level.getBlockEntity(pos) instanceof LieBlockEntity lieBE) {
-
-            if (lieBE.isPhasing() && context instanceof EntityCollisionContext ecc && ecc.getEntity() != null) {
-
-                if (ecc.getEntity() instanceof Player player) {
-                    if (hasFullSuperGoldArmor(player)) {
-                        return Shapes.block();
-                    }
-                }
-
-                double distSqr = ecc.getEntity().distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-                if (distSqr < 12.25) {
-                    return Shapes.empty();
-                }
-            }
+    public VoxelShape getCollisionShape(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos,
+            CollisionContext context
+    ) {
+        if (!state.getValue(MIMICKING)) {
+            return Shapes.block();
         }
+
+        if (!(level.getBlockEntity(pos)
+                instanceof LieBlockEntity lieBlockEntity)) {
+            return Shapes.block();
+        }
+
+        if (!lieBlockEntity.isPhasing()) {
+            return Shapes.block();
+        }
+
+        if (!(context instanceof EntityCollisionContext entityContext)
+                || entityContext.getEntity() == null) {
+            return Shapes.block();
+        }
+
+        if (entityContext.getEntity() instanceof Player player
+                && hasFullSuperGoldArmor(player)) {
+            return Shapes.block();
+        }
+
+        BlockPos fadeOrigin =
+                lieBlockEntity.getFadeOriginPos();
+
+        double multiplier =
+                lieBlockEntity.hasNephritisSource()
+                        ? NEPHRITIS_RANGE_MULTIPLIER
+                        : 1.0D;
+
+        double collisionDistance =
+                NORMAL_COLLISION_DISTANCE * multiplier;
+
+        double distanceSqr =
+                entityContext.getEntity().distanceToSqr(
+                        fadeOrigin.getX() + 0.5D,
+                        fadeOrigin.getY() + 0.5D,
+                        fadeOrigin.getZ() + 0.5D
+                );
+
+        if (distanceSqr
+                < collisionDistance * collisionDistance) {
+            return Shapes.empty();
+        }
+
         return Shapes.block();
     }
 }
