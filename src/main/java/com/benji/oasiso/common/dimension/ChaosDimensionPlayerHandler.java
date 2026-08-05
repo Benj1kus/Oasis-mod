@@ -3,7 +3,7 @@ package com.benji.oasiso.common.dimension;
 import com.benji.oasiso.Oasiso;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -17,6 +17,12 @@ import net.minecraftforge.fml.common.Mod;
         bus = Mod.EventBusSubscriber.Bus.FORGE
 )
 public final class ChaosDimensionPlayerHandler {
+
+    private static final double LOW_GRAVITY_COMPENSATION =
+            0.06D;
+
+    private static final double MAX_FALL_SPEED =
+            -0.35D;
 
     private static final String FLOATING_MARKER =
             Oasiso.MODID + ":chaos_floating";
@@ -34,11 +40,8 @@ public final class ChaosDimensionPlayerHandler {
             return;
         }
 
-        Player player = event.player;
-
-        if (player.level().isClientSide) {
-            return;
-        }
+        Player player =
+                event.player;
 
         boolean insideChaos =
                 player.level().dimension()
@@ -49,43 +52,40 @@ public final class ChaosDimensionPlayerHandler {
             return;
         }
 
-        player.getPersistentData()
-                .putBoolean(FLOATING_MARKER, true);
+
+        restoreGravity(player);
+
+        if (canApplyLowGravity(player)) {
+            Vec3 movement =
+                    player.getDeltaMovement();
+
+            double newVerticalMovement =
+                    movement.y
+                            + LOW_GRAVITY_COMPENSATION;
+
+            newVerticalMovement =
+                    Math.max(
+                            newVerticalMovement,
+                            MAX_FALL_SPEED
+                    );
+
+            player.setDeltaMovement(
+                    movement.x,
+                    newVerticalMovement,
+                    movement.z
+            );
+
+            if (!player.level().isClientSide) {
+                player.hurtMarked = true;
+            }
+        }
 
 
-        player.setNoGravity(true);
-        player.fallDistance = 0.0F;
-
-        Vec3 movement =
-                player.getDeltaMovement();
-
-
-        double bob =
-                Math.sin(
-                        (player.tickCount
-                                + player.getId() * 7)
-                                * 0.07D
-                ) * 0.0025D;
-
-        double verticalMovement =
-                Mth.clamp(
-                        movement.y * 0.82D + bob,
-                        -0.075D,
-                        0.075D
-                );
-
-        player.setDeltaMovement(
-                movement.x,
-                verticalMovement,
-                movement.z
-        );
-
-        player.hurtMarked = true;
-
-
-        if (player.getY()
+        if (!player.level().isClientSide
+                && player.getY()
                 < player.level().getMinBuildHeight() + 8
-                && player instanceof ServerPlayer serverPlayer
+                && player
+                instanceof ServerPlayer serverPlayer
                 && player.level()
                 instanceof ServerLevel serverLevel) {
 
@@ -98,8 +98,23 @@ public final class ChaosDimensionPlayerHandler {
                     serverPlayer.getXRot()
             );
 
-            serverPlayer.setDeltaMovement(Vec3.ZERO);
+            serverPlayer.setDeltaMovement(
+                    Vec3.ZERO
+            );
+
+            serverPlayer.fallDistance = 0.0F;
         }
+    }
+
+    private static boolean canApplyLowGravity(
+            Player player
+    ) {
+        return !player.onGround()
+                && !player.getAbilities().flying
+                && !player.isFallFlying()
+                && !player.isInWaterOrBubble()
+                && !player.isInLava()
+                && !player.onClimbable();
     }
 
     private static void restoreGravity(
@@ -114,6 +129,25 @@ public final class ChaosDimensionPlayerHandler {
 
         player.getPersistentData()
                 .remove(FLOATING_MARKER);
+    }
+
+    @SubscribeEvent
+    public static void onLivingFall(
+            LivingFallEvent event
+    ) {
+        if (!(event.getEntity()
+                instanceof Player player)) {
+            return;
+        }
+
+        if (!player.level().dimension()
+                .equals(Oasiso.CHAOS_DIMENSION)) {
+            return;
+        }
+
+        event.setDistance(
+                event.getDistance() * 0.35F
+        );
     }
 
 
