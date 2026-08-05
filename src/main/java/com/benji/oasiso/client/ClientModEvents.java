@@ -6,7 +6,8 @@ import com.benji.oasiso.client.particle.PurpleStarsParticle;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import com.benji.oasiso.client.particle.GoldenHeartParticle;
 import com.benji.oasiso.client.particle.GoldenStarsParticle;
-
+import com.benji.oasiso.client.dimension.ChaosDimensionEffects;
+import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +20,17 @@ import net.minecraftforge.fml.common.Mod;
         value = Dist.CLIENT
 )
 public class ClientModEvents {
+
+
+    @SubscribeEvent
+    public static void registerDimensionEffects(
+            RegisterDimensionSpecialEffectsEvent event
+    ) {
+        event.register(
+                Oasiso.CHAOS_SKY_EFFECTS,
+                new ChaosDimensionEffects()
+        );
+    }
 
     @SubscribeEvent
     public static void registerParticleProviders(

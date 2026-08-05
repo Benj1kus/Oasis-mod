@@ -2,8 +2,12 @@ package com.benji.oasiso;
 
 import com.benji.oasiso.client.renderer.CactoRenderer;
 import com.benji.oasiso.client.renderer.MonkiRenderer;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import com.benji.oasiso.common.block.*;
 import com.benji.oasiso.common.enchantment.HammerPowerEnchantment;
+import com.benji.oasiso.common.block.ChaosPortalBlock;
 import net.minecraft.world.item.enchantment.Enchantment;
 import com.benji.oasiso.common.block.entity.SandedChestBlockEntity;
 import com.benji.oasiso.common.block.entity.StatBlockEntity;
@@ -54,6 +58,21 @@ public class Oasiso {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
             DeferredRegister.create(net.minecraft.core.registries.Registries.STRUCTURE_TYPE, MODID);
+
+    public static final ResourceKey<Level> CHAOS_DIMENSION =
+            ResourceKey.create(
+                    Registries.DIMENSION,
+                    ResourceLocation.fromNamespaceAndPath(
+                            MODID,
+                            "chaos_dimension"
+                    )
+            );
+
+    public static final ResourceLocation CHAOS_SKY_EFFECTS =
+            ResourceLocation.fromNamespaceAndPath(
+                    MODID,
+                    "chaos_sky"
+            );
 
     public static final DeferredRegister<Enchantment> ENCHANTMENTS =
             DeferredRegister.create(
@@ -230,6 +249,16 @@ public class Oasiso {
 
     public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block",
             () -> new BlockItem(ENTROPY_BLOCK.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> CHAOS_PORTAL =
+            BLOCKS.register(
+                    "chaos_portal",
+                    () -> new ChaosPortalBlock(
+                            BlockBehaviour.Properties.copy(
+                                    Blocks.NETHER_PORTAL
+                            )
+                    )
+            );
 
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein",
             () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN)
