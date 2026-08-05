@@ -17,6 +17,17 @@
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
 
+  "echo1": { "sounds": [ "oasiso:echo1" ] },
+  "echo2": { "sounds": [ "oasiso:echo2" ] },
+  "echo3": { "sounds": [ "oasiso:echo3" ] },
+
+  "dimension_ambient": { "sounds": [ "oasiso:dimension_ambient" ] },
+  "echo_stars": { "sounds": [ "oasiso:echo_stars" ] },
+  "god_scream": { "sounds": [ "oasiso:god_scream" ] },
+  "chaos_life": { "sounds": [ "oasiso:chaos_life" ] },
+  "chaos_death": { "sounds": [ "oasiso:chaos_death" ] },
+
+
   "voices": { "sounds": [ "oasiso:voices" ] },
   "white_flash": { "sounds": [ "oasiso:white_flash" ] },
   "support": { "sounds": [ "oasiso:support" ] },

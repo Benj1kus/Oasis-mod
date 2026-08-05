@@ -10,6 +10,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.benji.oasiso.ModSounds;
+import com.benji.oasiso.client.sound.ChaosDimensionAmbientSound;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvent;
 
 @Mod.EventBusSubscriber(
         modid = Oasiso.MODID,
@@ -17,6 +21,11 @@ import net.minecraftforge.fml.common.Mod;
         value = Dist.CLIENT
 )
 public final class ChaosDimensionClientEvents {
+
+    private static ChaosDimensionAmbientSound ambientSound;
+
+    private static int nextEchoTimer;
+    private static int lastMoonStage = 1;
 
     private static final RandomSource RANDOM =
             RandomSource.create();
@@ -58,15 +67,124 @@ public final class ChaosDimensionClientEvents {
 
         if (!isInsideChaosDimension(minecraft)) {
             dimensionTicks = 0;
+            nextEchoTimer = 0;
+            lastMoonStage = 1;
+
+            stopAmbientSound();
+
             return;
         }
 
         dimensionTicks++;
 
+
+        ensureAmbientSound();
+
+        if (dimensionTicks == 1) {
+
+            nextEchoTimer =
+                    120 + RANDOM.nextInt(241);
+
+            lastMoonStage =
+                    getMoonStage();
+        } else {
+            handleMoonStageSound();
+            handleRandomEcho();
+        }
+
         spawnAtmosphere(
                 minecraft.level,
                 minecraft.player
         );
+    }
+
+    private static void handleMoonStageSound() {
+        int currentStage =
+                getMoonStage();
+
+        if (currentStage == lastMoonStage) {
+            return;
+        }
+
+        if (currentStage >= 3) {
+            playLocalSound(
+                    ModSounds.GOD_SCREAM.get(),
+                    1.0F,
+                    1.0F
+            );
+        }
+
+        lastMoonStage = currentStage;
+    }
+
+    private static void handleRandomEcho() {
+        if (nextEchoTimer > 0) {
+            nextEchoTimer--;
+            return;
+        }
+
+        SoundEvent[] echoes = {
+                ModSounds.ECHO1.get(),
+                ModSounds.ECHO2.get(),
+                ModSounds.ECHO3.get()
+        };
+
+        SoundEvent selectedEcho =
+                echoes[RANDOM.nextInt(echoes.length)];
+
+        playLocalSound(
+                selectedEcho,
+                0.92F + RANDOM.nextFloat() * 0.16F,
+                0.75F
+        );
+
+        nextEchoTimer =
+                120 + RANDOM.nextInt(241);
+    }
+
+    private static void ensureAmbientSound() {
+        Minecraft minecraft =
+                Minecraft.getInstance();
+
+        if (ambientSound != null
+                && !ambientSound.isStopped()) {
+            return;
+        }
+
+        ambientSound =
+                new ChaosDimensionAmbientSound();
+
+        minecraft.getSoundManager().play(
+                ambientSound
+        );
+    }
+
+    private static void stopAmbientSound() {
+        if (ambientSound == null) {
+            return;
+        }
+
+        Minecraft.getInstance()
+                .getSoundManager()
+                .stop(ambientSound);
+
+        ambientSound = null;
+    }
+
+    private static void playLocalSound(
+            SoundEvent sound,
+            float pitch,
+            float volume
+    ) {
+        Minecraft.getInstance()
+                .getSoundManager()
+                .play(
+                        SimpleSoundInstance.forUI(
+                                sound,
+                                pitch,
+                                volume
+                        )
+                );
     }
 
 

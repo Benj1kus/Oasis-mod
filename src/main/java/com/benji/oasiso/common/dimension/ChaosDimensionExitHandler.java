@@ -127,6 +127,22 @@ public final class ChaosDimensionExitHandler {
                 ) + 1L;
 
         if (gameDay % 2L == 0L) {
+
+            playPlayerSound(
+                    player,
+                    ModSounds.CHAOS_DEATH.get(),
+                    1.0F,
+                    1.0F
+            );
+
+
+            playPlayerSound(
+                    player,
+                    ModSounds.ECHO_STARS.get(),
+                    1.0F,
+                    1.0F
+            );
+
             ACTIVE_SEQUENCES.put(
                     player.getUUID(),
                     new ExitSequence(
@@ -136,6 +152,13 @@ public final class ChaosDimensionExitHandler {
 
             return;
         }
+
+        playPlayerSound(
+                player,
+                ModSounds.CHAOS_LIFE.get(),
+                1.0F,
+                1.0F
+        );
 
         KrombulEntity actor =
                 createKrombulActor(
@@ -173,6 +196,21 @@ public final class ChaosDimensionExitHandler {
                 player.getY(),
                 player.getZ(),
                 player.getRandom()
+        );
+    }
+
+    private static void playPlayerSound(
+            ServerPlayer player,
+            SoundEvent sound,
+            float volume,
+            float pitch
+    ) {
+
+        player.playNotifySound(
+                sound,
+                SoundSource.AMBIENT,
+                volume,
+                pitch
         );
     }
 

@@ -10,6 +10,18 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> MAGNETIC = registerSoundEvent("magnetic");
 
+
+    //DIMENSION
+    public static final RegistryObject<SoundEvent> ECHO1 = registerSoundEvent("echo1");
+    public static final RegistryObject<SoundEvent> ECHO2 = registerSoundEvent("echo2");
+    public static final RegistryObject<SoundEvent> ECHO3 = registerSoundEvent("echo3");
+
+    public static final RegistryObject<SoundEvent> DIMENSION_AMBIENT = registerSoundEvent("dimension_ambient");
+    public static final RegistryObject<SoundEvent> GOD_SCREAM = registerSoundEvent("god_scream");
+    public static final RegistryObject<SoundEvent> ECHO_STARS = registerSoundEvent("echo_stars");
+    public static final RegistryObject<SoundEvent> CHAOS_DEATH = registerSoundEvent("chaos_death");
+    public static final RegistryObject<SoundEvent> CHAOS_LIFE = registerSoundEvent("chaos_life");
+
     //BOMBUL
 
     public static final RegistryObject<SoundEvent> BOMBUL_HURT = registerSoundEvent("bombul_hurt");

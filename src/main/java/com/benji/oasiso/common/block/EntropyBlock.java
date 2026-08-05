@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import com.benji.oasiso.ModSounds;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -231,14 +232,22 @@ public class EntropyBlock extends Block {
             }
 
             if (entity instanceof LivingEntity livingEntity) {
-                livingEntity.addEffect(new MobEffectInstance(
-                        Oasiso.ENTROPY_EFFECT.get(),
-                        12,
-                        0,
-                        false,
-                        false,
-                        true
-                ));
+                boolean protectedByArmor =
+                        livingEntity instanceof Player player
+                                && hasFullSuperGoldArmor(player);
+
+                if (!protectedByArmor) {
+                    livingEntity.addEffect(
+                            new MobEffectInstance(
+                                    Oasiso.ENTROPY_EFFECT.get(),
+                                    12,
+                                    0,
+                                    false,
+                                    false,
+                                    true
+                            )
+                    );
+                }
             }
 
             if (entity.isPassenger()) {
@@ -261,6 +270,22 @@ public class EntropyBlock extends Block {
                     pull.z
             ));
         }
+    }
+
+    private static boolean hasFullSuperGoldArmor(
+            Player player
+    ) {
+        return player.getItemBySlot(EquipmentSlot.HEAD)
+                .is(Oasiso.SUPER_GOLD_HELMET.get())
+
+                && player.getItemBySlot(EquipmentSlot.CHEST)
+                .is(Oasiso.SUPER_GOLD_CHESTPLATE.get())
+
+                && player.getItemBySlot(EquipmentSlot.LEGS)
+                .is(Oasiso.SUPER_GOLD_LEGGINGS.get())
+
+                && player.getItemBySlot(EquipmentSlot.FEET)
+                .is(Oasiso.SUPER_GOLD_BOOTS.get());
     }
 
     @Override

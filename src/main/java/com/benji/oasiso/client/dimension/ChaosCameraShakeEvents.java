@@ -36,10 +36,10 @@ public final class ChaosCameraShakeEvents {
                 ChaosDimensionClientEvents.getMoonStage();
 
         float intensity = switch (stage) {
-            case 3 -> 0.12F;
-            case 4 -> 0.30F;
-            case 5 -> 0.60F;
-            case 6 -> 1.05F;
+            case 3 -> 0.30F;
+            case 4 -> 0.60F;
+            case 5 -> 1.20F;
+            case 6 -> 1.60F;
             default -> 0.0F;
         };
 
@@ -54,10 +54,6 @@ public final class ChaosCameraShakeEvents {
                                 + event.getPartialTick()
                 );
 
-        /*
-         * Несколько волн с разной частотой дают
-         * органичную, а не механическую тряску.
-         */
         float yawOffset =
                 (
                         Mth.sin(time * 0.91F) * 0.7F

@@ -15,6 +15,7 @@ import com.benji.oasiso.common.block.entity.StatueBlockEntity;
 import com.benji.oasiso.common.effect.BombulBuffEffect;
 import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.entity.projectile.CactoProjEntity;
+import com.benji.oasiso.common.dispenser.ModDispenserBehaviors;
 import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.benji.oasiso.common.item.*;
 import com.benji.oasiso.network.ModMessages;
@@ -848,6 +849,7 @@ public class Oasiso {
 
     private void setup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
+            ModDispenserBehaviors.register();
             ModMessages.register();
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(FLOWERY.getId(), POTTED_FLOWERY);
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(CACTULO.getId(), POTTED_CACTULO);
