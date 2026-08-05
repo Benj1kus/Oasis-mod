@@ -494,6 +494,23 @@ public class Oasiso {
             () -> BlockEntityType.Builder.of(SandedChestBlockEntity::new, SANDED_CHEST.get()).build(null));
     //============================
     // ENTITIES
+    public static final RegistryObject<EntityType<KrombulEntity>> KROMBUL =
+            ENTITIES.register(
+                    "krombul",
+                    () -> EntityType.Builder.of(
+                                    KrombulEntity::new,
+                                    MobCategory.CREATURE
+                            )
+                            .sized(0.75F, 1.25F)
+                            .clientTrackingRange(8)
+                            .build(
+                                    ResourceLocation.fromNamespaceAndPath(
+                                            MODID,
+                                            "krombul"
+                                    ).toString()
+                            )
+            );
+
     public static final RegistryObject<EntityType<MonkiEntity>> MONKI = ENTITIES.register("monki",
             () -> EntityType.Builder.of(MonkiEntity::new, MobCategory.MONSTER)
                     .sized(0.625F, 1.25F)
@@ -558,6 +575,22 @@ public class Oasiso {
     public static final RegistryObject<Item> MONKI_SPAWN_EGG = ITEMS.register("monki_spawn_egg",
             () -> new net.minecraftforge.common.ForgeSpawnEggItem(
                     MONKI,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> KROMBUL_SPAWN_EGG = ITEMS.register("krombul_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    KROMBUL,
+                    0xFFFFFF,
+                    0xFFFFFF,
+                    new Item.Properties()
+            ));
+
+    public static final RegistryObject<Item> BOMBUL_SPAWN_EGG = ITEMS.register("bombul_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    BOMBUL,
                     0xFFFFFF,
                     0xFFFFFF,
                     new Item.Properties()
@@ -853,6 +886,7 @@ public class Oasiso {
             event.put(MONKI_BIG.get(), MonkiBigEntity.createAttributes().build());
             event.put(TITANA.get(), TitanaEntity.createAttributes().build());
             event.put(SAND_HAND.get(), SandHandEntity.createAttributes().build());
+            event.put(KROMBUL.get(), KrombulEntity.createAttributes().build());
             event.put(BOMBUL.get(), BombulEntity.createAttributes().build());
             event.put(DASHER.get(), DasherEntity.createAttributes().build());
             event.put(CACTO.get(), CactoEntity.createAttributes().build());

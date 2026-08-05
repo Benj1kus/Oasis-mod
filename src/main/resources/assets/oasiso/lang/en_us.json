@@ -67,6 +67,8 @@
   "item.oasiso.bombul_bottle_empty": "Karakolit Bottle",
 
   "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
+  "item.oasiso.krombul_spawn_egg": "Krombul Spawn Egg",
+  "item.oasiso.bombul_spawn_egg": "Bombul Spawn Egg",
   "item.oasiso.titana_spawn_egg": "Beetan the Hammerer Spawn Egg",
   "item.oasiso.caser_spawn_egg": "Caesarus Genie Spawn Egg",
   "item.oasiso.sand_golem_spawn_egg": "Sandstone Golem Spawn Egg",
@@ -75,6 +77,7 @@
 
   "entity.oasiso.monki": "Monki",
   "entity.oasiso.bombul": "Bombul",
+  "entity.oasiso.krombul": "Krombul",
   "entity.oasiso.monki_big": "Big Monki",
   "entity.oasiso.titana": "Beetan the Hammerer",
   "entity.oasiso.sand_hand": "Sand hand",

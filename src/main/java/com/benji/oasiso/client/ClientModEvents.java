@@ -100,6 +100,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                Oasiso.KROMBUL.get(),
+                KrombulRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.CASER.get(),
                 CaserRenderer::new
         );

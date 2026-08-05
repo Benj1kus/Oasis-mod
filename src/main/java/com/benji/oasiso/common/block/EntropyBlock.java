@@ -1,6 +1,7 @@
 package com.benji.oasiso.common.block;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.entity.KrombulEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -8,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +28,8 @@ public class EntropyBlock extends Block {
     private static final double ENTROPY_RADIUS = 10.0D;
     private static final double ENTROPY_RADIUS_SQR =
             ENTROPY_RADIUS * ENTROPY_RADIUS;
+    private static final double KROMBUL_SPAWN_PLAYER_RADIUS = 30.0D;
+    private static final int MAX_NEARBY_KROMBULS = 6;
 
     private static final double PULL_STRENGTH = 0.1D;
 
@@ -34,12 +38,109 @@ public class EntropyBlock extends Block {
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        super.onPlace(state, level, pos, oldState, movedByPiston);
+    public void onPlace(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            BlockState oldState,
+            boolean movedByPiston
+    ) {
+        super.onPlace(
+                state,
+                level,
+                pos,
+                oldState,
+                movedByPiston
+        );
 
-        if (!level.isClientSide && !state.is(oldState.getBlock())) {
+        if (!level.isClientSide
+                && !state.is(oldState.getBlock())) {
+
             level.scheduleTick(pos, this, 2);
+
+            if (level instanceof ServerLevel serverLevel) {
+                trySpawnKrombul(
+                        serverLevel,
+                        pos,
+                        serverLevel.random
+                );
+            }
         }
+    }
+
+    private void trySpawnKrombul(
+            ServerLevel level,
+            BlockPos sourcePos,
+            RandomSource random
+    ) {
+        AABB spawnArea = new AABB(sourcePos)
+                .inflate(KROMBUL_SPAWN_PLAYER_RADIUS);
+
+        double radiusSqr =
+                KROMBUL_SPAWN_PLAYER_RADIUS
+                        * KROMBUL_SPAWN_PLAYER_RADIUS;
+
+
+        boolean hasNearbyPlayer =
+                !level.getEntitiesOfClass(
+                        Player.class,
+                        spawnArea,
+                        player ->
+                                player.isAlive()
+                                        && !player.isSpectator()
+                                        && player.distanceToSqr(
+                                        Vec3.atCenterOf(sourcePos)
+                                ) <= radiusSqr
+                ).isEmpty();
+
+        if (!hasNearbyPlayer) {
+            return;
+        }
+
+        int nearbyKrombulCount =
+                level.getEntitiesOfClass(
+                        KrombulEntity.class,
+                        spawnArea,
+                        krombul ->
+                                krombul.isAlive()
+                                        && krombul.distanceToSqr(
+                                        Vec3.atCenterOf(sourcePos)
+                                ) <= radiusSqr
+                ).size();
+
+        if (nearbyKrombulCount >= MAX_NEARBY_KROMBULS) {
+            return;
+        }
+
+        if (random.nextFloat() >= 0.40F) {
+            return;
+        }
+
+        KrombulEntity krombul =
+                Oasiso.KROMBUL.get().spawn(
+                        level,
+                        sourcePos.above(2),
+                        MobSpawnType.MOB_SUMMONED
+                );
+
+        if (krombul == null) {
+            return;
+        }
+
+        krombul.setPersistenceRequired();
+
+        level.sendParticles(
+                Oasiso.PURPLE_STARS.get(),
+                krombul.getX(),
+                krombul.getY()
+                        + krombul.getBbHeight() * 0.5D,
+                krombul.getZ(),
+                35,
+                0.5D,
+                0.7D,
+                0.5D,
+                0.08D
+        );
     }
 
     @Override
@@ -115,7 +216,10 @@ public class EntropyBlock extends Block {
         List<Entity> entities = level.getEntitiesOfClass(
                 Entity.class,
                 area,
-                entity -> entity.isAlive() && !entity.isSpectator()
+                entity ->
+                        entity.isAlive()
+                                && !entity.isSpectator()
+                                && !(entity instanceof KrombulEntity)
         );
 
         for (Entity entity : entities) {
