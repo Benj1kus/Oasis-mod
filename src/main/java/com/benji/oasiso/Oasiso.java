@@ -121,7 +121,8 @@ public class Oasiso {
 // BLOCKS
 
     public static final RegistryObject<Block> LIE_BLOCK = BLOCKS.register("lie_block",
-            () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.CALCITE)
+            () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
+                    .sound(SoundType.SCULK_CATALYST )
                     .strength(80.0F)
                     .noOcclusion()
                     .explosionResistance(3_600_000.0F)
