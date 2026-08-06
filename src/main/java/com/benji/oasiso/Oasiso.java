@@ -171,6 +171,21 @@ public class Oasiso {
     public static final RegistryObject<Item> SANDSTONE_POLISHED_ITEM = ITEMS.register("sandstone_polished",
             () -> new BlockItem(SANDSTONE_POLISHED.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> CHAOS_EYE =
+            BLOCKS.register(
+                    "chaos_eye",
+                    () -> new ChaosEyeBlock(
+                            BlockBehaviour.Properties
+                                    .copy(Blocks.AMETHYST_BLOCK)
+                                    .instabreak()
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()
+                    )
+            );
+
+    public static final RegistryObject<Item> CHAOS_EYE_ITEM = ITEMS.register("chaos_eye",
+            () -> new BlockItem(CHAOS_EYE.get(), new Item.Properties()));
+
     public static final RegistryObject<Block> SANDSTONE_COLUMN = BLOCKS.register("sandstone_column",
             () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE)
                     .strength(2.0F)
@@ -936,6 +951,7 @@ public class Oasiso {
             event.accept(TITANA_HAMMER);
         }
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ENCHANTED_BOOK_HAMMER);
             event.accept(NEPHRITIS);
             event.accept(NEPHRITIS_CORE);
             event.accept(KARAKOLIT_INGOT);

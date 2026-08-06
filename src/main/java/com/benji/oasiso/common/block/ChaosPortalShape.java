@@ -141,10 +141,6 @@ public final class ChaosPortalShape {
                     continue;
                 }
 
-                /*
-                 * Внутреннее пространство до активации
-                 * должно быть полностью пустым.
-                 */
                 if (!currentState.isAir()) {
                     return false;
                 }

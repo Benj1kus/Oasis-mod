@@ -12,6 +12,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -23,29 +26,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Mod.EventBusSubscriber(
         modid = Oasiso.MODID,
         bus = Mod.EventBusSubscriber.Bus.FORGE
 )
 public final class ChaosDimensionExitHandler {
 
-    /*
-     * chaos_moon6 начинается после 30 секунд.
-     */
+
     private static final int OUTCOME_START_TIME = 600;
 
-    /*
-     * Поглощение длится 5 секунд.
-     */
+
     private static final int CONSUMING_TIME = 100;
 
-    /*
-     * Обе анимации Krombul имеют длину 0,75 секунды.
-     */
+
     private static final int KROMBUL_ANIMATION_TIME = 15;
 
     private static final String STAY_TICKS_TAG =
             Oasiso.MODID + ":chaos_stay_ticks";
+
+
+    private static final long ORB_REWARD_COOLDOWN =
+            20L * 60L * 5L;
+
+    private static final String ORB_REWARD_COOLDOWN_TAG =
+            Oasiso.MODID
+                    + ":chaos_orb_reward_cooldown_until";
 
     private static final Map<UUID, ExitSequence>
             ACTIVE_SEQUENCES = new HashMap<>();
@@ -171,6 +177,9 @@ public final class ChaosDimensionExitHandler {
                 new ExitSequence(
                         ExitPhase.KROMBUL_START
                 );
+
+        sequence.orbRewardEligible =
+                hasFullSuperGoldArmor(player);
 
         if (actor != null) {
             sequence.actorId =
@@ -536,6 +545,10 @@ public final class ChaosDimensionExitHandler {
             actor.discard();
         }
 
+        if (sequence.orbRewardEligible) {
+            tryGiveLifeReward(player);
+        }
+
         ACTIVE_SEQUENCES.remove(
                 player.getUUID()
         );
@@ -631,6 +644,130 @@ public final class ChaosDimensionExitHandler {
                 0.0D,
                 Math.cos(radians)
         );
+    }
+
+    private static boolean hasFullSuperGoldArmor(
+            ServerPlayer player
+    ) {
+        return player.getItemBySlot(
+                EquipmentSlot.HEAD
+        ).is(
+                Oasiso.SUPER_GOLD_HELMET.get()
+        ) && player.getItemBySlot(
+                EquipmentSlot.CHEST
+        ).is(
+                Oasiso.SUPER_GOLD_CHESTPLATE.get()
+        ) && player.getItemBySlot(
+                EquipmentSlot.LEGS
+        ).is(
+                Oasiso.SUPER_GOLD_LEGGINGS.get()
+        ) && player.getItemBySlot(
+                EquipmentSlot.FEET
+        ).is(
+                Oasiso.SUPER_GOLD_BOOTS.get()
+        );
+    }
+
+    private static void tryGiveLifeReward(
+            ServerPlayer player
+    ) {
+        MinecraftServer server =
+                player.getServer();
+
+        if (server == null) {
+            return;
+        }
+
+        ServerLevel overworld =
+                server.getLevel(Level.OVERWORLD);
+
+        if (overworld == null) {
+            return;
+        }
+
+        CompoundTag data =
+                player.getPersistentData();
+
+        long currentGameTime =
+                overworld.getGameTime();
+
+        long cooldownUntil =
+                data.getLong(
+                        ORB_REWARD_COOLDOWN_TAG
+                );
+
+
+        if (currentGameTime < cooldownUntil) {
+            return;
+        }
+
+        ItemStack reward =
+                new ItemStack(
+                        player.getRandom().nextBoolean()
+                                ? Oasiso.ORB_CHAOS.get()
+                                : Oasiso.ORB_DOMINATION.get()
+                );
+
+
+        boolean addedToInventory =
+                player.getInventory().add(
+                        reward
+                );
+
+
+        if (!addedToInventory
+                && !reward.isEmpty()) {
+
+            player.drop(
+                    reward,
+                    false
+            );
+        }
+
+        data.putLong(
+                ORB_REWARD_COOLDOWN_TAG,
+                currentGameTime
+                        + ORB_REWARD_COOLDOWN
+        );
+
+
+        overworld.sendParticles(
+                Oasiso.GOLDEN_STARS.get(),
+                player.getX(),
+                player.getY()
+                        + player.getBbHeight() * 0.5D,
+                player.getZ(),
+                35,
+                0.45D,
+                0.7D,
+                0.45D,
+                0.07D
+        );
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(
+            PlayerEvent.Clone event
+    ) {
+        CompoundTag oldData =
+                event.getOriginal()
+                        .getPersistentData();
+
+        if (!oldData.contains(
+                ORB_REWARD_COOLDOWN_TAG,
+                Tag.TAG_LONG
+        )) {
+            return;
+        }
+
+        event.getEntity()
+                .getPersistentData()
+                .putLong(
+                        ORB_REWARD_COOLDOWN_TAG,
+                        oldData.getLong(
+                                ORB_REWARD_COOLDOWN_TAG
+                        )
+                );
     }
 
     private static void freezePlayer(
@@ -763,6 +900,7 @@ public final class ChaosDimensionExitHandler {
 
     private static final class ExitSequence {
 
+        private boolean orbRewardEligible;
         private ExitPhase phase;
         private int ticks;
         private UUID actorId;
