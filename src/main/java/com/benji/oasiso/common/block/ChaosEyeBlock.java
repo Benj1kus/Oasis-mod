@@ -22,17 +22,10 @@ public class ChaosEyeBlock extends Block {
             BlockPos pos,
             RandomSource random
     ) {
-        /*
-         * За время ожидания блок мог быть заменён
-         * чем-то другим.
-         */
         if (!state.is(this)) {
             return;
         }
-
-        /*
-         * Удаляем без выпадения предмета.
-         */
+        
         if (!level.removeBlock(pos, false)) {
             return;
         }
