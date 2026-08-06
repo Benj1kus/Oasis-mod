@@ -464,6 +464,13 @@ public class Oasiso {
     public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+
     public static final RegistryObject<Item> ENCHANTED_BOOK_HAMMER =
             ITEMS.register(
                     "enchanted_book_hammer",
