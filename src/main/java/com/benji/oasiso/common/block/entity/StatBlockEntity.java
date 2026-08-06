@@ -21,9 +21,8 @@ public class StatBlockEntity extends BlockEntity {
 
     public void setStoredItem(ItemStack storedItem) {
         this.storedItem = storedItem;
-        this.setChanged(); // Сообщаем игре, что данные изменились
+        this.setChanged();
         if (this.level != null && !this.level.isClientSide) {
-            // Синхронизируем изменения с клиентом
             this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
         }
     }
@@ -32,11 +31,9 @@ public class StatBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!this.storedItem.isEmpty()) {
-            // Если предмет есть, сохраняем его
             tag.put("StoredItem", this.storedItem.save(new CompoundTag()));
             tag.putBoolean("IsEmpty", false);
         } else {
-            // Если предмета нет, ЯВНО говорим об этом клиенту
             tag.putBoolean("IsEmpty", true);
         }
     }
@@ -44,17 +41,14 @@ public class StatBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        // Читаем предмет
         if (tag.contains("StoredItem")) {
             this.storedItem = ItemStack.of(tag.getCompound("StoredItem"));
         }
-        // Если пришел флаг пустоты — стираем предмет на клиенте
         else if (tag.getBoolean("IsEmpty")) {
             this.storedItem = ItemStack.EMPTY;
         }
     }
 
-    // Эти два метода нужны для правильной отправки данных на клиент при загрузке чанка
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();

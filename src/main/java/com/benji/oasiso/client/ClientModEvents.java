@@ -158,5 +158,10 @@ public class ClientModEvents {
                 SandedChestRenderer::new
         );
 
+        event.registerBlockEntityRenderer(
+                Oasiso.CHAOS_ALTAR_BE.get(),
+                ChaosAltarRenderer::new
+        );
+
     }
 }

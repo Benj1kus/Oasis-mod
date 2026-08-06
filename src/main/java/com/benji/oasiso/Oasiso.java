@@ -4,6 +4,8 @@ import com.benji.oasiso.client.renderer.CactoRenderer;
 import com.benji.oasiso.client.renderer.MonkiRenderer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import com.benji.oasiso.common.block.ChaosAltarBlock;
+import com.benji.oasiso.common.block.entity.ChaosAltarBlockEntity;
 import net.minecraft.world.level.Level;
 import com.benji.oasiso.common.block.*;
 import com.benji.oasiso.common.enchantment.HammerPowerEnchantment;
@@ -430,6 +432,28 @@ public class Oasiso {
                     ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
             ));
 
+    public static final RegistryObject<Block> CHAOS_ALTAR =
+            BLOCKS.register(
+                    "chaos_altar",
+                    () -> new ChaosAltarBlock(
+                            BlockBehaviour.Properties
+                                    .copy(Blocks.STONE)
+                                    .strength(100.0F)
+                                    .requiresCorrectToolForDrops()
+                                    .noOcclusion()
+                    )
+            );
+
+    public static final RegistryObject<Item> CHAOS_ALTAR_ITEM = ITEMS.register("chaos_altar",
+            () -> new GeoBlockItem(
+                    CHAOS_ALTAR.get(),
+                    new Item.Properties(),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "geo/chaos_altar.geo.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/chaos_altar.png"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "animations/chaos_altar.animation.json"),
+                    ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")
+            ));
+
     public static final RegistryObject<Block> TITANA_STATUE = BLOCKS.register("titana_statue",
             () -> new StatueBlock(TITANA_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE)
                     .strength(300.0F)
@@ -527,6 +551,9 @@ public class Oasiso {
 
     public static final RegistryObject<BlockEntityType<com.benji.oasiso.common.block.entity.LieBlockEntity>> LIE_BLOCK_BE = BLOCK_ENTITIES.register("lie_block",
             () -> BlockEntityType.Builder.of(com.benji.oasiso.common.block.entity.LieBlockEntity::new, LIE_BLOCK.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<ChaosAltarBlockEntity>> CHAOS_ALTAR_BE = BLOCK_ENTITIES.register("chaos_altar",
+            () -> BlockEntityType.Builder.of(ChaosAltarBlockEntity::new, CHAOS_ALTAR.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<SandedChestBlockEntity>> SANDED_CHEST_BE = BLOCK_ENTITIES.register("sanded_chest",
             () -> BlockEntityType.Builder.of(SandedChestBlockEntity::new, SANDED_CHEST.get()).build(null));

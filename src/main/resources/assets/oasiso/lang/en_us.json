@@ -23,7 +23,7 @@
   "block.oasiso.karakolit_block": "Karakolit block",
   "block.oasiso.nephritis_block": "Nephritis block",
   "block.oasiso.azazel_desertstatue": "Ancient Azazel statue",
-  "block.oasiso.lie_block": "Oasis-Mimic block",
+  "block.oasiso.lie_block": "Oasis block",
   "block.oasiso.ball_cactus": "Balloon Cactus",
 
   "block.oasiso.doum_palm_button": "Doum Palm Button",
@@ -45,6 +45,7 @@
   "block.oasiso.doum_palm_trapdoor": "Doum Palm Trapdoor",
   "block.oasiso.entropy_block": "Block of Entropy",
   "block.oasiso.entropy_vein": "Entropy vein",
+  "block.oasiso.chaos_altar": "Altar of Entropy",
 
 
 
