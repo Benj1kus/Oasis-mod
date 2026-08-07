@@ -25,7 +25,7 @@ public class ChaosEyeBlock extends Block {
         if (!state.is(this)) {
             return;
         }
-        
+
         if (!level.removeBlock(pos, false)) {
             return;
         }
