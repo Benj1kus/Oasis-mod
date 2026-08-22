@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "oasiso:block/stat" },
+    "facing=east":  { "model": "oasiso:block/stat", "y": 90 },
+    "facing=south": { "model": "oasiso:block/stat", "y": 180 },
+    "facing=west":  { "model": "oasiso:block/stat", "y": 270 }
+  }
+}

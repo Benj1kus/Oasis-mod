@@ -1,0 +1,78 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "main",
+					"pivot": [0, 0.75, 0],
+					"cubes": [
+						{"origin": [-4, 6, -4], "size": [8, 10, 8], "uv": [0, 41]},
+						{"origin": [-6, 13, -6], "size": [12, 5, 12], "uv": [2, 2]},
+						{"origin": [-7, 11, -7], "size": [14, 8, 14], "uv": [72, 106]},
+						{"origin": [-7, 0, -7], "size": [14, 6, 14], "uv": [0, 21]}
+					]
+				},
+				{
+					"name": "sphere1",
+					"parent": "main",
+					"pivot": [0, 29, 0],
+					"cubes": [
+						{"origin": [-3, 26, -3], "size": [6, 6, 6], "uv": [32, 41]}
+					]
+				},
+				{
+					"name": "sphere2",
+					"parent": "main",
+					"pivot": [0, 29, 0],
+					"cubes": [
+						{"origin": [-3, 26, -3], "size": [6, 6, 6], "uv": [32, 53]}
+					]
+				},
+				{
+					"name": "claw",
+					"parent": "main",
+					"pivot": [0, 18, -4],
+					"cubes": [
+						{"origin": [-2, 18, -5], "size": [4, 10, 2], "uv": [56, 0]}
+					]
+				},
+				{
+					"name": "claw2",
+					"parent": "main",
+					"pivot": [4, 18, 0],
+					"rotation": [0, -90, 0],
+					"cubes": [
+						{"origin": [2, 18, -1], "size": [4, 10, 2], "uv": [56, 0]}
+					]
+				},
+				{
+					"name": "claw3",
+					"parent": "main",
+					"pivot": [-4, 18, 0],
+					"rotation": [0, 90, 0],
+					"cubes": [
+						{"origin": [-6, 18, -1], "size": [4, 10, 2], "uv": [56, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "claw4",
+					"parent": "main",
+					"pivot": [0, 18, 4],
+					"rotation": [0, 180, 0],
+					"cubes": [
+						{"origin": [-2, 18, 3], "size": [4, 10, 2], "uv": [56, 0]}
+					]
+				}
+			]
+		}
+	]
+}

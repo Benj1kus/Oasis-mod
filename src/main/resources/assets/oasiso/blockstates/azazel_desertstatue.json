@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "oasiso:block/azazel_desertstatue" },
+    "facing=east":  { "model": "oasiso:block/azazel_desertstatue", "y": 90 },
+    "facing=south": { "model": "oasiso:block/azazel_desertstatue", "y": 180 },
+    "facing=west":  { "model": "oasiso:block/azazel_desertstatue", "y": 270 }
+  }
+}

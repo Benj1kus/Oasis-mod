@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "S_S",
+    " s "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:sandstone_slab"
+    },
+    "S":{
+      "item": "minecraft:sandstone_wall"
+    },
+    "_":{
+      "item": "minecraft:red_carpet"
+    },
+    "s":{
+      "item":  "oasiso:sandstone_bricked"
+    }
+  },
+  "result": {
+    "item": "oasiso:stat"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "oasiso:item/cpaladin_spawn_egg"
+  }
+}

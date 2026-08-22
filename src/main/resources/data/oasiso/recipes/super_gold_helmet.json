@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    ". .",
+    "#o#",
+    "# #"
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:gold_nugget"
+    },
+    "#":{
+      "item": "oasiso:karakolit_ingot"
+    },
+    "o":{
+      "item": "oasiso:nephritis_core"
+    }
+  },
+  "result": {
+    "item": "oasiso:super_gold_helmet"
+  }
+}

@@ -1,0 +1,12 @@
+
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:sandstone_polished"
+    }
+  ],
+  "result": {
+    "item": "oasiso:sandstone_column"
+  }
+}

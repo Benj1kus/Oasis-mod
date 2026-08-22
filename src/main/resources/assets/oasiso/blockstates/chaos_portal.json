@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "oasiso:block/chaos_portal_x"
+    },
+    "axis=z": {
+      "model": "oasiso:block/chaos_portal_z"
+    }
+  }
+}

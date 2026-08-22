@@ -1,0 +1,9 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "particle": "oasiso:block/scarlet_grass_side",
+    "bottom": "oasiso:block/scarlet_grass_bottom",
+    "top": "oasiso:block/scarlet_grass_top",
+    "side": "oasiso:block/scarlet_grass_side"
+  }
+}

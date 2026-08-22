@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "particle": "oasiso:block/nephritis_bricks",
+    "end": "oasiso:block/nephritis_polished",
+    "side": "oasiso:block/nephritis_bricks"
+  }
+}

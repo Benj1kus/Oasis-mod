@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    ".#.",
+    "# #",
+    "# #"
+  ],
+  "key": {
+    ".": {
+      "item": "oasiso:nephritis"
+    },
+    "#":{
+      "item": "oasiso:karakolit_ingot"
+    }
+  },
+  "result": {
+    "item": "oasiso:super_gold_leggings"
+  }
+}

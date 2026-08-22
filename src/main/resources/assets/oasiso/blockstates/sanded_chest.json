@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "oasiso:block/sanded_chest_dummy" },
+    "facing=south": { "model": "oasiso:block/sanded_chest_dummy", "y": 180 },
+    "facing=west":  { "model": "oasiso:block/sanded_chest_dummy", "y": 270 },
+    "facing=east":  { "model": "oasiso:block/sanded_chest_dummy", "y": 90 }
+  }
+}

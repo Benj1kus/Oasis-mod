@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "oasiso:block/skelet_believer" },
+    "facing=east":  { "model": "oasiso:block/skelet_believer", "y": 90 },
+    "facing=south": { "model": "oasiso:block/skelet_believer", "y": 180 },
+    "facing=west":  { "model": "oasiso:block/skelet_believer", "y": 270 }
+  }
+}

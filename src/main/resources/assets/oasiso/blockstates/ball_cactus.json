@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "cactus_state=0": { "model": "oasiso:block/ball_cactus" },
+    "cactus_state=1": { "model": "oasiso:block/ball_cactus_eat" },
+    "cactus_state=2": { "model": "oasiso:block/ball_cactus_empty" },
+    "cactus_state=3": { "model": "oasiso:block/ball_cactus_water" },
+    "cactus_state=4": { "model": "oasiso:block/ball_cactus_milk" }
+  }
+}

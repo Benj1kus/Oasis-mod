@@ -1,0 +1,125 @@
+{
+  "flowery1": { "sounds": [ "oasiso:flowery1" ] },
+  "flowery2": { "sounds": [ "oasiso:flowery2" ] },
+  "flowery3": { "sounds": [ "oasiso:flowery3" ] },
+  "flowery4": { "sounds": [ "oasiso:flowery4" ] },
+  "flowery5": { "sounds": [ "oasiso:flowery5" ] },
+  "flowery6": { "sounds": [ "oasiso:flowery6" ] },
+  "flowery7": { "sounds": [ "oasiso:flowery7" ] },
+  "flowery8": { "sounds": [ "oasiso:flowery8" ] },
+  "flowery9": { "sounds": [ "oasiso:flowery9" ] },
+  "flowery10": { "sounds": [ "oasiso:flowery10" ] },
+  "flowery11": { "sounds": [ "oasiso:flowery11" ] },
+  "flowery12": { "sounds": [ "oasiso:flowery12" ] },
+  "flowery13": { "sounds": [ "oasiso:flowery13" ] },
+
+  "entropy1": { "sounds": [ "oasiso:entropy1" ] },
+  "entropy2": { "sounds": [ "oasiso:entropy2" ] },
+  "entropy3": { "sounds": [ "oasiso:entropy3" ] },
+
+  "gaster": { "sounds": [ "oasiso:gaster" ] },
+  "honk": { "sounds": [ "oasiso:honk" ] },
+  "tower_place": { "sounds": [ "oasiso:tower_place" ] },
+  "cast": { "sounds": [ "oasiso:cast" ] },
+
+
+  "azumaal_idle1": { "sounds": [ "oasiso:azumaal_idle1" ] },
+  "azumaal_idle2": { "sounds": [ "oasiso:azumaal_idle2" ] },
+  "azumaal_idle3": { "sounds": [ "oasiso:azumaal_idle3" ] },
+  "azumaal_death": { "sounds": [ "oasiso:azumaal_death" ] },
+  "azumaal_hit": { "sounds": [ "oasiso:azumaal_hit" ] },
+  "summon_cast": { "sounds": [ "oasiso:summon_cast" ] },
+  "eyelid_shot": { "sounds": [ "oasiso:eyelid_shot" ] },
+  "eye_attack": { "sounds": [ "oasiso:eye_attack" ] },
+  "frame": { "sounds": [ "oasiso:frame" ] },
+  "scissors": { "sounds": [ "oasiso:scissors" ] },
+  "bomb_spawn": { "sounds": [ "oasiso:bomb_spawn" ] },
+  "boss_spawn": { "sounds": [ "oasiso:boss_spawn" ] },
+  "timer": { "sounds": [ "oasiso:timer" ] },
+  "swing": { "sounds": [ "oasiso:swing" ] },
+  "clones": { "sounds": [ "oasiso:clones" ] },
+  "portal_open": { "sounds": [ "oasiso:portal_open" ] },
+  "azumaal_song": {
+    "sounds": [
+      {
+        "name": "oasiso:azumaal_song",
+        "stream": true
+      }
+    ]
+  },
+
+  "azumaal_looped": {
+    "sounds": [
+      {
+        "name": "oasiso:azumaal_looped",
+        "stream": true
+      }
+    ]
+  },
+  "sandstorm": { "sounds": [ "oasiso:sandstorm" ] },
+
+  "echo1": { "sounds": [ "oasiso:echo1" ] },
+  "echo2": { "sounds": [ "oasiso:echo2" ] },
+  "echo3": { "sounds": [ "oasiso:echo3" ] },
+
+  "dimension_ambient": { "sounds": [ "oasiso:dimension_ambient" ] },
+  "echo_stars": { "sounds": [ "oasiso:echo_stars" ] },
+  "god_scream": { "sounds": [ "oasiso:god_scream" ] },
+  "chaos_life": { "sounds": [ "oasiso:chaos_life" ] },
+  "chaos_death": { "sounds": [ "oasiso:chaos_death" ] },
+
+
+  "voices": { "sounds": [ "oasiso:voices" ] },
+  "white_flash": { "sounds": [ "oasiso:white_flash" ] },
+  "support": { "sounds": [ "oasiso:support" ] },
+
+  "bombul_idle": { "sounds": [ "oasiso:bombul_idle" ] },
+  "bombul_hurt": { "sounds": [ "oasiso:bombul_hurt" ] },
+
+  "yes": { "sounds": [ "oasiso:yes" ] },
+
+  "magnetic": { "sounds": [ "oasiso:magnetic" ] },
+
+  "caser1": { "sounds": [ "oasiso:caser1" ] },
+  "caser2": { "sounds": [ "oasiso:caser2" ] },
+  "caser3": { "sounds": [ "oasiso:caser3" ] },
+  "caser_hit": { "sounds": [ "oasiso:caser_hit" ] },
+  "caser_default": { "sounds": [ "oasiso:caser_default" ] },
+  "caser_spin": { "sounds": [ "oasiso:caser_spin" ] },
+  "caser_success": { "sounds": [ "oasiso:caser_success" ] },
+
+  "monki1": { "sounds": [ "oasiso:monki1" ] },
+  "monki2": { "sounds": [ "oasiso:monki2" ] },
+  "monki3": { "sounds": [ "oasiso:monki3" ] },
+  "monki_hit": { "sounds": [ "oasiso:monki_hit" ] },
+  "monki_death": { "sounds": [ "oasiso:monki_death" ] },
+
+  "cacto1": { "sounds": [ "oasiso:cacto1" ] },
+  "cacto2": { "sounds": [ "oasiso:cacto2" ] },
+  "cacto3": { "sounds": [ "oasiso:cacto3" ] },
+  "cacto_hit": { "sounds": [ "oasiso:cacto_hit" ] },
+  "cacto_death": { "sounds": [ "oasiso:cacto_death" ] },
+
+  "dasher1": { "sounds": [ "oasiso:dasher1" ] },
+  "dasher2": { "sounds": [ "oasiso:dasher2" ] },
+  "dasher3": { "sounds": [ "oasiso:dasher3" ] },
+  "dasher_hit": { "sounds": [ "oasiso:dasher_hit" ] },
+  "dasher_attack": { "sounds": [ "oasiso:dasher_attack" ] },
+  "dash": { "sounds": [ "oasiso:dash" ] },
+  "dasher_death": { "sounds": [ "oasiso:dasher_death" ] },
+
+  "sandgolem1": { "sounds": [ "oasiso:sandgolem1" ] },
+  "sandgolem2": { "sounds": [ "oasiso:sandgolem2" ] },
+  "sandgolem3": { "sounds": [ "oasiso:sandgolem3" ] },
+  "sandgolem_hit": { "sounds": [ "oasiso:sandgolem_hit" ] },
+  "sandgolem_step": { "sounds": [ "oasiso:sandgolem_step" ] },
+
+  "titana1": { "sounds": [ "oasiso:titana1" ] },
+  "titana2": { "sounds": [ "oasiso:titana2" ] },
+  "titana3": { "sounds": [ "oasiso:titana3" ] },
+  "titana_hit": { "sounds": [ "oasiso:titana_hit" ] },
+  "titana_attack": { "sounds": [ "oasiso:titana_attack" ] },
+  "desert_hand": { "sounds": [ "oasiso:desert_hand" ] },
+  "titana_step": { "sounds": [ "oasiso:titana_step" ] },
+  "titana_death": { "sounds": [ "oasiso:titana_death" ] }
+}

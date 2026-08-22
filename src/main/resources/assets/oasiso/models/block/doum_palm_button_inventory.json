@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/button_inventory",
+  "textures": {
+    "texture": "oasiso:block/doum_palm_planks"
+  }
+}
+

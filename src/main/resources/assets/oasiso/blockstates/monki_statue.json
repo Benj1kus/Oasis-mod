@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "oasiso:block/monki_statue_dummy" },
+    "facing=south": { "model": "oasiso:block/monki_statue_dummy", "y": 180 },
+    "facing=west":  { "model": "oasiso:block/monki_statue_dummy", "y": 270 },
+    "facing=east":  { "model": "oasiso:block/monki_statue_dummy", "y": 90 }
+  }
+}

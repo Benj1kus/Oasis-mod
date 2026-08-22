@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "oasiso:doum_palm_log",
+    "oasiso:doum_palm_wood",
+    "oasiso:stripped_doum_palm_log",
+    "oasiso:stripped_doum_palm_wood"
+  ]
+}

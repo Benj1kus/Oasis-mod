@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "oasiso:doum_palm_log",
+    "oasiso:stripped_doum_palm_log",
+    "oasiso:doum_palm_planks",
+    "oasiso:doum_palm_door",
+    "oasiso:doum_palm_trapdoor",
+    "oasiso:doum_palm_fence",
+    "oasiso:doum_palm_fence_gate",
+    "oasiso:doum_palm_button",
+    "oasiso:doum_palm_pressure_plate",
+    "oasiso:doum_palm_sign",
+    "oasiso:doum_palm_wall_sign",
+    "oasiso:doum_palm_hanging_sign",
+    "oasiso:doum_palm_wall_hanging_sign",
+    "oasiso:doum_palm_slab",
+    "oasiso:doum_palm_stairs",
+    "oasiso:scarlet_log"
+  ]
+}

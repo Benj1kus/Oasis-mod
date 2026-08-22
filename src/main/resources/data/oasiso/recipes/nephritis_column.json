@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:nephritis_bricks"
+    }
+  ],
+  "result": {
+    "item": "oasiso:nephritis_column"
+  }
+}

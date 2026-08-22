@@ -1,0 +1,97 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "monki",
+					"pivot": [0.25, 3.75, 0.5],
+					"cubes": [
+						{"origin": [1, 0, -1], "size": [0, 0, 0], "uv": [4, 2]}
+					]
+				},
+				{
+					"name": "up",
+					"parent": "monki",
+					"pivot": [0, 5, 1],
+					"cubes": [
+						{"origin": [-2, 5, -1], "size": [4, 6, 4], "uv": [16, 16]}
+					]
+				},
+				{
+					"name": "head",
+					"parent": "up",
+					"pivot": [0, 11, 1],
+					"cubes": [
+						{"origin": [-4, 11, -3], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 19, 1], "size": [8, 4, 0], "uv": [16, 30]}
+					]
+				},
+				{
+					"name": "us_left",
+					"parent": "head",
+					"pivot": [3, 18.25, -2.5],
+					"cubes": [
+						{"origin": [3, 16, -9], "size": [0, 16, 8], "uv": [0, 16]}
+					]
+				},
+				{
+					"name": "us_right2",
+					"parent": "head",
+					"pivot": [-3, 18.25, -2.5],
+					"cubes": [
+						{"origin": [-3, 16, -9], "size": [0, 16, 8], "uv": [0, 16], "mirror": true}
+					]
+				},
+				{
+					"name": "arm_left",
+					"parent": "up",
+					"pivot": [2, 10, 1],
+					"cubes": [
+						{"origin": [2, 9, 0], "size": [8, 2, 2], "uv": [16, 26]}
+					]
+				},
+				{
+					"name": "arm_right",
+					"parent": "up",
+					"pivot": [-2, 10, 1],
+					"cubes": [
+						{"origin": [-10, 9, 0], "size": [8, 2, 2], "uv": [16, 26], "mirror": true}
+					]
+				},
+				{
+					"name": "desertball",
+					"parent": "arm_right",
+					"pivot": [-4.5, 10, 1],
+					"cubes": [
+						{"origin": [-12, 8.5, -0.5], "size": [3, 3, 3], "uv": [52, 58]}
+					]
+				},
+				{
+					"name": "leg_left",
+					"parent": "monki",
+					"pivot": [1.5, 5, 1],
+					"cubes": [
+						{"origin": [1, 0, 0.5], "size": [1, 5, 1], "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "leg_right",
+					"parent": "monki",
+					"pivot": [-1.5, 5, 1],
+					"cubes": [
+						{"origin": [-2, 0, 0.5], "size": [1, 5, 1], "uv": [32, 0], "mirror": true}
+					]
+				}
+			]
+		}
+	]
+}

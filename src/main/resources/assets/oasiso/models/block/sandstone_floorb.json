@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "particle": "oasiso:block/sandstone_floorb",
+    "end": "minecraft:block/sandstone_top",
+    "side": "oasiso:block/sandstone_floorb"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "oasiso:block/nephritis_bricks"
+    },
+    "axis=x": {
+      "model": "oasiso:block/nephritis_bricks",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "oasiso:block/nephritis_bricks",
+      "x": 90
+    }
+  }
+}

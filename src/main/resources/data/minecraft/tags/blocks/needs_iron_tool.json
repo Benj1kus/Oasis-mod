@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "oasiso:dasher_statue",
+    "oasiso:titana_statue",
+    "oasiso:monki_statue",
+    "oasiso:nephritis_block",
+    "oasiso:karakolit_block",
+    "oasiso:lie_block",
+    "oasiso:entropy_block",
+    "oasiso:nephritis_column",
+    "oasiso:nephritis_bricks",
+    "oasiso:nephritis_line",
+    "oasiso:nephritis_corner",
+    "oasiso:nephritis_compressed",
+    "oasiso:nephritis_polished",
+    "oasiso:nephritis_spiral",
+    "oasiso:storm_totem",
+    "oasiso:nephritis_lamp"
+  ]
+}

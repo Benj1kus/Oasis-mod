@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:nephritis_compressed"
+    }
+  ],
+  "result": {
+    "item": "oasiso:nephritis_polished"
+  }
+}

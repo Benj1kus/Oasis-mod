@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=up":    { "model": "oasiso:block/nephritis_corner" },
+    "facing=down":  { "model": "oasiso:block/nephritis_corner", "x": 180 },
+    "facing=north": { "model": "oasiso:block/nephritis_corner", "x": 90 },
+    "facing=east":  { "model": "oasiso:block/nephritis_corner", "x": 90, "y": 90 },
+    "facing=south": { "model": "oasiso:block/nephritis_corner", "x": 90, "y": 180 },
+    "facing=west":  { "model": "oasiso:block/nephritis_corner", "x": 90, "y": 270 }
+  }
+}

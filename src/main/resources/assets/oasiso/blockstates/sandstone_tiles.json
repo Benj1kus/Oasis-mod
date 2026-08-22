@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "oasiso:block/sandstone_tiles"
+    },
+    "facing=east": {
+      "model": "oasiso:block/sandstone_tiles",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "oasiso:block/sandstone_tiles",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oasiso:block/sandstone_tiles",
+      "y": 270
+    }
+  }
+}

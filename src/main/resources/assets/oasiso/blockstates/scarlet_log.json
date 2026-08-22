@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "oasiso:block/scarlet_log"
+    },
+    "axis=x": {
+      "model": "oasiso:block/scarlet_log",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "oasiso:block/scarlet_log",
+      "x": 90
+    }
+  }
+}

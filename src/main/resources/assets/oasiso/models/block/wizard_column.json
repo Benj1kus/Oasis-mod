@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "particle": "oasiso:block/wizard_column",
+    "end": "oasiso:block/nephritis_spiral",
+    "side": "oasiso:block/wizard_column"
+  }
+}
