@@ -24,7 +24,7 @@ public class DialogueDefinition {
     public String text_color = "white";
     public List<String> text_gradient;
     public String text_effect = "wave";
-    
+
     public String text_style;
 
     // Visuals
@@ -132,7 +132,6 @@ public class DialogueDefinition {
         public String target;
 
         public double radius = 5.0D;
-
         public double look_angle = 12.0D;
 
         public int check_interval = 5;
@@ -146,7 +145,7 @@ public class DialogueDefinition {
         // External event ID.
         public String event;
 
-        // Area/dimension
+        // Dimension filter.
         public String dimension;
 
         public Double x;
@@ -160,5 +159,52 @@ public class DialogueDefinition {
         public Double max_x;
         public Double max_y;
         public Double max_z;
+
+        public ZoneAnchor anchor;
+        public String shape = "cylinder";
+
+        public double height = 2.0D;
+        public double size_x = 6.0D;
+        public double size_y = 2.0D;
+        public double size_z = 6.0D;
+        public ZoneVisual visual = new ZoneVisual();
+    }
+
+
+    public static class ZoneAnchor {
+
+        public String type = "absolute";
+        public String target;
+        public String entity_tag;
+        public String pick = "nearest";
+
+
+        public Double x;
+        public Double y;
+        public Double z;
+
+
+        public double offset_x = 0.0D;
+        public double offset_y = 0.0D;
+        public double offset_z = 0.0D;
+
+        public double search_height = 8.0D;
+    }
+
+
+    public static class ZoneVisual {
+
+        public boolean enabled = true;
+        public String style = "auto";
+        public String texture;
+
+        public String color = "cyan";
+        public float alpha = 0.55F;
+        public double y_offset = 0.03D;
+        public double size = 0.0D;
+
+        public double visual_height = 0.0D;
+        public boolean pulse = true;
+        public double preview_distance = 16.0D;
     }
 }
