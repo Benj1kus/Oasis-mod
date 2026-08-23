@@ -33,7 +33,27 @@ float hash21(vec2 p) {
 
 void main() {
 
+    vec4 originalScene =
+    texture(
+        DiffuseSampler,
+        texCoord
+    );
 
+    if (
+    BaseRadius <= 0.0001
+    || TopRadius <= 0.0001
+    || BaseRadius > 0.55
+    || TopRadius > 0.42
+
+    || abs(PortalBase.x) > 4.0
+    || abs(PortalBase.y) > 4.0
+
+    || abs(PortalTop.x) > 4.0
+    || abs(PortalTop.y) > 4.0
+    ) {
+        fragColor = originalScene;
+        return;
+    }
 
     vec2 axis = PortalTop - PortalBase;
 
@@ -249,6 +269,20 @@ void main() {
     * 1.65
     * energy;
 
+    float offsetLength =
+    length(offset);
+
+
+    const float MAX_OFFSET =
+    0.015;
+
+
+    if (offsetLength > MAX_OFFSET) {
+
+        offset *=
+        MAX_OFFSET
+        / offsetLength;
+    }
 
     vec2 distortedUv = clamp(
         texCoord + offset,

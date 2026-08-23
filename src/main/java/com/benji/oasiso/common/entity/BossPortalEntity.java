@@ -142,12 +142,15 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     @Override
     public void tick() {
+        super.setDeltaMovement(Vec3.ZERO);
         super.tick();
+
         this.setNoGravity(true);
         this.setInvulnerable(true);
-
         this.noPhysics = true;
-        this.setDeltaMovement(Vec3.ZERO);
+
+        super.setDeltaMovement(Vec3.ZERO);
+
         this.fallDistance = 0.0F;
         if (this.level().isClientSide || !(this.level() instanceof ServerLevel serverLevel)) {
             return;
@@ -249,6 +252,19 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
     @Override
     public boolean isPushable() {
         return false;
+    }
+
+    @Override
+    public void push(double x, double y, double z) {
+    }
+
+    @Override
+    public void knockback(double strength, double x, double z) {
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 movement) {
+        super.setDeltaMovement(Vec3.ZERO);
     }
 
     @Override

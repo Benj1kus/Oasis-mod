@@ -52,14 +52,14 @@ public final class AzumaalSpawnOverlay {
     private static final int SUBTITLE_IN_START = 48;
     private static final int SUBTITLE_IN_END = 56;
 
-    private static final int TEXT_OUT_START = 84;
-    private static final int TEXT_OUT_END = 102;
+    private static final int BG_DISSOLVE_START = 126;
+    private static final int BG_DISSOLVE_END = 160;
 
-    private static final int BG_OUT_START = 102;
-    private static final int BG_OUT_END = 114;
+    private static final int TEXT_OUT_START = 120;
+    private static final int TEXT_OUT_END = 144;
 
-    private static final int FRAME_OUT_START = 114;
-    private static final int TOTAL_TICKS = 130;
+    private static final int FRAME_OUT_START = 150;
+    private static final int TOTAL_TICKS = 172;
 
     private static final Set<UUID> SHOWN_FOR_BOSSES = new HashSet<>();
 
@@ -171,11 +171,10 @@ public final class AzumaalSpawnOverlay {
         int panelY = Mth.floor(Mth.lerp(frameProgress, hiddenY, visibleY));
 
         float bgReveal = smoothProgress(overlayTick, BG_IN_START, BG_IN_END);
+
         float bgAlpha = 1.0F;
 
-        if (overlayTick >= BG_OUT_START) {
-            bgAlpha = 1.0F - smoothProgress(overlayTick, BG_OUT_START, BG_OUT_END);
-        }
+        float bgDissolve = smoothProgress(overlayTick, BG_DISSOLVE_START, BG_DISSOLVE_END);
 
         float time = (overlayTick + minecraft.getFrameTime()) / 20.0F;
 
@@ -187,11 +186,23 @@ public final class AzumaalSpawnOverlay {
             float innerWidth = PANEL_WIDTH - INNER_BORDER * 2;
             float innerHeight = PANEL_HEIGHT - INNER_BORDER * 2;
 
-            boolean rendered = AzumaalPanelShader.render(graphics.pose(), innerX, innerY, innerWidth, innerHeight, time, bgReveal, bgAlpha);
+            boolean rendered =
+                    AzumaalPanelShader.render(
+                            graphics.pose(),
+                            innerX,
+                            innerY,
+                            innerWidth,
+                            innerHeight,
+                            time,
+                            bgReveal,
+                            bgAlpha,
+                            bgDissolve
+                    );
 
             if (!rendered) {
-                int fallbackAlpha = Mth.floor(bgAlpha * 200.0F);
-                graphics.fill((int) innerX, (int) innerY, (int) (innerX + innerWidth), (int) (innerY + innerHeight), (fallbackAlpha << 24) | 0x083C3A);
+                int alpha = Mth.floor((1.0F - bgDissolve) * 200.0F);
+
+                graphics.fill((int) innerX, (int) innerY, (int) (innerX + innerWidth), (int) (innerY + innerHeight), (alpha << 24) | 0x083C3A);
             }
         }
 

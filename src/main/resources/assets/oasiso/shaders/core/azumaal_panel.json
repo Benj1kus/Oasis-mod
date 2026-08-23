@@ -48,6 +48,12 @@
       "values": [ 1.0 ]
     },
     {
+      "name": "Dissolve",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    },
+    {
       "name": "PanelWidth",
       "type": "float",
       "count": 1,

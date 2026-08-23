@@ -119,10 +119,10 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 1800.0D)
+                .add(Attributes.MAX_HEALTH, 1500.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.4D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 28.0D)
+                .add(Attributes.ATTACK_DAMAGE, 20.0D)
                 .add(Attributes.FOLLOW_RANGE, LOOK_RANGE);
     }
 

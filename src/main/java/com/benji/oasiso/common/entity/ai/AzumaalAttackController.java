@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.BattleHintArrowEntity;
 import com.benji.oasiso.common.entity.CircleHintEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public final class AzumaalAttackController {
     private static final double DASH_STOP_DISTANCE = 2.0D;
 
     private static final double DAMAGE_RANGE = 8.0D;
-    private static final float MELEE_DAMAGE = 30.0F;
+    private static final float MELEE_DAMAGE_MULTIPLIER = 1.0F;
 
     private static final int SUMMON_1_DURATION = 60;
     private static final int SUMMON_WEAK_TICK = 36;
@@ -55,7 +56,7 @@ public final class AzumaalAttackController {
     private static final int DOUBLE_DAMAGE_1_TICK = 23;
     private static final int DOUBLE_DAMAGE_2_TICK = 38;
     private static final double DOUBLE_DAMAGE_RANGE = 8.0D;
-    private static final float DOUBLE_DAMAGE = 30.0F;
+    private static final float DOUBLE_DAMAGE_MULTIPLIER = 0.80F;
 
     private static final int THROW_APPROACH_TICKS = 5;
     private static final double THROW_APPROACH_DISTANCE = 2.0D;
@@ -68,7 +69,7 @@ public final class AzumaalAttackController {
     private static final double AIR_HEIGHT_OFFSET = 1.75D;
     private static final int THROW_DOWN_TICK = 24;
     private static final double THROW_DOWN_RANGE = 5.0D;
-    private static final float THROW_DOWN_DAMAGE = 30.0F;
+    private static final float THROW_DOWN_DAMAGE_MULTIPLIER = 1.10F;
     private static final double THROW_DOWN_HORIZONTAL = 1.15D;
     private static final double THROW_DOWN_VERTICAL = -1.55D;
 
@@ -119,6 +120,12 @@ public final class AzumaalAttackController {
         this.boss = boss;
     }
 
+
+    private float getAttackDamage(float multiplier) {
+        return (float) boss.getAttributeValue(
+                Attributes.ATTACK_DAMAGE
+        ) * multiplier;
+    }
 
     public void reset() {
         this.phase = AttackPhase.NONE;
@@ -567,22 +574,12 @@ public final class AzumaalAttackController {
         }
 
         if (this.attackTick == DOUBLE_DAMAGE_1_TICK) {
-            dealDoubleDamage(level, target);
-        }
-
-        if (this.attackTick == DOUBLE_DAMAGE_2_TICK) {
-            dealDoubleDamage(level, target);
-        }
-
-        if (this.attackTick == DOUBLE_DAMAGE_1_TICK) {
             playBossSound(ModSounds.SWING.get(), 2.5F, 1.0F);
-
             dealDoubleDamage(level, target);
         }
 
         if (this.attackTick == DOUBLE_DAMAGE_2_TICK) {
             playBossSound(ModSounds.SWING.get(), 2.5F, 1.0F);
-
             dealDoubleDamage(level, target);
         }
 
@@ -599,7 +596,7 @@ public final class AzumaalAttackController {
         if (!this.cloneManager.isTargetInAttackRange(level, target, DOUBLE_DAMAGE_RANGE)) {
             return;
         }
-        target.hurt(boss.damageSources().mobAttack(boss), DOUBLE_DAMAGE);
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(DOUBLE_DAMAGE_MULTIPLIER));
     }
 
     private void startMelee(ServerPlayer target, AttackPhase attackPhase) {
@@ -767,14 +764,6 @@ public final class AzumaalAttackController {
 
         if (this.attackTick == THROW_DOWN_TICK) {
 
-            throwTargetDown(level, target);
-
-            this.returnTicksRemaining = AIR_THROW_DURATION - THROW_DOWN_TICK;
-        }
-
-
-        if (this.attackTick == THROW_DOWN_TICK) {
-
             playBossSound(ModSounds.SWING.get(), 2.5F, 0.92F);
 
             throwTargetDown(level, target);
@@ -849,7 +838,7 @@ public final class AzumaalAttackController {
 
         target.serverLevel().sendParticles(Oasiso.PURPLE_STARS.get(), target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(), 38, 0.65D, 0.55D, 0.65D, 0.12D);
 
-        target.hurt(boss.damageSources().mobAttack(boss), THROW_DOWN_DAMAGE);
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(THROW_DOWN_DAMAGE_MULTIPLIER));
 
         Vec3 attackOrigin = this.cloneManager.getClosestMemberPosition(level, target);
         Vec3 horizontal = new Vec3(target.getX() - attackOrigin.x, 0.0D, target.getZ() - attackOrigin.z);
@@ -950,7 +939,7 @@ public final class AzumaalAttackController {
             return;
         }
 
-        target.hurt(boss.damageSources().mobAttack(boss), MELEE_DAMAGE);
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(MELEE_DAMAGE_MULTIPLIER));
     }
 
     private void finishAttack() {

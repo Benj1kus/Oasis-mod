@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.EventPriority;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class AzumaalAdaptiveDamageEvents {
@@ -19,7 +20,7 @@ public final class AzumaalAdaptiveDamageEvents {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLivingHurt(LivingHurtEvent event) {
 
         if (!(event.getEntity() instanceof ServerPlayer player)) {
@@ -37,7 +38,7 @@ public final class AzumaalAdaptiveDamageEvents {
         }
 
 
-        float scaledDamage = AzumaalDamageScaler.scaleDamage(level, boss, source, event.getAmount());
+        float scaledDamage = AzumaalDamageScaler.scaleDamage(player, source, event.getAmount());
 
 
         event.setAmount(scaledDamage);

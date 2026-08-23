@@ -15,23 +15,23 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class AnnoyingGooseBlock extends GenericDecorateBlock {
 
-    private static final String[] FACTS = {
-
-            "Breaking a block makes the block disappear.",
-            "Creepers can explode.",
-            "Torches produce light.",
-            "Chests can store items.",
-            "Sand falls when there is nothing below it.",
-            "Water can be found in oceans.",
-            "Zombies are hostile.",
-            "You can jump by pressing the jump button.",
-            "Doors can be opened.",
-            "Beds are useful when you want to sleep."};
-
+    private static final String[] FACT_KEYS = {
+            "message.oasiso.annoying_goose.fact_1",
+            "message.oasiso.annoying_goose.fact_2",
+            "message.oasiso.annoying_goose.fact_3",
+            "message.oasiso.annoying_goose.fact_4",
+            "message.oasiso.annoying_goose.fact_5",
+            "message.oasiso.annoying_goose.fact_6",
+            "message.oasiso.annoying_goose.fact_7",
+            "message.oasiso.annoying_goose.fact_8",
+            "message.oasiso.annoying_goose.fact_9",
+            "message.oasiso.annoying_goose.fact_10"
+    };
 
     public AnnoyingGooseBlock(Properties properties) {
         super(properties);
     }
+
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -39,13 +39,15 @@ public class AnnoyingGooseBlock extends GenericDecorateBlock {
 
             level.playSound(null, pos, ModSounds.HONK.get(), SoundSource.BLOCKS, 1.0F, 0.95F + level.random.nextFloat() * 0.10F);
 
-            String fact = FACTS[level.random.nextInt(FACTS.length)];
+            String factKey = FACT_KEYS[level.random.nextInt(FACT_KEYS.length)];
 
-            Component message = Component.literal("<").append(Component.literal("Annoying Goose").withStyle(ChatFormatting.YELLOW)).append(Component.literal("> ").withStyle(ChatFormatting.WHITE)).append(Component.literal(fact).withStyle(ChatFormatting.WHITE));
+            Component message = Component.literal("<")
+                    .append(Component.translatable("message.oasiso.annoying_goose.name").withStyle(ChatFormatting.YELLOW))
+                    .append(Component.literal("> ").withStyle(ChatFormatting.WHITE))
+                    .append(Component.translatable(factKey).withStyle(ChatFormatting.WHITE));
+
             player.sendSystemMessage(message);
         }
-
-
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

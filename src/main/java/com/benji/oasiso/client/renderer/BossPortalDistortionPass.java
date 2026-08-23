@@ -48,28 +48,32 @@ public final class BossPortalDistortionPass {
         Vec3 horizontal = baseWorld.subtract(camera);
         horizontal = new Vec3(horizontal.x, 0.0D, horizontal.z);
 
-        Vec3 right;
-
-        if (horizontal.lengthSqr() < 0.0001D) {
-            right = new Vec3(1.0D, 0.0D, 0.0D);
-
-        } else {
-            right = new Vec3(-horizontal.z, 0.0D, horizontal.x).normalize();
-        }
 
         ProjectedPoint base = project(baseWorld, event);
         ProjectedPoint top = project(topWorld, event);
-        ProjectedPoint baseEdge = project(baseWorld.add(right.scale(BASE_WORLD_RADIUS)), event);
-        ProjectedPoint topEdge = project(topWorld.add(right.scale(TOP_WORLD_RADIUS)), event);
-
-        if (base == null || top == null || baseEdge == null || topEdge == null) {
+        if (base == null || top == null) {
             return;
         }
 
+
         float aspect = minecraft.getWindow().getWidth() / (float) minecraft.getWindow().getHeight();
 
-        float baseRadius = screenDistance(base, baseEdge, aspect);
-        float topRadius = screenDistance(top, topEdge, aspect);
+
+        float baseRadius = projectWorldRadius(BASE_WORLD_RADIUS, base, event, aspect);
+
+
+        float topRadius = projectWorldRadius(TOP_WORLD_RADIUS, top, event, aspect);
+
+
+        if (!Float.isFinite(baseRadius) || !Float.isFinite(topRadius) || baseRadius <= 0.001F || topRadius <= 0.001F || baseRadius > 0.55F || topRadius > 0.42F) {
+
+            return;
+        }
+
+        if (isCompletelyOffscreen(base, top, baseRadius, topRadius, aspect)) {
+            return;
+        }
+
 
         if (baseRadius < 0.002F || topRadius < 0.001F) return;
 
@@ -90,8 +94,7 @@ public final class BossPortalDistortionPass {
         double bestDistance = RANGE * RANGE;
 
 
-        for (BossPortalEntity portal : minecraft.level.getEntitiesOfClass(BossPortalEntity.class, minecraft.player.getBoundingBox().inflate(RANGE),
-                candidate -> candidate.isAlive() && candidate.isChaosPortal() && (candidate.getAnimState() == BossPortalEntity.STATE_IDLE || candidate.getAnimState() == BossPortalEntity.STATE_DESPAWN))) {
+        for (BossPortalEntity portal : minecraft.level.getEntitiesOfClass(BossPortalEntity.class, minecraft.player.getBoundingBox().inflate(RANGE), candidate -> candidate.isAlive() && candidate.isChaosPortal() && (candidate.getAnimState() == BossPortalEntity.STATE_IDLE || candidate.getAnimState() == BossPortalEntity.STATE_DESPAWN))) {
 
             double distance = portal.distanceToSqr(minecraft.player);
 
@@ -106,30 +109,55 @@ public final class BossPortalDistortionPass {
     }
 
     private static ProjectedPoint project(Vec3 world, RenderLevelStageEvent event) {
-
         Vec3 camera = event.getCamera().getPosition();
-        Vector4f clip = new Vector4f((float) (world.x - camera.x), (float) (world.y - camera.y), (float) (world.z - camera.z), 1.0F);
 
-        clip.mul(event.getPoseStack().last().pose());
+
+        Vector4f view = new Vector4f((float) (world.x - camera.x), (float) (world.y - camera.y), (float) (world.z - camera.z), 1.0F);
+
+        view.mul(event.getPoseStack().last().pose());
+
+        Vector4f clip = new Vector4f(view);
+
         clip.mul(event.getProjectionMatrix());
 
-        if (clip.w() <= 0.001F) return null;
+        if (clip.w() <= 0.08F) {
+            return null;
+        }
 
         float ndcX = clip.x() / clip.w();
         float ndcY = clip.y() / clip.w();
         float ndcZ = clip.z() / clip.w();
 
-        return new ProjectedPoint(ndcX * 0.5F + 0.5F, ndcY * 0.5F + 0.5F, ndcZ * 0.5F + 0.5F);
+        if (!Float.isFinite(ndcX) || !Float.isFinite(ndcY) || !Float.isFinite(ndcZ) || Math.abs(ndcX) > 4.0F || Math.abs(ndcY) > 4.0F) {
+            return null;
+        }
+        return new ProjectedPoint(ndcX * 0.5F + 0.5F, ndcY * 0.5F + 0.5F, ndcZ * 0.5F + 0.5F, clip.w());
     }
 
-    private static float screenDistance(ProjectedPoint first, ProjectedPoint second, float aspect) {
+    private static float projectWorldRadius(double worldRadius, ProjectedPoint center, RenderLevelStageEvent event, float aspect) {
+        float projectedNdcRadius = (float) (worldRadius * event.getProjectionMatrix().m00() / center.clipW);
 
-        float x = (first.u - second.u) * aspect;
-        float y = first.v - second.v;
 
-        return (float) Math.sqrt(x * x + y * y);
+        return Math.abs(projectedNdcRadius * 0.5F * aspect);
     }
 
-    private record ProjectedPoint(float u, float v, float depth) {
+    private static boolean isCompletelyOffscreen(ProjectedPoint base, ProjectedPoint top, float baseRadius, float topRadius, float aspect) {
+        float margin = 0.08F;
+
+        float baseRadiusX = baseRadius / aspect;
+        float topRadiusX = topRadius / aspect;
+
+
+        float minX = Math.min(base.u - baseRadiusX, top.u - topRadiusX);
+        float maxX = Math.max(base.u + baseRadiusX, top.u + topRadiusX);
+
+        float minY = Math.min(base.v - baseRadius, top.v - topRadius);
+        float maxY = Math.max(base.v + baseRadius, top.v + topRadius);
+
+
+        return maxX < -margin || minX > 1.0F + margin || maxY < -margin || minY > 1.0F + margin;
+    }
+
+    private record ProjectedPoint(float u, float v, float depth, float clipW) {
     }
 }

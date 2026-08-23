@@ -126,6 +126,19 @@
   "enchantment.oasiso.hammer_power": "Sand Hand",
 
 
+  "message.oasiso.annoying_goose.name": "Annoying Goose",
+
+  "message.oasiso.annoying_goose.fact_1": "Breaking a block makes the block disappear.",
+  "message.oasiso.annoying_goose.fact_2": "Creepers can explode.",
+  "message.oasiso.annoying_goose.fact_3": "Torches produce light.",
+  "message.oasiso.annoying_goose.fact_4": "Chests can store items.",
+  "message.oasiso.annoying_goose.fact_5": "Sand falls when there is nothing below it.",
+  "message.oasiso.annoying_goose.fact_6": "Water can be found in oceans.",
+  "message.oasiso.annoying_goose.fact_7": "Zombies are hostile.",
+  "message.oasiso.annoying_goose.fact_8": "You can jump by pressing the jump button.",
+  "message.oasiso.annoying_goose.fact_9": "Doors can be opened.",
+  "message.oasiso.annoying_goose.fact_10": "Beds are useful when you want to sleep.",
+
   "gui.oasiso.azumaal.title": "OSIRIS",
   "gui.oasiso.azumaal.subtitle": "CHAOS CREATURE",
 

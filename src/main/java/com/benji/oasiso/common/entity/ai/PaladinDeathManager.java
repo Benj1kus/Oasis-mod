@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -26,6 +26,8 @@ public final class PaladinDeathManager {
     public static final int DEATH_DURATION = 87;
 
     private static final int BODY_PARTICLE_INTERVAL = 2;
+
+    private static final ResourceLocation BARREL_LOOT_TABLE = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "chests/paladin_barrel");
 
     private static final String DATA_TAG = "PaladinDeath";
 
@@ -110,6 +112,7 @@ public final class PaladinDeathManager {
         int x = Mth.floor(boss.getX());
         int z = Mth.floor(boss.getZ());
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+
         BlockPos barrelPos = new BlockPos(x, y, z);
 
         level.setBlock(barrelPos, Blocks.BARREL.defaultBlockState(), 3);
@@ -117,9 +120,8 @@ public final class PaladinDeathManager {
         if (!(level.getBlockEntity(barrelPos) instanceof BarrelBlockEntity barrel)) {
             return;
         }
-        barrel.setItem(0, new ItemStack(Oasiso.ORB_CHAOS.get(), 1));
-        barrel.setItem(1, new ItemStack(Oasiso.ORB_DOMINATION.get(), 1));
 
+        barrel.setLootTable(BARREL_LOOT_TABLE, level.random.nextLong());
         barrel.setChanged();
     }
 

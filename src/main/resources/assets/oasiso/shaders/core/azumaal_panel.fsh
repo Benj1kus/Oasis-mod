@@ -9,7 +9,7 @@ uniform float Reveal;
 
 uniform float Alpha;
 
-
+uniform float Dissolve;
 
 uniform float PanelWidth;
 
@@ -1104,6 +1104,79 @@ void main() {
 
 
 
+    vec2 dissolveCoord =
+    abs(
+        uv - 0.5
+    ) * 2.0;
+
+
+    float dissolveDistance =
+    max(
+        dissolveCoord.x,
+        dissolveCoord.y
+    );
+
+
+    float dissolveNoise =
+    (liquid - 0.5) * 0.075
+    + (cloud - 0.5) * 0.035;
+
+
+    float noisyDistance =
+    dissolveDistance
+    + dissolveNoise;
+
+
+    float dissolveThreshold =
+    mix(
+        -0.16,
+        1.08,
+        Dissolve
+    );
+
+
+    float dissolveMask =
+    smoothstep(
+        dissolveThreshold - 0.075,
+        dissolveThreshold + 0.075,
+        noisyDistance
+    );
+
+    float dissolveEdge =
+    1.0
+    - smoothstep(
+        0.0,
+        0.055,
+
+        abs(
+            noisyDistance
+            - dissolveThreshold
+        )
+    );
+
+
+    dissolveEdge *=
+    smoothstep(
+        0.02,
+        0.12,
+        Dissolve
+    );
+
+
+    dissolveEdge *=
+    1.0
+    - smoothstep(
+        0.88,
+        1.0,
+        Dissolve
+    );
+
+
+    color +=
+    brightColor
+    * dissolveEdge
+    * 0.11;
+
 
     color =
     clamp(
@@ -1119,6 +1192,7 @@ void main() {
 
     Alpha
     * revealMask
+    * dissolveMask
     * 0.96
     );
 }

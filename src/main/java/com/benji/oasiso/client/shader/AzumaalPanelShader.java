@@ -28,7 +28,7 @@ public final class AzumaalPanelShader {
         event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "azumaal_panel"), DefaultVertexFormat.POSITION_TEX), loadedShader -> shader = loadedShader);
     }
 
-    public static boolean render(PoseStack poseStack, float x, float y, float width, float height, float time, float reveal, float alpha) {
+    public static boolean render(PoseStack poseStack, float x, float y, float width, float height, float time, float reveal, float alpha, float dissolve) {
         if (shader == null || width <= 0.0F || height <= 0.0F || alpha <= 0.0F) {
             return false;
         }
@@ -46,6 +46,7 @@ public final class AzumaalPanelShader {
         setFloat("Time", time);
         setFloat("Reveal", reveal);
         setFloat("Alpha", alpha);
+        setFloat("Dissolve", dissolve);
         setFloat("PanelWidth", width);
         setFloat("PanelHeight", height);
 

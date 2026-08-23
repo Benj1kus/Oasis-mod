@@ -53,18 +53,17 @@ public final class PaladinAwakeOverlay {
     private static final int TITLE_IN_START = 5;
     private static final int TITLE_IN_END = 11;
 
+    private static final int BG_DISSOLVE_START = 92;
+    private static final int BG_DISSOLVE_END = 114;
 
     private static final int SUBTITLE_IN_START = 8;
     private static final int SUBTITLE_IN_END = 14;
 
-    private static final int TEXT_OUT_START = 50;
-    private static final int TEXT_OUT_END = 62;
+    private static final int TEXT_OUT_START = 88;
+    private static final int TEXT_OUT_END = 104;
 
-    private static final int BG_OUT_START = 55;
-    private static final int BG_OUT_END = 66;
-
-    private static final int FRAME_OUT_START = 62;
-    private static final int TOTAL_TICKS = 70;
+    private static final int FRAME_OUT_START = 108;
+    private static final int TOTAL_TICKS = 124;
 
     private static final Set<UUID> SHOWN_FOR_PALADINS = new HashSet<>();
 
@@ -175,13 +174,10 @@ public final class PaladinAwakeOverlay {
 
         float bgReveal = smoothProgress(overlayTick, BG_IN_START, BG_IN_END);
 
-
         float bgAlpha = 1.0F;
 
+        float bgDissolve = smoothProgress(overlayTick, BG_DISSOLVE_START, BG_DISSOLVE_END);
 
-        if (overlayTick >= BG_OUT_START) {
-            bgAlpha = 1.0F - smoothProgress(overlayTick, BG_OUT_START, BG_OUT_END);
-        }
 
         float time = (overlayTick + minecraft.getFrameTime()) / 20.0F;
 
@@ -194,10 +190,22 @@ public final class PaladinAwakeOverlay {
             float innerHeight = PANEL_HEIGHT - INNER_BORDER * 2;
 
 
-            boolean rendered = AzumaalPanelShader.render(graphics.pose(), innerX, innerY, innerWidth, innerHeight, time, bgReveal, bgAlpha);
+            boolean rendered =
+                    AzumaalPanelShader.render(
+                            graphics.pose(),
+                            innerX,
+                            innerY,
+                            innerWidth,
+                            innerHeight,
+                            time,
+                            bgReveal,
+                            bgAlpha,
+                            bgDissolve
+                    );
 
             if (!rendered) {
-                int alpha = Mth.floor(bgAlpha * 200.0F);
+                int alpha = Mth.floor((1.0F - bgDissolve) * 200.0F);
+
                 graphics.fill((int) innerX, (int) innerY, (int) (innerX + innerWidth), (int) (innerY + innerHeight), (alpha << 24) | 0x083C3A);
             }
         }
