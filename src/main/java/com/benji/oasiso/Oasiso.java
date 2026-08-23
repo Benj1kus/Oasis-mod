@@ -2,6 +2,7 @@ package com.benji.oasiso;
 
 import com.benji.oasiso.client.renderer.CactoRenderer;
 import com.benji.oasiso.client.renderer.MonkiRenderer;
+import com.benji.oasiso.network.BossPortalTransitionNetwork;
 import com.benji.oasiso.common.block.entity.*;
 import com.benji.oasiso.common.effect.ChaosChamberEffect;
 import net.minecraft.core.registries.Registries;
@@ -1333,6 +1334,7 @@ public class Oasiso {
         event.enqueueWork(() -> {
             ModDispenserBehaviors.register();
             ModMessages.register();
+            BossPortalTransitionNetwork.register();
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(FLOWERY.getId(), POTTED_FLOWERY);
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(CACTULO.getId(), POTTED_CACTULO);
         });

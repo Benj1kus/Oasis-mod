@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import com.benji.oasiso.common.dimension.BossPortalTransitionServer;
 import com.benji.oasiso.common.dimension.BossArenaEncounter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
@@ -201,7 +202,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
             return;
         }
         for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, getTeleportArea(), candidate -> candidate.isAlive() && !candidate.isSpectator())) {
-            if (BossArenaEncounter.enterArena(player, this)) {
+            if (BossPortalTransitionServer.beginEnter(player, this)) {
                 return;
             }
         }
@@ -212,7 +213,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
             return;
         }
         for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, getTeleportArea(), candidate -> candidate.isAlive() && !candidate.isSpectator())) {
-            if (BossArenaEncounter.returnToEntrance(player, this)) {
+            if (BossPortalTransitionServer.beginReturn(player, this)) {
                 return;
             }
         }

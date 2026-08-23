@@ -70,7 +70,14 @@ float breathingPulse(float time, float speed, float phase) {
     + 0.5
     * sin(time * speed + phase);
 
-    return pulse * pulse * (3.0 - 2.0 * pulse);
+    return pulse * pulse * pulse
+    * (
+    pulse
+    * (
+    pulse * 6.0 - 15.0
+    )
+    + 10.0
+    );
 }
 
 
@@ -81,85 +88,38 @@ void main() {
     float goldPulse =
     breathingPulse(
         Time,
-        2.10,
+        1.35,
         0.0
     );
 
     float swordPulse =
     breathingPulse(
         Time,
-        2.18,
-        0.28
-    );
-
-
-
-
-    float goldCoreThickness =
-    mix(
-        0.68,
-        0.92,
-        goldPulse
-    );
-
-    float goldMidThickness =
-    mix(
-        1.05,
-        2.10,
-        goldPulse
-    );
-
-    float goldOuterThickness =
-    mix(
         1.35,
-        3.35,
-        goldPulse
+        0.12
     );
+
 
 
     float goldCore =
     sobel(
         GoldMask,
         texCoord,
-        goldCoreThickness
+        0.62
     );
 
     float goldMid =
     sobel(
         GoldMask,
         texCoord,
-        goldMidThickness
+        1.05
     );
 
     float goldOuter =
     sobel(
         GoldMask,
         texCoord,
-        goldOuterThickness
-    );
-
-
-
-
-    float swordCoreThickness =
-    mix(
-        0.58,
-        0.82,
-        swordPulse
-    );
-
-    float swordMidThickness =
-    mix(
-        0.92,
-        1.80,
-        swordPulse
-    );
-
-    float swordOuterThickness =
-    mix(
-        1.20,
-        2.85,
-        swordPulse
+        1.65
     );
 
 
@@ -167,21 +127,21 @@ void main() {
     sobel(
         SwordMask,
         texCoord,
-        swordCoreThickness
+        0.58
     );
 
     float swordMid =
     sobel(
         SwordMask,
         texCoord,
-        swordMidThickness
+        0.95
     );
 
     float swordOuter =
     sobel(
         SwordMask,
         texCoord,
-        swordOuterThickness
+        1.50
     );
 
 
@@ -219,48 +179,55 @@ void main() {
 
 
 
-
     float goldCoreAlpha =
     goldCore
     * (
-    0.78
-    + goldPulse * 0.14
+    0.72
+    + goldPulse * 0.10
     );
+
 
     float goldMidAlpha =
     goldMid
-    * (
-    0.06
-    + goldPulse * 0.31
+    * mix(
+        0.035,
+        0.25,
+        goldPulse
     );
+
 
     float goldOuterAlpha =
     goldOuter
-    * (
-    0.015
-    + goldPulse * 0.24
+    * mix(
+        0.0,
+        0.16,
+        goldPulse
     );
 
 
     float swordCoreAlpha =
     swordCore
     * (
-    0.82
-    + swordPulse * 0.12
+    0.76
+    + swordPulse * 0.10
     );
+
 
     float swordMidAlpha =
     swordMid
-    * (
-    0.05
-    + swordPulse * 0.32
+    * mix(
+        0.03,
+        0.24,
+        swordPulse
     );
+
 
     float swordOuterAlpha =
     swordOuter
-    * (
-    0.01
-    + swordPulse * 0.25
+    * mix(
+        0.0,
+        0.15,
+        swordPulse
     );
 
 
@@ -384,20 +351,18 @@ void main() {
 
 
 
-    vec3 color =
-    goldFinal
-    * goldAlpha;
-
-
-
-
-    color =
-    mix(
-        color,
-        swordFinal,
-        swordAlpha
-    );
-
+/*
+ * =========================================================
+ * Gold + Cyan combine
+ * =========================================================
+ *
+ * ВАЖНО:
+ * RGB здесь НЕ умножаем на alpha.
+ *
+ * Minecraft использует обычный straight-alpha blend,
+ * поэтому premultiplied RGB давал тёмную / почти чёрную
+ * кайму на мягких краях Sobel.
+ */
 
     float alpha =
     max(
@@ -409,6 +374,21 @@ void main() {
     if (alpha < 0.006) {
         discard;
     }
+
+    float colorWeight =
+    goldAlpha
+    + swordAlpha;
+
+
+    vec3 color =
+    (
+    goldFinal * goldAlpha
+    + swordFinal * swordAlpha
+    )
+    / max(
+        colorWeight,
+        0.0001
+    );
 
 
     fragColor =

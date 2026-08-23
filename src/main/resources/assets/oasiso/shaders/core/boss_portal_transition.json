@@ -1,0 +1,33 @@
+{
+  "vertex": "oasiso:boss_portal_transition",
+  "fragment": "oasiso:boss_portal_transition",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "PatternSampler"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    },
+    {
+      "name": "Cover",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    },
+    {
+      "name": "Aspect",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.7777778 ]
+    }
+  ]
+}

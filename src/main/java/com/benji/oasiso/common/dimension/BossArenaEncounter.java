@@ -49,7 +49,7 @@ public final class BossArenaEncounter {
     private BossArenaEncounter() {
     }
 
-    public static boolean enterArena(ServerPlayer player, BossPortalEntity entrancePortal) {
+    static boolean enterArenaNow(ServerPlayer player, BossPortalEntity entrancePortal) {
         MinecraftServer server = player.getServer();
         if (server == null) {
             return false;
@@ -184,7 +184,7 @@ public final class BossArenaEncounter {
         data.putFloat(RETURN_PITCH, player.getXRot());
     }
 
-    public static boolean returnToEntrance(ServerPlayer player, BossPortalEntity returnPortal) {
+    public static boolean returnToEntranceNow(ServerPlayer player, BossPortalEntity returnPortal) {
         if (!isArenaSession(player)) {
             return false;
         }
