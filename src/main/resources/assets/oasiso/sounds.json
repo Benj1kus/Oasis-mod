@@ -17,6 +17,9 @@
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
 
+  "osiris_voice": { "sounds": [ "oasiso:osiris_voice" ] },
+  "paladin_voice": { "sounds": [ "oasiso:paladin_voice" ] },
+
   "gaster": { "sounds": [ "oasiso:gaster" ] },
   "honk": { "sounds": [ "oasiso:honk" ] },
   "tower_place": { "sounds": [ "oasiso:tower_place" ] },

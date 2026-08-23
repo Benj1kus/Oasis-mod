@@ -27,6 +27,9 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
+
+import java.util.UUID;
 
 public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
@@ -37,6 +40,15 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int STATE_GRAB = 4;
     public static final int STATE_SHIELD = 5;
 
+    private static final int INTRO_FAILSAFE_TICKS = 20 * 45;
+
+    private boolean introLocked;
+    private boolean introPanelFinished;
+    private boolean introDialogueStarted;
+
+    private int introDialogueTicks;
+
+    private UUID introPlayerId;
 
     //cutscene states
     public static final int STATE_WAIT = 6;
@@ -172,12 +184,24 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
                 this.awakeTicks++;
 
                 if (this.awakeTicks >= AWAKE_DURATION) {
-
-                    this.awakeTicks = 0;
-                    this.setNoAi(false);
-                    this.setAnimState(STATE_IDLE);
+                    this.awakeTicks =
+                            AWAKE_DURATION;
+                    this.setAnimState(
+                            STATE_IDLE
+                    );
                 }
             }
+            return;
+        }
+
+        if (!this.level().isClientSide
+                && this.introLocked
+                && this.level() instanceof ServerLevel serverLevel) {
+
+            tickIntroDialogue(
+                    serverLevel
+            );
+
             return;
         }
 
@@ -203,15 +227,136 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         }
 
         this.awakeTicks = 0;
+        this.introLocked = true;
+        this.introPanelFinished = false;
+        this.introDialogueStarted = false;
+
+        this.introDialogueTicks = 0;
+        this.introPlayerId = null;
         this.setAnimState(STATE_AWAKE);
         this.setNoAi(true);
         this.getNavigation().stop();
         this.setDeltaMovement(Vec3.ZERO);
         if (source.getEntity() instanceof Player player) {
 
+            this.introPlayerId =
+                    player.getUUID();
+
             this.setTarget(player);
             this.lookAtPlayer(player, 180.0F);
         }
+    }
+
+    //dialog methhods
+
+    public void onIntroPanelFinished(ServerPlayer player) {
+        if (!this.introLocked) {
+            return;
+        }
+
+        this.introPanelFinished = true;
+        this.introPlayerId = player.getUUID();
+
+
+        if (this.level() instanceof ServerLevel level) {
+            tryStartIntroDialogue(level);
+        }
+    }
+
+
+    private void tryStartIntroDialogue(ServerLevel level) {
+        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished
+                || this.getAnimState() != STATE_IDLE) {
+
+            return;
+        }
+
+        ServerPlayer player = resolveIntroPlayer(level);
+
+
+        if (player == null) {
+            return;
+        }
+
+        this.introDialogueStarted = true;
+        this.introDialogueTicks = 0;
+
+        this.setNoAi(true);
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+
+        BossDialogueNetwork.startDialogue(player, this.getUUID(), "paladin");
+    }
+
+
+    private void tickIntroDialogue(ServerLevel level) {
+        this.setNoAi(true);
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+
+        ServerPlayer player = resolveIntroPlayer(level);
+
+
+        if (player != null) {
+            this.lookAtPlayer(player, 5.0F);
+        }
+
+        this.introDialogueTicks++;
+
+        if (!this.introPanelFinished && this.introDialogueTicks >= 160) {
+            this.introPanelFinished = true;
+            tryStartIntroDialogue(level);
+            this.introDialogueTicks = 0;
+
+            return;
+        }
+
+        if (this.introDialogueStarted && this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
+            finishIntroDialogueInternal();
+        }
+    }
+
+
+    private ServerPlayer resolveIntroPlayer(ServerLevel level) {
+        if (this.introPlayerId == null) {
+            return null;
+        }
+
+        ServerPlayer player = level.getServer().getPlayerList().getPlayer(this.introPlayerId);
+        if (player == null || player.serverLevel() != level) {
+            return null;
+        }
+        return player;
+    }
+
+
+    public void finishIntroDialogue(ServerPlayer player) {
+        if (!this.introLocked || !this.introDialogueStarted) {
+            return;
+        }
+
+        if (this.introPlayerId != null && !this.introPlayerId.equals(player.getUUID())) {
+            return;
+        }
+
+
+        finishIntroDialogueInternal();
+    }
+
+
+    private void finishIntroDialogueInternal() {
+        this.introLocked = false;
+        this.introPanelFinished = false;
+        this.introDialogueStarted = false;
+
+        this.introDialogueTicks = 0;
+        this.introPlayerId = null;
+
+        this.setAnimState(STATE_IDLE);
+
+        this.setDeltaMovement(Vec3.ZERO);
+
+        this.setNoAi(false);
     }
 
 // anim states
@@ -254,7 +399,9 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         if (this.isDeathSequenceActive()) {
             return false;
         }
-
+        if (this.introLocked) {
+            return true;
+        }
         if (this.getAnimState() == STATE_WAIT) {
             if (source.getEntity() instanceof Player) {
                 if (!this.level().isClientSide) {

@@ -13,6 +13,7 @@ import com.benji.oasiso.ModSounds;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
@@ -65,6 +66,7 @@ public final class AzumaalSpawnOverlay {
 
     private static boolean active;
     private static int overlayTick;
+    private static UUID activeBossId;
 
     private AzumaalSpawnOverlay() {
     }
@@ -81,6 +83,7 @@ public final class AzumaalSpawnOverlay {
             active = false;
             overlayTick = 0;
             SHOWN_FOR_BOSSES.clear();
+            activeBossId = null;
             return;
         }
 
@@ -91,9 +94,14 @@ public final class AzumaalSpawnOverlay {
         AzumaalEntity spawnBoss = findSpawningAzumaal(minecraft);
 
         if (spawnBoss != null && !SHOWN_FOR_BOSSES.contains(spawnBoss.getUUID())) {
+
             SHOWN_FOR_BOSSES.add(spawnBoss.getUUID());
+
+            activeBossId = spawnBoss.getUUID();
+
             active = true;
             overlayTick = 0;
+
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.FRAME.get(), 1.0F));
         }
 
@@ -104,6 +112,12 @@ public final class AzumaalSpawnOverlay {
 
         if (overlayTick >= TOTAL_TICKS) {
             active = false;
+
+            if (activeBossId != null) {
+                BossDialogueNetwork.panelFinished(activeBossId, "azumaal");
+
+                activeBossId = null;
+            }
         }
     }
 

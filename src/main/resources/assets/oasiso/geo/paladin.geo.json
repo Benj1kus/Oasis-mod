@@ -193,6 +193,42 @@
 					]
 				},
 				{
+					"name": "sword_arc_bottom",
+					"parent": "paladin sword",
+					"pivot": [-6.1, 27.5, 0],
+					"cubes": [
+						{
+							"origin": [-6.1, 27.5, 0],
+							"size": [0, 0, 0],
+							"uv": [3, 2]
+						}
+					]
+				},
+				{
+					"name": "sword_arc_middle",
+					"parent": "paladin sword",
+					"pivot": [-6.1, 46.5, 0],
+					"cubes": [
+						{
+							"origin": [-6.1, 46.5, 0],
+							"size": [0, 0, 0],
+							"uv": [3, 2]
+						}
+					]
+				},
+				{
+					"name": "sword_arc_top",
+					"parent": "paladin sword",
+					"pivot": [-6.1, 66.5, 0],
+					"cubes": [
+						{
+							"origin": [-6.1, 66.5, 0],
+							"size": [0, 0, 0],
+							"uv": [3, 2]
+						}
+					]
+				},
+				{
 					"name": "Left Leg",
 					"parent": "main",
 					"pivot": [1.9, 12, 0],

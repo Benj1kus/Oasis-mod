@@ -18,6 +18,7 @@ import com.benji.oasiso.common.entity.ai.AzumaalAttackController;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
+import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 
 import java.util.UUID;
 
@@ -109,6 +110,17 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
 
     private int bladeSplashMode = SPLASH_NONE;
     private int spawnTicks;
+// DIALOG
+
+    private static final int INTRO_FAILSAFE_TICKS = 20 * 45;
+
+    private boolean introLocked;
+    private boolean introPanelFinished;
+    private boolean introDialogueStarted;
+
+    private int introDialogueTicks;
+
+    private UUID introPlayerId;
 
     public AzumaalEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -235,6 +247,13 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
         this.spawnTicks = 0;
         this.attackController.reset();
 
+        this.introLocked = true;
+        this.introPanelFinished = false;
+        this.introDialogueStarted = false;
+
+        this.introDialogueTicks = 0;
+        this.introPlayerId = null;
+
         this.setDefending(false);
         this.setDeathVisualTicks(0);
         this.setParkourActive(false);
@@ -289,10 +308,26 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
                 this.spawnTicks++;
                 if (this.spawnTicks >= SPAWN_ANIMATION_TIME) {
                     this.setAnimState(STATE_IDLE);
-                    this.setInvulnerable(false);
-                    this.attackController.beginPostSpawnCooldown();
+                    this.setInvulnerable(true);
+
+                    if (this.level() instanceof ServerLevel serverLevel) {
+                        tryStartIntroDialogue(
+                                serverLevel
+                        );
+                    }
                 }
             }
+            return;
+        }
+
+        if (!this.level().isClientSide
+                && this.introLocked
+                && this.level() instanceof ServerLevel serverLevel) {
+
+            tickIntroDialogue(
+                    serverLevel
+            );
+
             return;
         }
 
@@ -383,6 +418,116 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
             return;
         }
         lookAtPlayer(nearestPlayer, 5.0F);
+    }
+// dialogue methods
+public void onIntroPanelFinished(ServerPlayer player) {
+    if (this.isClone() || !this.introLocked) {
+        return;
+    }
+    this.introPanelFinished = true;
+    this.introPlayerId = player.getUUID();
+
+    if (this.level() instanceof ServerLevel level) {
+        tryStartIntroDialogue(level);
+    }
+}
+
+
+    private void tryStartIntroDialogue(ServerLevel level) {
+        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished || this.getAnimState() == STATE_SPAWN) {
+            return;
+        }
+
+        ServerPlayer player = resolveIntroPlayer(level);
+
+        if (player == null) {
+            Player nearest = level.getNearestPlayer(this, 96.0D);
+
+            if (nearest instanceof ServerPlayer serverPlayer) {
+                player = serverPlayer;
+                this.introPlayerId = serverPlayer.getUUID();
+            }
+        }
+        if (player == null) {
+            return;
+        }
+
+        this.introDialogueStarted = true;
+        this.introDialogueTicks = 0;
+        this.setInvulnerable(true);
+        this.setDeltaMovement(Vec3.ZERO);
+
+        BossDialogueNetwork.startDialogue(player, this.getUUID(), "azumaal");
+    }
+
+    private void tickIntroDialogue(ServerLevel level) {
+        this.setInvulnerable(true);
+        this.setDeltaMovement(Vec3.ZERO);
+        this.fallDistance = 0.0F;
+        ServerPlayer player = resolveIntroPlayer(level);
+
+        if (player != null) {
+            this.lookAtPlayer(player, 5.0F);
+        }
+
+        this.introDialogueTicks++;
+
+        if (!this.introPanelFinished && this.introDialogueTicks >= 120) {
+            this.introPanelFinished = true;
+            tryStartIntroDialogue(level);
+            this.introDialogueTicks = 0;
+            return;
+        }
+
+        if (this.introDialogueStarted && this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
+            finishIntroDialogueInternal();
+        }
+    }
+
+
+    private ServerPlayer resolveIntroPlayer(ServerLevel level) {
+        if (this.introPlayerId == null) {
+            return null;
+        }
+        ServerPlayer player = level.getServer().getPlayerList().getPlayer(this.introPlayerId);
+        if (player == null || player.serverLevel() != level) {
+            return null;
+        }
+        return player;
+    }
+
+
+    public void finishIntroDialogue(ServerPlayer player) {
+        if (!this.introLocked || !this.introDialogueStarted) {
+            return;
+        }
+        if (this.introPlayerId != null && !this.introPlayerId.equals(player.getUUID())) {
+            return;
+        }
+        finishIntroDialogueInternal();
+    }
+
+
+    private void finishIntroDialogueInternal() {
+        this.introLocked = false;
+        this.introPanelFinished = false;
+        this.introDialogueStarted = false;
+
+        this.introDialogueTicks = 0;
+        this.introPlayerId = null;
+
+        this.setInvulnerable(false);
+        this.setDeltaMovement(Vec3.ZERO);
+
+        if (this.level() instanceof ServerLevel serverLevel) {
+            ChaosChamberManager.captureNearbyPlayers(serverLevel, this);
+        }
+
+        this.attackController.beginPostSpawnCooldown();
+    }
+
+    public boolean isIntroLocked() {
+        return this.introLocked;
     }
 
     public void lookAtPlayer(Player target, float maxRotationStep) {
@@ -567,6 +712,10 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (!this.isClone()
+                && this.introLocked) {
+            return false;
+        }
         if (!this.isClone() && this.isDeathSequenceActive()) {
             return false;
         }

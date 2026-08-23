@@ -45,22 +45,39 @@ public final class ChaosChamberManager {
         CompoundTag data = player.getPersistentData();
 
         data.putUUID(BOSS_TAG, boss.getUUID());
+
+        if (boss.isIntroLocked()) {
+            if (player.hasEffect(Oasiso.CHAOS_CHAMBER_EFFECT.get())) {
+                player.removeEffect(Oasiso.CHAOS_CHAMBER_EFFECT.get());
+            }
+            return;
+        }
         ensureEffect(player);
     }
 
     public static void maintainPlayer(ServerPlayer player) {
         UUID bossId = getBoundBossId(player);
+
         if (bossId == null) {
             return;
         }
 
+
         AzumaalEntity boss = resolveBoss(player.getServer(), bossId);
 
         if (boss == null || boss.isClone() || !boss.isAlive()) {
+
             clearPlayer(player);
             return;
         }
+        if (boss.isIntroLocked()) {
 
+            if (player.hasEffect(Oasiso.CHAOS_CHAMBER_EFFECT.get())) {
+                player.removeEffect(Oasiso.CHAOS_CHAMBER_EFFECT.get());
+            }
+
+            return;
+        }
         ensureEffect(player);
     }
 
@@ -92,7 +109,14 @@ public final class ChaosChamberManager {
     }
 
     public static boolean isRestricted(ServerPlayer player) {
-        return player.hasEffect(Oasiso.CHAOS_CHAMBER_EFFECT.get());
+        UUID bossId = getBoundBossId(player);
+
+        if (bossId == null) {
+            return false;
+        }
+
+        AzumaalEntity boss = resolveBoss(player.getServer(), bossId);
+        return boss != null && !boss.isClone() && boss.isAlive();
     }
 
     private static UUID getBoundBossId(ServerPlayer player) {

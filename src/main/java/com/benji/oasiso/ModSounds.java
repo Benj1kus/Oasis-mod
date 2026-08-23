@@ -13,6 +13,9 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> TOWER_PLACE = registerSoundEvent("tower_place");
     public static final RegistryObject<SoundEvent> CAST = registerSoundEvent("cast");
 
+    public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
+    public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
+
 
     public static final RegistryObject<SoundEvent> GASTER = registerSoundEvent("gaster");
     public static final RegistryObject<SoundEvent> SANDSTORM = registerSoundEvent("sandstorm");

@@ -16,6 +16,7 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +70,7 @@ public final class PaladinAwakeOverlay {
 
     private static boolean active;
     private static int overlayTick;
+    private static UUID activePaladinId;
 
     private PaladinAwakeOverlay() {
     }
@@ -83,6 +85,7 @@ public final class PaladinAwakeOverlay {
         if (minecraft.level == null) {
             active = false;
             overlayTick = 0;
+            activePaladinId = null;
             SHOWN_FOR_PALADINS.clear();
             return;
         }
@@ -96,6 +99,9 @@ public final class PaladinAwakeOverlay {
         if (paladin != null && !SHOWN_FOR_PALADINS.contains(paladin.getUUID())) {
 
             SHOWN_FOR_PALADINS.add(paladin.getUUID());
+
+            activePaladinId = paladin.getUUID();
+
             active = true;
             overlayTick = 0;
         }
@@ -108,6 +114,12 @@ public final class PaladinAwakeOverlay {
 
         if (overlayTick >= TOTAL_TICKS) {
             active = false;
+
+            if (activePaladinId != null) {
+                BossDialogueNetwork.panelFinished(activePaladinId, "paladin");
+
+                activePaladinId = null;
+            }
         }
     }
 
