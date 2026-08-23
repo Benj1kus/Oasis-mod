@@ -24,12 +24,7 @@ public class DialogueDefinition {
     public String text_color = "white";
     public List<String> text_gradient;
     public String text_effect = "wave";
-
-    /*
-     * Legacy compatibility:
-     * старые JSON с text_style: gold/rainbow
-     * продолжат работать.
-     */
+    
     public String text_style;
 
     // Visuals
@@ -52,18 +47,8 @@ public class DialogueDefinition {
     public boolean source_invulnerable = true;
     public boolean cancel_if_source_missing = true;
 
-    /*
-     * Не даёт одному NPC одновременно
-     * говорить с десятью игроками.
-     */
     public boolean exclusive_source = true;
 
-    /*
-     * never
-     * player
-     * entity
-     * session
-     */
     public String once = "never";
 
     public Layout layout = new Layout();
@@ -104,7 +89,6 @@ public class DialogueDefinition {
         // Translation key
         public String text;
 
-        // Или прямой текст без lang.
         public String literal;
 
         public String sprite;
@@ -144,29 +128,7 @@ public class DialogueDefinition {
 
 
     public static class Trigger {
-
-        /*
-         * manual
-         * external
-         * right_click_entity
-         * right_click_block
-         * proximity_entity
-         * proximity_block
-         * hit_entity
-         * shift_near_entity
-         * look_at_entity
-         * kill_entity
-         * enter_area
-         */
         public String type = "manual";
-
-        /*
-         * minecraft:villager
-         * oasiso:paladin
-         *
-         * или tag:
-         * #minecraft:skeletons
-         */
         public String target;
 
         public double radius = 5.0D;
@@ -176,10 +138,6 @@ public class DialogueDefinition {
         public int check_interval = 5;
         public int cooldown_ticks = 40;
 
-        /*
-         * Для click/hit:
-         * съесть само действие.
-         */
         public boolean consume = false;
 
         // Override dialogue-level once.
