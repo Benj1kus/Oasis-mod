@@ -14,7 +14,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
@@ -22,7 +21,9 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
 import java.awt.Color;
 import java.util.*;
@@ -295,9 +296,9 @@ public final class DialogueClient {
             return;
         }
 
-        SoundEvent sound = resolveVoice(line);
+        ResourceLocation soundId = resolveVoiceId(line);
 
-        if (sound == null) {
+        if (soundId == null) {
             return;
         }
 
@@ -305,28 +306,44 @@ public final class DialogueClient {
 
         float volume = line.voice_volume != null ? line.voice_volume : definition.voice_volume;
 
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, volume));
+        SoundSource source = resolveVoiceSource(line);
+        SimpleSoundInstance sound = new SimpleSoundInstance(soundId, source, volume, pitch, RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
+
+        Minecraft.getInstance().getSoundManager().play(sound);
     }
 
 
-    private static SoundEvent resolveVoice(DialogueDefinition.Line line) {
+    private static ResourceLocation resolveVoiceId(DialogueDefinition.Line line) {
         String value = line.voice != null ? line.voice : definition.voice;
 
         if (value == null || value.isBlank()) {
             return null;
         }
 
-        if (value.equals("osiris")) {
-            return ModSounds.OSIRIS_VOICE.get();
+        if ("osiris".equalsIgnoreCase(value)) {
+            return ModSounds.OSIRIS_VOICE.get().getLocation();
         }
 
-        if (value.equals("paladin")) {
-            return ModSounds.PALADIN_VOICE.get();
+        if ("paladin".equalsIgnoreCase(value)) {
+            return ModSounds.PALADIN_VOICE.get().getLocation();
         }
 
-        ResourceLocation id = ResourceLocation.tryParse(value);
+        return ResourceLocation.tryParse(value);
+    }
 
-        return id != null ? ForgeRegistries.SOUND_EVENTS.getValue(id) : null;
+
+    private static SoundSource resolveVoiceSource(DialogueDefinition.Line line) {
+        String value = line.voice_source != null ? line.voice_source : definition.voice_source;
+
+        if (value == null || value.isBlank()) {
+            return SoundSource.MASTER;
+        }
+
+        try {
+            return SoundSource.valueOf(value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return SoundSource.MASTER;
+        }
     }
 
 

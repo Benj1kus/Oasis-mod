@@ -9,6 +9,8 @@ public class DialogueDefinition {
 
     // Voice
     public String voice;
+    public String voice_source = "master";
+
     public float voice_pitch = 1.0F;
     public float voice_volume = 0.55F;
     public int voice_every = 1;
@@ -112,6 +114,7 @@ public class DialogueDefinition {
         public Integer hold_ticks;
 
         public String voice;
+        public String voice_source;
         public Float voice_pitch;
         public Float voice_volume;
         public Integer voice_every;
