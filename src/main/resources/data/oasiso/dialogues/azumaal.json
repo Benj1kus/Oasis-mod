@@ -1,0 +1,96 @@
+{
+  "format": 2,
+
+  "voice": "osiris",
+  "voice_pitch": 1.0,
+  "voice_volume": 0.55,
+  "voice_every": 1,
+
+  "char_ticks": 2,
+  "hold_ticks": 20,
+  "fade_ticks": 14,
+
+  "text_color": "rainbow",
+  "text_effect": "wave",
+
+  "frame": "oasiso:textures/gui/dialogue/frame_dialog.png",
+  "background": "oasiso:textures/gui/dialogue/dithering_gradient.png",
+
+  "background_alpha": 0.62,
+  "background_bob": 1.6,
+  "background_speed": 1.1,
+
+  "sprite_position": "center",
+  "sprite_transition": "bounce",
+  "sprite_move_ticks": 10,
+  "sprite_transition_ticks": 8,
+
+  "freeze_source": true,
+  "source_invulnerable": true,
+  "cancel_if_source_missing": true,
+  "exclusive_source": true,
+
+  "once": "never",
+
+  "layout": {
+    "canvas_width": 192,
+    "canvas_height": 108,
+
+    "frame_x": 0,
+    "frame_y": 63,
+    "frame_width": 192,
+    "frame_height": 45,
+
+    "text_x": 23,
+    "text_y": 75,
+    "text_width": 146,
+    "text_scale": 0.72,
+    "line_height": 10,
+
+    "sprite_width": 126,
+    "sprite_height": 78,
+    "sprite_y": 0,
+
+    "sprite_left_x": 0,
+    "sprite_center_x": 33,
+    "sprite_right_x": 66
+  },
+
+  "triggers": [
+    {
+      "type": "manual"
+    }
+  ],
+
+  "lines": [
+    {
+      "text": "dialogue.oasiso.azumaal.1",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_speak.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.2",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.3",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_laugh.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.4",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_think.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.5",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_kill.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.6",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_laugh.png"
+    },
+    {
+      "text": "dialogue.oasiso.azumaal.7",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_scary.png",
+      "hold_ticks": 24
+    }
+  ]
+}

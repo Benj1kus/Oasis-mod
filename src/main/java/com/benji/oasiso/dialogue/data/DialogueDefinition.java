@@ -1,0 +1,203 @@
+package com.benji.oasiso.dialogue.data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DialogueDefinition {
+
+    public int format = 2;
+
+    // Voice
+    public String voice;
+    public float voice_pitch = 1.0F;
+    public float voice_volume = 0.55F;
+    public int voice_every = 1;
+
+    // Typewriter
+    public int char_ticks = 2;
+    public int hold_ticks = 20;
+    public int fade_ticks = 14;
+
+    // Text
+    public String text_color = "white";
+    public List<String> text_gradient;
+    public String text_effect = "wave";
+
+    /*
+     * Legacy compatibility:
+     * старые JSON с text_style: gold/rainbow
+     * продолжат работать.
+     */
+    public String text_style;
+
+    // Visuals
+    public String frame;
+    public String background;
+
+    public float background_alpha = 0.62F;
+    public float background_bob = 1.6F;
+    public float background_speed = 1.1F;
+
+    // Sprite
+    public String sprite_position = "center";
+    public String sprite_transition = "bounce";
+
+    public int sprite_move_ticks = 10;
+    public int sprite_transition_ticks = 8;
+
+    // Gameplay
+    public boolean freeze_source = true;
+    public boolean source_invulnerable = true;
+    public boolean cancel_if_source_missing = true;
+
+    /*
+     * Не даёт одному NPC одновременно
+     * говорить с десятью игроками.
+     */
+    public boolean exclusive_source = true;
+
+    /*
+     * never
+     * player
+     * entity
+     * session
+     */
+    public String once = "never";
+
+    public Layout layout = new Layout();
+
+    public List<Trigger> triggers = new ArrayList<>();
+    public List<Line> lines = new ArrayList<>();
+
+
+    public static class Layout {
+
+        public int canvas_width = 192;
+        public int canvas_height = 108;
+
+        public int frame_x = 0;
+        public int frame_y = 63;
+        public int frame_width = 192;
+        public int frame_height = 45;
+
+        public int text_x = 23;
+        public int text_y = 75;
+        public int text_width = 146;
+
+        public float text_scale = 0.72F;
+        public int line_height = 10;
+
+        public int sprite_width = 126;
+        public int sprite_height = 78;
+        public int sprite_y = 0;
+
+        public float sprite_left_x = 0.0F;
+        public float sprite_center_x = 33.0F;
+        public float sprite_right_x = 66.0F;
+    }
+
+
+    public static class Line {
+
+        // Translation key
+        public String text;
+
+        // Или прямой текст без lang.
+        public String literal;
+
+        public String sprite;
+
+        // Line overrides
+        public Integer char_ticks;
+        public Integer hold_ticks;
+
+        public String voice;
+        public Float voice_pitch;
+        public Float voice_volume;
+        public Integer voice_every;
+
+        public String text_color;
+        public List<String> text_gradient;
+
+        public String text_effect;
+
+        // legacy
+        public String text_style;
+
+        public String frame;
+        public String background;
+
+        public String sprite_position;
+        public Float sprite_x;
+
+        public String sprite_transition;
+
+        public Integer sprite_move_ticks;
+        public Integer sprite_transition_ticks;
+
+        public Integer sprite_width;
+        public Integer sprite_height;
+    }
+
+
+    public static class Trigger {
+
+        /*
+         * manual
+         * external
+         * right_click_entity
+         * right_click_block
+         * proximity_entity
+         * proximity_block
+         * hit_entity
+         * shift_near_entity
+         * look_at_entity
+         * kill_entity
+         * enter_area
+         */
+        public String type = "manual";
+
+        /*
+         * minecraft:villager
+         * oasiso:paladin
+         *
+         * или tag:
+         * #minecraft:skeletons
+         */
+        public String target;
+
+        public double radius = 5.0D;
+
+        public double look_angle = 12.0D;
+
+        public int check_interval = 5;
+        public int cooldown_ticks = 40;
+
+        /*
+         * Для click/hit:
+         * съесть само действие.
+         */
+        public boolean consume = false;
+
+        // Override dialogue-level once.
+        public String once;
+
+        // External event ID.
+        public String event;
+
+        // Area/dimension
+        public String dimension;
+
+        public Double x;
+        public Double y;
+        public Double z;
+
+        public Double min_x;
+        public Double min_y;
+        public Double min_z;
+
+        public Double max_x;
+        public Double max_y;
+        public Double max_z;
+    }
+}

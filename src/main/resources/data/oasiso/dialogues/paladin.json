@@ -1,0 +1,61 @@
+{
+  "format": 2,
+
+  "voice": "paladin",
+
+  "char_ticks": 2,
+  "hold_ticks": 24,
+  "fade_ticks": 14,
+
+  "voice_pitch": 1.0,
+  "voice_volume": 0.48,
+  "voice_every": 1,
+
+  "text_color": "gold",
+  "text_effect": "wave",
+
+  "frame": "oasiso:textures/gui/dialogue/frame_dialog.png",
+  "background": "oasiso:textures/gui/dialogue/dithering_gradient.png",
+  "background_alpha": 0.62,
+
+  "sprite_position": "center",
+  "sprite_transition": "bounce",
+  "sprite_move_ticks": 10,
+
+  "freeze_source": true,
+  "source_invulnerable": true,
+
+  "triggers": [
+    {
+      "type": "manual"
+    }
+  ],
+
+  "lines": [
+    {
+      "text": "dialogue.oasiso.paladin.1",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_idle.png"
+    },
+    {
+      "text": "dialogue.oasiso.paladin.2",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_idle.png"
+    },
+    {
+      "text": "dialogue.oasiso.paladin.3",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_stink.png"
+    },
+    {
+      "text": "dialogue.oasiso.paladin.4",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_oops.png"
+    },
+    {
+      "text": "dialogue.oasiso.paladin.5",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_move1.png"
+    },
+    {
+      "text": "dialogue.oasiso.paladin.6",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_move2.png",
+      "hold_ticks": 30
+    }
+  ]
+}

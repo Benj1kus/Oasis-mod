@@ -6,6 +6,10 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.entity.AzumaalEntity;
+import com.benji.oasiso.common.entity.PaladinEntity;
+import com.benji.oasiso.dialogue.DialogueApi;
+import net.minecraft.world.entity.Entity;
 
 import java.util.UUID;
 
@@ -25,7 +29,23 @@ public final class BossDialogueNetwork {
     }
 
     public static void startDialogue(ServerPlayer player, UUID bossId, String dialogueId) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DialogueStartS2CPacket(bossId, dialogueId));
+        Entity source = player.serverLevel().getEntity(bossId);
+
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, dialogueId);
+
+        boolean started = DialogueApi.start(player, source, id, () -> {
+            if (source instanceof AzumaalEntity azumaal) {
+                azumaal.finishIntroDialogue(player);
+            }
+
+            if (source instanceof PaladinEntity paladin) {
+                paladin.finishIntroDialogue(player);
+            }
+        });
+
+        if (!started) {
+            CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DialogueStartS2CPacket(bossId, dialogueId));
+        }
     }
 
     public static void panelFinished(UUID bossId, String dialogueId) {

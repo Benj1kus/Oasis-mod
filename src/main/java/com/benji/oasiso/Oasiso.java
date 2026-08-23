@@ -6,6 +6,7 @@ import com.benji.oasiso.network.BossPortalTransitionNetwork;
 import com.benji.oasiso.common.block.entity.*;
 import com.benji.oasiso.common.effect.ChaosChamberEffect;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
+import com.benji.oasiso.network.dialogueengine.DialogueNetwork;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import com.benji.oasiso.common.block.ChaosAltarBlock;
@@ -1337,6 +1338,7 @@ public class Oasiso {
             ModMessages.register();
             BossPortalTransitionNetwork.register();
             BossDialogueNetwork.register();
+            DialogueNetwork.register();
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(FLOWERY.getId(), POTTED_FLOWERY);
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(CACTULO.getId(), POTTED_CACTULO);
         });
