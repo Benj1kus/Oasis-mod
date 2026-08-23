@@ -33,6 +33,7 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     private static final EntityDataAccessor<Integer> QTE_SLOT = SynchedEntityData.defineId(SwordHeartEntity.class, EntityDataSerializers.INT);
 
+    private static final int HOLY_OUTLINE_COLOR = 0xFFD45A;
 
     private static final RawAnimation IDLE_ANIMATION = RawAnimation.begin().thenLoop("idle");
 
@@ -51,12 +52,7 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
 
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 1.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 0.0D)
-                .add(Attributes.FOLLOW_RANGE, 0.0D);
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 1.0D).add(Attributes.MOVEMENT_SPEED, 0.0D).add(Attributes.KNOCKBACK_RESISTANCE, 1.0D).add(Attributes.ATTACK_DAMAGE, 0.0D).add(Attributes.FOLLOW_RANGE, 0.0D);
     }
 
 
@@ -142,11 +138,7 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
             return false;
         }
         this.destroyed = true;
-        level.sendParticles(Oasiso.PURPLE_STARS.get(),
-                this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ(),
-                35,
-                0.35D, 0.35D, 0.35D,
-                0.08D);
+        level.sendParticles(Oasiso.PURPLE_STARS.get(), this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ(), 35, 0.35D, 0.35D, 0.35D, 0.08D);
 
 
         UUID ownerUuid = this.getOwnerUuid();
@@ -165,6 +157,7 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
     public boolean isPushable() {
         return false;
     }
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0,
@@ -190,6 +183,20 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
             this.setOwnerUuid(tag.getUUID("QteOwner"));
         }
         this.setQteSlot(tag.getInt("QteSlot"));
+    }
+
+    @Override
+    public boolean isCurrentlyGlowing() {
+        if (this.level().isClientSide) {
+            return this.isAlive();
+        }
+
+        return super.isCurrentlyGlowing();
+    }
+
+    @Override
+    public int getTeamColor() {
+        return HOLY_OUTLINE_COLOR;
     }
 
 

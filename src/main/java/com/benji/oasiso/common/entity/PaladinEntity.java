@@ -37,6 +37,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int STATE_GRAB = 4;
     public static final int STATE_SHIELD = 5;
 
+
     //cutscene states
     public static final int STATE_WAIT = 6;
     public static final int STATE_AWAKE = 7;
@@ -417,7 +418,6 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.combatController.save(tag);
         this.deathManager.save(tag);
     }
-
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {

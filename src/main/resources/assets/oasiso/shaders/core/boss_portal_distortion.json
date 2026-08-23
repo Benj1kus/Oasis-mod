@@ -1,0 +1,72 @@
+{
+  "vertex": "oasiso:boss_portal_distortion",
+  "fragment": "oasiso:boss_portal_distortion",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "DiffuseSampler"
+    },
+    {
+      "name": "DepthSampler"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    },
+    {
+      "name": "PortalBase",
+      "type": "float",
+      "count": 2,
+      "values": [ 0.5, 0.5 ]
+    },
+    {
+      "name": "PortalTop",
+      "type": "float",
+      "count": 2,
+      "values": [ 0.5, 0.8 ]
+    },
+    {
+      "name": "BaseRadius",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.15 ]
+    },
+    {
+      "name": "TopRadius",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.08 ]
+    },
+    {
+      "name": "BaseDepth",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.5 ]
+    },
+    {
+      "name": "TopDepth",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.5 ]
+    },
+    {
+      "name": "Aspect",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.7777778 ]
+    },
+    {
+      "name": "Strength",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.01 ]
+    }
+  ]
+}

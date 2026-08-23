@@ -1,0 +1,30 @@
+{
+  "vertex": "oasiso:paladin_outline",
+  "fragment": "oasiso:paladin_outline",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "GoldMask"
+    },
+    {
+      "name": "SwordMask"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "TexelSize",
+      "type": "float",
+      "count": 2,
+      "values": [ 0.001, 0.001 ]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    }
+  ]
+}
