@@ -15,8 +15,8 @@ public class DialogueEditorProject {
     public DialogueDefinition definition = new DialogueDefinition();
 
     public Map<String, LinkedHashMap<String, String>> languages = new LinkedHashMap<>();
-
     public Map<String, String> sounds = new LinkedHashMap<>();
+    public Map<String, FontAsset> fonts = new LinkedHashMap<>();
 
     public int selected_line = 0;
     public int selected_trigger = 0;
@@ -100,6 +100,16 @@ public class DialogueEditorProject {
             sounds = new LinkedHashMap<>();
         }
 
+        if (fonts == null) {
+            fonts = new LinkedHashMap<>();
+        }
+
+        fonts.entrySet().removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
+        for (FontAsset asset : fonts.values()) {
+            if (asset.chars == null) asset.chars = new ArrayList<>();
+            if (asset.type == null || asset.type.isBlank()) asset.type = "ttf";
+        }
+
         if (node_positions == null) {
             node_positions = new LinkedHashMap<>();
         }
@@ -144,10 +154,6 @@ public class DialogueEditorProject {
         if (definition.nodes == null) {
             definition.nodes = new LinkedHashMap<>();
         }
-
-        /*
-         * Remove editor positions for deleted nodes.
-         */
         node_positions.keySet().removeIf(id -> !definition.nodes.containsKey(id));
 
         int autoIndex = 0;
@@ -612,6 +618,7 @@ public class DialogueEditorProject {
         definition.background = replacePrefix(definition.background, oldNamespace, newNamespace);
 
         definition.voice = replacePrefix(definition.voice, oldNamespace, newNamespace);
+        definition.text_font = replacePrefix(definition.text_font, oldNamespace, newNamespace);
 
         for (DialogueDefinition.Line line : definition.lines) {
             rewriteLineNamespace(line, oldNamespace, newNamespace);
@@ -704,6 +711,15 @@ public class DialogueEditorProject {
         line.background = replacePrefix(line.background, oldNamespace, newNamespace);
 
         line.voice = replacePrefix(line.voice, oldNamespace, newNamespace);
+        line.text_font = replacePrefix(line.text_font, oldNamespace, newNamespace);
+
+        if (line.rich_regions != null) {
+            for (DialogueDefinition.TextRegion region : line.rich_regions) {
+                if (region != null) {
+                    region.font = replacePrefix(region.font, oldNamespace, newNamespace);
+                }
+            }
+        }
     }
 
 
@@ -735,6 +751,12 @@ public class DialogueEditorProject {
 
         line.text_style = source.text_style;
 
+        line.markdown = source.markdown;
+        line.text_font = source.text_font;
+        line.text_outline_color = source.text_outline_color;
+        line.text_outline_gradient = source.text_outline_gradient != null ? new ArrayList<>(source.text_outline_gradient) : null;
+        line.text_outline_thickness = source.text_outline_thickness;
+
         if (source.rich_regions != null) {
             line.rich_regions = new ArrayList<>();
 
@@ -753,6 +775,15 @@ public class DialogueEditorProject {
                 region.gradient = sourceRegion.gradient != null ? new ArrayList<>(sourceRegion.gradient) : null;
 
                 region.effects = sourceRegion.effects != null ? new ArrayList<>(sourceRegion.effects) : null;
+
+                region.bold = sourceRegion.bold;
+                region.italic = sourceRegion.italic;
+                region.underline = sourceRegion.underline;
+                region.strikethrough = sourceRegion.strikethrough;
+                region.font = sourceRegion.font;
+                region.outline_color = sourceRegion.outline_color;
+                region.outline_gradient = sourceRegion.outline_gradient != null ? new ArrayList<>(sourceRegion.outline_gradient) : null;
+                region.outline_thickness = sourceRegion.outline_thickness;
 
                 if (sourceRegion.animation != null) {
                     region.animation = new DialogueDefinition.TextAnimation();
@@ -838,6 +869,17 @@ public class DialogueEditorProject {
         value = value.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_");
 
         return value.isBlank() ? "node" : value;
+    }
+
+
+    public static final class FontAsset {
+        public String type = "ttf";
+        public String file;
+        public float size = 11.0F;
+        public float oversample = 2.0F;
+        public int height = 11;
+        public int ascent = 9;
+        public List<String> chars = new ArrayList<>();
     }
 
 

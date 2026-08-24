@@ -48,6 +48,40 @@ public final class DialogueRichTextUtil {
                 result.effects = List.copyOf(region.effects);
             }
 
+            if (region.bold != null) {
+                result.bold = region.bold;
+            }
+
+            if (region.italic != null) {
+                result.italic = region.italic;
+            }
+
+            if (region.underline != null) {
+                result.underline = region.underline;
+            }
+
+            if (region.strikethrough != null) {
+                result.strikethrough = region.strikethrough;
+            }
+
+            if (region.font != null) {
+                result.font = region.font;
+            }
+
+            if (region.outline_color != null) {
+                result.outlineColor = region.outline_color;
+            }
+
+            if (region.outline_gradient != null) {
+                result.outlineGradient = List.copyOf(region.outline_gradient);
+                result.outlineGradientStart = range.start;
+                result.outlineGradientEnd = range.end;
+            }
+
+            if (region.outline_thickness != null) {
+                result.outlineThickness = region.outline_thickness;
+            }
+
             mergeAnimation(result.animation, region.animation);
         }
 
@@ -233,8 +267,21 @@ public final class DialogueRichTextUtil {
         public List<String> gradient;
         public List<String> effects;
 
+        public Boolean bold;
+        public Boolean italic;
+        public Boolean underline;
+        public Boolean strikethrough;
+
+        public String font;
+
+        public String outlineColor;
+        public List<String> outlineGradient;
+        public Float outlineThickness;
+
         public int gradientStart = -1;
         public int gradientEnd = -1;
+        public int outlineGradientStart = -1;
+        public int outlineGradientEnd = -1;
 
         public final DialogueDefinition.TextAnimation animation = new DialogueDefinition.TextAnimation();
     }

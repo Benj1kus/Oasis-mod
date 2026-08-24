@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -95,6 +96,13 @@ public final class DialogueEditorScreen extends Screen {
         labels.clear();
         tips.clear();
         scrollWidgets.clear();
+
+        /*
+         * Imported fonts are workspace assets, not Minecraft resources yet.
+         * Keep a tiny font-only Studio preview pack synchronized so the live
+         * preview can use them before the user performs a real Export.
+         */
+        DialogueEditorFontPreviewPack.ensureLoaded(project);
 
         uiSettings = DialogueEditorUiSettings.get();
         LEFT = uiSettings.resolvedInspectorWidth(width);
@@ -258,10 +266,21 @@ public final class DialogueEditorScreen extends Screen {
             reopen(tab);
         })));
 
-        button("Test current voice", 10, b -> testVoice());
-        help(11, "v3 combined effects can stack wave + shake + explode + linear. Legacy text_effect still works.");
-        help(12, "Imported .ogg files generate sounds.json on export. New files become playable after resource reload.");
+        toggleButton("Markdown default", project.definition.markdown, 9, value -> project.definition.markdown = value);
+
+        button("GLOBAL default font: " + fontSummary(project.definition.text_font), 10, b -> minecraft.setScreen(new DialogueEditorFontPickerScreen(this, project, project.definition.text_font, value -> {
+            project.definition.text_font = value;
+            reopen(tab);
+        })));
+
+        button(globalOutlineSummary(), 11, b -> minecraft.setScreen(DialogueOutlineEditorScreen.global(this, project)));
+
+        button("Test current voice", 13, b -> testVoice());
+        help(14, "Markdown: **bold**  *italic*  ~~strike~~  __underline__. It is OFF by default for old packs.");
+        help(15, "Font hierarchy: GLOBAL -> LINE -> REGION. A Line/Region override wins over the global font.");
+        help(16, "Custom TTF/MSDF fonts activate after Export/Install + F3+T. Outline has its own compact editor.");
     }
+
 
     private void initVisuals() {
         assetField("Frame texture", project.definition.frame, 0, ".png", false, s -> project.definition.frame = blankToNull(s));
@@ -622,13 +641,9 @@ public final class DialogueEditorScreen extends Screen {
         graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 24)), 12, height - 14, 0xFF8E9AA8, false);
 
         int inspectorClipTop = inspectorContentTop();
-
         int inspectorClipBottom = inspectorContentBottom();
 
-        /*
-         * Hard clip inspector text too. Scrolling can never paint labels over
-         * the fixed Studio toolbar/tabs or the Ready/status footer.
-         */
+
         graphics.enableScissor(4, inspectorClipTop, LEFT, inspectorClipBottom);
 
         for (Label label : labels) {
@@ -657,15 +672,9 @@ public final class DialogueEditorScreen extends Screen {
             previewTransform = DialogueEditorPreview.render(project, graphics, px, py + cardH + 8, pw, previewH, previewTicks, partialTick);
         } else if (lineTimeline) {
             int timelineH = Math.min(timelineHeight, Math.max(58, ph - 96));
-
             int gap = 10;
-
             int previewH = Math.max(86, ph - timelineH - gap);
 
-            /*
-             * Lines / Line+ are legacy-line editors even when Nodes v3 is ON.
-             * Force the live preview to follow project.selected_line here.
-             */
             previewTransform = DialogueEditorPreview.render(project, graphics, px, py, pw, previewH, previewTicks, partialTick, true);
 
             timelineY = py + ph - timelineH;
@@ -1133,6 +1142,11 @@ public final class DialogueEditorScreen extends Screen {
                 d.text_effect = defaults.text_effect;
                 d.text_effects = defaults.text_effects;
                 d.text_style = defaults.text_style;
+                d.markdown = defaults.markdown;
+                d.text_font = defaults.text_font;
+                d.text_outline_color = defaults.text_outline_color;
+                d.text_outline_gradient = defaults.text_outline_gradient;
+                d.text_outline_thickness = defaults.text_outline_thickness;
             }
 
             case VISUALS -> {
@@ -1238,20 +1252,48 @@ public final class DialogueEditorScreen extends Screen {
 
     private void testVoice() {
         String value = project.definition.voice;
-        ResourceLocation id = ResourceLocation.tryParse(value);
-        if (id == null) {
-            STATUS = "Voice id is empty or invalid.";
+
+        if (value == null || value.isBlank()) {
+
+            STATUS = "No voice selected.";
+
+            showToast("No voice selected • choose/import an OGG first");
+
             return;
         }
+
+        ResourceLocation id = ResourceLocation.tryParse(value.trim());
+
+        if (id == null || id.getPath().isBlank()) {
+
+            STATUS = "Voice id is invalid: " + value;
+
+            showToast("Invalid voice sound id");
+
+            return;
+        }
+
         SoundSource source;
+
         try {
             source = SoundSource.valueOf((project.definition.voice_source != null ? project.definition.voice_source : "master").toUpperCase(Locale.ROOT));
+
         } catch (Exception ignored) {
             source = SoundSource.MASTER;
         }
-        SimpleSoundInstance sound = new SimpleSoundInstance(id, source, project.definition.voice_volume, project.definition.voice_pitch, RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
-        minecraft.getSoundManager().play(sound);
-        STATUS = "Played voice request: " + id;
+
+        try {
+            SimpleSoundInstance sound = new SimpleSoundInstance(id, source, project.definition.voice_volume, project.definition.voice_pitch, RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
+
+            minecraft.getSoundManager().play(sound);
+
+            STATUS = "Played voice request: " + id;
+
+        } catch (Exception exception) {
+            STATUS = "Could not test voice: " + (exception.getMessage() != null ? exception.getMessage() : exception.getClass().getSimpleName());
+
+            showToast("Voice preview unavailable • check sound id/resource pack");
+        }
     }
 
     private void saveProject() {
@@ -1548,7 +1590,7 @@ public final class DialogueEditorScreen extends Screen {
     private int maxLeftScroll() {
         int maxRow = switch (tab) {
             case PROJECT -> 21;
-            case DIALOGUE -> 12;
+            case DIALOGUE -> 18;
             case VISUALS -> 9;
             case LINES -> 13;
             case LINE_OVERRIDES, LAYOUT, TRIGGERS, ZONE_FX -> 10;
@@ -1830,6 +1872,12 @@ public final class DialogueEditorScreen extends Screen {
             return "Comma-separated gradient stops, e.g. #42F2E1, purple, gold. 'none' disables an inherited line gradient.";
         if (key.contains("text effect"))
             return "Animation applied to revealed letters: normal, wave, shake, explode or linear.";
+        if (key.contains("markdown"))
+            return "Enable lightweight Markdown: **bold**, *italic*, ~~strike~~ and __underline__. Disabled by default for backwards compatibility.";
+        if (key.contains("font"))
+            return "Minecraft default is used when blank. The font picker can import TTF or an msdf-atlas-gen JSON + PNG pair.";
+        if (key.contains("outline"))
+            return "Text outline. Color accepts named/HEX/rainbow; gradient uses comma-separated colors; thickness 0 disables it.";
         if (key.contains("frame texture") || key.contains("frame override"))
             return "PNG used as the dialogue frame. Browse or drag a PNG into Studio.";
         if (key.contains("background texture") || key.contains("background override"))
@@ -1894,6 +1942,27 @@ public final class DialogueEditorScreen extends Screen {
 
     private static int richRegionCount(DialogueDefinition.Line line) {
         return line != null && line.rich_regions != null ? line.rich_regions.size() : 0;
+    }
+
+
+    private String globalOutlineSummary() {
+        float thickness = Math.max(0.0F, project.definition.text_outline_thickness);
+
+        if (thickness <= 0.01F) {
+            return "Global text outline: OFF  •  Configure...";
+        }
+
+        String color = project.definition.text_outline_color != null && !project.definition.text_outline_color.isBlank() ? project.definition.text_outline_color : "black";
+
+        return "Global text outline: " + String.format(Locale.ROOT, "%.2f", thickness) + " px  •  " + color + "  •  Configure...";
+    }
+
+
+    private static String fontSummary(String value) {
+        if (value == null || value.isBlank() || "minecraft:default".equalsIgnoreCase(value)) {
+            return "VANILLA";
+        }
+        return value.length() <= 24 ? value : "…" + value.substring(value.length() - 23);
     }
 
 

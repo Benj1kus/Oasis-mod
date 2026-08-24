@@ -2,7 +2,9 @@ package com.benji.oasiso.dialogue.editor;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
+import com.benji.oasiso.dialogue.text.DialogueMarkdown;
 import com.benji.oasiso.dialogue.text.DialogueRichTextUtil;
+import com.benji.oasiso.dialogue.text.DialogueTextRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -85,7 +87,7 @@ public final class DialogueEditorPreview {
         renderBackground(project, graphics, definition);
         renderSprite(project, graphics, definition, line, ticks + partialTick);
         renderFrame(project, graphics, definition, line);
-        renderText(project, graphics, definition, line, ticks + partialTick, nodePreview);
+        renderText(project, graphics, definition, line, ticks + partialTick, nodePreview, scale);
 
         if (nodePreview) {
             DialogueDefinition.Node selectedNode = definition.nodes.get(project.selected_node);
@@ -177,7 +179,7 @@ public final class DialogueEditorPreview {
         };
     }
 
-    private static void renderText(DialogueEditorProject project, GuiGraphics graphics, DialogueDefinition definition, DialogueDefinition.Line line, float time, boolean nodePreview) {
+    private static void renderText(DialogueEditorProject project, GuiGraphics graphics, DialogueDefinition definition, DialogueDefinition.Line line, float time, boolean nodePreview, float previewCanvasScale) {
         Font font = Minecraft.getInstance().font;
 
         DialogueDefinition.Layout layout = definition.layout;
@@ -208,9 +210,12 @@ public final class DialogueEditorPreview {
             text = line.text != null ? "<" + line.text + ">" : "<empty line>";
         }
 
+        DialogueMarkdown.Result markdown = DialogueMarkdown.parse(text, markdownEnabled(definition, line));
+        text = markdown.text();
+
         int maxWidth = Math.max(1, Mth.floor(layout.text_width / layout.text_scale));
 
-        List<Glyph> glyphs = layoutGlyphs(font, text, maxWidth, layout.line_height);
+        List<Glyph> glyphs = layoutGlyphs(font, definition, line, text, locale, markdown, maxWidth, layout.line_height);
 
         List<String> baseEffects = resolveEffects(definition, line);
 
@@ -266,14 +271,8 @@ public final class DialogueEditorPreview {
                         float amplitude = animation.wave_amplitude != null ? animation.wave_amplitude : 0.85F;
 
                         float speed = animation.wave_speed != null ? animation.wave_speed : 5.0F;
-
                         float frequency = animation.wave_frequency != null ? animation.wave_frequency : 0.55F;
 
-                        /*
-                         * Preview uses its own slower time unit than runtime.
-                         * Convert the runtime speed into a visually similar
-                         * editor animation.
-                         */
                         gy += Mth.sin(time * 0.044F * speed + glyph.index * frequency) * amplitude;
                     }
 
@@ -315,7 +314,7 @@ public final class DialogueEditorPreview {
             glyphPose.translate(gx, gy, 0);
 
             if (glyphScale != 1.0F) {
-                int glyphWidth = font.width(String.valueOf(glyph.character));
+                int glyphWidth = glyph.width;
 
                 glyphPose.translate(glyphWidth * 0.5F, font.lineHeight * 0.5F, 0);
 
@@ -324,7 +323,25 @@ public final class DialogueEditorPreview {
                 glyphPose.translate(-glyphWidth * 0.5F, -font.lineHeight * 0.5F, 0);
             }
 
-            graphics.drawString(font, String.valueOf(glyph.character), 0, 0, 0xFF000000 | rgb, false);
+            DialogueTextRenderUtil.GlyphStyle glyphStyle = effectiveGlyphStyle(definition, line, markdown, glyph.index, rich);
+            int outlineRgb = outlineColor(definition, line, glyph, maxWidth, time, rich);
+            float outlineThickness = outlineThickness(definition, line, rich);
+
+            float glyphToGuiScale =
+                    previewCanvasScale
+                            * layout.text_scale
+                            * glyphScale;
+
+            DialogueTextRenderUtil.drawGlyph(
+                    graphics,
+                    font,
+                    glyph.character,
+                    0xFF000000 | rgb,
+                    0xFF000000 | outlineRgb,
+                    outlineThickness,
+                    glyphStyle,
+                    glyphToGuiScale
+            );
 
             glyphPose.popPose();
         }
@@ -498,11 +515,21 @@ public final class DialogueEditorPreview {
         return ((value & 1023L) / 1023.0F - 0.5F) * 1.6F;
     }
 
-    private static List<Glyph> layoutGlyphs(Font font, String text, int maxWidth, int lineHeight) {
+    private static List<Glyph> layoutGlyphs(
+            Font font,
+            DialogueDefinition definition,
+            DialogueDefinition.Line line,
+            String text,
+            String locale,
+            DialogueMarkdown.Result markdown,
+            int maxWidth,
+            int lineHeight
+    ) {
         List<Glyph> result = new ArrayList<>();
         int x = 0;
         int y = 0;
         int i = 0;
+
         while (i < text.length()) {
             char c = text.charAt(i);
             if (c == '\n') {
@@ -511,41 +538,97 @@ public final class DialogueEditorPreview {
                 i++;
                 continue;
             }
+
             if (Character.isWhitespace(c)) {
-                int cw = font.width(String.valueOf(c));
+                int cw = styledWidth(font, definition, line, text, locale, markdown, i, c);
                 if (x + cw > maxWidth) {
                     x = 0;
                     y += lineHeight;
                 } else {
-                    result.add(new Glyph(i, c, x, y));
+                    result.add(new Glyph(i, c, x, y, cw));
                     x += cw;
                 }
                 i++;
                 continue;
             }
 
-            int end = i;
-            while (end < text.length() && !Character.isWhitespace(text.charAt(end)) && text.charAt(end) != '\n') end++;
-            String word = text.substring(i, end);
-            if (x > 0 && x + font.width(word) > maxWidth) {
+            int wordEnd = i;
+            while (wordEnd < text.length() && !Character.isWhitespace(text.charAt(wordEnd)) && text.charAt(wordEnd) != '\n') wordEnd++;
+
+            int wordWidth = 0;
+            for (int j = i; j < wordEnd; j++) {
+                wordWidth += styledWidth(font, definition, line, text, locale, markdown, j, text.charAt(j));
+            }
+
+            if (x > 0 && x + wordWidth > maxWidth) {
                 x = 0;
                 y += lineHeight;
             }
-            for (int j = i; j < end; j++) {
+
+            for (int j = i; j < wordEnd; j++) {
                 char letter = text.charAt(j);
-                int cw = font.width(String.valueOf(letter));
+                int cw = styledWidth(font, definition, line, text, locale, markdown, j, letter);
                 if (x > 0 && x + cw > maxWidth) {
                     x = 0;
                     y += lineHeight;
                 }
-                result.add(new Glyph(j, letter, x, y));
+                result.add(new Glyph(j, letter, x, y, cw));
                 x += cw;
             }
-            i = end;
+            i = wordEnd;
         }
         return result;
     }
 
-    private record Glyph(int index, char character, int x, int y) {
+    private static int styledWidth(Font font, DialogueDefinition definition, DialogueDefinition.Line line, String text, String locale, DialogueMarkdown.Result markdown, int index, char character) {
+        DialogueRichTextUtil.ResolvedStyle rich = DialogueRichTextUtil.resolve(line, text, index, locale);
+        return DialogueTextRenderUtil.width(font, character, effectiveGlyphStyle(definition, line, markdown, index, rich));
+    }
+
+    private static DialogueTextRenderUtil.GlyphStyle effectiveGlyphStyle(DialogueDefinition definition, DialogueDefinition.Line line, DialogueMarkdown.Result markdown, int index, DialogueRichTextUtil.ResolvedStyle rich) {
+        DialogueMarkdown.CharStyle md = markdown.styleAt(index);
+        return new DialogueTextRenderUtil.GlyphStyle(
+                rich.font != null ? rich.font : line.text_font != null ? line.text_font : definition.text_font,
+                rich.bold != null ? rich.bold : md.bold(),
+                rich.italic != null ? rich.italic : md.italic(),
+                rich.underline != null ? rich.underline : md.underline(),
+                rich.strikethrough != null ? rich.strikethrough : md.strikethrough()
+        );
+    }
+
+    private static boolean markdownEnabled(DialogueDefinition definition, DialogueDefinition.Line line) {
+        return line.markdown != null ? line.markdown : definition.markdown;
+    }
+
+    private static float outlineThickness(DialogueDefinition definition, DialogueDefinition.Line line, DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.outlineThickness != null) return Math.max(0.0F, rich.outlineThickness);
+        if (line.text_outline_thickness != null) return Math.max(0.0F, line.text_outline_thickness);
+        return Math.max(0.0F, definition.text_outline_thickness);
+    }
+
+    private static int outlineColor(DialogueDefinition definition, DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time, DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.outlineGradient != null && rich.outlineGradient.size() >= 2) {
+            int span = Math.max(1, rich.outlineGradientEnd - rich.outlineGradientStart - 1);
+            float t = Mth.clamp((glyph.index - rich.outlineGradientStart) / (float) span, 0.0F, 1.0F);
+            return gradientColor(rich.outlineGradient, t);
+        }
+
+        List<String> gradient = line.text_outline_gradient != null ? line.text_outline_gradient : definition.text_outline_gradient;
+        if (rich.outlineGradient == null && gradient != null && gradient.size() >= 2) {
+            float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0.0F, 1.0F);
+            return gradientColor(gradient, t);
+        }
+
+        String value = rich.outlineColor != null ? rich.outlineColor : line.text_outline_color != null ? line.text_outline_color : definition.text_outline_color;
+        if (value == null || value.isBlank()) value = "black";
+        if ("rainbow".equalsIgnoreCase(value)) {
+            float hue = (glyph.index * 0.095F + time * 0.0028F) % 1.0F;
+            return Color.HSBtoRGB(hue, 0.76F, 1.0F) & 0xFFFFFF;
+        }
+        return parseColor(value);
+    }
+
+
+    private record Glyph(int index, char character, int x, int y, int width) {
     }
 }

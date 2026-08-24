@@ -28,6 +28,12 @@ public class DialogueDefinition {
 
     public String text_style;
 
+    public boolean markdown = false;
+    public String text_font;
+    public String text_outline_color;
+    public List<String> text_outline_gradient;
+    public float text_outline_thickness = 0.0F;
+
     public String frame;
     public String background;
 
@@ -119,6 +125,13 @@ public class DialogueDefinition {
         public String text_effect;
         public List<String> text_effects;
         public String text_style;
+
+        public Boolean markdown;
+        public String text_font;
+        public String text_outline_color;
+        public List<String> text_outline_gradient;
+        public Float text_outline_thickness;
+
         public List<TextRegion> rich_regions;
 
         public String frame;
@@ -146,6 +159,17 @@ public class DialogueDefinition {
         public String color;
         public List<String> gradient;
         public List<String> effects;
+
+        public Boolean bold;
+        public Boolean italic;
+        public Boolean underline;
+        public Boolean strikethrough;
+
+        public String font;
+
+        public String outline_color;
+        public List<String> outline_gradient;
+        public Float outline_thickness;
 
         public TextAnimation animation = new TextAnimation();
     }

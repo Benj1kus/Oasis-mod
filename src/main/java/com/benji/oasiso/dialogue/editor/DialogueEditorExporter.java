@@ -55,6 +55,7 @@ public final class DialogueEditorExporter {
 
         writeLanguages(project, namespaceAssets);
         writeSounds(project, namespaceAssets);
+        writeFonts(project, namespaceAssets);
 
         zipTree(datapack, root.resolve("datapack.zip"));
         zipTree(resourcepack, root.resolve("resourcepack.zip"));
@@ -113,6 +114,65 @@ public final class DialogueEditorExporter {
 
         Files.writeString(namespaceAssets.resolve("sounds.json"), GSON.toJson(root), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
+
+    private static void writeFonts(DialogueEditorProject project, Path namespaceAssets) throws IOException {
+        if (project.fonts == null || project.fonts.isEmpty()) return;
+
+        Path fontDir = namespaceAssets.resolve("font");
+        Files.createDirectories(fontDir);
+
+        for (Map.Entry<String, DialogueEditorProject.FontAsset> entry : project.fonts.entrySet()) {
+            String key = sanitize(entry.getKey());
+            DialogueEditorProject.FontAsset asset = entry.getValue();
+            if (asset == null || asset.file == null || asset.file.isBlank()) continue;
+
+            JsonObject root = new JsonObject();
+            JsonArray providers = new JsonArray();
+            JsonObject provider = new JsonObject();
+
+            if ("bitmap_msdf".equalsIgnoreCase(asset.type)) {
+                provider.addProperty("type", "bitmap");
+                provider.addProperty("file", project.namespace + ":" + asset.file);
+                provider.addProperty("ascent", Math.max(1, Math.min(asset.height, asset.ascent)));
+                provider.addProperty("height", Math.max(1, asset.height));
+
+                JsonArray chars = new JsonArray();
+                if (asset.chars != null) {
+                    for (String row : asset.chars) {
+                        chars.add(row != null ? row : "");
+                    }
+                }
+                provider.add("chars", chars);
+            } else {
+                provider.addProperty("type", "ttf");
+                String ttfFile = asset.file.replace('\\', '/');
+
+                if (ttfFile.startsWith("font/")) {
+                    ttfFile = ttfFile.substring("font/".length());
+                }
+
+                provider.addProperty("file", project.namespace + ":" + ttfFile);
+
+                provider.addProperty("size", Math.max(1.0F, asset.size));
+                /*
+                 * Existing v0.7.x projects may still store oversample=2.
+                 * Re-exporting automatically upgrades TTF raster quality.
+                 */
+                provider.addProperty("oversample", Math.max(8.0F, asset.oversample));
+
+                JsonArray shift = new JsonArray();
+                shift.add(0.0F);
+                shift.add(0.0F);
+                provider.add("shift", shift);
+            }
+
+            providers.add(provider);
+            root.add("providers", providers);
+
+            Files.writeString(fontDir.resolve(key + ".json"), GSON.toJson(root), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        }
+    }
+
 
     private static void writePackMcmeta(Path root, String description) throws IOException {
         JsonObject pack = new JsonObject();

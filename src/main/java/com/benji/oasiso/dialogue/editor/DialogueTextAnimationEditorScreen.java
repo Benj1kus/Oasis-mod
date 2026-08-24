@@ -1,6 +1,7 @@
 package com.benji.oasiso.dialogue.editor;
 
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
+import com.benji.oasiso.dialogue.text.DialogueTextRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -214,7 +215,7 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
         graphics.drawString(font, summary, x + 8, y + 6, effects.isEmpty() ? 0xFF7D8794 : 0xFFFFD45A, false);
 
-        int baseX = x + Math.max(12, (w - font.width(sample)) / 2);
+        int baseX = x + Math.max(12, (w - sampleWidth()) / 2);
 
         int baseY = y + h / 2 + 4;
 
@@ -228,7 +229,8 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
             char character = sample.charAt(i);
 
-            int glyphWidth = Math.max(1, font.width(String.valueOf(character)));
+            DialogueTextRenderUtil.GlyphStyle glyphStyle = effectiveGlyphStyle();
+            int glyphWidth = Math.max(1, DialogueTextRenderUtil.width(font, character, glyphStyle));
 
             float gx = cursorX;
             float gy = baseY;
@@ -287,7 +289,10 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
                 pose.translate(-glyphWidth * 0.5F, -font.lineHeight * 0.5F, 0);
             }
 
-            graphics.drawString(font, String.valueOf(character), 0, 0, 0xFFFFFFFF, false);
+            int color = 0xFF000000 | previewColor(i);
+            int outline = 0xFF000000 | previewOutlineColor(i);
+
+            DialogueTextRenderUtil.drawGlyph(graphics, font, character, color, outline, previewOutlineThickness(), glyphStyle, glyphScale);
 
             pose.popPose();
 
@@ -295,6 +300,57 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
         }
     }
 
+
+    private DialogueTextRenderUtil.GlyphStyle effectiveGlyphStyle() {
+        String fontId = region.font != null ? region.font : line.text_font != null ? line.text_font : project.definition.text_font;
+        return new DialogueTextRenderUtil.GlyphStyle(fontId, region.bold != null && region.bold, region.italic != null && region.italic, region.underline != null && region.underline, region.strikethrough != null && region.strikethrough);
+    }
+
+    private int sampleWidth() {
+        DialogueTextRenderUtil.GlyphStyle style = effectiveGlyphStyle();
+        int result = 0;
+        for (int i = 0; i < sample.length(); i++) {
+            result += DialogueTextRenderUtil.width(font, sample.charAt(i), style);
+        }
+        return result;
+    }
+
+    private int previewColor(int index) {
+        List<String> gradient = region.gradient != null ? region.gradient : line.text_gradient != null ? line.text_gradient : project.definition.text_gradient;
+        if (gradient != null && gradient.size() >= 2) {
+            return gradientColor(gradient, sample.length() <= 1 ? 0.0F : index / (float) (sample.length() - 1));
+        }
+        String color = region.color != null ? region.color : line.text_color != null ? line.text_color : project.definition.text_color;
+        return DialogueEditorPreview.parseColor(color);
+    }
+
+    private int previewOutlineColor(int index) {
+        List<String> gradient = region.outline_gradient != null ? region.outline_gradient : line.text_outline_gradient != null ? line.text_outline_gradient : project.definition.text_outline_gradient;
+        if (gradient != null && gradient.size() >= 2) {
+            return gradientColor(gradient, sample.length() <= 1 ? 0.0F : index / (float) (sample.length() - 1));
+        }
+        String color = region.outline_color != null ? region.outline_color : line.text_outline_color != null ? line.text_outline_color : project.definition.text_outline_color;
+        return DialogueEditorPreview.parseColor(color != null ? color : "black");
+    }
+
+    private float previewOutlineThickness() {
+        if (region.outline_thickness != null) return Math.max(0.0F, region.outline_thickness);
+        if (line.text_outline_thickness != null) return Math.max(0.0F, line.text_outline_thickness);
+        return Math.max(0.0F, project.definition.text_outline_thickness);
+    }
+
+    private int gradientColor(List<String> colors, float t) {
+        int sections = colors.size() - 1;
+        float scaled = Mth.clamp(t, 0.0F, 1.0F) * sections;
+        int index = Mth.clamp((int) Math.floor(scaled), 0, sections - 1);
+        float local = scaled - index;
+        int a = DialogueEditorPreview.parseColor(colors.get(index));
+        int b = DialogueEditorPreview.parseColor(colors.get(index + 1));
+        int r = Math.round(Mth.lerp(local, (a >> 16) & 255, (b >> 16) & 255));
+        int g = Math.round(Mth.lerp(local, (a >> 8) & 255, (b >> 8) & 255));
+        int blue = Math.round(Mth.lerp(local, a & 255, b & 255));
+        return (r << 16) | (g << 8) | blue;
+    }
 
     private List<String> effectiveEffects() {
         if (region.effects != null) {

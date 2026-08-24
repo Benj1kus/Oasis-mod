@@ -1,7 +1,9 @@
 package com.benji.oasiso.dialogue.editor;
 
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
+import com.benji.oasiso.dialogue.text.DialogueMarkdown;
 import com.benji.oasiso.dialogue.text.DialogueRichTextUtil;
+import com.benji.oasiso.dialogue.text.DialogueTextRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +25,9 @@ public final class DialogueRichTextEditorScreen extends Screen {
     private final Screen parent;
     private final DialogueEditorProject project;
     private final DialogueDefinition.Line line;
-    private final String text;
+    private final String sourceText;
+    private String text;
+    private DialogueMarkdown.Result markdownResult = DialogueMarkdown.parse("", false);
     private final String locale;
     private final String heading;
 
@@ -66,7 +70,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
         this.parent = parent;
         this.project = project;
         this.line = line;
-        this.text = text != null ? text : "";
+        this.sourceText = text != null ? text : "";
         this.locale = locale;
         this.heading = heading != null ? heading : "Rich Text";
 
@@ -74,7 +78,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
             this.line.rich_regions = new ArrayList<>();
         }
 
-        DialogueRichTextUtil.repairRegions(this.line, this.text, this.locale);
+        refreshParsedText();
 
         selectedRegion = firstRegionForLocale();
     }
@@ -85,6 +89,8 @@ public final class DialogueRichTextEditorScreen extends Screen {
         scrollWidgets.clear();
         labels.clear();
         cards.clear();
+
+        refreshParsedText();
 
         panelW = Math.min(920, width - 16);
 
@@ -115,6 +121,37 @@ public final class DialogueRichTextEditorScreen extends Screen {
         buildFixedControls();
 
         int y = settingsTop + 8 - scrollOffset;
+
+        y = addInfoCard(y, "LINE BASE STYLE", "Markdown, font and outline here affect the whole line. A Rich Text region can override any of them for only the selected word/phrase.", 0xFF24536C, 0xFF8FD9FF);
+
+        y = addTwoButtons(y, "Markdown: " + nullableBoolean(line.markdown), () -> {
+            line.markdown = nextNullableBoolean(line.markdown);
+            selectionAnchor = -1;
+            selectionCursor = -1;
+            refreshParsedText();
+            rebuild();
+        }, "LINE font: " + lineFontSummary(), () -> openFontPicker(line.text_font, value -> {
+            line.text_font = value;
+            rebuild();
+        }));
+
+        y = addFullButton(y, lineOutlineSummary(), () -> minecraft.setScreen(DialogueOutlineEditorScreen.line(this, project, line)));
+
+        y = addFullButton(y, "Reset LINE markdown/font/outline to INHERIT", () -> {
+            line.markdown = null;
+            line.text_font = null;
+            line.text_outline_color = null;
+            line.text_outline_gradient = null;
+            line.text_outline_thickness = null;
+            selectionAnchor = -1;
+            selectionCursor = -1;
+            refreshParsedText();
+            rebuild();
+        });
+
+        if (markdownEnabled()) {
+            y = addInfoCard(y, "MARKDOWN", "**bold**  *italic*  ***bold italic***  ~~strike~~  __underline__  \\* escapes a marker. Rich Text selection uses the visible text without Markdown symbols.", 0xFF4C5F31, 0xFFD8E36A);
+        }
 
         DialogueDefinition.TextRegion region = currentRegion();
 
@@ -149,6 +186,29 @@ public final class DialogueRichTextEditorScreen extends Screen {
             y = addColorField(y, region);
             y = addGradientField(y, region);
 
+            y = addTwoButtons(y, "Bold: " + nullableBoolean(region.bold), () -> {
+                region.bold = nextNullableBoolean(region.bold);
+                rebuild();
+            }, "Italic: " + nullableBoolean(region.italic), () -> {
+                region.italic = nextNullableBoolean(region.italic);
+                rebuild();
+            });
+
+            y = addTwoButtons(y, "Underline: " + nullableBoolean(region.underline), () -> {
+                region.underline = nextNullableBoolean(region.underline);
+                rebuild();
+            }, "Strike: " + nullableBoolean(region.strikethrough), () -> {
+                region.strikethrough = nextNullableBoolean(region.strikethrough);
+                rebuild();
+            });
+
+            y = addFullButton(y, "REGION font: " + regionFontSummary(region), () -> openFontPicker(region.font, value -> {
+                region.font = value;
+                rebuild();
+            }));
+
+            y = addFullButton(y, regionOutlineSummary(region), () -> minecraft.setScreen(DialogueOutlineEditorScreen.region(this, project, line, region)));
+
             y = addFullButton(y, "Combined effects: " + effectsSummary(region.effects), () -> minecraft.setScreen(new DialogueEditorTextEffectsScreen(this, region.effects, true, effects -> {
                 region.effects = effects;
 
@@ -163,6 +223,14 @@ public final class DialogueRichTextEditorScreen extends Screen {
                 region.gradient = null;
 
                 region.effects = null;
+                region.bold = null;
+                region.italic = null;
+                region.underline = null;
+                region.strikethrough = null;
+                region.font = null;
+                region.outline_color = null;
+                region.outline_gradient = null;
+                region.outline_thickness = null;
 
                 region.animation = new DialogueDefinition.TextAnimation();
 
@@ -466,7 +534,11 @@ public final class DialogueRichTextEditorScreen extends Screen {
                 pose.translate(-glyph.width * 0.5F, -font.lineHeight * 0.5F, 0);
             }
 
-            graphics.drawString(font, String.valueOf(glyph.character), 0, 0, 0xFF000000 | rgb, false);
+            DialogueTextRenderUtil.GlyphStyle glyphStyle = effectiveGlyphStyle(glyph.index, rich);
+            int outlineRgb = resolvedOutlineColor(glyph, rich);
+            float outlineThickness = resolvedOutlineThickness(rich);
+
+            DialogueTextRenderUtil.drawGlyph(graphics, font, glyph.character, 0xFF000000 | rgb, 0xFF000000 | outlineRgb, outlineThickness, glyphStyle, scale);
 
             pose.popPose();
         }
@@ -816,6 +888,187 @@ public final class DialogueRichTextEditorScreen extends Screen {
     }
 
 
+    private void refreshParsedText() {
+        markdownResult = DialogueMarkdown.parse(sourceText, markdownEnabled());
+        text = markdownResult.text();
+        DialogueRichTextUtil.repairRegions(line, text, locale);
+    }
+
+    private boolean markdownEnabled() {
+        return line.markdown != null ? line.markdown : project.definition.markdown;
+    }
+
+    private DialogueTextRenderUtil.GlyphStyle effectiveGlyphStyle(int index, DialogueRichTextUtil.ResolvedStyle rich) {
+        DialogueMarkdown.CharStyle md = markdownResult.styleAt(index);
+        String fontId = rich.font != null ? rich.font : line.text_font != null ? line.text_font : project.definition.text_font;
+        return new DialogueTextRenderUtil.GlyphStyle(fontId, rich.bold != null ? rich.bold : md.bold(), rich.italic != null ? rich.italic : md.italic(), rich.underline != null ? rich.underline : md.underline(), rich.strikethrough != null ? rich.strikethrough : md.strikethrough());
+    }
+
+    private float resolvedOutlineThickness(DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.outlineThickness != null) return Math.max(0.0F, rich.outlineThickness);
+        if (line.text_outline_thickness != null) return Math.max(0.0F, line.text_outline_thickness);
+        return Math.max(0.0F, project.definition.text_outline_thickness);
+    }
+
+    private int resolvedOutlineColor(TextGlyph glyph, DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.outlineGradient != null && rich.outlineGradient.size() >= 2) {
+            int span = Math.max(1, rich.outlineGradientEnd - rich.outlineGradientStart - 1);
+            float t = Mth.clamp((glyph.index - rich.outlineGradientStart) / (float) span, 0.0F, 1.0F);
+            return gradientColor(rich.outlineGradient, t);
+        }
+
+        List<String> gradient = line.text_outline_gradient != null ? line.text_outline_gradient : project.definition.text_outline_gradient;
+        if (rich.outlineGradient == null && gradient != null && gradient.size() >= 2) {
+            return gradientColor(gradient, Mth.clamp(glyph.x / (float) Math.max(1, textMaxWidth), 0.0F, 1.0F));
+        }
+
+        String color = rich.outlineColor != null ? rich.outlineColor : line.text_outline_color != null ? line.text_outline_color : project.definition.text_outline_color;
+        if (color == null || color.isBlank()) color = "black";
+        if ("rainbow".equalsIgnoreCase(color)) {
+            float hue = (glyph.index * 0.095F + previewTicks * 0.003F) % 1.0F;
+            return Color.HSBtoRGB(hue, 0.76F, 1.0F) & 0xFFFFFF;
+        }
+        return DialogueEditorPreview.parseColor(color);
+    }
+
+    private int addTwoButtons(int y, String leftText, Runnable leftAction, String rightText, Runnable rightAction) {
+        int gap = 4;
+        int w = (panelW - 32 - gap) / 2;
+        addScrollableWidget(Button.builder(Component.literal(leftText), b -> leftAction.run()).bounds(left + 16, y, w, 20).build());
+        addScrollableWidget(Button.builder(Component.literal(rightText), b -> rightAction.run()).bounds(left + 16 + w + gap, y, w, 20).build());
+        return y + 28;
+    }
+
+    private String lineOutlineSummary() {
+        if (line.text_outline_thickness == null) {
+            float inherited = Math.max(0.0F, project.definition.text_outline_thickness);
+
+            return "LINE outline: INHERIT  •  effective " + String.format(Locale.ROOT, "%.2f", inherited) + " px  •  Configure...";
+        }
+
+        if (line.text_outline_thickness <= 0.01F) {
+            return "LINE outline: OFF  •  Configure...";
+        }
+
+        return "LINE outline: " + String.format(Locale.ROOT, "%.2f", line.text_outline_thickness) + " px  •  Configure...";
+    }
+
+
+    private String regionOutlineSummary(DialogueDefinition.TextRegion region) {
+        if (region.outline_thickness == null) {
+            float inherited = line.text_outline_thickness != null ? Math.max(0.0F, line.text_outline_thickness) : Math.max(0.0F, project.definition.text_outline_thickness);
+
+            return "REGION outline: INHERIT  •  effective " + String.format(Locale.ROOT, "%.2f", inherited) + " px  •  Configure...";
+        }
+
+        if (region.outline_thickness <= 0.01F) {
+            return "REGION outline: OFF  •  Configure...";
+        }
+
+        return "REGION outline: " + String.format(Locale.ROOT, "%.2f", region.outline_thickness) + " px  •  Configure...";
+    }
+
+
+    private int addLineOutlineFields(int y) {
+        int pickerW = 82;
+        addLabel("Line outline color (blank = inherit global)", left + 16, y - 11, 0xFF9EA8B5);
+        EditBox color = new EditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Outline color"));
+        color.setMaxLength(64);
+        color.setValue(line.text_outline_color != null ? line.text_outline_color : "");
+        color.setResponder(value -> line.text_outline_color = blankToNull(value));
+        addScrollableWidget(color);
+        addScrollableWidget(Button.builder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, line.text_outline_color != null ? line.text_outline_color : "black", picked -> {
+            line.text_outline_color = picked;
+            rebuild();
+        }))).bounds(left + panelW - 16 - pickerW, y, pickerW, 20).build());
+        y += 32;
+
+        y = addTextField(y, "Line outline gradient: blank=inherit, none=disable", gradientText(line.text_outline_gradient), 512, value -> line.text_outline_gradient = parseGradient(value));
+        y = addTextField(y, "Line outline thickness: blank=inherit, 0=off, 0..4", line.text_outline_thickness != null ? String.valueOf(line.text_outline_thickness) : "", 32, value -> line.text_outline_thickness = nullableFloat(value));
+        return y;
+    }
+
+    private int addRegionOutlineFields(int y, DialogueDefinition.TextRegion region) {
+        int pickerW = 82;
+        addLabel("Region outline color (blank = inherit)", left + 16, y - 11, 0xFF9EA8B5);
+        EditBox color = new EditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Region outline color"));
+        color.setMaxLength(64);
+        color.setValue(region.outline_color != null ? region.outline_color : "");
+        color.setResponder(value -> region.outline_color = blankToNull(value));
+        addScrollableWidget(color);
+        addScrollableWidget(Button.builder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, region.outline_color != null ? region.outline_color : "black", picked -> {
+            region.outline_color = picked;
+            rebuild();
+        }))).bounds(left + panelW - 16 - pickerW, y, pickerW, 20).build());
+        y += 32;
+
+        y = addTextField(y, "Region outline gradient: blank=inherit, none=disable", gradientText(region.outline_gradient), 512, value -> region.outline_gradient = parseGradient(value));
+        y = addTextField(y, "Region outline thickness: blank=inherit, 0=off, 0..4", region.outline_thickness != null ? String.valueOf(region.outline_thickness) : "", 32, value -> region.outline_thickness = nullableFloat(value));
+        return y;
+    }
+
+    private void openFontPicker(String current, java.util.function.Consumer<String> setter) {
+        minecraft.setScreen(new DialogueEditorFontPickerScreen(this, project, current, true, setter));
+    }
+
+    private String lineFontSummary() {
+        if (line.text_font == null || line.text_font.isBlank()) {
+
+            return "INHERIT → " + displayFont(project.definition.text_font);
+        }
+
+        if (isVanillaFont(line.text_font)) {
+            return "VANILLA (override)";
+        }
+
+        return displayFont(line.text_font) + " (override)";
+    }
+
+    private String regionFontSummary(DialogueDefinition.TextRegion region) {
+        if (region.font == null || region.font.isBlank()) {
+
+            String inherited = line.text_font != null && !line.text_font.isBlank() ? line.text_font : project.definition.text_font;
+
+            return "INHERIT → " + displayFont(inherited);
+        }
+
+        if (isVanillaFont(region.font)) {
+            return "VANILLA (override)";
+        }
+
+        return displayFont(region.font) + " (override)";
+    }
+
+    private static String displayFont(String value) {
+        if (isVanillaFont(value)) {
+            return "VANILLA";
+        }
+
+        return value.length() <= 28 ? value : "…" + value.substring(value.length() - 27);
+    }
+
+    private static boolean isVanillaFont(String value) {
+        return value == null || value.isBlank() || "minecraft:default".equalsIgnoreCase(value) || "default".equalsIgnoreCase(value) || "vanilla".equalsIgnoreCase(value);
+    }
+
+    private static String nullableBoolean(Boolean value) {
+        return value == null ? "INHERIT" : value ? "ON" : "OFF";
+    }
+
+    private static Boolean nextNullableBoolean(Boolean value) {
+        if (value == null) return Boolean.TRUE;
+        if (value) return Boolean.FALSE;
+        return null;
+    }
+
+    private static Float nullableFloat(String value) {
+        try {
+            return value == null || value.isBlank() ? null : Mth.clamp(Float.parseFloat(value.trim()), 0.0F, 4.0F);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
     private String inheritedBaseColor() {
         if (line.text_color != null && !line.text_color.isBlank()) {
 
@@ -940,11 +1193,8 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
     private List<TextGlyph> layoutText(Font font, String text, int maxWidth, int lineHeight) {
         List<TextGlyph> result = new ArrayList<>();
-
         int x = 0;
-
         int y = 0;
-
         int i = 0;
 
         while (i < text.length()) {
@@ -952,75 +1202,61 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
             if (character == '\n') {
                 x = 0;
-
                 y += lineHeight;
-
                 i++;
                 continue;
             }
 
             if (Character.isWhitespace(character)) {
-
-                int width = Math.max(2, font.width(String.valueOf(character)));
-
-                if (x + width > maxWidth) {
+                int glyphWidth = Math.max(2, styledWidth(i, character));
+                if (x + glyphWidth > maxWidth) {
                     x = 0;
-
                     y += lineHeight;
-
                 } else {
-                    result.add(new TextGlyph(i, character, x, y, width));
-
-                    x += width;
+                    result.add(new TextGlyph(i, character, x, y, glyphWidth));
+                    x += glyphWidth;
                 }
-
                 i++;
                 continue;
             }
 
             int wordEnd = i;
-
             while (wordEnd < text.length()) {
                 char next = text.charAt(wordEnd);
-
-                if (Character.isWhitespace(next) || next == '\n') {
-                    break;
-                }
-
+                if (Character.isWhitespace(next) || next == '\n') break;
                 wordEnd++;
             }
 
-            String word = text.substring(i, wordEnd);
+            int wordWidth = 0;
+            for (int index = i; index < wordEnd; index++) {
+                wordWidth += Math.max(1, styledWidth(index, text.charAt(index)));
+            }
 
-            if (x > 0 && x + font.width(word) > maxWidth) {
-
+            if (x > 0 && x + wordWidth > maxWidth) {
                 x = 0;
-
                 y += lineHeight;
             }
 
             for (int index = i; index < wordEnd; index++) {
-
                 char letter = text.charAt(index);
-
-                int width = Math.max(1, font.width(String.valueOf(letter)));
-
-                if (x > 0 && x + width > maxWidth) {
-
+                int glyphWidth = Math.max(1, styledWidth(index, letter));
+                if (x > 0 && x + glyphWidth > maxWidth) {
                     x = 0;
-
                     y += lineHeight;
                 }
-
-                result.add(new TextGlyph(index, letter, x, y, width));
-
-                x += width;
+                result.add(new TextGlyph(index, letter, x, y, glyphWidth));
+                x += glyphWidth;
             }
 
             i = wordEnd;
         }
 
         return result;
+    }
+
+    private int styledWidth(int index, char character) {
+        DialogueRichTextUtil.ResolvedStyle rich = DialogueRichTextUtil.resolve(line, text, index, locale);
+        return DialogueTextRenderUtil.width(font, character, effectiveGlyphStyle(index, rich));
     }
 
 
