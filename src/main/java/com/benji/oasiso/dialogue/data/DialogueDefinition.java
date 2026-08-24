@@ -119,6 +119,7 @@ public class DialogueDefinition {
         public String text_effect;
         public List<String> text_effects;
         public String text_style;
+        public List<TextRegion> rich_regions;
 
         public String frame;
         public String background;
@@ -133,6 +134,36 @@ public class DialogueDefinition {
         public Integer sprite_width;
         public Integer sprite_height;
     }
+
+    public static class TextRegion {
+        public String name;
+
+        public int start = 0;
+        public int end = 0;
+
+        public String match;
+        public String locale;
+        public String color;
+        public List<String> gradient;
+        public List<String> effects;
+
+        public TextAnimation animation = new TextAnimation();
+    }
+
+    public static class TextAnimation {
+        public Float wave_amplitude;
+        public Float wave_speed;
+        public Float wave_frequency;
+
+        public Float shake_strength;
+
+        public Float explode_amount;
+        public Integer explode_ticks;
+
+        public Float slide_distance;
+        public Integer slide_ticks;
+    }
+
 
     public static class Node {
         public String type = "line";

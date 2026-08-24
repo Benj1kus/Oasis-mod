@@ -2,6 +2,7 @@ package com.benji.oasiso.dialogue.editor;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
+import com.benji.oasiso.dialogue.text.DialogueRichTextUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -43,10 +44,18 @@ public final class DialogueEditorPreview {
     }
 
     public static Transform render(DialogueEditorProject project, GuiGraphics graphics, int x, int y, int width, int height, int ticks, float partialTick) {
+        return render(project, graphics, x, y, width, height, ticks, partialTick, false);
+    }
+    public static Transform render(DialogueEditorProject project, GuiGraphics graphics, int x, int y, int width, int height, int ticks, float partialTick, boolean forceSelectedLegacyLine) {
         project.normalize();
+
         DialogueDefinition definition = project.definition;
+
         DialogueDefinition.Layout layout = definition.layout;
-        DialogueDefinition.Line line = project.previewLine();
+
+        boolean nodePreview = !forceSelectedLegacyLine && definition.graph_enabled && project.selected_node != null;
+
+        DialogueDefinition.Line line = forceSelectedLegacyLine ? project.currentLine() : project.previewLine();
 
         graphics.fill(x, y, x + width, y + height, 0xE0090B10);
         graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, 0xFF121720);
@@ -58,9 +67,13 @@ public final class DialogueEditorPreview {
         Transform transform = new Transform(originX, originY, scale, layout.canvas_width, layout.canvas_height);
 
         graphics.drawString(Minecraft.getInstance().font, "LIVE DIALOGUE PREVIEW", x + 10, y + 9, 0xFF67F0E6, false);
-        String previewLabel = definition.graph_enabled && project.selected_node != null ? "Node " + project.selected_node + "  |  " + project.dialogueId() : "Line " + (project.selected_line + 1) + "/" + definition.lines.size() + "  |  " + project.dialogueId();
+        String previewLabel = nodePreview ? "Node " + project.selected_node + "  |  " + project.dialogueId() : "Line " + (project.selected_line + 1) + "/" + definition.lines.size() + "  |  " + project.dialogueId();
 
-        graphics.drawString(Minecraft.getInstance().font, previewLabel, x + 10, y + 20, 0xFF87909D, false);
+        Font headerFont = Minecraft.getInstance().font;
+
+        previewLabel = ellipsize(headerFont, previewLabel, Math.max(20, width - 20));
+
+        graphics.drawString(headerFont, previewLabel, x + 10, y + 20, 0xFF87909D, false);
 
         graphics.enableScissor(x + 1, y + 28, x + width - 1, y + height - 1);
 
@@ -72,9 +85,9 @@ public final class DialogueEditorPreview {
         renderBackground(project, graphics, definition);
         renderSprite(project, graphics, definition, line, ticks + partialTick);
         renderFrame(project, graphics, definition, line);
-        renderText(project, graphics, definition, line, ticks + partialTick);
+        renderText(project, graphics, definition, line, ticks + partialTick, nodePreview);
 
-        if (definition.graph_enabled && project.selected_node != null) {
+        if (nodePreview) {
             DialogueDefinition.Node selectedNode = definition.nodes.get(project.selected_node);
 
             if (selectedNode != null && "choice".equalsIgnoreCase(selectedNode.type)) {
@@ -164,77 +177,156 @@ public final class DialogueEditorPreview {
         };
     }
 
-    private static void renderText(DialogueEditorProject project, GuiGraphics graphics, DialogueDefinition definition, DialogueDefinition.Line line, float time) {
+    private static void renderText(DialogueEditorProject project, GuiGraphics graphics, DialogueDefinition definition, DialogueDefinition.Line line, float time, boolean nodePreview) {
         Font font = Minecraft.getInstance().font;
+
         DialogueDefinition.Layout layout = definition.layout;
+
         String text;
+
+        String locale;
+
         if (line.literal != null) {
             text = line.literal;
-        } else if (definition.graph_enabled && project.selected_node != null) {
+
+            locale = null;
+
+        } else if (nodePreview && project.selected_node != null) {
+
             text = project.getLocalizedNodeText(project.preview_locale, line, project.selected_node);
+
+            locale = project.preview_locale;
+
         } else {
             text = project.getLocalizedText(project.preview_locale, line, project.selected_line);
+
+            locale = project.preview_locale;
         }
 
         if (text == null || text.isEmpty()) {
+
             text = line.text != null ? "<" + line.text + ">" : "<empty line>";
         }
 
         int maxWidth = Math.max(1, Mth.floor(layout.text_width / layout.text_scale));
+
         List<Glyph> glyphs = layoutGlyphs(font, text, maxWidth, layout.line_height);
 
-        List<String> effects = resolveEffects(definition, line);
+        List<String> baseEffects = resolveEffects(definition, line);
 
         int charTicks = line.char_ticks != null ? Math.max(1, line.char_ticks) : Math.max(1, definition.char_ticks);
+
         int visible = text.length();
+
         if (project.animate_preview && !text.isEmpty()) {
+
             int loop = text.length() * charTicks + 30;
+
             int phase = Math.floorMod((int) time, Math.max(1, loop));
+
             visible = Math.min(text.length(), phase / charTicks + 1);
         }
 
         PoseStack pose = graphics.pose();
+
         pose.pushPose();
+
         pose.translate(layout.text_x, layout.text_y, 10);
+
         pose.scale(layout.text_scale, layout.text_scale, 1);
 
         for (Glyph glyph : glyphs) {
-            if (glyph.index >= visible) continue;
+
+            if (glyph.index >= visible) {
+                continue;
+            }
+
+            DialogueRichTextUtil.ResolvedStyle rich = DialogueRichTextUtil.resolve(line, text, glyph.index, locale);
+
+            List<String> effects = rich.effects != null ? normalizeEffects(rich.effects) : baseEffects;
+
+            DialogueDefinition.TextAnimation animation = rich.animation;
+
             float gx = glyph.x;
+
             float gy = glyph.y;
+
             float glyphScale = 1.0F;
+
             float age = Math.max(0, visible - glyph.index);
 
             for (String effect : effects) {
-                if (effect == null) continue;
+
+                if (effect == null) {
+                    continue;
+                }
 
                 switch (effect.toLowerCase(Locale.ROOT)) {
-                    case "wave" -> gy += Mth.sin(time * 0.22F + glyph.index * 0.55F) * 0.85F;
+                    case "wave" -> {
+                        float amplitude = animation.wave_amplitude != null ? animation.wave_amplitude : 0.85F;
 
-                    case "shake" -> {
-                        long seed = glyph.index * 734287L + (long) time * 912271L;
-                        gx += hashOffset(seed);
-                        gy += hashOffset(seed + 19L);
+                        float speed = animation.wave_speed != null ? animation.wave_speed : 5.0F;
+
+                        float frequency = animation.wave_frequency != null ? animation.wave_frequency : 0.55F;
+
+                        /*
+                         * Preview uses its own slower time unit than runtime.
+                         * Convert the runtime speed into a visually similar
+                         * editor animation.
+                         */
+                        gy += Mth.sin(time * 0.044F * speed + glyph.index * frequency) * amplitude;
                     }
 
-                    case "explode" -> glyphScale *= 1.0F + Math.max(0, 1.0F - age / 4.0F) * 0.85F;
+                    case "shake" -> {
+                        float strength = animation.shake_strength != null ? animation.shake_strength : 1.0F;
 
-                    case "slide", "linear" -> gx -= Math.max(0, 1.0F - age / 4.0F) * 13.0F;
+                        long seed = glyph.index * 734287L + (long) time * 912271L;
+
+                        gx += hashOffset(seed) * strength;
+
+                        gy += hashOffset(seed + 19L) * strength;
+                    }
+
+                    case "explode" -> {
+                        int duration = animation.explode_ticks != null ? Math.max(1, animation.explode_ticks) : 6;
+
+                        float amount = animation.explode_amount != null ? Math.max(0.0F, animation.explode_amount) : 0.85F;
+
+                        glyphScale *= 1.0F + Math.max(0, 1.0F - age / duration) * amount;
+                    }
+
+                    case "slide", "linear" -> {
+
+                        int duration = animation.slide_ticks != null ? Math.max(1, animation.slide_ticks) : 6;
+
+                        float distance = animation.slide_distance != null ? animation.slide_distance : 13.0F;
+
+                        gx -= Math.max(0, 1.0F - age / duration) * distance;
+                    }
                 }
             }
 
-            int rgb = letterColor(definition, line, glyph, maxWidth, time);
-            PoseStack gp = graphics.pose();
-            gp.pushPose();
-            gp.translate(gx, gy, 0);
+            int rgb = letterColor(definition, line, glyph, maxWidth, time, rich);
+
+            PoseStack glyphPose = graphics.pose();
+
+            glyphPose.pushPose();
+
+            glyphPose.translate(gx, gy, 0);
+
             if (glyphScale != 1.0F) {
-                int gw = font.width(String.valueOf(glyph.character));
-                gp.translate(gw * 0.5F, font.lineHeight * 0.5F, 0);
-                gp.scale(glyphScale, glyphScale, 1);
-                gp.translate(-gw * 0.5F, -font.lineHeight * 0.5F, 0);
+                int glyphWidth = font.width(String.valueOf(glyph.character));
+
+                glyphPose.translate(glyphWidth * 0.5F, font.lineHeight * 0.5F, 0);
+
+                glyphPose.scale(glyphScale, glyphScale, 1);
+
+                glyphPose.translate(-glyphWidth * 0.5F, -font.lineHeight * 0.5F, 0);
             }
+
             graphics.drawString(font, String.valueOf(glyph.character), 0, 0, 0xFF000000 | rgb, false);
-            gp.popPose();
+
+            glyphPose.popPose();
         }
 
         pose.popPose();
@@ -309,18 +401,36 @@ public final class DialogueEditorPreview {
     }
 
 
-    private static int letterColor(DialogueDefinition definition, DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time) {
-        List<String> gradient = line.text_gradient != null ? line.text_gradient : definition.text_gradient;
-        if (gradient != null && gradient.size() >= 2) {
-            float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0F, 1F);
-            return gradientColor(gradient, t);
+    private static int letterColor(DialogueDefinition definition, DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time, DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.gradient != null) {
+
+            if (rich.gradient.size() >= 2) {
+                int span = Math.max(1, rich.gradientEnd - rich.gradientStart - 1);
+
+                float t = Mth.clamp((glyph.index - rich.gradientStart) / (float) span, 0.0F, 1.0F);
+
+                return gradientColor(rich.gradient, t);
+            }
+
+        } else {
+            List<String> gradient = line.text_gradient != null ? line.text_gradient : definition.text_gradient;
+
+            if (gradient != null && gradient.size() >= 2) {
+
+                float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0F, 1F);
+
+                return gradientColor(gradient, t);
+            }
         }
 
-        String value = line.text_color != null ? line.text_color : definition.text_color;
+        String value = rich.color != null ? rich.color : (line.text_color != null ? line.text_color : definition.text_color);
+
         if ("rainbow".equalsIgnoreCase(value)) {
             float hue = (glyph.index * 0.095F + time * 0.0028F) % 1.0F;
+
             return Color.HSBtoRGB(hue, 0.76F, 1.0F) & 0xFFFFFF;
         }
+
         return parseColor(value);
     }
 
@@ -336,6 +446,23 @@ public final class DialogueEditorPreview {
         int bl = Math.round(Mth.lerp(local, a & 255, b & 255));
         return (r << 16) | (g << 8) | bl;
     }
+
+    private static String ellipsize(Font font, String value, int maxWidth) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        if (font.width(value) <= maxWidth) {
+            return value;
+        }
+
+        String suffix = "…";
+
+        int allowed = Math.max(0, maxWidth - font.width(suffix));
+
+        return font.plainSubstrByWidth(value, allowed) + suffix;
+    }
+
 
     public static int parseColor(String value) {
         if (value == null) return 0xFFFFFF;

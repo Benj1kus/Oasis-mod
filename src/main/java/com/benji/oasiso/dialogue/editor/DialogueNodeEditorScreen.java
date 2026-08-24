@@ -170,6 +170,14 @@ public final class DialogueNodeEditorScreen extends Screen {
             rebuild();
         })));
 
+        y = addFullButton(y, "Rich Text regions: " + richRegionCount(line) + "  •  visual editor", () -> {
+            String resolved = line.literal != null ? nullToEmpty(line.literal) : project.getLocalizedNodeText(project.preview_locale, line, nodeId);
+
+            String locale = line.literal != null ? null : project.preview_locale;
+
+            minecraft.setScreen(new DialogueRichTextEditorScreen(this, project, line, resolved, locale, "Node " + nodeId + " • line"));
+        });
+
         if (node.actions == null) node.actions = new ArrayList<>();
 
         y = addFullButton(y, "Actions when this line starts (" + node.actions.size() + ")", () -> minecraft.setScreen(new DialogueActionListScreen(this, project, node.actions, "LINE actions • " + nodeId)));
@@ -228,6 +236,14 @@ public final class DialogueNodeEditorScreen extends Screen {
             prompt.text_effects = effects;
             rebuild();
         })));
+
+        y = addFullButton(y, "Prompt Rich Text regions: " + richRegionCount(prompt) + "  •  visual editor", () -> {
+            String resolved = prompt.literal != null ? nullToEmpty(prompt.literal) : project.getLocalizedNodeText(project.preview_locale, prompt, nodeId);
+
+            String locale = prompt.literal != null ? null : project.preview_locale;
+
+            minecraft.setScreen(new DialogueRichTextEditorScreen(this, project, prompt, resolved, locale, "Node " + nodeId + " • choice prompt"));
+        });
 
         if (node.actions == null) node.actions = new ArrayList<>();
 
@@ -804,6 +820,11 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         found.event = event;
     }
+
+    private static int richRegionCount(DialogueDefinition.Line line) {
+        return line != null && line.rich_regions != null ? line.rich_regions.size() : 0;
+    }
+
 
     private static String effectsSummary(DialogueDefinition.Line line) {
         if (line.text_effects == null) {

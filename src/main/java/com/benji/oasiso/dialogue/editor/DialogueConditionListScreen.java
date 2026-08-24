@@ -545,7 +545,7 @@ public final class DialogueConditionListScreen extends Screen {
             if (!current.isEmpty()) {
                 result.add(current);
             }
-            
+
             if (font.width(word) > pixelWidth) {
 
                 String remaining = word;

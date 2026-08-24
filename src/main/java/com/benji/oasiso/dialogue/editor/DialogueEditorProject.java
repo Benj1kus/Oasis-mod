@@ -108,7 +108,35 @@ public class DialogueEditorProject {
 
         selected_trigger = Math.max(0, Math.min(selected_trigger, definition.triggers.size() - 1));
 
+        for (DialogueDefinition.Line line : definition.lines) {
+            normalizeRichLine(line);
+        }
+
         normalizeGraph();
+
+        for (DialogueDefinition.Node node : definition.nodes.values()) {
+            if (node != null) {
+                normalizeRichLine(node.line);
+            }
+        }
+    }
+
+
+    private static void normalizeRichLine(DialogueDefinition.Line line) {
+        if (line == null || line.rich_regions == null) {
+            return;
+        }
+
+        line.rich_regions.removeIf(region -> region == null);
+
+        for (DialogueDefinition.TextRegion region : line.rich_regions) {
+            region.start = Math.max(0, region.start);
+            region.end = Math.max(region.start, region.end);
+
+            if (region.animation == null) {
+                region.animation = new DialogueDefinition.TextAnimation();
+            }
+        }
     }
 
 
@@ -706,6 +734,42 @@ public class DialogueEditorProject {
         line.text_effects = source.text_effects != null ? new ArrayList<>(source.text_effects) : null;
 
         line.text_style = source.text_style;
+
+        if (source.rich_regions != null) {
+            line.rich_regions = new ArrayList<>();
+
+            for (DialogueDefinition.TextRegion sourceRegion : source.rich_regions) {
+                if (sourceRegion == null) continue;
+
+                DialogueDefinition.TextRegion region = new DialogueDefinition.TextRegion();
+
+                region.name = sourceRegion.name;
+                region.start = sourceRegion.start;
+                region.end = sourceRegion.end;
+                region.match = sourceRegion.match;
+                region.locale = sourceRegion.locale;
+
+                region.color = sourceRegion.color;
+                region.gradient = sourceRegion.gradient != null ? new ArrayList<>(sourceRegion.gradient) : null;
+
+                region.effects = sourceRegion.effects != null ? new ArrayList<>(sourceRegion.effects) : null;
+
+                if (sourceRegion.animation != null) {
+                    region.animation = new DialogueDefinition.TextAnimation();
+
+                    region.animation.wave_amplitude = sourceRegion.animation.wave_amplitude;
+                    region.animation.wave_speed = sourceRegion.animation.wave_speed;
+                    region.animation.wave_frequency = sourceRegion.animation.wave_frequency;
+                    region.animation.shake_strength = sourceRegion.animation.shake_strength;
+                    region.animation.explode_amount = sourceRegion.animation.explode_amount;
+                    region.animation.explode_ticks = sourceRegion.animation.explode_ticks;
+                    region.animation.slide_distance = sourceRegion.animation.slide_distance;
+                    region.animation.slide_ticks = sourceRegion.animation.slide_ticks;
+                }
+
+                line.rich_regions.add(region);
+            }
+        }
 
         line.frame = source.frame;
         line.background = source.background;

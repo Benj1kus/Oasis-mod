@@ -321,6 +321,14 @@ public final class DialogueEditorScreen extends Screen {
             line.text_effects = effects;
             reopen(tab);
         })));
+
+        button("Rich Text regions: " + richRegionCount(line) + "  •  open visual editor", 12, b -> {
+            String resolved = line.literal != null ? nullToEmpty(line.literal) : project.getLocalizedText(project.preview_locale, line, project.selected_line);
+
+            String locale = line.literal != null ? null : project.preview_locale;
+
+            minecraft.setScreen(new DialogueRichTextEditorScreen(this, project, line, resolved, locale, "Line " + (project.selected_line + 1)));
+        });
     }
 
     private void initLineOverrides() {
@@ -614,12 +622,24 @@ public final class DialogueEditorScreen extends Screen {
         graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 24)), 12, height - 14, 0xFF8E9AA8, false);
 
         int inspectorClipTop = inspectorContentTop();
+
         int inspectorClipBottom = inspectorContentBottom();
+
+        /*
+         * Hard clip inspector text too. Scrolling can never paint labels over
+         * the fixed Studio toolbar/tabs or the Ready/status footer.
+         */
+        graphics.enableScissor(4, inspectorClipTop, LEFT, inspectorClipBottom);
+
         for (Label label : labels) {
-            if (label.y >= inspectorClipTop && label.y <= inspectorClipBottom - 9) {
+
+            if (label.y + font.lineHeight >= inspectorClipTop && label.y <= inspectorClipBottom - 1) {
+
                 graphics.drawString(font, label.text, label.x, label.y, label.color, false);
             }
         }
+
+        graphics.disableScissor();
 
         int px = LEFT + 12;
         int py = bodyTop + 6;
@@ -637,10 +657,19 @@ public final class DialogueEditorScreen extends Screen {
             previewTransform = DialogueEditorPreview.render(project, graphics, px, py + cardH + 8, pw, previewH, previewTicks, partialTick);
         } else if (lineTimeline) {
             int timelineH = Math.min(timelineHeight, Math.max(58, ph - 96));
+
             int gap = 10;
+
             int previewH = Math.max(86, ph - timelineH - gap);
-            previewTransform = DialogueEditorPreview.render(project, graphics, px, py, pw, previewH, previewTicks, partialTick);
+
+            /*
+             * Lines / Line+ are legacy-line editors even when Nodes v3 is ON.
+             * Force the live preview to follow project.selected_line here.
+             */
+            previewTransform = DialogueEditorPreview.render(project, graphics, px, py, pw, previewH, previewTicks, partialTick, true);
+
             timelineY = py + ph - timelineH;
+
             renderLineTimeline(graphics, px, timelineY, pw, timelineH, mouseX, mouseY);
         } else {
             previewTransform = DialogueEditorPreview.render(project, graphics, px, py, pw, ph, previewTicks, partialTick);
@@ -1462,14 +1491,31 @@ public final class DialogueEditorScreen extends Screen {
     }
 
     private void help(int row, String text) {
-        int y = rowY(row) + Math.max(4, controlHeight / 4);
+        int topOffset = Math.max(4, controlHeight / 4);
+
+        int y = rowY(row) + topOffset;
+
         int maxWidth = Math.max(40, LEFT - 24);
+
         int lineStep = font.lineHeight + 2;
-        int maxLines = Math.max(1, rowSpacing / lineStep);
+        int usableHeight = Math.max(font.lineHeight, rowSpacing - topOffset - 10);
+
+        int maxLines = Math.max(1, usableHeight / lineStep);
+
         List<String> wrapped = wrapPlainText(text != null ? text : "", maxWidth);
 
-        for (int line = 0; line < Math.min(maxLines, wrapped.size()); line++) {
-            labels.add(new Label(wrapped.get(line), 12, y + line * lineStep, 0xFF87909D));
+        int drawCount = Math.min(maxLines, wrapped.size());
+
+        for (int line = 0; line < drawCount; line++) {
+
+            String shown = wrapped.get(line);
+
+            if (line == drawCount - 1 && wrapped.size() > drawCount) {
+
+                shown = ellipsize(shown + " …", maxWidth);
+            }
+
+            labels.add(new Label(shown, 12, y + line * lineStep, 0xFF87909D));
         }
     }
 
@@ -1504,7 +1550,7 @@ public final class DialogueEditorScreen extends Screen {
             case PROJECT -> 21;
             case DIALOGUE -> 12;
             case VISUALS -> 9;
-            case LINES -> 12;
+            case LINES -> 13;
             case LINE_OVERRIDES, LAYOUT, TRIGGERS, ZONE_FX -> 10;
             case NODES -> 12;
             case ZONE -> 12;
@@ -1518,38 +1564,80 @@ public final class DialogueEditorScreen extends Screen {
 
     private void renderLineTimeline(GuiGraphics graphics, int x, int y, int w, int h, int mouseX, int mouseY) {
         graphics.fill(x, y, x + w, y + h, 0xF00D1219);
-        graphics.drawString(font, "LINE / SPRITE TIMELINE   drag cards to reorder", x + 8, y + 5, 0xFF6FF8E9, false);
+
+        /*
+         * Hard clip the entire timeline. Nothing from its title, cards or hints
+         * can spill into the Live Preview above or outside the right panel.
+         */
+        graphics.enableScissor(x, y, x + w, y + h);
 
         int cardW = 106;
+
         int gap = 4;
+
         int visible = Math.max(1, (w - 16) / (cardW + gap));
+
         LINE_TIMELINE_SCROLL = Math.max(0, Math.min(LINE_TIMELINE_SCROLL, Math.max(0, project.definition.lines.size() - visible)));
 
+        String title = "LINE / SPRITE TIMELINE";
+
+        graphics.drawString(font, ellipsize(title, Math.max(40, w - 16)), x + 8, y + 5, 0xFF6FF8E9, false);
+        if (project.definition.lines.size() > visible) {
+
+            String hint = "wheel: scroll";
+
+            int hintW = font.width(hint);
+
+            int titleW = font.width(title);
+
+            if (titleW + hintW + 32 <= w) {
+
+                graphics.drawString(font, hint, x + w - hintW - 8, y + 5, 0xFF778493, false);
+            }
+        }
+
         int end = Math.min(project.definition.lines.size(), LINE_TIMELINE_SCROLL + visible);
+
         for (int index = LINE_TIMELINE_SCROLL; index < end; index++) {
+
             DialogueDefinition.Line line = project.definition.lines.get(index);
+
             int slot = index - LINE_TIMELINE_SCROLL;
+
             int cx = x + 8 + slot * (cardW + gap);
-            int cy = y + 18;
+
+            int cy = y + 20;
+
             int color = index == project.selected_line ? 0xFF263941 : 0xFF171E28;
-            if (index == dragLineIndex) color = 0xFF314A54;
+
+            if (index == dragLineIndex) {
+                color = 0xFF314A54;
+            }
+
             graphics.fill(cx, cy, cx + cardW, cy + 40, color);
+
             graphics.fill(cx + 1, cy + 1, cx + cardW - 1, cy + 39, 0xFF0E141C);
 
             ResourceLocation sprite = DialogueEditorTextureCache.resolve(project, line.sprite, EDITOR_DEFAULT_SPRITE);
-            if (sprite != null) graphics.blit(sprite, cx + 4, cy + 4, 0, 0, 30, 30, 30, 30);
+
+            if (sprite != null) {
+                graphics.blit(sprite, cx + 4, cy + 4, 0, 0, 30, 30, 30, 30);
+            }
 
             graphics.drawString(font, "#" + (index + 1), cx + 38, cy + 4, index == project.selected_line ? 0xFF6FF8E9 : 0xFFFFFFFF, false);
+
             String text = line.literal != null ? line.literal : project.getLocalizedText(project.preview_locale, line, index);
+
             graphics.drawString(font, shortText(text, 11), cx + 38, cy + 15, 0xFFADB7C3, false);
+
             String transition = line.sprite_transition != null ? line.sprite_transition : project.definition.sprite_transition;
+
             graphics.drawString(font, shortText(transition != null ? transition : "none", 11), cx + 38, cy + 27, 0xFF778493, false);
         }
 
-        if (project.definition.lines.size() > visible) {
-            graphics.drawString(font, "wheel: scroll timeline", x + w - 124, y + 5, 0xFF778493, false);
-        }
+        graphics.disableScissor();
     }
+
 
     private int timelineVisibleCards() {
         int w = Math.max(1, width - (LEFT + 12) - 12);
@@ -1560,7 +1648,9 @@ public final class DialogueEditorScreen extends Screen {
         if (timelineY < 0) return -1;
         int x = LEFT + 12;
         int w = width - x - 12;
-        if (mouseX < x + 8 || mouseX > x + w - 8 || mouseY < timelineY + 18 || mouseY > timelineY + 58) return -1;
+        if (mouseX < x + 8 || mouseX > x + w - 8 || mouseY < timelineY + 20 || mouseY > timelineY + 60) {
+            return -1;
+        }
         int slot = (int) ((mouseX - (x + 8)) / 110.0D);
         int localX = (int) ((mouseX - (x + 8)) % 110.0D);
         if (localX > 106) return -1;
@@ -1673,8 +1763,6 @@ public final class DialogueEditorScreen extends Screen {
         float fadeIn = Math.min(1.0F, age / 6.0F);
         float fadeOut = age <= 46.0F ? 1.0F : Math.max(0.0F, 1.0F - (age - 46.0F) / (TOAST_DURATION - 46.0F));
         float alpha = fadeIn * fadeOut;
-
-        // Ease-out upward drift: obvious at first, subtle near the end.
         float eased = 1.0F - (float) Math.pow(1.0F - progress, 3.0D);
         int rise = Math.round(24.0F * eased);
 
@@ -1803,6 +1891,11 @@ public final class DialogueEditorScreen extends Screen {
         String type = t.type != null ? t.type.toLowerCase(Locale.ROOT) : "";
         return type.contains("block");
     }
+
+    private static int richRegionCount(DialogueDefinition.Line line) {
+        return line != null && line.rich_regions != null ? line.rich_regions.size() : 0;
+    }
+
 
     private static String effectsSummary(List<String> effects, boolean inheritAllowed) {
         if (effects == null) return inheritAllowed ? "INHERIT" : "legacy";

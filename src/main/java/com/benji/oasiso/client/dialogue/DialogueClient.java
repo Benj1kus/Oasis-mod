@@ -3,6 +3,7 @@ package com.benji.oasiso.client.dialogue;
 import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
+import com.benji.oasiso.dialogue.text.DialogueRichTextUtil;
 import com.benji.oasiso.network.dialogueengine.DialogueNetwork;
 import com.google.gson.Gson;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -42,22 +43,11 @@ public final class DialogueClient {
     private static UUID sessionId;
     private static ResourceLocation dialogueId;
 
-    // Legacy linear mode
     private static int lineIndex;
-
-    // v3 graph mode
     private static boolean nodeMode;
     private static String currentNodeId;
     private static List<Boolean> enabledChoices = List.of();
     private static int selectedChoice;
-
-    /*
-     * Mouse hover is kept separate from keyboard selection.
-     *
-     * -1 = mouse is not currently over a selectable choice.
-     * This avoids a stationary cursor constantly overwriting W/S or Up/Down
-     * keyboard selection.
-     */
     private static int hoveredChoice = -1;
 
     private static boolean waitingForNodeState;
@@ -74,7 +64,6 @@ public final class DialogueClient {
     private static String currentText = "";
     private static int[] revealTicks = new int[0];
 
-    // Sprite transition
     private static String previousSprite;
     private static float spriteMoveFromX;
     private static int spriteMoveAge = 1000;
@@ -144,11 +133,6 @@ public final class DialogueClient {
         }
     }
 
-
-    /**
-     * Called by DialogueNodeStateS2CPacket.
-     * Server owns graph traversal and condition evaluation.
-     */
     public static void setNodeState(UUID targetSession, String nodeId, List<Boolean> availability) {
         if (!active || !nodeMode || sessionId == null || !sessionId.equals(targetSession) || definition == null) {
             return;
@@ -357,7 +341,6 @@ public final class DialogueClient {
         DialogueDefinition.Line line = currentLineOrNull();
 
         currentText = resolveText(line);
-
         revealTicks = new int[currentText.length()];
 
         Arrays.fill(revealTicks, Integer.MIN_VALUE / 2);
@@ -477,9 +460,7 @@ public final class DialogueClient {
         float volume = line.voice_volume != null ? line.voice_volume : definition.voice_volume;
 
         SoundSource source = resolveVoiceSource(line);
-
         SimpleSoundInstance sound = new SimpleSoundInstance(soundId, source, volume, pitch, RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
-
         Minecraft.getInstance().getSoundManager().play(sound);
     }
 
@@ -573,13 +554,11 @@ public final class DialogueClient {
         float scale = Math.max(screenW / (float) layout.canvas_width, screenH / (float) layout.canvas_height) * 1.05F;
 
         float width = layout.canvas_width * scale;
-
         float height = layout.canvas_height * scale;
 
         float bob = (float) Math.sin(time * definition.background_speed) * definition.background_bob * scale;
 
         float x = (screenW - width) * 0.5F;
-
         float y = (screenH - height) * 0.5F + bob;
 
         PoseStack pose = graphics.pose();
@@ -587,16 +566,13 @@ public final class DialogueClient {
         pose.pushPose();
 
         pose.translate(x, y, 300.0F);
-
         pose.scale(scale, scale, 1.0F);
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
         graphics.setColor(1.0F, 1.0F, 1.0F, definition.background_alpha * alpha);
-
         graphics.blit(texture, 0, 0, 0, 0, layout.canvas_width, layout.canvas_height, layout.canvas_width, layout.canvas_height);
-
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         pose.popPose();
@@ -754,7 +730,9 @@ public final class DialogueClient {
 
         int alphaByte = Mth.clamp(Math.round(alpha * 255.0F), 0, 255);
 
-        List<String> effects = textEffects(line);
+        List<String> baseEffects = textEffects(line);
+
+        String locale = currentTextLocale();
 
         for (Glyph glyph : glyphs) {
 
@@ -762,9 +740,17 @@ public final class DialogueClient {
                 continue;
             }
 
+            DialogueRichTextUtil.ResolvedStyle rich = DialogueRichTextUtil.resolve(line, currentText, glyph.index, locale);
+
+            List<String> effects = rich.effects != null ? normalizedEffects(rich.effects) : baseEffects;
+
+            DialogueDefinition.TextAnimation animation = rich.animation;
+
             float age = totalTicks + partialTick - revealTicks[glyph.index];
+
             float x = glyph.x;
             float y = glyph.y;
+
             float glyphScale = 1.0F;
 
             for (String effect : effects) {
@@ -774,31 +760,45 @@ public final class DialogueClient {
                 }
 
                 switch (effect.toLowerCase(Locale.ROOT)) {
-                    case "wave" -> y += (float) Math.sin(time * 5.0F + glyph.index * 0.55F) * 0.85F;
+                    case "wave" -> {
+                        float amplitude = animation.wave_amplitude != null ? animation.wave_amplitude : 0.85F;
+                        float speed = animation.wave_speed != null ? animation.wave_speed : 5.0F;
+                        float frequency = animation.wave_frequency != null ? animation.wave_frequency : 0.55F;
+
+                        y += (float) Math.sin(time * speed + glyph.index * frequency) * amplitude;
+                    }
 
                     case "shake" -> {
+                        float strength = animation.shake_strength != null ? animation.shake_strength : 1.0F;
+
                         long seed = glyph.index * 734287L + totalTicks * 912271L;
 
-                        x += hashOffset(seed);
-
-                        y += hashOffset(seed + 19L);
+                        x += hashOffset(seed) * strength;
+                        y += hashOffset(seed + 19L) * strength;
                     }
 
                     case "explode" -> {
-                        float p = smooth(age / 6.0F);
+                        int duration = animation.explode_ticks != null ? Math.max(1, animation.explode_ticks) : 6;
 
-                        glyphScale *= 1.0F + (1.0F - p) * 0.85F;
+                        float amount = animation.explode_amount != null ? Math.max(0.0F, animation.explode_amount) : 0.85F;
+                        float progress = smooth(age / duration);
+
+                        glyphScale *= 1.0F + (1.0F - progress) * amount;
                     }
 
                     case "slide", "linear" -> {
-                        float p = smooth(age / 6.0F);
 
-                        x -= (1.0F - p) * 13.0F;
+                        int duration = animation.slide_ticks != null ? Math.max(1, animation.slide_ticks) : 6;
+
+                        float distance = animation.slide_distance != null ? animation.slide_distance : 13.0F;
+                        float progress = smooth(age / duration);
+
+                        x -= (1.0F - progress) * distance;
                     }
                 }
             }
 
-            int rgb = letterColor(line, glyph, maxWidth, time);
+            int rgb = letterColor(line, glyph, maxWidth, time, rich);
 
             int color = (alphaByte << 24) | rgb;
 
@@ -1119,22 +1119,35 @@ public final class DialogueClient {
     }
 
 
-    private static int letterColor(DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time) {
-        List<String> gradient = line.text_gradient != null ? line.text_gradient : definition.text_gradient;
+    private static int letterColor(DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time, DialogueRichTextUtil.ResolvedStyle rich) {
+        if (rich.gradient != null) {
 
-        if (gradient != null && gradient.size() >= 2) {
+            if (rich.gradient.size() >= 2) {
+                int span = Math.max(1, rich.gradientEnd - rich.gradientStart - 1);
 
-            float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0.0F, 1.0F);
-            return gradientColor(gradient, t);
+                float t = Mth.clamp((glyph.index - rich.gradientStart) / (float) span, 0.0F, 1.0F);
+
+                return gradientColor(rich.gradient, t);
+            }
+
+        } else {
+            List<String> gradient = line.text_gradient != null ? line.text_gradient : definition.text_gradient;
+
+            if (gradient != null && gradient.size() >= 2) {
+
+                float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0.0F, 1.0F);
+
+                return gradientColor(gradient, t);
+            }
         }
 
-        String value = line.text_color != null ? line.text_color : definition.text_color;
+        String value = rich.color != null ? rich.color : (line.text_color != null ? line.text_color : definition.text_color);
 
         if (value == null || value.equals("white")) {
 
             String legacy = line.text_style != null ? line.text_style : definition.text_style;
 
-            if (legacy != null) {
+            if (legacy != null && rich.color == null) {
                 value = legacy;
             }
         }
@@ -1146,6 +1159,21 @@ public final class DialogueClient {
         }
 
         return parseColor(value);
+    }
+
+
+    private static String currentTextLocale() {
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        if (line == null || line.literal != null) {
+            return null;
+        }
+
+        try {
+            return Minecraft.getInstance().getLanguageManager().getSelected();
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
 
