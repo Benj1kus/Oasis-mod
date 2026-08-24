@@ -3,6 +3,7 @@ package com.benji.oasiso.dialogue;
 import com.benji.oasiso.Oasiso;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +21,21 @@ public final class DialogueRuntimeEvents {
         }
 
         DialogueSessionManager.tick(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.getOriginal() instanceof ServerPlayer original && event.getEntity() instanceof ServerPlayer replacement) {
+
+            DialogueQuestState.copy(original, replacement);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerDeath(LivingDeathEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            DialogueSessionManager.cancel(player);
+        }
     }
 
     @SubscribeEvent

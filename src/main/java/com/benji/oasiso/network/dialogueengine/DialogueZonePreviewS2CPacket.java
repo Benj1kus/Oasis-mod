@@ -95,15 +95,12 @@ public record DialogueZonePreviewS2CPacket(List<Zone> zones) {
 
     public record Zone(String key, String shape,
 
-                       double x, double y, double z,
-                       double radius, double height,
-                       double sizeX, double sizeY, double sizeZ,
+                       double x, double y, double z, double radius, double height, double sizeX, double sizeY,
+                       double sizeZ,
 
                        String style, String texture, String color,
 
-                       float alpha,
-                       double yOffset, double visualSize, double visualHeight,
-                       boolean pulse,
+                       float alpha, double yOffset, double visualSize, double visualHeight, boolean pulse,
 
                        double previewDistance) {
     }

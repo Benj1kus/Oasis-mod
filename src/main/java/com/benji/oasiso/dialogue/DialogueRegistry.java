@@ -50,9 +50,12 @@ public final class DialogueRegistry {
         try (InputStreamReader reader = new InputStreamReader(resource.open(), StandardCharsets.UTF_8)) {
             DialogueDefinition definition = GSON.fromJson(reader, DialogueDefinition.class);
 
-            if (definition == null || definition.lines == null || definition.lines.isEmpty()) {
+            boolean graph = definition != null && definition.hasGraph();
+            boolean legacy = definition != null && definition.lines != null && !definition.lines.isEmpty();
 
-                LOGGER.warn("Dialogue {} has no lines", dialogueId);
+            if (definition == null || (!graph && !legacy)) {
+
+                LOGGER.warn("Dialogue {} has neither legacy lines nor a valid Nodes v3 graph", dialogueId);
 
                 return;
             }

@@ -13,17 +13,17 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 
 import java.awt.Color;
 import java.util.*;
@@ -42,9 +42,27 @@ public final class DialogueClient {
     private static UUID sessionId;
     private static ResourceLocation dialogueId;
 
+    // Legacy linear mode
     private static int lineIndex;
-    private static int revealedChars;
 
+    // v3 graph mode
+    private static boolean nodeMode;
+    private static String currentNodeId;
+    private static List<Boolean> enabledChoices = List.of();
+    private static int selectedChoice;
+
+    /*
+     * Mouse hover is kept separate from keyboard selection.
+     *
+     * -1 = mouse is not currently over a selectable choice.
+     * This avoids a stationary cursor constantly overwriting W/S or Up/Down
+     * keyboard selection.
+     */
+    private static int hoveredChoice = -1;
+
+    private static boolean waitingForNodeState;
+
+    private static int revealedChars;
     private static int typingDelay;
     private static int holdTicks;
     private static int totalTicks;
@@ -54,15 +72,12 @@ public final class DialogueClient {
     private static int endingTicks;
 
     private static String currentText = "";
-
     private static int[] revealTicks = new int[0];
 
     // Sprite transition
     private static String previousSprite;
-
     private static float spriteMoveFromX;
     private static int spriteMoveAge = 1000;
-
     private static int spriteTransitionAge = 1000;
 
     private static int voiceLetterCounter;
@@ -75,10 +90,13 @@ public final class DialogueClient {
         try {
             DialogueDefinition loaded = GSON.fromJson(json, DialogueDefinition.class);
 
-            if (loaded == null || loaded.lines == null || loaded.lines.isEmpty()) {
+            boolean graph = loaded != null && loaded.hasGraph();
+
+            boolean legacy = loaded != null && loaded.lines != null && !loaded.lines.isEmpty();
+
+            if (loaded == null || (!graph && !legacy)) {
 
                 DialogueNetwork.finish(newSessionId);
-
                 return;
             }
 
@@ -87,33 +105,107 @@ public final class DialogueClient {
             dialogueId = newDialogueId;
 
             lineIndex = 0;
-            revealedChars = 0;
 
+            nodeMode = graph;
+            currentNodeId = null;
+            enabledChoices = List.of();
+            selectedChoice = 0;
+            hoveredChoice = -1;
+            waitingForNodeState = graph;
+
+            revealedChars = 0;
             typingDelay = 0;
             holdTicks = 0;
             totalTicks = 0;
 
             ending = false;
             endingTicks = 0;
-
             active = true;
 
             previousSprite = null;
-
             spriteTransitionAge = 1000;
             spriteMoveAge = 1000;
 
             voiceLetterCounter = 0;
 
-            updateCurrentText();
+            if (!graph) {
+                updateCurrentText();
 
-            spriteMoveFromX = resolveSpriteTargetX(currentLine());
+                spriteMoveFromX = resolveSpriteTargetX(currentLine());
+            } else {
+                currentText = "";
+                revealTicks = new int[0];
+                spriteMoveFromX = definition.layout.sprite_center_x;
+            }
 
         } catch (Exception exception) {
             exception.printStackTrace();
-
             DialogueNetwork.finish(newSessionId);
         }
+    }
+
+
+    /**
+     * Called by DialogueNodeStateS2CPacket.
+     * Server owns graph traversal and condition evaluation.
+     */
+    public static void setNodeState(UUID targetSession, String nodeId, List<Boolean> availability) {
+        if (!active || !nodeMode || sessionId == null || !sessionId.equals(targetSession) || definition == null) {
+            return;
+        }
+
+        if ("__oasiso_end__".equals(nodeId)) {
+            waitingForNodeState = false;
+            closeChoiceInputScreen();
+            ending = true;
+            endingTicks = 0;
+            return;
+        }
+
+        DialogueDefinition.Node nextNode = definition.nodes != null ? definition.nodes.get(nodeId) : null;
+
+        if (nextNode == null) {
+            return;
+        }
+
+        DialogueDefinition.Line oldLine = currentLineOrNull();
+
+        float oldX = oldLine != null ? currentSpriteX(0.0F) : definition.layout.sprite_center_x;
+
+        String oldSprite = oldLine != null ? oldLine.sprite : null;
+
+        currentNodeId = nodeId;
+        enabledChoices = availability != null ? List.copyOf(availability) : List.of();
+
+        selectedChoice = firstSelectableChoice();
+
+        hoveredChoice = -1;
+        waitingForNodeState = false;
+
+        DialogueDefinition.Line newLine = currentLineOrNull();
+
+        previousSprite = oldSprite;
+
+        spriteMoveFromX = oldX;
+
+        spriteMoveAge = 0;
+
+        String nextSprite = newLine != null ? newLine.sprite : null;
+
+        if (!Objects.equals(oldSprite, nextSprite)) {
+            spriteTransitionAge = 0;
+        } else {
+            spriteTransitionAge = 1000;
+        }
+
+        revealedChars = 0;
+        typingDelay = 0;
+        holdTicks = 0;
+        voiceLetterCounter = 0;
+
+        updateCurrentText();
+
+        closeChoiceInputScreen();
     }
 
 
@@ -144,7 +236,6 @@ public final class DialogueClient {
         }
 
         totalTicks++;
-
         spriteMoveAge++;
         spriteTransitionAge++;
 
@@ -152,14 +243,17 @@ public final class DialogueClient {
             endingTicks++;
 
             if (endingTicks >= getFadeTicks()) {
-                finish();
+                finishLegacy();
             }
 
             return;
         }
 
-        if (revealedChars < currentText.length()) {
+        if (nodeMode && waitingForNodeState) {
+            return;
+        }
 
+        if (revealedChars < currentText.length()) {
             if (typingDelay > 0) {
                 typingDelay--;
                 return;
@@ -178,15 +272,49 @@ public final class DialogueClient {
             return;
         }
 
+        if (nodeMode) {
+            tickGraphNode();
+            return;
+        }
+
         holdTicks++;
 
         if (holdTicks >= getHoldTicks()) {
-            advanceLine();
+            advanceLegacyLine();
         }
     }
 
 
-    private static void advanceLine() {
+    private static void tickGraphNode() {
+        DialogueDefinition.Node node = currentNode();
+
+        if (node == null) {
+            return;
+        }
+
+        String type = node.type != null ? node.type.toLowerCase(Locale.ROOT) : "line";
+
+        if ("choice".equals(type)) {
+            ensureChoiceInputScreen();
+            return;
+        }
+
+        if (!"line".equals(type)) {
+            return;
+        }
+
+        holdTicks++;
+
+        if (holdTicks >= getHoldTicks() && !waitingForNodeState) {
+
+            waitingForNodeState = true;
+
+            DialogueNetwork.advanceNode(sessionId, currentNodeId);
+        }
+    }
+
+
+    private static void advanceLegacyLine() {
         if (lineIndex >= definition.lines.size() - 1) {
 
             ending = true;
@@ -207,6 +335,7 @@ public final class DialogueClient {
         previousSprite = oldSprite;
 
         spriteMoveFromX = oldX;
+
         spriteMoveAge = 0;
 
         if (!Objects.equals(oldSprite, next.sprite)) {
@@ -218,7 +347,6 @@ public final class DialogueClient {
         revealedChars = 0;
         typingDelay = 0;
         holdTicks = 0;
-
         voiceLetterCounter = 0;
 
         updateCurrentText();
@@ -226,9 +354,9 @@ public final class DialogueClient {
 
 
     private static void updateCurrentText() {
-        DialogueDefinition.Line line = currentLine();
+        DialogueDefinition.Line line = currentLineOrNull();
 
-        currentText = line.literal != null ? line.literal : line.text != null ? I18n.get(line.text) : "";
+        currentText = resolveText(line);
 
         revealTicks = new int[currentText.length()];
 
@@ -236,7 +364,41 @@ public final class DialogueClient {
     }
 
 
-    private static void finish() {
+    private static String resolveText(DialogueDefinition.Line line) {
+        if (line == null) {
+            return "";
+        }
+
+        if (line.literal != null) {
+            return line.literal;
+        }
+
+        if (line.text != null) {
+            return I18n.get(line.text);
+        }
+
+        return "";
+    }
+
+
+    private static String resolveChoiceText(DialogueDefinition.Choice choice) {
+        if (choice == null) {
+            return "";
+        }
+
+        if (choice.literal != null) {
+            return choice.literal;
+        }
+
+        if (choice.text != null) {
+            return I18n.get(choice.text);
+        }
+
+        return "<choice>";
+    }
+
+
+    private static void finishLegacy() {
         UUID finished = sessionId;
 
         reset();
@@ -248,33 +410,37 @@ public final class DialogueClient {
 
 
     private static void reset() {
-        definition = null;
+        closeChoiceInputScreen();
 
+        definition = null;
         sessionId = null;
         dialogueId = null;
 
         lineIndex = 0;
-        revealedChars = 0;
 
+        nodeMode = false;
+        currentNodeId = null;
+        enabledChoices = List.of();
+        selectedChoice = 0;
+        hoveredChoice = -1;
+        waitingForNodeState = false;
+
+        revealedChars = 0;
         typingDelay = 0;
         holdTicks = 0;
-
         totalTicks = 0;
 
         ending = false;
         endingTicks = 0;
 
         currentText = "";
-
         revealTicks = new int[0];
 
         previousSprite = null;
-
         spriteTransitionAge = 1000;
         spriteMoveAge = 1000;
 
         voiceLetterCounter = 0;
-
         active = false;
     }
 
@@ -284,9 +450,13 @@ public final class DialogueClient {
             return;
         }
 
-        voiceLetterCounter++;
+        DialogueDefinition.Line line = currentLineOrNull();
 
-        DialogueDefinition.Line line = currentLine();
+        if (line == null) {
+            return;
+        }
+
+        voiceLetterCounter++;
 
         int every = line.voice_every != null ? line.voice_every : definition.voice_every;
 
@@ -307,6 +477,7 @@ public final class DialogueClient {
         float volume = line.voice_volume != null ? line.voice_volume : definition.voice_volume;
 
         SoundSource source = resolveVoiceSource(line);
+
         SimpleSoundInstance sound = new SimpleSoundInstance(soundId, source, volume, pitch, RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
 
         Minecraft.getInstance().getSoundManager().play(sound);
@@ -365,6 +536,10 @@ public final class DialogueClient {
 
     private static void render(GuiGraphics graphics) {
         if (!active || definition == null) {
+            return;
+        }
+
+        if (nodeMode && waitingForNodeState && currentNodeId == null) {
             return;
         }
 
@@ -432,13 +607,9 @@ public final class DialogueClient {
         DialogueDefinition.Layout layout = definition.layout;
 
         int screenW = graphics.guiWidth();
-
         int screenH = graphics.guiHeight();
-
         float scale = Math.min(screenW / (float) layout.canvas_width, screenH / (float) layout.canvas_height);
-
         float originX = (screenW - layout.canvas_width * scale) * 0.5F;
-
         float originY = (screenH - layout.canvas_height * scale) * 0.5F;
 
         PoseStack pose = graphics.pose();
@@ -446,23 +617,25 @@ public final class DialogueClient {
         pose.pushPose();
 
         pose.translate(originX, originY, 400.0F);
-
         pose.scale(scale, scale, 1.0F);
 
         renderSprite(graphics, partialTick, alpha);
-
         renderFrame(graphics, alpha);
-
         renderText(graphics, font, time, partialTick, alpha);
+
+        if (nodeMode && !waitingForNodeState && isCurrentChoiceNode() && revealedChars >= currentText.length()) {
+
+            renderChoices(graphics, font, alpha);
+        }
 
         pose.popPose();
     }
 
 
     private static void renderSprite(GuiGraphics graphics, float partialTick, float alpha) {
-        DialogueDefinition.Line line = currentLine();
+        DialogueDefinition.Line line = currentLineOrNull();
 
-        if (line.sprite == null) {
+        if (line == null || line.sprite == null) {
             return;
         }
 
@@ -475,55 +648,41 @@ public final class DialogueClient {
         String transition = spriteTransition(line);
 
         int transitionTicks = spriteTransitionTicks(line);
-
         float progress = Mth.clamp((spriteTransitionAge + partialTick) / transitionTicks, 0.0F, 1.0F);
-
         float x = currentSpriteX(partialTick);
-
         int width = spriteWidth(line);
-
         int height = spriteHeight(line);
 
         int y = definition.layout.sprite_y;
 
+        if (("fade".equals(transition) || "fade_up".equals(transition)) && previousSprite != null && progress < 1.0F) {
 
-        if ("fade".equals(transition) || "fade_up".equals(transition)) {
+            ResourceLocation old = ResourceLocation.tryParse(previousSprite);
 
-            if (previousSprite != null && progress < 1.0F) {
+            if (old != null) {
+                int visibleHeight = Math.max(0, Math.round(height * (1.0F - progress)));
 
-                ResourceLocation old = ResourceLocation.tryParse(previousSprite);
+                if (visibleHeight > 0) {
+                    graphics.setColor(1.0F, 1.0F, 1.0F, alpha);
 
-                if (old != null) {
-                    int visibleHeight = Math.max(0, Math.round(height * (1.0F - progress)));
-
-                    if (visibleHeight > 0) {
-                        graphics.setColor(1.0F, 1.0F, 1.0F, alpha);
-
-                        graphics.blit(old, Math.round(spriteMoveFromX), y, 0, 0, width, visibleHeight, width, height);
-                    }
+                    graphics.blit(old, Math.round(spriteMoveFromX), y, 0, 0, width, visibleHeight, width, height);
                 }
             }
         }
-
         PoseStack pose = graphics.pose();
 
         pose.pushPose();
 
         float centerX = x + width * 0.5F;
-
         float centerY = y + height * 0.5F;
 
         float drawAlpha = alpha;
 
         switch (transition) {
-
             case "bounce" -> {
                 float age = spriteTransitionAge + partialTick;
-
                 float damping = (float) Math.exp(-age * 0.22F);
-
                 float bounceY = -(float) Math.sin(age * 0.92F) * damping * 4.0F;
-
                 float bounceScale = 1.0F + Math.max(0.0F, (float) Math.sin(age * 0.92F)) * damping * 0.035F;
 
                 pose.translate(centerX, centerY + bounceY, 0.0F);
@@ -535,9 +694,7 @@ public final class DialogueClient {
 
             case "sway" -> {
                 float age = spriteTransitionAge + partialTick;
-
                 float damping = (float) Math.exp(-age * 0.20F);
-
                 float sway = (float) Math.sin(age * 0.95F) * damping;
 
                 pose.translate(centerX + sway * 3.5F, centerY, 0.0F);
@@ -557,9 +714,7 @@ public final class DialogueClient {
         }
 
         graphics.setColor(1.0F, 1.0F, 1.0F, drawAlpha);
-
         graphics.blit(sprite, 0, 0, 0, 0, width, height, width, height);
-
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         pose.popPose();
@@ -570,16 +725,19 @@ public final class DialogueClient {
         DialogueDefinition.Layout layout = definition.layout;
 
         ResourceLocation frame = currentFrame();
-
         graphics.setColor(1.0F, 1.0F, 1.0F, alpha);
-
         graphics.blit(frame, layout.frame_x, layout.frame_y, 0, 0, layout.frame_width, layout.frame_height, layout.frame_width, layout.frame_height);
-
         graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
 
     private static void renderText(GuiGraphics graphics, Font font, float time, float partialTick, float alpha) {
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        if (line == null) {
+            return;
+        }
+
         DialogueDefinition.Layout layout = definition.layout;
 
         int maxWidth = Mth.floor(layout.text_width / layout.text_scale);
@@ -596,7 +754,7 @@ public final class DialogueClient {
 
         int alphaByte = Mth.clamp(Math.round(alpha * 255.0F), 0, 255);
 
-        String effect = textEffect(currentLine());
+        List<String> effects = textEffects(line);
 
         for (Glyph glyph : glyphs) {
 
@@ -605,37 +763,42 @@ public final class DialogueClient {
             }
 
             float age = totalTicks + partialTick - revealTicks[glyph.index];
-
             float x = glyph.x;
             float y = glyph.y;
+            float glyphScale = 1.0F;
 
-            float scale = 1.0F;
+            for (String effect : effects) {
 
-            switch (effect) {
-
-                case "wave" -> y += (float) Math.sin(time * 5.0F + glyph.index * 0.55F) * 0.85F;
-
-                case "shake" -> {
-                    long seed = glyph.index * 734287L + totalTicks * 912271L;
-
-                    x += hashOffset(seed);
-                    y += hashOffset(seed + 19L);
+                if (effect == null) {
+                    continue;
                 }
 
-                case "explode" -> {
-                    float p = smooth(age / 6.0F);
+                switch (effect.toLowerCase(Locale.ROOT)) {
+                    case "wave" -> y += (float) Math.sin(time * 5.0F + glyph.index * 0.55F) * 0.85F;
 
-                    scale = 1.0F + (1.0F - p) * 0.85F;
-                }
+                    case "shake" -> {
+                        long seed = glyph.index * 734287L + totalTicks * 912271L;
 
-                case "slide", "linear" -> {
-                    float p = smooth(age / 6.0F);
+                        x += hashOffset(seed);
 
-                    x -= (1.0F - p) * 13.0F;
+                        y += hashOffset(seed + 19L);
+                    }
+
+                    case "explode" -> {
+                        float p = smooth(age / 6.0F);
+
+                        glyphScale *= 1.0F + (1.0F - p) * 0.85F;
+                    }
+
+                    case "slide", "linear" -> {
+                        float p = smooth(age / 6.0F);
+
+                        x -= (1.0F - p) * 13.0F;
+                    }
                 }
             }
 
-            int rgb = letterColor(currentLine(), glyph, maxWidth, time);
+            int rgb = letterColor(line, glyph, maxWidth, time);
 
             int color = (alphaByte << 24) | rgb;
 
@@ -645,12 +808,12 @@ public final class DialogueClient {
 
             glyphPose.translate(x, y, 0.0F);
 
-            if (scale != 1.0F) {
+            if (glyphScale != 1.0F) {
                 int glyphWidth = font.width(String.valueOf(glyph.character));
 
                 glyphPose.translate(glyphWidth * 0.5F, font.lineHeight * 0.5F, 0.0F);
 
-                glyphPose.scale(scale, scale, 1.0F);
+                glyphPose.scale(glyphScale, glyphScale, 1.0F);
 
                 glyphPose.translate(-glyphWidth * 0.5F, -font.lineHeight * 0.5F, 0.0F);
             }
@@ -664,19 +827,310 @@ public final class DialogueClient {
     }
 
 
+    private static void renderChoices(GuiGraphics graphics, Font font, float alpha) {
+        DialogueDefinition.Node node = currentNode();
+
+        if (node == null || node.choices == null || node.choices.isEmpty()) {
+            return;
+        }
+
+        DialogueDefinition.Layout layout = definition.layout;
+
+        List<Integer> visible = visibleChoiceIndices();
+
+        if (visible.isEmpty()) {
+            return;
+        }
+
+        int rowHeight = Math.max(7, layout.choice_line_height);
+
+        int startY = Math.min(layout.choice_y, layout.canvas_height - visible.size() * rowHeight - 2);
+
+        PoseStack pose = graphics.pose();
+
+        pose.pushPose();
+
+        pose.translate(layout.choice_x, startY, 15.0F);
+
+        pose.scale(layout.choice_scale, layout.choice_scale, 1.0F);
+
+        int alphaByte = Mth.clamp(Math.round(alpha * 255.0F), 0, 255);
+
+        int visualRow = 0;
+
+        for (int choiceIndex : visible) {
+
+            DialogueDefinition.Choice choice = node.choices.get(choiceIndex);
+
+            boolean enabled = isChoiceEnabled(choiceIndex);
+            boolean selected = choiceIndex == (hoveredChoice >= 0 ? hoveredChoice : selectedChoice);
+
+            String text = resolveChoiceText(choice);
+
+            int rgb;
+
+            if (!enabled) {
+                rgb = parseColor(layout.choice_disabled_color);
+            } else if (selected) {
+                rgb = parseColor(layout.choice_selected_color);
+            } else {
+                rgb = parseColor(layout.choice_color);
+            }
+
+            String prefix = (selected ? "> " : "  ") + (visualRow + 1) + ". ";
+
+            graphics.drawString(font, prefix + text, 0, visualRow * rowHeight, (alphaByte << 24) | rgb, false);
+
+            visualRow++;
+        }
+
+        pose.popPose();
+    }
+
+    public static void updateChoiceHover(double mouseX, double mouseY) {
+        if (!canChoose()) {
+            hoveredChoice = -1;
+            return;
+        }
+
+        int choiceIndex = choiceAtScreen(mouseX, mouseY);
+
+        hoveredChoice = choiceIndex >= 0 && isChoiceEnabled(choiceIndex) ? choiceIndex : -1;
+    }
+
+    public static void clearChoiceHover() {
+        hoveredChoice = -1;
+    }
+
+    public static boolean clickChoice(double mouseX, double mouseY) {
+        if (!canChoose()) {
+            return false;
+        }
+
+        int choiceIndex = choiceAtScreen(mouseX, mouseY);
+
+        if (choiceIndex < 0 || !isChoiceEnabled(choiceIndex)) {
+            return false;
+        }
+
+        selectedChoice = choiceIndex;
+        hoveredChoice = choiceIndex;
+        submitSelectedChoice();
+
+        return true;
+    }
+
+
+    public static void moveChoiceSelection(int direction) {
+        if (!canChoose()) {
+            return;
+        }
+
+        hoveredChoice = -1;
+
+        List<Integer> selectable = selectableChoiceIndices();
+
+        if (selectable.isEmpty()) {
+            return;
+        }
+
+        int current = selectable.indexOf(selectedChoice);
+
+        if (current < 0) {
+            selectedChoice = selectable.get(0);
+            return;
+        }
+
+        int next = Math.floorMod(current + direction, selectable.size());
+
+        selectedChoice = selectable.get(next);
+    }
+
+
+    public static void selectChoiceNumber(int number) {
+        if (!canChoose()) {
+            return;
+        }
+
+        hoveredChoice = -1;
+
+        List<Integer> selectable = selectableChoiceIndices();
+
+        int local = number - 1;
+
+        if (local < 0 || local >= selectable.size()) {
+            return;
+        }
+
+        selectedChoice = selectable.get(local);
+
+        submitSelectedChoice();
+    }
+
+
+    public static void submitSelectedChoice() {
+        if (!canChoose() || !isChoiceEnabled(selectedChoice)) {
+            return;
+        }
+
+        waitingForNodeState = true;
+        hoveredChoice = -1;
+
+        closeChoiceInputScreen();
+
+        DialogueNetwork.choose(sessionId, currentNodeId, selectedChoice);
+    }
+
+
+    public static boolean canChoose() {
+        return active && nodeMode && !waitingForNodeState && isCurrentChoiceNode() && revealedChars >= currentText.length();
+    }
+
+
+    private static int choiceAtScreen(double mouseX, double mouseY) {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        DialogueDefinition.Node node = currentNode();
+
+        if (minecraft == null || definition == null || node == null || node.choices == null) {
+            return -1;
+        }
+
+        DialogueDefinition.Layout layout = definition.layout;
+
+        int screenW = minecraft.getWindow().getGuiScaledWidth();
+        int screenH = minecraft.getWindow().getGuiScaledHeight();
+
+        float canvasScale = Math.min(screenW / (float) layout.canvas_width, screenH / (float) layout.canvas_height);
+        float originX = (screenW - layout.canvas_width * canvasScale) * 0.5F;
+        float originY = (screenH - layout.canvas_height * canvasScale) * 0.5F;
+
+        List<Integer> visible = visibleChoiceIndices();
+
+        int rowHeight = Math.max(7, layout.choice_line_height);
+        int startY = Math.min(layout.choice_y, layout.canvas_height - visible.size() * rowHeight - 2);
+
+        double localX = (mouseX - originX) / canvasScale;
+        double localY = (mouseY - originY) / canvasScale;
+
+        if (localX < layout.choice_x || localX > layout.choice_x + layout.choice_width || localY < startY) {
+            return -1;
+        }
+
+        double scaledRowHeight = rowHeight * layout.choice_scale;
+
+        if (scaledRowHeight <= 0.0D) {
+            return -1;
+        }
+        double choiceLocalY = (localY - startY) / layout.choice_scale;
+
+        int row = (int) Math.floor(choiceLocalY / rowHeight);
+
+        if (row < 0 || row >= visible.size()) {
+            return -1;
+        }
+
+        return visible.get(row);
+    }
+
+    private static void ensureChoiceInputScreen() {
+        if (!canChoose()) {
+            return;
+        }
+
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (minecraft.screen == null) {
+            minecraft.setScreen(new DialogueChoiceInputScreen());
+        }
+    }
+
+    private static void closeChoiceInputScreen() {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        if (minecraft.screen instanceof DialogueChoiceInputScreen) {
+            minecraft.setScreen(null);
+        }
+    }
+
+    private static List<Integer> visibleChoiceIndices() {
+        DialogueDefinition.Node node = currentNode();
+
+        if (node == null || node.choices == null) {
+            return List.of();
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < node.choices.size(); i++) {
+            DialogueDefinition.Choice choice = node.choices.get(i);
+            boolean enabled = isChoiceEnabled(i);
+            String mode = choice != null && choice.when_unavailable != null ? choice.when_unavailable : "hide";
+
+            if (enabled || !"hide".equalsIgnoreCase(mode)) {
+                result.add(i);
+            }
+        }
+
+        return result;
+    }
+
+
+    private static List<Integer> selectableChoiceIndices() {
+        List<Integer> result = new ArrayList<>();
+
+        for (int index : visibleChoiceIndices()) {
+            if (isChoiceEnabled(index)) {
+                result.add(index);
+            }
+        }
+
+        return result;
+    }
+
+
+    private static int firstSelectableChoice() {
+        DialogueDefinition.Node node = currentNode();
+
+        if (node == null || node.choices == null) {
+            return 0;
+        }
+
+        for (int i = 0; i < node.choices.size(); i++) {
+
+            if (isChoiceEnabled(i)) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+
+    private static boolean isChoiceEnabled(int index) {
+        return index >= 0 && index < enabledChoices.size() && Boolean.TRUE.equals(enabledChoices.get(index));
+    }
+
+
+    private static boolean isCurrentChoiceNode() {
+        DialogueDefinition.Node node = currentNode();
+
+        return node != null && "choice".equalsIgnoreCase(node.type);
+    }
+
+
     private static int letterColor(DialogueDefinition.Line line, Glyph glyph, int maxWidth, float time) {
         List<String> gradient = line.text_gradient != null ? line.text_gradient : definition.text_gradient;
 
         if (gradient != null && gradient.size() >= 2) {
 
             float t = Mth.clamp(glyph.x / (float) Math.max(1, maxWidth), 0.0F, 1.0F);
-
             return gradientColor(gradient, t);
         }
 
         String value = line.text_color != null ? line.text_color : definition.text_color;
 
-        if ((value == null || value.equals("white"))) {
+        if (value == null || value.equals("white")) {
 
             String legacy = line.text_style != null ? line.text_style : definition.text_style;
 
@@ -695,6 +1149,45 @@ public final class DialogueClient {
     }
 
 
+    private static List<String> textEffects(DialogueDefinition.Line line) {
+        if (line.text_effects != null) {
+            return normalizedEffects(line.text_effects);
+        }
+
+        if (definition.text_effects != null) {
+            return normalizedEffects(definition.text_effects);
+        }
+
+        String legacy = line.text_effect != null ? line.text_effect : definition.text_effect;
+
+        if (legacy == null || legacy.isBlank() || "normal".equalsIgnoreCase(legacy)) {
+            return List.of();
+        }
+
+        return List.of(legacy.toLowerCase(Locale.ROOT));
+    }
+
+
+    private static List<String> normalizedEffects(List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return List.of();
+        }
+
+        LinkedHashSet<String> result = new LinkedHashSet<>();
+
+        for (String value : values) {
+
+            if (value == null || value.isBlank() || "normal".equalsIgnoreCase(value)) {
+                continue;
+            }
+
+            result.add(value.trim().toLowerCase(Locale.ROOT));
+        }
+
+        return List.copyOf(result);
+    }
+
+
     private static int parseColor(String value) {
         if (value == null) {
             return 0xFFFFFF;
@@ -703,23 +1196,14 @@ public final class DialogueClient {
         value = value.trim().toLowerCase(Locale.ROOT);
 
         return switch (value) {
-
             case "blue" -> 0x4AA3FF;
-
             case "red" -> 0xFF4D55;
-
             case "gold", "golden" -> 0xFFD45A;
-
             case "green" -> 0x55E878;
-
             case "white" -> 0xFFFFFF;
-
             case "black" -> 0x000000;
-
             case "purple" -> 0xB76CFF;
-
             case "cyan" -> 0x42F2E1;
-
             default -> parseHex(value);
         };
     }
@@ -779,7 +1263,11 @@ public final class DialogueClient {
 
 
     private static float currentSpriteX(float partialTick) {
-        DialogueDefinition.Line line = currentLine();
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        if (line == null) {
+            return definition.layout.sprite_center_x;
+        }
 
         float target = resolveSpriteTargetX(line);
 
@@ -839,10 +1327,11 @@ public final class DialogueClient {
         return Math.max(1, line.sprite_transition_ticks != null ? line.sprite_transition_ticks : definition.sprite_transition_ticks);
     }
 
-    private static ResourceLocation currentFrame() {
-        DialogueDefinition.Line line = currentLine();
 
-        String value = line.frame != null ? line.frame : definition.frame;
+    private static ResourceLocation currentFrame() {
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        String value = line != null && line.frame != null ? line.frame : definition.frame;
 
         ResourceLocation parsed = value != null ? ResourceLocation.tryParse(value) : null;
 
@@ -851,31 +1340,29 @@ public final class DialogueClient {
 
 
     private static ResourceLocation currentBackground() {
-        DialogueDefinition.Line line = currentLine();
+        DialogueDefinition.Line line = currentLineOrNull();
 
-        String value = line.background != null ? line.background : definition.background;
+        String value = line != null && line.background != null ? line.background : definition.background;
 
         ResourceLocation parsed = value != null ? ResourceLocation.tryParse(value) : null;
 
         return parsed != null ? parsed : DEFAULT_BACKGROUND;
     }
 
-    private static String textEffect(DialogueDefinition.Line line) {
-        String value = line.text_effect != null ? line.text_effect : definition.text_effect;
-
-        return value != null ? value.toLowerCase(Locale.ROOT) : "normal";
-    }
-
 
     private static int getCharTicks() {
-        Integer custom = currentLine().char_ticks;
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        Integer custom = line != null ? line.char_ticks : null;
 
         return Math.max(1, custom != null ? custom : definition.char_ticks);
     }
 
 
     private static int getHoldTicks() {
-        Integer custom = currentLine().hold_ticks;
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        Integer custom = line != null ? line.hold_ticks : null;
 
         return Math.max(1, custom != null ? custom : definition.hold_ticks);
     }
@@ -924,22 +1411,55 @@ public final class DialogueClient {
     }
 
 
-    private static DialogueDefinition.Line currentLine() {
+    private static DialogueDefinition.Node currentNode() {
+        if (!nodeMode || definition == null || definition.nodes == null || currentNodeId == null) {
+            return null;
+        }
+
+        return definition.nodes.get(currentNodeId);
+    }
+
+
+    private static DialogueDefinition.Line currentLineOrNull() {
+        if (definition == null) {
+            return null;
+        }
+
+        if (nodeMode) {
+            DialogueDefinition.Node node = currentNode();
+
+            return node != null ? node.line : null;
+        }
+
+        if (definition.lines == null || definition.lines.isEmpty() || lineIndex < 0 || lineIndex >= definition.lines.size()) {
+            return null;
+        }
+
         return definition.lines.get(lineIndex);
     }
+
+
+    private static DialogueDefinition.Line currentLine() {
+        DialogueDefinition.Line line = currentLineOrNull();
+
+        if (line == null) {
+            throw new IllegalStateException("Dialogue has no current line");
+        }
+
+        return line;
+    }
+
 
     private static List<Glyph> layoutGlyphs(Font font, String text, int maxWidth) {
         List<Glyph> result = new ArrayList<>();
 
         int x = 0;
         int y = 0;
-
         int i = 0;
 
         int lineHeight = definition.layout.line_height;
 
         while (i < text.length()) {
-
             char character = text.charAt(i);
 
             if (character == '\n') {
@@ -968,7 +1488,6 @@ public final class DialogueClient {
             int wordEnd = i;
 
             while (wordEnd < text.length()) {
-
                 char next = text.charAt(wordEnd);
 
                 if (Character.isWhitespace(next) || next == '\n') {
@@ -983,7 +1502,6 @@ public final class DialogueClient {
             int wordWidth = font.width(word);
 
             if (x > 0 && x + wordWidth > maxWidth) {
-
                 x = 0;
                 y += lineHeight;
             }
@@ -991,11 +1509,9 @@ public final class DialogueClient {
             for (int index = i; index < wordEnd; index++) {
 
                 char letter = text.charAt(index);
-
                 int width = font.width(String.valueOf(letter));
 
                 if (x > 0 && x + width > maxWidth) {
-
                     x = 0;
                     y += lineHeight;
                 }
@@ -1004,8 +1520,10 @@ public final class DialogueClient {
 
                 x += width;
             }
+
             i = wordEnd;
         }
+
         return result;
     }
 

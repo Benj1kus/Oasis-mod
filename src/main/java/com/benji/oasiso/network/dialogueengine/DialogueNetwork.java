@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public final class DialogueNetwork {
 
-    private static final String PROTOCOL = "2";
+    private static final String PROTOCOL = "3";
 
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "dialogue_engine"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
 
@@ -22,12 +22,12 @@ public final class DialogueNetwork {
 
     public static void register() {
         CHANNEL.registerMessage(0, DialogueEngineStartS2CPacket.class, DialogueEngineStartS2CPacket::encode, DialogueEngineStartS2CPacket::decode, DialogueEngineStartS2CPacket::handle);
-
         CHANNEL.registerMessage(1, DialogueEngineFinishC2SPacket.class, DialogueEngineFinishC2SPacket::encode, DialogueEngineFinishC2SPacket::decode, DialogueEngineFinishC2SPacket::handle);
-
         CHANNEL.registerMessage(2, DialogueEngineStopS2CPacket.class, DialogueEngineStopS2CPacket::encode, DialogueEngineStopS2CPacket::decode, DialogueEngineStopS2CPacket::handle);
-
         CHANNEL.registerMessage(3, DialogueZonePreviewS2CPacket.class, DialogueZonePreviewS2CPacket::encode, DialogueZonePreviewS2CPacket::decode, DialogueZonePreviewS2CPacket::handle);
+        CHANNEL.registerMessage(4, DialogueNodeStateS2CPacket.class, DialogueNodeStateS2CPacket::encode, DialogueNodeStateS2CPacket::decode, DialogueNodeStateS2CPacket::handle);
+        CHANNEL.registerMessage(5, DialogueNodeAdvanceC2SPacket.class, DialogueNodeAdvanceC2SPacket::encode, DialogueNodeAdvanceC2SPacket::decode, DialogueNodeAdvanceC2SPacket::handle);
+        CHANNEL.registerMessage(6, DialogueChoiceC2SPacket.class, DialogueChoiceC2SPacket::encode, DialogueChoiceC2SPacket::decode, DialogueChoiceC2SPacket::handle);
     }
 
 
@@ -48,5 +48,20 @@ public final class DialogueNetwork {
 
     public static void syncZones(ServerPlayer player, List<DialogueZonePreviewS2CPacket.Zone> zones) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DialogueZonePreviewS2CPacket(zones));
+    }
+
+
+    public static void nodeState(ServerPlayer player, UUID sessionId, String nodeId, List<Boolean> enabledChoices) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DialogueNodeStateS2CPacket(sessionId, nodeId, enabledChoices));
+    }
+
+
+    public static void advanceNode(UUID sessionId, String nodeId) {
+        CHANNEL.sendToServer(new DialogueNodeAdvanceC2SPacket(sessionId, nodeId));
+    }
+
+
+    public static void choose(UUID sessionId, String nodeId, int choiceIndex) {
+        CHANNEL.sendToServer(new DialogueChoiceC2SPacket(sessionId, nodeId, choiceIndex));
     }
 }

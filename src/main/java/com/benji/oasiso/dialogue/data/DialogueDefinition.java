@@ -1,13 +1,14 @@
 package com.benji.oasiso.dialogue.data;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DialogueDefinition {
 
-    public int format = 2;
+    public int format = 3;
 
-    // Voice
     public String voice;
     public String voice_source = "master";
 
@@ -15,19 +16,18 @@ public class DialogueDefinition {
     public float voice_volume = 0.55F;
     public int voice_every = 1;
 
-    // Typewriter
     public int char_ticks = 2;
     public int hold_ticks = 20;
     public int fade_ticks = 14;
 
-    // Text
     public String text_color = "white";
     public List<String> text_gradient;
+
     public String text_effect = "wave";
+    public List<String> text_effects;
 
     public String text_style;
 
-    // Visuals
     public String frame;
     public String background;
 
@@ -35,26 +35,30 @@ public class DialogueDefinition {
     public float background_bob = 1.6F;
     public float background_speed = 1.1F;
 
-    // Sprite
     public String sprite_position = "center";
     public String sprite_transition = "bounce";
 
     public int sprite_move_ticks = 10;
     public int sprite_transition_ticks = 8;
 
-    // Gameplay
     public boolean freeze_source = true;
     public boolean source_invulnerable = true;
     public boolean cancel_if_source_missing = true;
-
     public boolean exclusive_source = true;
-
     public String once = "never";
 
     public Layout layout = new Layout();
-
     public List<Trigger> triggers = new ArrayList<>();
+
     public List<Line> lines = new ArrayList<>();
+    public boolean graph_enabled = false;
+    public String start_node;
+    public Map<String, Node> nodes = new LinkedHashMap<>();
+
+
+    public boolean hasGraph() {
+        return graph_enabled && start_node != null && !start_node.isBlank() && nodes != null && !nodes.isEmpty() && nodes.containsKey(start_node);
+    }
 
 
     public static class Layout {
@@ -81,19 +85,25 @@ public class DialogueDefinition {
         public float sprite_left_x = 0.0F;
         public float sprite_center_x = 33.0F;
         public float sprite_right_x = 66.0F;
+
+        public int choice_x = 23;
+        public int choice_y = 86;
+        public int choice_width = 146;
+        public float choice_scale = 0.62F;
+        public int choice_line_height = 9;
+
+        public String choice_color = "white";
+        public String choice_selected_color = "gold";
+        public String choice_disabled_color = "#777777";
     }
 
 
     public static class Line {
 
-        // Translation key
         public String text;
-
         public String literal;
-
         public String sprite;
 
-        // Line overrides
         public Integer char_ticks;
         public Integer hold_ticks;
 
@@ -107,8 +117,7 @@ public class DialogueDefinition {
         public List<String> text_gradient;
 
         public String text_effect;
-
-        // legacy
+        public List<String> text_effects;
         public String text_style;
 
         public String frame;
@@ -116,7 +125,6 @@ public class DialogueDefinition {
 
         public String sprite_position;
         public Float sprite_x;
-
         public String sprite_transition;
 
         public Integer sprite_move_ticks;
@@ -124,6 +132,88 @@ public class DialogueDefinition {
 
         public Integer sprite_width;
         public Integer sprite_height;
+    }
+
+    public static class Node {
+        public String type = "line";
+
+        public Line line;
+
+        public String next;
+
+        public String else_node;
+
+        public List<Choice> choices = new ArrayList<>();
+
+        public List<Condition> conditions = new ArrayList<>();
+
+        public List<Action> actions = new ArrayList<>();
+    }
+
+
+    public static class Choice {
+        public String text;
+        public String literal;
+
+        public String goto_node;
+        public String when_unavailable = "hide";
+
+        public List<Condition> conditions = new ArrayList<>();
+        public List<Action> actions = new ArrayList<>();
+    }
+
+    public static class Condition {
+        public String type = "always";
+
+        public String id;
+
+        public String objective;
+        public String operator = ">=";
+        public int value = 1;
+
+        public int count = 1;
+        public String state = "active";
+
+        public Map<String, String> data = new LinkedHashMap<>();
+
+        public boolean invert = false;
+    }
+
+    public static class Action {
+        public String type = "fire_external";
+
+        public String target = "player";
+
+        public String id;
+
+        public int count = 1;
+
+        public String objective;
+        public int value = 1;
+
+        public String command;
+
+        public String event;
+
+        public String sound_source = "master";
+        public float volume = 1.0F;
+        public float sound_pitch = 1.0F;
+
+        public double x = 0.0D;
+        public double y = 0.0D;
+        public double z = 0.0D;
+
+        public boolean relative = false;
+        public String dimension;
+        public Float yaw;
+        public Float teleport_pitch;
+
+        public double spread_x = 0.0D;
+        public double spread_y = 0.0D;
+        public double spread_z = 0.0D;
+        public double speed = 0.0D;
+
+        public Map<String, String> data = new LinkedHashMap<>();
     }
 
 
@@ -139,13 +229,10 @@ public class DialogueDefinition {
 
         public boolean consume = false;
 
-        // Override dialogue-level once.
         public String once;
 
-        // External event ID.
         public String event;
 
-        // Dimension filter.
         public String dimension;
 
         public Double x;
@@ -172,17 +259,14 @@ public class DialogueDefinition {
 
 
     public static class ZoneAnchor {
-
         public String type = "absolute";
         public String target;
         public String entity_tag;
         public String pick = "nearest";
 
-
         public Double x;
         public Double y;
         public Double z;
-
 
         public double offset_x = 0.0D;
         public double offset_y = 0.0D;
@@ -193,7 +277,6 @@ public class DialogueDefinition {
 
 
     public static class ZoneVisual {
-
         public boolean enabled = true;
         public String style = "auto";
         public String texture;
