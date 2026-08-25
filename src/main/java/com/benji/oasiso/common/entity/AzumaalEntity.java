@@ -53,6 +53,9 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int SPLASH_RIGHT = 2;
     public static final int SPLASH_LEFT = 3;
 
+    private static final int TEXTURE_FRAME_COUNT = 6;
+    private static final int TEXTURE_FRAME_TICKS = 2;
+
     public static final int STATE_ATTACK_THROW = 4;
     public static final int STATE_AIR_THROW = 5;
     public static final int STATE_IDLE = 1;
@@ -134,7 +137,7 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
                 .add(Attributes.MAX_HEALTH, 1500.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.4D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 20.0D)
+                .add(Attributes.ATTACK_DAMAGE, 22.0D)
                 .add(Attributes.FOLLOW_RANGE, LOOK_RANGE);
     }
 
@@ -215,7 +218,6 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
     public boolean isCloneOf(AzumaalEntity owner) {
         return this.isClone() && this.cloneOwnerId != null && this.cloneOwnerId.equals(owner.getUUID());
     }
-
 
     public void initializeClone(AzumaalEntity owner, int cloneIndex, Vec3 relativeOffset, int formationDuration) {
         this.entityData.set(CLONE_MODE, true);
@@ -819,10 +821,28 @@ public void onIntroPanelFinished(ServerPlayer player) {
         return ModSounds.AZUMAAL_HIT.get();
     }
 
+    public int getTextureAnimationFrame() {
+        return (this.tickCount / TEXTURE_FRAME_TICKS) % TEXTURE_FRAME_COUNT;
+    }
+
+    public ResourceLocation getMainTexture() {
+        String baseName = this.isDefending() ? "azumaal_defend" : "azumaal";
+        return buildAnimatedTexture("textures/entity/", baseName);
+    }
+
+    public ResourceLocation getAnimatedEmissiveTexture() {
+        return buildAnimatedTexture("textures/entity/emissive/", "azumaal_emissive");
+    }
+
+    private ResourceLocation buildAnimatedTexture(String folder, String baseName) {
+        int frame = getTextureAnimationFrame();
+        String textureName = frame == 0 ? baseName : baseName + "_frame" + (frame + 1);
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, folder + textureName + ".png");
+    }
+
     @Override
     public ResourceLocation getGlowmaskTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID,
-                this.isDefending() ? "textures/entity/emissive/" + "azumaal_defend_emissive.png" : "textures/entity/emissive/" + "azumaal_emissive.png");
+        return getAnimatedEmissiveTexture();
     }
 
     @Override

@@ -39,7 +39,7 @@ public final class AzumaalParkourManager {
     private static final double PARKOUR_HEIGHT = 20.0D;
 
     private static final int RISE_TICKS = 30;
-    private static final int HOLD_TICKS = 30 * 20;
+    private static final int HOLD_TICKS = 25 * 20;
     private static final int DESCEND_TICKS = 30;
 
     private static final double PARTICIPANT_RANGE = 96.0D;
