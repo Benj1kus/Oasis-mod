@@ -24,18 +24,18 @@ public final class DialogueZoneFxGuiPreview {
 
         DialogueDefinition.ZoneVisual visual = trigger.visual;
 
-        graphics.fill(x, y, x + width, y + height, 0xFF090D13);
-        graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, 0xFF0E141C);
-        graphics.fill(x + 8, y + 28, x + width - 8, y + height - 48, 0xFF0A0F16);
+        DialogueRetroTheme.drawPanel(graphics, x, y, x + width, y + height);
+        DialogueRetroTheme.drawTitleBar(graphics, x + 3, y + 3, x + width - 3, 24);
+        DialogueRetroTheme.drawDarkInset(graphics, x + 8, y + 28, x + width - 8, y + height - 48);
 
         var font = net.minecraft.client.Minecraft.getInstance().font;
-        graphics.drawString(font, "ZONE FX / LIVE PREVIEW", x + 10, y + 9, 0xFF6FF8E9, false);
+        graphics.drawString(font, "ZONE FX / LIVE PREVIEW", x + 10, y + 9, 0xFFB8FF72, false);
 
         String shape = normalized(trigger.shape, "cylinder");
         String textureMode = normalized(visual.texture_mode, "plane");
         String preset = visual.preset != null ? visual.preset : "custom";
 
-        graphics.drawString(font, shape + "  |  " + textureMode + "  |  preset: " + preset, x + 10, y + 18, 0xFF93A2B4, false);
+        graphics.drawString(font, shape + "  |  " + textureMode + "  |  preset: " + preset, x + 10, y + 18, 0xFFC5BCA0, false);
 
         int vx = x + 8;
         int vy = y + 28;
@@ -87,12 +87,12 @@ public final class DialogueZoneFxGuiPreview {
 
         int infoY = y + height - 40;
         String layerInfo = "default " + (visual.show_default_zone ? "ON" : "OFF") + "  |  fill " + (visual.fill_enabled ? visual.fill_mode : "OFF") + "  |  texture " + (visual.texture != null && !visual.texture.isBlank() ? "ON" : "OFF");
-        graphics.drawString(font, layerInfo, x + 10, infoY, 0xFFD9E1EA, false);
+        graphics.drawString(font, layerInfo, x + 10, infoY, 0xFFF5EDD4, false);
 
         String animationInfo = String.format(Locale.ROOT, "pulse %s  bob %s  rot XYZ %.0f/%.0f/%.0f°  alpha %s", visual.pulse ? "ON" : "OFF", visual.bob ? "ON" : "OFF", visual.texture_rotation_x, visual.texture_rotation + (visual.rotate ? seconds * visual.rotate_speed : 0.0D), visual.texture_rotation_z, visual.alpha_breathe ? "ON" : "OFF");
-        graphics.drawString(font, animationInfo, x + 10, infoY + 10, 0xFF7F91A5, false);
+        graphics.drawString(font, animationInfo, x + 10, infoY + 10, 0xFFA89F83, false);
 
-        graphics.drawString(font, "Exact world transform: Zone FX -> Edit texture with world gizmo", x + 10, infoY + 20, 0xFF42F2E1, false);
+        graphics.drawString(font, "Exact world transform: Zone FX -> Edit texture with world gizmo", x + 10, infoY + 20, 0xFF93E85D, false);
     }
 
     private static PreviewAnimation animation(DialogueDefinition.ZoneVisual visual, double seconds) {

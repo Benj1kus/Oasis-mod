@@ -2,7 +2,6 @@ package com.benji.oasiso.dialogue.editor;
 
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public final class DialogueNodeGraphScreen extends Screen {
+public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
 
     private static final int TOOLBAR_H = 30;
     private static final int INFO_H = 24;
@@ -68,32 +67,32 @@ public final class DialogueNodeGraphScreen extends Screen {
         int right = width - INSPECTOR_W + 8;
         int buttonW = INSPECTOR_W - 16;
 
-        addRenderableWidget(Button.builder(Component.literal("Edit selected"), b -> openSelectedEditor()).bounds(right, height - 72, buttonW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Edit selected"), b -> openSelectedEditor()).bounds(right, height - 72, buttonW, 20).build());
 
         int half = (buttonW - 4) / 2;
 
-        addRenderableWidget(Button.builder(Component.literal("Set START"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Set START"), b -> {
             if (project.selected_node != null) {
                 project.definition.start_node = project.selected_node;
                 project.definition.graph_enabled = true;
             }
         }).bounds(right, height - 48, half, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Delete"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Delete"), b -> {
             if (project.selected_node != null) {
                 project.deleteNode(project.selected_node);
                 rebuild();
             }
         }).bounds(right + half + 4, height - 48, half, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Auto layout"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Auto layout"), b -> {
             autoLayoutReadable();
             fitGraph();
         }).bounds(right, height - 24, buttonW, 20).build());
     }
 
     private int addTopButton(int x, int y, int w, String text, Runnable action) {
-        addRenderableWidget(Button.builder(Component.literal(text), b -> action.run()).bounds(x, y, w, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(text), b -> action.run()).bounds(x, y, w, 20).build());
         return x + w + 4;
     }
 
@@ -140,9 +139,9 @@ public final class DialogueNodeGraphScreen extends Screen {
 
         int canvasRight = width - INSPECTOR_W;
 
-        graphics.fill(0, TOOLBAR_H, canvasRight, height, 0xFF0A0E14);
-        graphics.fill(0, TOOLBAR_H, canvasRight, CANVAS_TOP, 0xF0121821);
-        graphics.fill(0, CANVAS_TOP - 1, canvasRight, CANVAS_TOP, 0xFF27313D);
+        graphics.fill(0, TOOLBAR_H, canvasRight, height, 0xFF0B1009);
+        graphics.fill(0, TOOLBAR_H, canvasRight, CANVAS_TOP, 0xF0121A10);
+        graphics.fill(0, CANVAS_TOP - 1, canvasRight, CANVAS_TOP, 0xFF31402A);
 
         renderGrid(graphics, canvasRight);
         graphics.enableScissor(0, CANVAS_TOP, canvasRight, height);
@@ -171,12 +170,12 @@ public final class DialogueNodeGraphScreen extends Screen {
             text = "LMB drag node  |  click colored output -> destination  |  RMB/MMB pan  |  wheel zoom  |  double-click = edit";
         }
 
-        graphics.drawString(font, trim(text, Math.max(40, canvasRight - 16)), 8, TOOLBAR_H + 8, pendingLink != null ? 0xFFFFD45A : 0xFF8E9AA8, false);
+        graphics.drawString(font, trim(text, Math.max(40, canvasRight - 16)), 8, TOOLBAR_H + 8, pendingLink != null ? 0xFFFFD45A : 0xFFBDB497, false);
 
         String zoomText = Math.round(zoom * 100.0D) + "%";
         int zw = font.width(zoomText);
 
-        graphics.drawString(font, zoomText, canvasRight - zw - 8, TOOLBAR_H + 8, 0xFF6FF8E9, false);
+        graphics.drawString(font, zoomText, canvasRight - zw - 8, TOOLBAR_H + 8, 0xFFB8FF72, false);
     }
 
     private void renderGrid(GuiGraphics graphics, int canvasRight) {
@@ -189,11 +188,11 @@ public final class DialogueNodeGraphScreen extends Screen {
         int startY = CANVAS_TOP + (int) Math.floor((panY * zoom) % spacing);
 
         for (double x = startX; x < canvasRight; x += spacing) {
-            graphics.vLine((int) x, CANVAS_TOP, height, 0xFF151C25);
+            graphics.vLine((int) x, CANVAS_TOP, height, 0xFF1A2116);
         }
 
         for (double y = startY; y < height; y += spacing) {
-            graphics.hLine(0, canvasRight, (int) y, 0xFF151C25);
+            graphics.hLine(0, canvasRight, (int) y, 0xFF1A2116);
         }
     }
 
@@ -208,13 +207,13 @@ public final class DialogueNodeGraphScreen extends Screen {
             if ("choice".equals(type) && node.choices != null) {
                 for (int i = 0; i < node.choices.size(); i++) {
                     DialogueDefinition.Choice choice = node.choices.get(i);
-                    drawConnection(graphics, fromId, choice != null ? choice.goto_node : null, i, 0xFF67F0E6);
+                    drawConnection(graphics, fromId, choice != null ? choice.goto_node : null, i, 0xFFA8F06A);
                 }
             } else if ("condition".equals(type)) {
-                drawConnection(graphics, fromId, node.next, 0, 0xFF55E878);
+                drawConnection(graphics, fromId, node.next, 0, 0xFF86D955);
                 drawConnection(graphics, fromId, node.else_node, 1, 0xFFFF4D55);
             } else if (!"end".equals(type)) {
-                drawConnection(graphics, fromId, node.next, 0, 0xFF8995A5);
+                drawConnection(graphics, fromId, node.next, 0, 0xFFAAA187);
             }
         }
     }
@@ -261,7 +260,7 @@ public final class DialogueNodeGraphScreen extends Screen {
         int headerColor = nodeHeaderColor(type);
         boolean selected = id.equals(project.selected_node);
 
-        graphics.fill(x, y, x + w, y + h, selected ? 0xFF26333E : 0xFF151C24);
+        graphics.fill(x, y, x + w, y + h, selected ? 0xFF34442C : 0xFF1A2116);
 
         int headerH = Math.max(7, scaled(22));
         graphics.fill(x, y, x + w, y + headerH, headerColor);
@@ -282,7 +281,7 @@ public final class DialogueNodeGraphScreen extends Screen {
 
         if (id.equals(project.definition.start_node) && zoom >= 0.42D) {
             String start = "START";
-            graphics.drawString(font, start, x + 5, y + h - 11, 0xFF55E878, false);
+            graphics.drawString(font, start, x + 5, y + h - 11, 0xFF86D955, false);
         }
     }
 
@@ -296,17 +295,17 @@ public final class DialogueNodeGraphScreen extends Screen {
             case "event" -> renderEventBody(graphics, node, x, baseY, w);
             case "end" -> {
                 graphics.drawString(font, "END DIALOGUE", x + 5, baseY, 0xFFFF9B9B, false);
-                graphics.drawString(font, "releases source/session", x + 5, baseY + 13, 0xFF9AA5B3, false);
+                graphics.drawString(font, "releases source/session", x + 5, baseY + 13, 0xFFC7BEA0, false);
             }
             default -> renderLineBody(graphics, node, x, baseY, w);
         }
     }
 
     private void renderLineBody(GuiGraphics graphics, DialogueDefinition.Node node, int x, int y, int w) {
-        graphics.drawString(font, "SHOW TEXT", x + 5, y, 0xFF9CCFE4, false);
-        graphics.drawString(font, trim(lineSummary(node.line), Math.max(20, w - 10)), x + 5, y + 13, 0xFFD2D8E0, false);
+        graphics.drawString(font, "SHOW TEXT", x + 5, y, 0xFFCFE6AE, false);
+        graphics.drawString(font, trim(lineSummary(node.line), Math.max(20, w - 10)), x + 5, y + 13, 0xFFF0E8D0, false);
 
-        graphics.drawString(font, trim("NEXT -> " + destination(node.next), Math.max(20, w - 10)), x + 5, y + 29, 0xFF8E9AA8, false);
+        graphics.drawString(font, trim("NEXT -> " + destination(node.next), Math.max(20, w - 10)), x + 5, y + 29, 0xFFBDB497, false);
 
         if (node.actions != null && !node.actions.isEmpty()) {
             graphics.drawString(font, trim("ACTIONS: " + actionsSummary(node.actions), Math.max(20, w - 10)), x + 5, y + 43, 0xFFA9C7A7, false);
@@ -314,10 +313,10 @@ public final class DialogueNodeGraphScreen extends Screen {
     }
 
     private void renderChoiceBody(GuiGraphics graphics, DialogueDefinition.Node node, int x, int y, int w) {
-        graphics.drawString(font, "PLAYER CHOOSES", x + 5, y, 0xFF67F0E6, false);
+        graphics.drawString(font, "PLAYER CHOOSES", x + 5, y, 0xFFA8F06A, false);
 
         String prompt = lineSummary(node.line);
-        graphics.drawString(font, trim("Q: " + prompt, Math.max(20, w - 10)), x + 5, y + 13, 0xFFD2D8E0, false);
+        graphics.drawString(font, trim("Q: " + prompt, Math.max(20, w - 10)), x + 5, y + 13, 0xFFF0E8D0, false);
 
         int rowY = y + 31;
 
@@ -334,29 +333,29 @@ public final class DialogueNodeGraphScreen extends Screen {
 
             String row = (i + 1) + ". " + text + " -> " + target + (actionCount > 0 ? "  [+" + actionCount + " action" + (actionCount == 1 ? "" : "s") + "]" : "");
 
-            graphics.drawString(font, trim(row, Math.max(20, w - 18)), x + 8, rowY + i * 16, 0xFFBFEDEA, false);
+            graphics.drawString(font, trim(row, Math.max(20, w - 18)), x + 8, rowY + i * 16, 0xFFECE5C9, false);
 
             if (choice != null && choice.conditions != null && !choice.conditions.isEmpty()) {
-                graphics.drawString(font, "[" + choice.conditions.size() + " condition" + (choice.conditions.size() == 1 ? "" : "s") + "]", x + 16, rowY + i * 16 + 8, 0xFF83929D, false);
+                graphics.drawString(font, "[" + choice.conditions.size() + " condition" + (choice.conditions.size() == 1 ? "" : "s") + "]", x + 16, rowY + i * 16 + 8, 0xFFAAA185, false);
             }
         }
     }
 
     private void renderConditionBody(GuiGraphics graphics, DialogueDefinition.Node node, int x, int y, int w) {
         graphics.drawString(font, "AUTO BRANCH", x + 5, y, 0xFFD8E36A, false);
-        graphics.drawString(font, trim("IF " + conditionsSummary(node.conditions), Math.max(20, w - 10)), x + 5, y + 13, 0xFFD2D8E0, false);
+        graphics.drawString(font, trim("IF " + conditionsSummary(node.conditions), Math.max(20, w - 10)), x + 5, y + 13, 0xFFF0E8D0, false);
 
-        graphics.drawString(font, trim("TRUE  -> " + destination(node.next), Math.max(20, w - 14)), x + 8, y + 34, 0xFF55E878, false);
+        graphics.drawString(font, trim("TRUE  -> " + destination(node.next), Math.max(20, w - 14)), x + 8, y + 34, 0xFF86D955, false);
 
         graphics.drawString(font, trim("FALSE -> " + destination(node.else_node), Math.max(20, w - 14)), x + 8, y + 52, 0xFFFF777D, false);
     }
 
     private void renderEventBody(GuiGraphics graphics, DialogueDefinition.Node node, int x, int y, int w) {
-        graphics.drawString(font, "DO ACTIONS", x + 5, y, 0xFFD5A7F0, false);
+        graphics.drawString(font, "DO ACTIONS", x + 5, y, 0xFFD8E36A, false);
 
-        graphics.drawString(font, trim(actionsSummary(node.actions), Math.max(20, w - 10)), x + 5, y + 13, 0xFFD2D8E0, false);
+        graphics.drawString(font, trim(actionsSummary(node.actions), Math.max(20, w - 10)), x + 5, y + 13, 0xFFF0E8D0, false);
 
-        graphics.drawString(font, trim("THEN -> " + destination(node.next), Math.max(20, w - 10)), x + 5, y + 31, 0xFF8E9AA8, false);
+        graphics.drawString(font, trim("THEN -> " + destination(node.next), Math.max(20, w - 10)), x + 5, y + 31, 0xFFBDB497, false);
     }
 
 
@@ -366,18 +365,18 @@ public final class DialogueNodeGraphScreen extends Screen {
 
         if ("choice".equals(type) && node.choices != null) {
             for (int i = 0; i < node.choices.size(); i++) {
-                drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, i)), 0xFF67F0E6);
+                drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, i)), 0xFFA8F06A);
             }
             return;
         }
 
         if ("condition".equals(type)) {
-            drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, 0)), 0xFF55E878);
+            drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, 0)), 0xFF86D955);
             drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, 1)), 0xFFFF4D55);
             return;
         }
 
-        drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, 0)), 0xFF8995A5);
+        drawPort(graphics, x + w, y + scaled(portOffsetWorld(node, 0)), 0xFFAAA187);
     }
 
     private void drawPort(GuiGraphics graphics, int x, int y, int color) {
@@ -385,23 +384,23 @@ public final class DialogueNodeGraphScreen extends Screen {
         graphics.fill(x - r, y - r, x + r + 1, y + r + 1, color);
 
         if (r >= 4) {
-            graphics.fill(x - 2, y - 2, x + 3, y + 3, 0xFF0A0E14);
+            graphics.fill(x - 2, y - 2, x + 3, y + 3, 0xFF0B1009);
         }
     }
 
     private void renderInspector(GuiGraphics graphics) {
         int x = width - INSPECTOR_W;
 
-        graphics.fill(x, TOOLBAR_H, width, height, 0xF010151D);
-        graphics.fill(x, TOOLBAR_H, x + 1, height, 0xFF39414C);
+        graphics.fill(x, TOOLBAR_H, width, height, 0xF0121710);
+        graphics.fill(x, TOOLBAR_H, x + 1, height, 0xFF445438);
 
-        graphics.drawString(font, "NODE INSPECTOR", x + 10, TOOLBAR_H + 10, 0xFF6FF8E9, false);
+        graphics.drawString(font, "NODE INSPECTOR", x + 10, TOOLBAR_H + 10, 0xFFB8FF72, false);
 
         int y = TOOLBAR_H + 30;
         int maxW = INSPECTOR_W - 20;
 
         if (project.selected_node == null) {
-            y = drawWrapped(graphics, "Select a node to see what it does.", x + 10, y, maxW, 0xFF9AA5B3);
+            y = drawWrapped(graphics, "Select a node to see what it does.", x + 10, y, maxW, 0xFFC7BEA0);
 
             y += 12;
             y = drawLegend(graphics, x + 10, y, maxW);
@@ -420,21 +419,21 @@ public final class DialogueNodeGraphScreen extends Screen {
         y += 18;
 
         if (project.selected_node.equals(project.definition.start_node)) {
-            graphics.drawString(font, "STARTS HERE", x + 10, y, 0xFF55E878, false);
+            graphics.drawString(font, "STARTS HERE", x + 10, y, 0xFF86D955, false);
             y += 17;
         }
 
-        y = drawWrapped(graphics, typeExplanation(type), x + 10, y, maxW, 0xFFB7C0CC);
+        y = drawWrapped(graphics, typeExplanation(type), x + 10, y, maxW, 0xFFE8E0C3);
 
         y += 10;
 
         switch (type) {
             case "choice" -> {
-                graphics.drawString(font, "PLAYER SEES:", x + 10, y, 0xFF67F0E6, false);
+                graphics.drawString(font, "PLAYER SEES:", x + 10, y, 0xFFA8F06A, false);
                 y += 14;
 
                 if (node.line != null) {
-                    y = drawWrapped(graphics, "Question: " + lineSummary(node.line), x + 10, y, maxW, 0xFFD2D8E0);
+                    y = drawWrapped(graphics, "Question: " + lineSummary(node.line), x + 10, y, maxW, 0xFFF0E8D0);
                 }
 
                 if (node.choices != null) {
@@ -442,7 +441,7 @@ public final class DialogueNodeGraphScreen extends Screen {
                         DialogueDefinition.Choice choice = node.choices.get(i);
                         String row = (i + 1) + ") " + choiceSummary(choice) + "  ->  " + destination(choice != null ? choice.goto_node : null);
 
-                        y = drawWrapped(graphics, row, x + 14, y + 2, maxW - 8, 0xFFBFEDEA);
+                        y = drawWrapped(graphics, row, x + 14, y + 2, maxW - 8, 0xFFECE5C9);
 
                         if (choice != null && choice.actions != null && !choice.actions.isEmpty()) {
                             y = drawWrapped(graphics, "   actions: " + actionsSummary(choice.actions), x + 14, y, maxW - 8, 0xFFA9C7A7);
@@ -456,24 +455,24 @@ public final class DialogueNodeGraphScreen extends Screen {
 
                 y += 5;
 
-                y = drawWrapped(graphics, "TRUE -> " + destination(node.next), x + 14, y, maxW - 8, 0xFF55E878);
+                y = drawWrapped(graphics, "TRUE -> " + destination(node.next), x + 14, y, maxW - 8, 0xFF86D955);
 
                 y = drawWrapped(graphics, "FALSE -> " + destination(node.else_node), x + 14, y, maxW - 8, 0xFFFF777D);
             }
 
             case "event" -> {
-                y = drawWrapped(graphics, "Actions: " + actionsSummary(node.actions), x + 10, y, maxW, 0xFFD5A7F0);
+                y = drawWrapped(graphics, "Actions: " + actionsSummary(node.actions), x + 10, y, maxW, 0xFFD8E36A);
 
-                y = drawWrapped(graphics, "Then continues to: " + destination(node.next), x + 10, y, maxW, 0xFFB7C0CC);
+                y = drawWrapped(graphics, "Then continues to: " + destination(node.next), x + 10, y, maxW, 0xFFE8E0C3);
             }
 
             case "end" ->
                     y = drawWrapped(graphics, "No output. The dialogue session ends here.", x + 10, y, maxW, 0xFFFF9B9B);
 
             default -> {
-                y = drawWrapped(graphics, "Text: " + lineSummary(node.line), x + 10, y, maxW, 0xFFD2D8E0);
+                y = drawWrapped(graphics, "Text: " + lineSummary(node.line), x + 10, y, maxW, 0xFFF0E8D0);
 
-                y = drawWrapped(graphics, "Next: " + destination(node.next), x + 10, y, maxW, 0xFFB7C0CC);
+                y = drawWrapped(graphics, "Next: " + destination(node.next), x + 10, y, maxW, 0xFFE8E0C3);
 
                 if (node.actions != null && !node.actions.isEmpty()) {
                     y = drawWrapped(graphics, "Actions on enter: " + actionsSummary(node.actions), x + 10, y, maxW, 0xFFA9C7A7);
@@ -483,17 +482,17 @@ public final class DialogueNodeGraphScreen extends Screen {
 
         if (y < height - 125) {
             y += 10;
-            drawWrapped(graphics, "Tip: click a colored output port on the node, then click a destination node. You do not need to type goto IDs manually.", x + 10, y, maxW, 0xFF7F8997);
+            drawWrapped(graphics, "Tip: click a colored output port on the node, then click a destination node. You do not need to type goto IDs manually.", x + 10, y, maxW, 0xFFA09A80);
         }
     }
 
     private int drawLegend(GuiGraphics graphics, int x, int y, int w) {
-        graphics.drawString(font, "VISUAL LANGUAGE", x, y, 0xFF6FF8E9, false);
+        graphics.drawString(font, "VISUAL LANGUAGE", x, y, 0xFFB8FF72, false);
         y += 15;
 
         String[] lines = {"LINE = show text, then continue", "CHOICE = player picks an option", "CONDITION = automatic TRUE/FALSE branch", "ACTIONS = change world/quest state, then continue", "END = finish dialogue"};
 
-        int[] colors = {0xFF9CCFE4, 0xFF67F0E6, 0xFFD8E36A, 0xFFD5A7F0, 0xFFFF9B9B};
+        int[] colors = {0xFFCFE6AE, 0xFFA8F06A, 0xFFD8E36A, 0xFFD8E36A, 0xFFFF9B9B};
 
         for (int i = 0; i < lines.length; i++) {
             y = drawWrapped(graphics, lines[i], x, y, w, colors[i]);
@@ -780,8 +779,8 @@ public final class DialogueNodeGraphScreen extends Screen {
         int y = screenY(p.y + portOffsetWorld(node, pendingLink.index));
 
         int color = switch (pendingLink.type) {
-            case "choice" -> 0xFF67F0E6;
-            case "condition" -> pendingLink.index == 0 ? 0xFF55E878 : 0xFFFF4D55;
+            case "choice" -> 0xFFA8F06A;
+            case "condition" -> pendingLink.index == 0 ? 0xFF86D955 : 0xFFFF4D55;
             default -> 0xFFFFD45A;
         };
 
@@ -860,11 +859,11 @@ public final class DialogueNodeGraphScreen extends Screen {
 
     private int nodeHeaderColor(String type) {
         return switch (type) {
-            case "choice" -> 0xFF146C70;
-            case "condition" -> 0xFF69782B;
-            case "event" -> 0xFF704C86;
+            case "choice" -> 0xFF3D7438;
+            case "condition" -> 0xFF778E43;
+            case "event" -> 0xFF566B3E;
             case "end" -> 0xFF7A3438;
-            default -> 0xFF24536C;
+            default -> 0xFF3F6438;
         };
     }
 

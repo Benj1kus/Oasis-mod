@@ -3,7 +3,6 @@ package com.benji.oasiso.dialogue.editor;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public final class DialogueNodeEditorScreen extends Screen {
+public final class DialogueNodeEditorScreen extends DialogueRetroScreen {
 
     private static final List<String> NODE_TYPES = List.of("line", "choice", "condition", "event", "end");
 
@@ -92,19 +91,19 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         updateContentVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
     }
 
     private void buildFixedHeader(DialogueDefinition.Node node) {
         graphicsSafeNoop();
 
-        EditBox idBox = new EditBox(font, left + 16, 42, innerW - 92, 20, Component.literal("Node ID"));
+        EditBox idBox = new DialogueRetroEditBox(font, left + 16, 42, innerW - 92, 20, Component.literal("Node ID"));
 
         idBox.setMaxLength(96);
         idBox.setValue(nodeId);
         addRenderableWidget(idBox);
 
-        addRenderableWidget(Button.builder(Component.literal("Rename"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Rename"), button -> {
             String requested = idBox.getValue();
 
             if (project.renameNode(nodeId, requested)) {
@@ -113,7 +112,7 @@ public final class DialogueNodeEditorScreen extends Screen {
             }
         }).bounds(left + 20 + innerW - 92, 42, 88, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Type: " + node.type), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Type: " + node.type), button -> {
             node.type = next(node.type, NODE_TYPES);
             normalizeNodeForType(node);
             selectedChoice = 0;
@@ -121,7 +120,7 @@ public final class DialogueNodeEditorScreen extends Screen {
             rebuild();
         }).bounds(left + 16, 72, innerW / 2 - 4, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(nodeId.equals(project.definition.start_node) ? "START NODE ✓" : "Set as START"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(nodeId.equals(project.definition.start_node) ? "START NODE ✓" : "Set as START"), button -> {
             project.definition.start_node = nodeId;
             project.definition.graph_enabled = true;
             rebuild();
@@ -140,7 +139,7 @@ public final class DialogueNodeEditorScreen extends Screen {
         DialogueDefinition.Line line = node.line;
         boolean literal = line.literal != null;
 
-        y = addInfoCard(y, "SHOW TEXT → NEXT", "The player sees one normal dialogue line. After hold_ticks, the server follows NEXT.", 0xFF24536C);
+        y = addInfoCard(y, "SHOW TEXT → NEXT", "The player sees one normal dialogue line. After hold_ticks, the server follows NEXT.", 0xFF3F6438);
 
         y = addFullButton(y, "Text mode: " + (literal ? "LITERAL" : "LANG"), () -> {
             if (literal) {
@@ -213,9 +212,9 @@ public final class DialogueNodeEditorScreen extends Screen {
         DialogueDefinition.Line prompt = node.line;
         boolean promptLiteral = prompt.literal != null;
 
-        y = addInfoCard(y, "PLAYER CHOOSES", "The dialogue pauses here. The prompt is shown first, then the player selects one answer. Each answer goes to its own node.", 0xFF146C70);
+        y = addInfoCard(y, "PLAYER CHOOSES", "The dialogue pauses here. The prompt is shown first, then the player selects one answer. Each answer goes to its own node.", 0xFF3D7438);
 
-        y = addSectionTitle(y, "QUESTION / PROMPT", 0xFF67F0E6);
+        y = addSectionTitle(y, "QUESTION / PROMPT", 0xFFA8F06A);
 
         y = addFullButton(y, "Prompt mode: " + (promptLiteral ? "LITERAL" : "LANG"), () -> {
             if (promptLiteral) {
@@ -266,7 +265,7 @@ public final class DialogueNodeEditorScreen extends Screen {
         y = addFullButton(y, "Actions before answers appear (" + node.actions.size() + ")", () -> minecraft.setScreen(new DialogueActionListScreen(this, project, node.actions, "CHOICE enter actions • " + nodeId)));
 
         y += 4;
-        y = addSectionTitle(y, "ANSWERS", 0xFF67F0E6);
+        y = addSectionTitle(y, "ANSWERS", 0xFFA8F06A);
 
         y = addChoiceNavigator(node, y);
 
@@ -307,12 +306,12 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         int rowY = y;
 
-        addContentWidget(Button.builder(Component.literal("If unavailable: " + nullToDefault(choice.when_unavailable, "hide")), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("If unavailable: " + nullToDefault(choice.when_unavailable, "hide")), b -> {
             choice.when_unavailable = next(nullToDefault(choice.when_unavailable, "hide"), UNAVAILABLE_MODES);
             rebuild();
         }).bounds(left + 16, rowY, innerW / 2 - 4, 20).build());
 
-        addContentWidget(Button.builder(Component.literal("Conditions (" + conditions + ")"), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Conditions (" + conditions + ")"), b -> {
             if (choice.conditions == null) {
                 choice.conditions = new ArrayList<>();
             }
@@ -320,7 +319,7 @@ public final class DialogueNodeEditorScreen extends Screen {
             minecraft.setScreen(new DialogueConditionListScreen(this, project, choice.conditions, "Choice availability"));
         }).bounds(left + 20 + innerW / 2, rowY, innerW / 2 - 4, 20).build());
 
-        labels.add(new Label("hide = remove the answer; disable = show it greyed out", left + 16, rowY + 23, 0xFF87909D));
+        labels.add(new Label("hide = remove the answer; disable = show it greyed out", left + 16, rowY + 23, 0xFFABA389));
 
         y += 42;
 
@@ -330,7 +329,7 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         y = addFullButton(y, "Actions when THIS answer is chosen (" + choice.actions.size() + ")", () -> minecraft.setScreen(new DialogueActionListScreen(this, project, choice.actions, "Answer " + (selectedChoice + 1) + " actions • " + nodeId)));
 
-        y = addInfoCard(y, "ORDER OF EXECUTION", "The server checks this answer's Conditions again, runs all Actions in order, then follows GOES TO.", 0xFF31585B);
+        y = addInfoCard(y, "ORDER OF EXECUTION", "The server checks this answer's Conditions again, runs all Actions in order, then follows GOES TO.", 0xFF4A6F3F);
 
         return y;
     }
@@ -346,26 +345,26 @@ public final class DialogueNodeEditorScreen extends Screen {
         int addW = 74;
         int removeW = 74;
 
-        addContentWidget(Button.builder(Component.literal("<"), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), b -> {
             selectedChoice = Math.max(0, selectedChoice - 1);
             rebuild();
         }).bounds(x, y, prevW, h).build());
 
         x += prevW + gap;
 
-        addContentWidget(Button.builder(Component.literal("Answer " + (selectedChoice + 1) + " / " + node.choices.size()), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Answer " + (selectedChoice + 1) + " / " + node.choices.size()), b -> {
         }).bounds(x, y, labelW, h).build());
 
         x += labelW + gap;
 
-        addContentWidget(Button.builder(Component.literal(">"), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), b -> {
             selectedChoice = Math.min(node.choices.size() - 1, selectedChoice + 1);
             rebuild();
         }).bounds(x, y, nextW, h).build());
 
         x += nextW + gap;
 
-        addContentWidget(Button.builder(Component.literal("+ Add"), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("+ Add"), b -> {
             DialogueDefinition.Choice choice = new DialogueDefinition.Choice();
 
             choice.literal = "New choice";
@@ -377,7 +376,7 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         x += addW + gap;
 
-        addContentWidget(Button.builder(Component.literal("- Remove"), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("- Remove"), b -> {
             if (node.choices.size() > 1) {
                 node.choices.remove(selectedChoice);
 
@@ -397,11 +396,11 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         int conditionCount = choice.conditions != null ? choice.conditions.size() : 0;
 
-        labels.add(new Label("PLAYER SEES:  [" + (selectedChoice + 1) + "] " + answer, left + 24, y + 8, 0xFFBFEDEA));
+        labels.add(new Label("PLAYER SEES:  [" + (selectedChoice + 1) + "] " + answer, left + 24, y + 8, 0xFFECE5C9));
         labels.add(new Label("when clicked  →  " + target, left + 24, y + 22, 0xFFFFFFFF));
-        labels.add(new Label(conditionCount == 0 ? "availability: always" : "availability: " + conditionCount + " condition" + (conditionCount == 1 ? "" : "s"), left + 24, y + 36, conditionCount == 0 ? 0xFF8E9AA8 : 0xFFFFD45A));
+        labels.add(new Label(conditionCount == 0 ? "availability: always" : "availability: " + conditionCount + " condition" + (conditionCount == 1 ? "" : "s"), left + 24, y + 36, conditionCount == 0 ? 0xFFBDB497 : 0xFFFFD45A));
 
-        cards.add(new Card(left + 16, y, innerW, 50, 0xC0122028, 0xFF146C70));
+        cards.add(new Card(left + 16, y, innerW, 50, 0xC0152516, 0xFF3D7438));
 
         return y + 54;
     }
@@ -413,7 +412,7 @@ public final class DialogueNodeEditorScreen extends Screen {
             node.conditions.add(new DialogueDefinition.Condition());
         }
 
-        y = addInfoCard(y, "AUTOMATIC IF / ELSE", "This node is invisible in-game. The server checks the rules immediately: TRUE follows the green output, FALSE follows the red output.", 0xFF69782B);
+        y = addInfoCard(y, "AUTOMATIC IF / ELSE", "This node is invisible in-game. The server checks the rules immediately: TRUE follows the green output, FALSE follows the red output.", 0xFF778E43);
         y = addConditionPreviewCard(node, y);
 
         if (node.actions == null) node.actions = new ArrayList<>();
@@ -428,10 +427,10 @@ public final class DialogueNodeEditorScreen extends Screen {
 
     private int addConditionPreviewCard(DialogueDefinition.Node node, int y) {
         labels.add(new Label("IF  " + conditionsSummary(node.conditions), left + 24, y + 8, 0xFFD8E36A));
-        labels.add(new Label("TRUE  →  " + destination(node.next), left + 24, y + 24, 0xFF55E878));
+        labels.add(new Label("TRUE  →  " + destination(node.next), left + 24, y + 24, 0xFF86D955));
         labels.add(new Label("FALSE →  " + destination(node.else_node), left + 24, y + 40, 0xFFFF777D));
 
-        cards.add(new Card(left + 16, y, innerW, 56, 0xC01B2114, 0xFF69782B));
+        cards.add(new Card(left + 16, y, innerW, 56, 0xC01B2114, 0xFF778E43));
 
         return y + 60;
     }
@@ -439,9 +438,9 @@ public final class DialogueNodeEditorScreen extends Screen {
     private int buildEventNode(DialogueDefinition.Node node, int y) {
         if (node.actions == null) node.actions = new ArrayList<>();
 
-        y = addInfoCard(y, "DO ACTIONS → THEN", "This node is invisible. It runs its Actions from top to bottom on the server, then immediately follows THEN. Use it for rewards, quest state, scores, sounds, particles, commands, teleports or Java events.", 0xFF704C86);
+        y = addInfoCard(y, "DO ACTIONS → THEN", "This node is invisible. It runs its Actions from top to bottom on the server, then immediately follows THEN. Use it for rewards, quest state, scores, sounds, particles, commands, teleports or Java events.", 0xFF566B3E);
         y = addFullButton(y, "Edit actions (" + node.actions.size() + ")", () -> minecraft.setScreen(new DialogueActionListScreen(this, project, node.actions, "ACTION node • " + nodeId)));
-        y = addInfoCard(y, "CURRENT ACTIONS", actionsSummary(node.actions), 0xFF51375F);
+        y = addInfoCard(y, "CURRENT ACTIONS", actionsSummary(node.actions), 0xFF49563B);
         y = addTextField(y, "THEN → node id  (grey output in Node Graph)", nullToEmpty(node.next), 96, value -> node.next = blankToNull(value));
 
         return y;
@@ -461,14 +460,14 @@ public final class DialogueNodeEditorScreen extends Screen {
         List<String> wrapped = wrap(text, innerW - 32);
         int height = Math.max(52, 34 + wrapped.size() * 12);
 
-        cards.add(new Card(left + 16, y, innerW, height, 0xD018202A, color));
+        cards.add(new Card(left + 16, y, innerW, height, 0xD01B2517, color));
 
         labels.add(new Label(title, left + 24, y + 8, 0xFFFFFFFF));
 
         int textY = y + 24;
 
         for (String line : wrapped) {
-            labels.add(new Label(line, left + 24, textY, 0xFFB7C0CC));
+            labels.add(new Label(line, left + 24, textY, 0xFFE8E0C3));
             textY += 12;
         }
 
@@ -482,17 +481,17 @@ public final class DialogueNodeEditorScreen extends Screen {
     }
 
     private int addFullButton(int y, String text, Runnable action) {
-        addContentWidget(Button.builder(Component.literal(text), b -> action.run()).bounds(left + 16, y, innerW, 20).build());
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(text), b -> action.run()).bounds(left + 16, y, innerW, 20).build());
 
         return y + 32;
     }
 
     private int addTextField(int y, String label, String value, int maxLength, Consumer<String> responder) {
-        labels.add(new Label(label, left + 16, y, 0xFF9EA8B5));
+        labels.add(new Label(label, left + 16, y, 0xFFCFC6A6));
 
         y += 12;
 
-        EditBox box = new EditBox(font, left + 16, y, innerW, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, innerW, 20, Component.literal(label));
 
         box.setMaxLength(maxLength);
         box.setValue(value != null ? value : "");
@@ -534,7 +533,7 @@ public final class DialogueNodeEditorScreen extends Screen {
     private int addNullableCycleButton(int y, String label, String current, List<String> values, Consumer<String> setter) {
         String shown = current == null || current.isBlank() ? "INHERIT" : current;
 
-        addContentWidget(Button.builder(Component.literal(label + ": " + shown), b -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(label + ": " + shown), b -> {
             if (current == null || current.isBlank()) {
                 setter.accept(values.get(0));
             } else {
@@ -558,11 +557,11 @@ public final class DialogueNodeEditorScreen extends Screen {
     }
 
     private int addAssetField(int y, String label, String value, String extension, boolean sound, Consumer<String> setter) {
-        labels.add(new Label(label, left + 16, y, 0xFF9EA8B5));
+        labels.add(new Label(label, left + 16, y, 0xFFCFC6A6));
 
         y += 12;
 
-        EditBox box = new EditBox(font, left + 16, y, innerW - 88, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, innerW - 88, 20, Component.literal(label));
 
         box.setMaxLength(512);
         box.setValue(value != null ? value : "");
@@ -570,7 +569,7 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         addContentWidget(box);
 
-        addContentWidget(Button.builder(Component.literal("Browse"), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), extension, path -> importAsset(path, sound, setter)))).bounds(left + innerW - 68, y, 84, 20).build());
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Browse"), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), extension, path -> importAsset(path, sound, setter)))).bounds(left + innerW - 68, y, 84, 20).build());
 
         return y + 32;
     }
@@ -641,11 +640,11 @@ public final class DialogueNodeEditorScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 16, left + panelW, height - 8, 0xF010151D);
-        graphics.fill(left, 104, left + panelW, 105, 0xFF39414C);
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, 16, left + panelW, height - 8, 0xF0121710);
+        graphics.fill(left, 104, left + panelW, 105, 0xFF445438);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
-        graphics.drawString(font, "NODE EDITOR  •  " + nodeId, left + 16, 24, 0xFF6FF8E9, false);
+        graphics.drawString(font, "NODE EDITOR  •  " + nodeId, left + 16, 24, 0xFFB8FF72, false);
 
         DialogueDefinition.Node node = project.definition.nodes.get(nodeId);
 
@@ -682,7 +681,7 @@ public final class DialogueNodeEditorScreen extends Screen {
         if (contentHeight > contentBottom - contentTop) {
             String hint = "wheel: scroll  " + Math.round(100.0D * scrollOffset / Math.max(1, contentHeight - (contentBottom - contentTop))) + "%";
 
-            graphics.drawString(font, hint, left + panelW - font.width(hint) - 18, height - 42, 0xFF697482, false);
+            graphics.drawString(font, hint, left + panelW - font.width(hint) - 18, height - 42, 0xFF8C856E, false);
         }
     }
 
@@ -708,11 +707,11 @@ public final class DialogueNodeEditorScreen extends Screen {
 
     private int typeColor(String type) {
         return switch (type) {
-            case "choice" -> 0xFF67F0E6;
+            case "choice" -> 0xFFA8F06A;
             case "condition" -> 0xFFD8E36A;
-            case "event" -> 0xFFD5A7F0;
+            case "event" -> 0xFFD8E36A;
             case "end" -> 0xFFFF9B9B;
-            default -> 0xFF9CCFE4;
+            default -> 0xFFCFE6AE;
         };
     }
 

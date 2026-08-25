@@ -48,6 +48,7 @@ public final class DialogueEditorPreview {
     public static Transform render(DialogueEditorProject project, GuiGraphics graphics, int x, int y, int width, int height, int ticks, float partialTick) {
         return render(project, graphics, x, y, width, height, ticks, partialTick, false);
     }
+
     public static Transform render(DialogueEditorProject project, GuiGraphics graphics, int x, int y, int width, int height, int ticks, float partialTick, boolean forceSelectedLegacyLine) {
         project.normalize();
 
@@ -59,8 +60,9 @@ public final class DialogueEditorPreview {
 
         DialogueDefinition.Line line = forceSelectedLegacyLine ? project.currentLine() : project.previewLine();
 
-        graphics.fill(x, y, x + width, y + height, 0xE0090B10);
-        graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, 0xFF121720);
+        DialogueRetroTheme.drawPanel(graphics, x, y, x + width, y + height);
+        DialogueRetroTheme.drawTitleBar(graphics, x + 3, y + 3, x + width - 3, 24);
+        DialogueRetroTheme.drawDarkInset(graphics, x + 6, y + 30, x + width - 6, y + height - 6);
 
         float scale = Math.min((width - 28) / (float) layout.canvas_width, (height - 52) / (float) layout.canvas_height);
         scale = Math.max(0.2F, scale);
@@ -68,14 +70,14 @@ public final class DialogueEditorPreview {
         float originY = y + 28 + (height - 38 - layout.canvas_height * scale) * 0.5F;
         Transform transform = new Transform(originX, originY, scale, layout.canvas_width, layout.canvas_height);
 
-        graphics.drawString(Minecraft.getInstance().font, "LIVE DIALOGUE PREVIEW", x + 10, y + 9, 0xFF67F0E6, false);
+        graphics.drawString(Minecraft.getInstance().font, "LIVE DIALOGUE PREVIEW", x + 10, y + 9, 0xFFA8F06A, false);
         String previewLabel = nodePreview ? "Node " + project.selected_node + "  |  " + project.dialogueId() : "Line " + (project.selected_line + 1) + "/" + definition.lines.size() + "  |  " + project.dialogueId();
 
         Font headerFont = Minecraft.getInstance().font;
 
         previewLabel = ellipsize(headerFont, previewLabel, Math.max(20, width - 20));
 
-        graphics.drawString(headerFont, previewLabel, x + 10, y + 20, 0xFF87909D, false);
+        graphics.drawString(headerFont, previewLabel, x + 10, y + 20, 0xFFABA389, false);
 
         graphics.enableScissor(x + 1, y + 28, x + width - 1, y + height - 1);
 
@@ -327,21 +329,9 @@ public final class DialogueEditorPreview {
             int outlineRgb = outlineColor(definition, line, glyph, maxWidth, time, rich);
             float outlineThickness = outlineThickness(definition, line, rich);
 
-            float glyphToGuiScale =
-                    previewCanvasScale
-                            * layout.text_scale
-                            * glyphScale;
+            float glyphToGuiScale = previewCanvasScale * layout.text_scale * glyphScale;
 
-            DialogueTextRenderUtil.drawGlyph(
-                    graphics,
-                    font,
-                    glyph.character,
-                    0xFF000000 | rgb,
-                    0xFF000000 | outlineRgb,
-                    outlineThickness,
-                    glyphStyle,
-                    glyphToGuiScale
-            );
+            DialogueTextRenderUtil.drawGlyph(graphics, font, glyph.character, 0xFF000000 | rgb, 0xFF000000 | outlineRgb, outlineThickness, glyphStyle, glyphToGuiScale);
 
             glyphPose.popPose();
         }
@@ -515,16 +505,7 @@ public final class DialogueEditorPreview {
         return ((value & 1023L) / 1023.0F - 0.5F) * 1.6F;
     }
 
-    private static List<Glyph> layoutGlyphs(
-            Font font,
-            DialogueDefinition definition,
-            DialogueDefinition.Line line,
-            String text,
-            String locale,
-            DialogueMarkdown.Result markdown,
-            int maxWidth,
-            int lineHeight
-    ) {
+    private static List<Glyph> layoutGlyphs(Font font, DialogueDefinition definition, DialogueDefinition.Line line, String text, String locale, DialogueMarkdown.Result markdown, int maxWidth, int lineHeight) {
         List<Glyph> result = new ArrayList<>();
         int x = 0;
         int y = 0;
@@ -553,7 +534,8 @@ public final class DialogueEditorPreview {
             }
 
             int wordEnd = i;
-            while (wordEnd < text.length() && !Character.isWhitespace(text.charAt(wordEnd)) && text.charAt(wordEnd) != '\n') wordEnd++;
+            while (wordEnd < text.length() && !Character.isWhitespace(text.charAt(wordEnd)) && text.charAt(wordEnd) != '\n')
+                wordEnd++;
 
             int wordWidth = 0;
             for (int j = i; j < wordEnd; j++) {
@@ -587,13 +569,7 @@ public final class DialogueEditorPreview {
 
     private static DialogueTextRenderUtil.GlyphStyle effectiveGlyphStyle(DialogueDefinition definition, DialogueDefinition.Line line, DialogueMarkdown.Result markdown, int index, DialogueRichTextUtil.ResolvedStyle rich) {
         DialogueMarkdown.CharStyle md = markdown.styleAt(index);
-        return new DialogueTextRenderUtil.GlyphStyle(
-                rich.font != null ? rich.font : line.text_font != null ? line.text_font : definition.text_font,
-                rich.bold != null ? rich.bold : md.bold(),
-                rich.italic != null ? rich.italic : md.italic(),
-                rich.underline != null ? rich.underline : md.underline(),
-                rich.strikethrough != null ? rich.strikethrough : md.strikethrough()
-        );
+        return new DialogueTextRenderUtil.GlyphStyle(rich.font != null ? rich.font : line.text_font != null ? line.text_font : definition.text_font, rich.bold != null ? rich.bold : md.bold(), rich.italic != null ? rich.italic : md.italic(), rich.underline != null ? rich.underline : md.underline(), rich.strikethrough != null ? rich.strikethrough : md.strikethrough());
     }
 
     private static boolean markdownEnabled(DialogueDefinition definition, DialogueDefinition.Line line) {

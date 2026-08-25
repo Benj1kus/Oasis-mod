@@ -1,7 +1,6 @@
 package com.benji.oasiso.dialogue.editor;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -27,7 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class DialogueEditorRegistryPickerScreen extends Screen {
+public final class DialogueEditorRegistryPickerScreen extends DialogueRetroScreen {
 
     public enum Kind {ENTITY, BLOCK, ITEM}
 
@@ -68,44 +67,30 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
     protected void init() {
         int listWidth = Math.min(420, width / 2);
 
-        /*
-         * Search row.
-         */
-        EditBox searchBox = new EditBox(font, 12, 10, listWidth - 94, 20, Component.literal("Search registry"));
+        EditBox searchBox = new DialogueRetroEditBox(font, 12, 10, listWidth - 94, 20, Component.literal("Search registry"));
 
         searchBox.setValue(search);
         searchBox.setResponder(value -> search = value != null ? value : "");
         addRenderableWidget(searchBox);
 
-        addRenderableWidget(Button.builder(Component.literal("Search"), button -> rebuild(0)).bounds(listWidth - 76, 10, 64, 20).build());
-
-        /*
-         * Automatically generated mod/namespace filter.
-         *
-         * Example:
-         * ALL -> minecraft -> netherman -> oasiso -> ...
-         */
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Search"), button -> rebuild(0)).bounds(listWidth - 76, 10, 64, 20).build());
         int filterY = 36;
 
-        addRenderableWidget(Button.builder(Component.literal("<"), button -> cycleNamespace(-1)).bounds(12, filterY, 28, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), button -> cycleNamespace(-1)).bounds(12, filterY, 28, 20).build());
 
         String filterLabel = ALL_NAMESPACES.equals(namespaceFilter) ? "Mod: ALL" : "Mod: " + modDisplayName(namespaceFilter) + " [" + namespaceFilter + "]";
 
-        addRenderableWidget(Button.builder(Component.literal(trimToWidth(filterLabel, listWidth - 150)), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(trimToWidth(filterLabel, listWidth - 150)), button -> {
             namespaceFilter = ALL_NAMESPACES;
             rebuild(0);
         }).bounds(44, filterY, listWidth - 128, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(">"), button -> cycleNamespace(1)).bounds(listWidth - 80, filterY, 28, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), button -> cycleNamespace(1)).bounds(listWidth - 80, filterY, 28, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("ALL"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("ALL"), button -> {
             namespaceFilter = ALL_NAMESPACES;
             rebuild(0);
         }).bounds(listWidth - 48, filterY, 36, 20).build());
-
-        /*
-         * Registry rows.
-         */
         List<ResourceLocation> ids = ids();
 
         int rows = rowsPerPage();
@@ -125,7 +110,7 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
 
             String display = (current ? "> " : "") + id;
 
-            addRenderableWidget(Button.builder(Component.literal(display), button -> {
+            addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(display), button -> {
                 selected = id.toString();
                 previewEntity = null;
             }).bounds(12, y, listWidth - 24, 20).build());
@@ -133,14 +118,14 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
 
         int footerY = height - 29;
 
-        addRenderableWidget(Button.builder(Component.literal("<"), button -> rebuild(Math.max(0, page - 1))).bounds(12, footerY, 30, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), button -> rebuild(Math.max(0, page - 1))).bounds(12, footerY, 30, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal((page + 1) + "/" + pages + "  (" + ids.size() + ")"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal((page + 1) + "/" + pages + "  (" + ids.size() + ")"), button -> {
         }).bounds(46, footerY, 112, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(">"), button -> rebuild(Math.min(pages - 1, page + 1))).bounds(162, footerY, 30, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), button -> rebuild(Math.min(pages - 1, page + 1))).bounds(162, footerY, 30, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Use selected"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Use selected"), button -> {
             minecraft.setScreen(parent);
 
             if (selected != null && !selected.isBlank()) {
@@ -148,7 +133,7 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
             }
         }).bounds(width - 230, footerY, 104, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), button -> minecraft.setScreen(parent)).bounds(width - 118, footerY, 104, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), button -> minecraft.setScreen(parent)).bounds(width - 118, footerY, 104, 20).build());
     }
 
     private int rowsPerPage() {
@@ -376,10 +361,10 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
 
         int footerTop = height - FOOTER_HEIGHT;
 
-        graphics.fill(6, 62, listWidth + 2, footerTop - 2, 0x6810141C);
-        graphics.fill(0, footerTop, width, height, 0xD40B0F15);
-        graphics.fill(0, footerTop, width, footerTop + 1, 0xFF39414C);
-        graphics.fill(previewX, 42, width - 16, footerTop - 4, 0xA0101218);
+        graphics.fill(6, 62, listWidth + 2, footerTop - 2, 0x6811170E);
+        graphics.fill(0, footerTop, width, height, 0xD40C100A);
+        graphics.fill(0, footerTop, width, footerTop + 1, 0xFF445438);
+        graphics.fill(previewX, 42, width - 16, footerTop - 4, 0xA010150D);
 
         String selectedName = selected != null ? selected : "Nothing selected";
 
@@ -395,9 +380,9 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
 
                 String mod = modDisplayName(id.getNamespace());
 
-                graphics.drawString(font, trimToWidth("Name: " + name, Math.max(40, previewW - 16)), previewX + 8, 80, 0xFFD8DEE7, false);
+                graphics.drawString(font, trimToWidth("Name: " + name, Math.max(40, previewW - 16)), previewX + 8, 80, 0xFFECE4CB, false);
 
-                graphics.drawString(font, trimToWidth("Mod: " + mod + " [" + id.getNamespace() + "]", Math.max(40, previewW - 16)), previewX + 8, 94, 0xFF6FF8E9, false);
+                graphics.drawString(font, trimToWidth("Mod: " + mod + " [" + id.getNamespace() + "]", Math.max(40, previewW - 16)), previewX + 8, 94, 0xFFB8FF72, false);
 
                 if (kind == Kind.ENTITY) {
                     renderEntityPreview(graphics, id, previewX, previewW, mouseX, mouseY);
@@ -408,7 +393,7 @@ public final class DialogueEditorRegistryPickerScreen extends Screen {
                 }
             }
         }
-        graphics.drawString(font, "Loaded namespaces: " + Math.max(0, namespaces().size() - 1), 12, 60, 0xFF7F8997, false);
+        graphics.drawString(font, "Loaded namespaces: " + Math.max(0, namespaces().size() - 1), 12, 60, 0xFFA09A80, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

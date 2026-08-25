@@ -7,7 +7,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -30,7 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public final class DialogueZoneWorldEditScreen extends Screen {
+public final class DialogueZoneWorldEditScreen extends DialogueRetroScreen {
 
     public enum EditMode {MOVE, SIZE, TEXTURE_MOVE, TEXTURE_SCALE, TEXTURE_ROTATE}
 
@@ -135,57 +134,57 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         int row1 = Math.max(8, height - 38);
         int row2 = row1 + buttonH + 2;
 
-        addRenderableWidget(Button.builder(Component.literal("Apply"), b -> applyAndReturn()).bounds(x, row1, 40, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Apply"), b -> applyAndReturn()).bounds(x, row1, 40, buttonH).build());
         x += 40 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> cancelAndReturn()).bounds(x, row1, 42, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), b -> cancelAndReturn()).bounds(x, row1, 42, buttonH).build());
         x += 42 + gap;
 
-        modeButton = addRenderableWidget(Button.builder(modeText(), b -> cycleMode()).bounds(x, row1, 56, buttonH).build());
+        modeButton = addRenderableWidget(DialogueRetroButton.retroBuilder(modeText(), b -> cycleMode()).bounds(x, row1, 56, buttonH).build());
         x += 56 + gap;
 
-        snapButton = addRenderableWidget(Button.builder(snapText(), b -> cycleSnap()).bounds(x, row1, 54, buttonH).build());
+        snapButton = addRenderableWidget(DialogueRetroButton.retroBuilder(snapText(), b -> cycleSnap()).bounds(x, row1, 54, buttonH).build());
 
         x = 8;
-        addRenderableWidget(Button.builder(Component.literal("P Cur"), b -> placeAtCursor()).bounds(x, row2, 44, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("P Cur"), b -> placeAtCursor()).bounds(x, row2, 44, buttonH).build());
         x += 44 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("F Me"), b -> placeAtPlayer()).bounds(x, row2, 42, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("F Me"), b -> placeAtPlayer()).bounds(x, row2, 42, buttonH).build());
         x += 42 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("R Find"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("R Find"), b -> {
             resolveAnchorNow();
             status = anchorResolved() ? "Anchor re-resolved" : "Anchor target is not currently visible";
         }).bounds(x, row2, 48, buttonH).build());
         x += 48 + gap;
 
-        markerButton = addRenderableWidget(Button.builder(markerText(), b -> toggleMarkerPlacement()).bounds(x, row2, 52, buttonH).build());
+        markerButton = addRenderableWidget(DialogueRetroButton.retroBuilder(markerText(), b -> toggleMarkerPlacement()).bounds(x, row2, 52, buttonH).build());
         x += 52 + gap;
 
-        defaultVisualButton = addRenderableWidget(Button.builder(defaultVisualText(), b -> toggleDefaultVisual()).bounds(x, row2, 62, buttonH).build());
+        defaultVisualButton = addRenderableWidget(DialogueRetroButton.retroBuilder(defaultVisualText(), b -> toggleDefaultVisual()).bounds(x, row2, 62, buttonH).build());
         x += 62 + gap;
 
-        textureFitButton = addRenderableWidget(Button.builder(textureFitText(), b -> toggleTextureFit()).bounds(x, row2, 62, buttonH).build());
+        textureFitButton = addRenderableWidget(DialogueRetroButton.retroBuilder(textureFitText(), b -> toggleTextureFit()).bounds(x, row2, 62, buttonH).build());
         x += 62 + gap;
 
-        textureModeButton = addRenderableWidget(Button.builder(textureModeText(), b -> cycleTextureMode()).bounds(x, row2, 78, buttonH).build());
+        textureModeButton = addRenderableWidget(DialogueRetroButton.retroBuilder(textureModeText(), b -> cycleTextureMode()).bounds(x, row2, 78, buttonH).build());
 
         int row3 = Math.max(8, row1 - buttonH - 2);
         x = 8;
 
-        addRenderableWidget(Button.builder(Component.literal("Tex Move"), b -> setMode(EditMode.TEXTURE_MOVE)).bounds(x, row3, 58, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Tex Move"), b -> setMode(EditMode.TEXTURE_MOVE)).bounds(x, row3, 58, buttonH).build());
         x += 58 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("Tex Scale"), b -> setMode(EditMode.TEXTURE_SCALE)).bounds(x, row3, 62, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Tex Scale"), b -> setMode(EditMode.TEXTURE_SCALE)).bounds(x, row3, 62, buttonH).build());
         x += 62 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("Tex Rotate"), b -> setMode(EditMode.TEXTURE_ROTATE)).bounds(x, row3, 66, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Tex Rotate"), b -> setMode(EditMode.TEXTURE_ROTATE)).bounds(x, row3, 66, buttonH).build());
         x += 66 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("Reset Tex"), b -> resetTextureTransform()).bounds(x, row3, 60, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Reset Tex"), b -> resetTextureTransform()).bounds(x, row3, 60, buttonH).build());
         x += 60 + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("H HUD"), b -> toggleUi()).bounds(x, row3, 48, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("H HUD"), b -> toggleUi()).bounds(x, row3, 48, buttonH).build());
 
         resolveAnchorNow();
     }
@@ -291,7 +290,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             renderHud(graphics);
             super.render(graphics, mouseX, mouseY, partialTick);
         } else {
-            graphics.drawString(font, "Texture gizmo | 1 move  2 scale  3 rotate XYZ | 4 mode  5 stretch/repeat | 0 reset | H HUD", 8, 8, 0xFFE3F7FF, true);
+            graphics.drawString(font, "Texture gizmo | 1 move  2 scale  3 rotate XYZ | 4 mode  5 stretch/repeat | 0 reset | H HUD", 8, 8, 0xFFFFF7DD, true);
         }
     }
 
@@ -304,15 +303,15 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         int panelH = 66;
         int panelY = Math.max(8, height - 128);
 
-        graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0x9A10141C);
-        graphics.fill(panelX + 1, panelY + 1, panelX + panelW - 1, panelY + panelH - 1, 0x9A0B1017);
+        graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0x9A11170E);
+        graphics.fill(panelX + 1, panelY + 1, panelX + panelW - 1, panelY + panelH - 1, 0x9A0C110A);
 
         String anchorState = anchorResolved() ? "OK" : "?";
         int anchorColor = anchorResolved() ? 0xFF7FEA9A : 0xFFFFAA55;
 
         graphics.drawString(font, "ZONE EDIT  " + modeLabel() + "  " + normalizeShape(trigger.shape) + "  A:" + anchorState, panelX + 5, panelY + 5, anchorColor, false);
 
-        graphics.drawString(font, String.format(Locale.ROOT, "XYZ %.1f  %.1f  %.1f", center.x, center.y, center.z), panelX + 5, panelY + 15, 0xFFD9E1EA, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "XYZ %.1f  %.1f  %.1f", center.x, center.y, center.z), panelX + 5, panelY + 15, 0xFFF5EDD4, false);
 
         String dimensions = switch (normalizeShape(trigger.shape)) {
             case "sphere" -> String.format(Locale.ROOT, "R %.2f", trigger.radius);
@@ -349,10 +348,10 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
         String shownStatus = status != null ? status : "Ready";
         if (shownStatus.length() > 34) shownStatus = shownStatus.substring(0, 33) + "…";
-        graphics.drawString(font, shownStatus, panelX + 5, panelY + 37, 0xFF65C7FF, false);
+        graphics.drawString(font, shownStatus, panelX + 5, panelY + 37, 0xFFB8FF72, false);
 
-        graphics.drawString(font, "G zone move | T zone size | 1/2/3 texture", panelX + 5, panelY + 49, 0xFF8EA2B6, false);
-        graphics.drawString(font, "H HUD | V snap | M marker | Enter apply", panelX + 5, panelY + 57, markerPlacementMode ? 0xFFFF82D8 : 0xFF8EA2B6, false);
+        graphics.drawString(font, "G zone move | T zone size | 1/2/3 texture", panelX + 5, panelY + 49, 0xFFC1B89B, false);
+        graphics.drawString(font, "H HUD | V snap | M marker | Enter apply", panelX + 5, panelY + 57, markerPlacementMode ? 0xFFB8FF72 : 0xFFC1B89B, false);
     }
 
     @Override

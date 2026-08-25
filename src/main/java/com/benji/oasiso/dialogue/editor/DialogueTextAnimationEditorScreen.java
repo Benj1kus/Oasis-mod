@@ -4,9 +4,7 @@ import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import com.benji.oasiso.dialogue.text.DialogueTextRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -17,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.DoubleConsumer;
 
-public final class DialogueTextAnimationEditorScreen extends Screen {
+public final class DialogueTextAnimationEditorScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private final DialogueEditorProject project;
@@ -90,7 +88,7 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
         y += 4;
 
-        addScrollableWidget(Button.builder(Component.literal("Reset animation parameters to engine defaults"), button -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Reset animation parameters to engine defaults"), button -> {
             region.animation = new DialogueDefinition.TextAnimation();
 
             rebuild();
@@ -103,7 +101,7 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
         updateVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> {
             DialogueEditorHistory.checkpoint(project);
 
             minecraft.setScreen(parent);
@@ -112,7 +110,7 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
 
     private int addSlider(int y, String label, double initial, double min, double max, int decimals, DoubleConsumer consumer) {
-        addLabel(label, left + 16, y - 10, 0xFF9EA8B5);
+        addLabel(label, left + 16, y - 10, 0xFFCFC6A6);
 
         RichSlider slider = new RichSlider(left + 16, y, panelW - 32, 20, label, initial, min, max, decimals, consumer);
         addScrollableWidget(slider);
@@ -172,9 +170,9 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 10, left + panelW, height - 8, 0xF010151D);
-        graphics.drawString(font, "TEXT ANIMATION • REGION", left + 16, 18, 0xFF6FF8E9, false);
-        graphics.drawString(font, "Drag sliders and watch the selected phrase react immediately.", left + 16, 30, 0xFF8E9AA8, false);
+        graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
+        graphics.drawString(font, "TEXT ANIMATION • REGION", left + 16, 18, 0xFFB8FF72, false);
+        graphics.drawString(font, "Drag sliders and watch the selected phrase react immediately.", left + 16, 30, 0xFFBDB497, false);
 
         renderAnimationPreview(graphics, partialTick);
         graphics.enableScissor(left, contentTop, left + panelW, contentBottom);
@@ -191,9 +189,9 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
 
         renderScrollbar(graphics);
 
-        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF00B0F15);
+        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF0090C08);
 
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -205,15 +203,15 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
         int w = panelW - 32;
         int h = Math.max(38, previewBottom - previewTop - 4);
 
-        graphics.fill(x, y, x + w, y + h, 0xFF0B1017);
+        graphics.fill(x, y, x + w, y + h, 0xFF0E130C);
 
-        graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF131B24);
+        graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF172013);
 
         List<String> effects = effectiveEffects();
 
         String summary = effects.isEmpty() ? "NO EFFECTS • parameters are stored for later" : String.join(" + ", effects).toUpperCase(Locale.ROOT);
 
-        graphics.drawString(font, summary, x + 8, y + 6, effects.isEmpty() ? 0xFF7D8794 : 0xFFFFD45A, false);
+        graphics.drawString(font, summary, x + 8, y + 6, effects.isEmpty() ? 0xFF9D967D : 0xFFFFD45A, false);
 
         int baseX = x + Math.max(12, (w - sampleWidth()) / 2);
 
@@ -417,9 +415,9 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
         int travel = Math.max(1, trackH - thumbH);
         int thumbY = trackTop + Math.round(travel * (scrollOffset / (float) max));
 
-        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
     }
 
 
@@ -466,7 +464,7 @@ public final class DialogueTextAnimationEditorScreen extends Screen {
     }
 
 
-    private static final class RichSlider extends AbstractSliderButton {
+    private static final class RichSlider extends DialogueRetroSlider {
 
         private final String label;
         private final double min;

@@ -3,7 +3,6 @@ package com.benji.oasiso.dialogue.editor;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public final class DialogueActionListScreen extends Screen {
+public final class DialogueActionListScreen extends DialogueRetroScreen {
 
     private static final List<String> TARGETS = List.of("player", "source");
 
@@ -67,7 +66,7 @@ public final class DialogueActionListScreen extends Screen {
         buildFixedHeader();
 
         if (actions.isEmpty()) {
-            addRenderableWidget(Button.builder(Component.literal("+ Add first action"), button -> {
+            addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("+ Add first action"), button -> {
                 DialogueDefinition.Action action = new DialogueDefinition.Action();
 
                 action.type = "give_item";
@@ -77,7 +76,7 @@ public final class DialogueActionListScreen extends Screen {
                 rebuild();
             }).bounds(left + 16, contentTop + 44, innerW, 20).build());
 
-            addRenderableWidget(Button.builder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
+            addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
 
             return;
         }
@@ -106,13 +105,13 @@ public final class DialogueActionListScreen extends Screen {
 
         updateContentVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> saveAndBack()).bounds(left + 16, height - 30, innerW, 20).build());
     }
 
     private void buildFixedHeader() {
         int y = 18;
 
-        addRenderableWidget(Button.builder(Component.literal("<"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), button -> {
             if (!actions.isEmpty()) {
                 selected = Math.max(0, selected - 1);
                 scrollOffset = 0;
@@ -120,10 +119,10 @@ public final class DialogueActionListScreen extends Screen {
             }
         }).bounds(left + 16, y + 28, 40, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(actions.isEmpty() ? "No actions" : "Action " + (selected + 1) + " / " + actions.size()), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(actions.isEmpty() ? "No actions" : "Action " + (selected + 1) + " / " + actions.size()), button -> {
         }).bounds(left + 60, y + 28, 150, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(">"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), button -> {
             if (!actions.isEmpty()) {
                 selected = Math.min(actions.size() - 1, selected + 1);
                 scrollOffset = 0;
@@ -131,7 +130,7 @@ public final class DialogueActionListScreen extends Screen {
             }
         }).bounds(left + 214, y + 28, 40, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("+ Add"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("+ Add"), button -> {
             DialogueDefinition.Action action = new DialogueDefinition.Action();
 
             action.type = "give_item";
@@ -143,7 +142,7 @@ public final class DialogueActionListScreen extends Screen {
             rebuild();
         }).bounds(left + 262, y + 28, 82, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("- Remove"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("- Remove"), button -> {
             if (!actions.isEmpty()) {
                 actions.remove(selected);
 
@@ -167,7 +166,7 @@ public final class DialogueActionListScreen extends Screen {
             case "take_item" -> {
                 y = addItemField(y, "Item id or #item_tag to remove", action.id, value -> action.id = blankToNull(value));
                 y = addIntegerField(y, "Amount to remove", action.count, value -> action.count = Math.max(1, value));
-                y = addInfoCard(y, "TIP", "take_item supports #item tags. give_item intentionally requires one concrete item id.", 0xFF34546A);
+                y = addInfoCard(y, "TIP", "take_item supports #item tags. give_item intentionally requires one concrete item id.", 0xFF4C6B3F);
             }
 
             case "add_player_tag", "remove_player_tag" -> {
@@ -182,7 +181,7 @@ public final class DialogueActionListScreen extends Screen {
 
                 y = addTextField(y, "Scoreboard objective", action.objective, 64, value -> action.objective = blankToNull(value));
                 y = addIntegerField(y, "Value  (negative values work with Add score)", action.value, value -> action.value = value);
-                y = addInfoCard(y, "QUEST PROGRESS", "If the objective does not exist, Dialogue Engine creates it as a dummy objective. Scores are good for stages, counters and progress.", 0xFF5C6232);
+                y = addInfoCard(y, "QUEST PROGRESS", "If the objective does not exist, Dialogue Engine creates it as a dummy objective. Scores are good for stages, counters and progress.", 0xFF6E7447);
             }
 
             case "run_command" -> {
@@ -225,7 +224,7 @@ public final class DialogueActionListScreen extends Screen {
                     action.id = null;
                 });
 
-                y = addInfoCard(y, "JAVA / MOD INTEGRATION", "Posts DialogueNodeExternalEvent. Another mod may listen to it. If nobody listens, the graph simply continues.", 0xFF4A5577);
+                y = addInfoCard(y, "JAVA / MOD INTEGRATION", "Posts DialogueNodeExternalEvent. Another mod may listen to it. If nobody listens, the graph simply continues.", 0xFF536246);
             }
 
             case "kill" -> {
@@ -241,7 +240,7 @@ public final class DialogueActionListScreen extends Screen {
 
             default -> {
                 y = addTextField(y, "Custom action id", action.type, 256, value -> action.type = blankToNull(value));
-                y = addInfoCard(y, "CUSTOM ACTION", "Namespaced custom actions can be handled by another mod through DialogueActionRegistry.", 0xFF4A5577);
+                y = addInfoCard(y, "CUSTOM ACTION", "Namespaced custom actions can be handled by another mod through DialogueActionRegistry.", 0xFF536246);
             }
         }
 
@@ -260,7 +259,7 @@ public final class DialogueActionListScreen extends Screen {
         int ty = y + 23;
 
         for (String line : wrapped) {
-            labels.add(new Label(line, left + 28, ty, 0xFFD2D8E0));
+            labels.add(new Label(line, left + 28, ty, 0xFFF0E8D0));
             ty += 12;
         }
 
@@ -277,9 +276,9 @@ public final class DialogueActionListScreen extends Screen {
     }
 
     private int addItemField(int y, String label, String value, Consumer<String> responder) {
-        labels.add(new Label(label, left + 16, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(label, left + 16, y - 10, 0xFFE8E0C3));
 
-        EditBox box = new EditBox(font, left + 16, y, innerW - 92, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, innerW - 92, 20, Component.literal(label));
 
         box.setMaxLength(256);
         box.setValue(value != null ? value : "");
@@ -287,7 +286,7 @@ public final class DialogueActionListScreen extends Screen {
 
         addContentWidget(box);
 
-        addContentWidget(Button.builder(Component.literal("Registry"), button -> minecraft.setScreen(new DialogueEditorRegistryPickerScreen(this, DialogueEditorRegistryPickerScreen.Kind.ITEM, box.getValue(), id -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Registry"), button -> minecraft.setScreen(new DialogueEditorRegistryPickerScreen(this, DialogueEditorRegistryPickerScreen.Kind.ITEM, box.getValue(), id -> {
             responder.accept(id);
             rebuild();
         }))).bounds(left + 20 + innerW - 92, y, 88, 20).build());
@@ -296,7 +295,7 @@ public final class DialogueActionListScreen extends Screen {
     }
 
     private int addFullButton(int y, String text, Runnable action) {
-        addContentWidget(Button.builder(Component.literal(text), button -> action.run()).bounds(left + 16, y, innerW, 20).build());
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(text), button -> action.run()).bounds(left + 16, y, innerW, 20).build());
 
         return y + 32;
     }
@@ -311,9 +310,9 @@ public final class DialogueActionListScreen extends Screen {
     }
 
     private int addTextField(int y, String label, String value, int maxLength, Consumer<String> responder) {
-        labels.add(new Label(label, left + 16, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(label, left + 16, y - 10, 0xFFE8E0C3));
 
-        EditBox box = new EditBox(font, left + 16, y, innerW, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, innerW, 20, Component.literal(label));
 
         box.setMaxLength(maxLength);
         box.setValue(value != null ? value : "");
@@ -345,11 +344,11 @@ public final class DialogueActionListScreen extends Screen {
     private int addTwoFloatFields(int y, String labelA, float valueA, Consumer<Float> responderA, String labelB, float valueB, Consumer<Float> responderB) {
         int w = (innerW - 8) / 2;
 
-        labels.add(new Label(labelA, left + 16, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(labelA, left + 16, y - 10, 0xFFE8E0C3));
 
-        labels.add(new Label(labelB, left + 24 + w, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(labelB, left + 24 + w, y - 10, 0xFFE8E0C3));
 
-        EditBox a = new EditBox(font, left + 16, y, w, 20, Component.literal(labelA));
+        EditBox a = new DialogueRetroEditBox(font, left + 16, y, w, 20, Component.literal(labelA));
 
         a.setValue(String.valueOf(valueA));
         a.setResponder(text -> {
@@ -359,7 +358,7 @@ public final class DialogueActionListScreen extends Screen {
             }
         });
 
-        EditBox b = new EditBox(font, left + 24 + w, y, w, 20, Component.literal(labelB));
+        EditBox b = new DialogueRetroEditBox(font, left + 24 + w, y, w, 20, Component.literal(labelB));
 
         b.setValue(String.valueOf(valueB));
         b.setResponder(text -> {
@@ -378,15 +377,15 @@ public final class DialogueActionListScreen extends Screen {
     private int addTwoNullableFloatFields(int y, String labelA, Float valueA, Consumer<Float> responderA, String labelB, Float valueB, Consumer<Float> responderB) {
         int w = (innerW - 8) / 2;
 
-        labels.add(new Label(labelA, left + 16, y - 10, 0xFFB7C0CC));
-        labels.add(new Label(labelB, left + 24 + w, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(labelA, left + 16, y - 10, 0xFFE8E0C3));
+        labels.add(new Label(labelB, left + 24 + w, y - 10, 0xFFE8E0C3));
 
-        EditBox a = new EditBox(font, left + 16, y, w, 20, Component.literal(labelA));
+        EditBox a = new DialogueRetroEditBox(font, left + 16, y, w, 20, Component.literal(labelA));
 
         a.setValue(valueA != null ? String.valueOf(valueA) : "");
         a.setResponder(text -> responderA.accept(nullableFloat(text)));
 
-        EditBox b = new EditBox(font, left + 24 + w, y, w, 20, Component.literal(labelB));
+        EditBox b = new DialogueRetroEditBox(font, left + 24 + w, y, w, 20, Component.literal(labelB));
 
         b.setValue(valueB != null ? String.valueOf(valueB) : "");
         b.setResponder(text -> responderB.accept(nullableFloat(text)));
@@ -410,9 +409,9 @@ public final class DialogueActionListScreen extends Screen {
         for (int i = 0; i < 3; i++) {
             int x = left + 16 + i * (w + gap);
 
-            labels.add(new Label(labelsArray[i], x, y - 10, 0xFFB7C0CC));
+            labels.add(new Label(labelsArray[i], x, y - 10, 0xFFE8E0C3));
 
-            EditBox box = new EditBox(font, x, y, w, 20, Component.literal(labelsArray[i]));
+            EditBox box = new DialogueRetroEditBox(font, x, y, w, 20, Component.literal(labelsArray[i]));
 
             box.setValue(String.valueOf(values[i]));
 
@@ -474,12 +473,12 @@ public final class DialogueActionListScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 10, left + panelW, height - 8, 0xF010151D);
+        graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
 
-        graphics.drawString(font, heading, left + 16, 18, 0xFF6FF8E9, false);
+        graphics.drawString(font, heading, left + 16, 18, 0xFFB8FF72, false);
 
         if (actions.isEmpty()) {
-            graphics.drawString(font, "No actions yet. Add one to change the world, quest state, inventory or story flow.", left + 16, contentTop + 12, 0xFFB7C0CC, false);
+            graphics.drawString(font, "No actions yet. Add one to change the world, quest state, inventory or story flow.", left + 16, contentTop + 12, 0xFFE8E0C3, false);
         }
 
         graphics.enableScissor(left, contentTop, left + panelW, contentBottom);
@@ -574,12 +573,12 @@ public final class DialogueActionListScreen extends Screen {
 
     private int actionColor(String type) {
         return switch (normalizeType(type)) {
-            case "give_item", "take_item" -> 0xFF4F8C5C;
+            case "give_item", "take_item" -> 0xFF668F48;
             case "quest_start", "quest_complete", "quest_fail", "quest_reset" -> 0xFFB88A37;
             case "kill" -> 0xFFB14E55;
-            case "fire_external" -> 0xFF2F8C8C;
-            case "play_sound", "particle" -> 0xFF704C86;
-            default -> 0xFF547EAA;
+            case "fire_external" -> 0xFF5D8D49;
+            case "play_sound", "particle" -> 0xFF566B3E;
+            default -> 0xFF6F8C56;
         };
     }
 

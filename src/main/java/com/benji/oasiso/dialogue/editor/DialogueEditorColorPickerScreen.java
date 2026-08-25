@@ -1,7 +1,6 @@
 package com.benji.oasiso.dialogue.editor;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,7 @@ import java.awt.Color;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public final class DialogueEditorColorPickerScreen extends Screen {
+public final class DialogueEditorColorPickerScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private final Consumer<String> callback;
@@ -43,7 +42,7 @@ public final class DialogueEditorColorPickerScreen extends Screen {
         int left = (width - panelW) / 2;
         int top = Math.max(24, (height - 236) / 2);
 
-        hexBox = new EditBox(font, left + 16, top + 184, 142, 20, Component.literal("HEX"));
+        hexBox = new DialogueRetroEditBox(font, left + 16, top + 184, 142, 20, Component.literal("HEX"));
         hexBox.setMaxLength(7);
         hexBox.setValue(hex());
         hexBox.setResponder(value -> {
@@ -60,12 +59,12 @@ public final class DialogueEditorColorPickerScreen extends Screen {
         });
         addRenderableWidget(hexBox);
 
-        addRenderableWidget(Button.builder(Component.literal("Use color"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Use color"), b -> {
             callback.accept(hex());
             minecraft.setScreen(parent);
         }).bounds(left + 164, top + 184, 70, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(left + 164, top + 208, 70, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(left + 164, top + 208, 70, 20).build());
     }
 
     @Override
@@ -76,9 +75,9 @@ public final class DialogueEditorColorPickerScreen extends Screen {
         int left = (width - panelW) / 2;
         int top = Math.max(24, (height - 236) / 2);
 
-        graphics.fill(left, top, left + panelW, top + 236, 0xF0141820);
-        graphics.fill(left + 1, top + 1, left + panelW - 1, top + 235, 0xFF0C1118);
-        graphics.drawString(font, "COLOR PICKER", left + 16, top + 10, 0xFF6FF8E9, false);
+        graphics.fill(left, top, left + panelW, top + 236, 0xF0141A11);
+        graphics.fill(left + 1, top + 1, left + panelW - 1, top + 235, 0xFF0C110A);
+        graphics.drawString(font, "COLOR PICKER", left + 16, top + 10, 0xFFB8FF72, false);
 
         int sx = left + 16;
         int sy = top + 30;
@@ -111,10 +110,10 @@ public final class DialogueEditorColorPickerScreen extends Screen {
 
         int rgb = Color.HSBtoRGB(hue, saturation, brightness) & 0xFFFFFF;
         graphics.fill(left + 200, top + 30, left + 234, top + 64, 0xFF000000 | rgb);
-        graphics.drawString(font, "Preview", left + 194, top + 70, 0xFFB7C0CC, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "H %.0f°", hue * 360.0F), left + 194, top + 90, 0xFF9AA5B3, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "S %.0f%%", saturation * 100.0F), left + 194, top + 102, 0xFF9AA5B3, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "V %.0f%%", brightness * 100.0F), left + 194, top + 114, 0xFF9AA5B3, false);
+        graphics.drawString(font, "Preview", left + 194, top + 70, 0xFFE8E0C3, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "H %.0f°", hue * 360.0F), left + 194, top + 90, 0xFFC7BEA0, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "S %.0f%%", saturation * 100.0F), left + 194, top + 102, 0xFFC7BEA0, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "V %.0f%%", brightness * 100.0F), left + 194, top + 114, 0xFFC7BEA0, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

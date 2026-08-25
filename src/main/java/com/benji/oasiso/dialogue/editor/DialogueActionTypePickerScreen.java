@@ -2,7 +2,6 @@ package com.benji.oasiso.dialogue.editor;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -10,20 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class DialogueActionTypePickerScreen extends Screen {
+public final class DialogueActionTypePickerScreen extends DialogueRetroScreen {
 
     private record Entry(String id, String title, String help, int color) {
     }
 
-    private static final List<Entry> ENTRIES = List.of(new Entry("give_item", "Give item", "Give an item stack to the player.", 0xFF4F8C5C), new Entry("take_item", "Take item", "Remove items from the player's inventory.", 0xFF4F8C5C),
+    private static final List<Entry> ENTRIES = List.of(new Entry("give_item", "Give item", "Give an item stack to the player.", 0xFF668F48), new Entry("take_item", "Take item", "Remove items from the player's inventory.", 0xFF668F48),
 
             new Entry("quest_start", "Start quest", "Mark a Dialogue Engine quest as ACTIVE.", 0xFFB88A37), new Entry("quest_complete", "Complete quest", "Mark a quest as COMPLETED.", 0xFFB88A37), new Entry("quest_fail", "Fail quest", "Mark a quest as FAILED.", 0xFFB88A37), new Entry("quest_reset", "Reset quest", "Return a quest to NOT STARTED.", 0xFFB88A37),
 
-            new Entry("add_player_tag", "Add tag", "Add a vanilla entity tag to player or dialogue source.", 0xFF547EAA), new Entry("remove_player_tag", "Remove tag", "Remove a vanilla entity tag.", 0xFF547EAA), new Entry("set_score", "Set score", "Set a scoreboard objective to an exact value.", 0xFF547EAA), new Entry("add_score", "Add score", "Add or subtract from a scoreboard objective.", 0xFF547EAA), new Entry("teleport", "Teleport", "Move player or dialogue source.", 0xFF547EAA), new Entry("kill", "Kill entity/player", "Kill player or dialogue source.", 0xFFB14E55),
+            new Entry("add_player_tag", "Add tag", "Add a vanilla entity tag to player or dialogue source.", 0xFF6F8C56), new Entry("remove_player_tag", "Remove tag", "Remove a vanilla entity tag.", 0xFF6F8C56), new Entry("set_score", "Set score", "Set a scoreboard objective to an exact value.", 0xFF6F8C56), new Entry("add_score", "Add score", "Add or subtract from a scoreboard objective.", 0xFF6F8C56), new Entry("teleport", "Teleport", "Move player or dialogue source.", 0xFF6F8C56), new Entry("kill", "Kill entity/player", "Kill player or dialogue source.", 0xFFB14E55),
 
-            new Entry("play_sound", "Play sound", "Play a sound for the dialogue player.", 0xFF704C86), new Entry("particle", "Particle", "Spawn particles around player or dialogue source.", 0xFF704C86),
+            new Entry("play_sound", "Play sound", "Play a sound for the dialogue player.", 0xFF566B3E), new Entry("particle", "Particle", "Spawn particles around player or dialogue source.", 0xFF566B3E),
 
-            new Entry("fire_external", "Fire external event", "Notify Java/another mod with DialogueNodeExternalEvent.", 0xFF2F8C8C), new Entry("run_command", "Run command", "Run a trusted server command from the dialogue graph.", 0xFF8C5F2F));
+            new Entry("fire_external", "Fire external event", "Notify Java/another mod with DialogueNodeExternalEvent.", 0xFF5D8D49), new Entry("run_command", "Run command", "Run a trusted server command from the dialogue graph.", 0xFF8C5F2F));
 
     private static final int CONTENT_TOP = 62;
     private static final int FOOTER_HEIGHT = 42;
@@ -84,7 +83,7 @@ public final class DialogueActionTypePickerScreen extends Screen {
 
             int y = CONTENT_TOP + 4 + row * ROW_HEIGHT - scrollOffset;
 
-            addContentWidget(Button.builder(Component.literal(entry.title), button -> {
+            addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(entry.title), button -> {
                 callback.accept(entry.id);
 
                 minecraft.setScreen(parent);
@@ -93,7 +92,7 @@ public final class DialogueActionTypePickerScreen extends Screen {
 
         updateContentVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), button -> minecraft.setScreen(parent)).bounds(left + 16, height - 30, innerW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), button -> minecraft.setScreen(parent)).bounds(left + 16, height - 30, innerW, 20).build());
     }
 
     private <T extends AbstractWidget> T addContentWidget(T widget) {
@@ -139,14 +138,14 @@ public final class DialogueActionTypePickerScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 12, left + panelW, height - 8, 0xF010151D);
+        graphics.fill(left, 12, left + panelW, height - 8, 0xF0121710);
 
-        graphics.drawString(font, "CHOOSE WHAT THIS ACTION DOES", left + 16, 22, 0xFF6FF8E9, false);
+        graphics.drawString(font, "CHOOSE WHAT THIS ACTION DOES", left + 16, 22, 0xFFB8FF72, false);
 
-        graphics.drawString(font, "Items / quests / entity state / world effects / integration", left + 16, 36, 0xFF8E9AA8, false);
+        graphics.drawString(font, "Items / quests / entity state / world effects / integration", left + 16, 36, 0xFFBDB497, false);
 
         if (maxScroll() > 0) {
-            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 49, 0xFF697585, false);
+            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 49, 0xFF8E876F, false);
         }
 
         graphics.enableScissor(left, CONTENT_TOP, left + panelW, contentBottom);
@@ -167,11 +166,11 @@ public final class DialogueActionTypePickerScreen extends Screen {
                 continue;
             }
 
-            graphics.fill(x, y + 21, x + colW, y + 34, 0xA0141820);
+            graphics.fill(x, y + 21, x + colW, y + 34, 0xA0151B11);
 
             graphics.fill(x, y + 21, x + 3, y + 34, entry.color);
 
-            graphics.drawString(font, trim(entry.help, colW - 10), x + 6, y + 24, 0xFF8E9AA8, false);
+            graphics.drawString(font, trim(entry.help, colW - 10), x + 6, y + 24, 0xFFBDB497, false);
         }
 
         int max = maxScroll();
@@ -193,15 +192,15 @@ public final class DialogueActionTypePickerScreen extends Screen {
 
             int thumbY = trackTop + Math.round(travel * (scrollOffset / (float) max));
 
-            graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+            graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-            graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+            graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
         }
 
         graphics.disableScissor();
-        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF00B0F15);
+        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF0090C08);
 
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

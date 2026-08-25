@@ -2,7 +2,6 @@ package com.benji.oasiso.dialogue.editor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public final class DialogueEditorFilePickerScreen extends Screen {
+public final class DialogueEditorFilePickerScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private final String extension;
@@ -44,24 +43,24 @@ public final class DialogueEditorFilePickerScreen extends Screen {
         int y = 8;
         int x = 10;
 
-        addRenderableWidget(Button.builder(Component.literal("Game"), b -> jump(minecraft.gameDirectory.toPath())).bounds(x, y, 54, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Game"), b -> jump(minecraft.gameDirectory.toPath())).bounds(x, y, 54, 20).build());
         x += 58;
-        addRenderableWidget(Button.builder(Component.literal("Home"), b -> jump(home())).bounds(x, y, 54, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Home"), b -> jump(home())).bounds(x, y, 54, 20).build());
         x += 58;
-        addRenderableWidget(Button.builder(Component.literal("Desktop"), b -> jump(preferred(home().resolve("Desktop"), home()))).bounds(x, y, 66, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Desktop"), b -> jump(preferred(home().resolve("Desktop"), home()))).bounds(x, y, 66, 20).build());
         x += 70;
-        addRenderableWidget(Button.builder(Component.literal("Downloads"), b -> jump(preferred(home().resolve("Downloads"), home()))).bounds(x, y, 78, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Downloads"), b -> jump(preferred(home().resolve("Downloads"), home()))).bounds(x, y, 78, 20).build());
         x += 82;
-        addRenderableWidget(Button.builder(Component.literal("Up"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Up"), b -> {
             if (current.getParent() != null) jump(current.getParent());
         }).bounds(x, y, 42, 20).build());
 
         int searchY = 34;
-        EditBox searchBox = new EditBox(font, 10, searchY, Math.max(90, width - 104), 20, Component.literal("Search"));
+        EditBox searchBox = new DialogueRetroEditBox(font, 10, searchY, Math.max(90, width - 104), 20, Component.literal("Search"));
         searchBox.setValue(search);
         searchBox.setResponder(value -> search = value);
         addRenderableWidget(searchBox);
-        addRenderableWidget(Button.builder(Component.literal("Find"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Find"), b -> {
             page = 0;
             rebuild();
         }).bounds(width - 88, searchY, 78, 20).build());
@@ -78,7 +77,7 @@ public final class DialogueEditorFilePickerScreen extends Screen {
             String name = (directory ? "[DIR]  " : "") + path.getFileName();
             int rowY = top + (i - start) * 24;
 
-            addRenderableWidget(Button.builder(Component.literal(name), b -> {
+            addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(name), b -> {
                 if (directory) jump(path);
                 else {
                     minecraft.setScreen(parent);
@@ -90,20 +89,20 @@ public final class DialogueEditorFilePickerScreen extends Screen {
         int pages = Math.max(1, (entries.size() + rows - 1) / rows);
         page = Math.max(0, Math.min(page, pages - 1));
 
-        addRenderableWidget(Button.builder(Component.literal("<"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), b -> {
             page = Math.max(0, page - 1);
             rebuild();
         }).bounds(width / 2 - 72, height - 28, 30, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal((page + 1) + "/" + pages), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal((page + 1) + "/" + pages), b -> {
         }).bounds(width / 2 - 38, height - 28, 76, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(">"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), b -> {
             page = Math.min(pages - 1, page + 1);
             rebuild();
         }).bounds(width / 2 + 42, height - 28, 30, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(width - 86, height - 28, 76, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(width - 86, height - 28, 76, 20).build());
     }
 
     private Path home() {
@@ -159,7 +158,7 @@ public final class DialogueEditorFilePickerScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
-        graphics.drawString(font, "Folder: " + current, 10, 59, 0xFFE6E6E6, false);
+        graphics.drawString(font, "Folder: " + current, 10, 59, 0xFFF1E9CF, false);
         graphics.drawString(font, "Mouse wheel changes pages. Showing folders and " + (extension.isBlank() ? "files" : extension + " files") + ". You can also drag files directly into Dialogue Studio.", 10, height - 40, 0xFFAAAAAA, false);
         super.render(graphics, mouseX, mouseY, partialTick);
     }

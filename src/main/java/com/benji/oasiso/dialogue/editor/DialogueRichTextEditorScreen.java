@@ -8,7 +8,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -20,7 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
-public final class DialogueRichTextEditorScreen extends Screen {
+public final class DialogueRichTextEditorScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private final DialogueEditorProject project;
@@ -122,7 +121,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
         int y = settingsTop + 8 - scrollOffset;
 
-        y = addInfoCard(y, "LINE BASE STYLE", "Markdown, font and outline here affect the whole line. A Rich Text region can override any of them for only the selected word/phrase.", 0xFF24536C, 0xFF8FD9FF);
+        y = addInfoCard(y, "LINE BASE STYLE", "Markdown, font and outline here affect the whole line. A Rich Text region can override any of them for only the selected word/phrase.", 0xFF3F6438, 0xFFE8E0C3);
 
         y = addTwoButtons(y, "Markdown: " + nullableBoolean(line.markdown), () -> {
             line.markdown = nextNullableBoolean(line.markdown);
@@ -150,21 +149,21 @@ public final class DialogueRichTextEditorScreen extends Screen {
         });
 
         if (markdownEnabled()) {
-            y = addInfoCard(y, "MARKDOWN", "**bold**  *italic*  ***bold italic***  ~~strike~~  __underline__  \\* escapes a marker. Rich Text selection uses the visible text without Markdown symbols.", 0xFF4C5F31, 0xFFD8E36A);
+            y = addInfoCard(y, "MARKDOWN", "**bold**  *italic*  ***bold italic***  ~~strike~~  __underline__  \\* escapes a marker. Rich Text selection uses the visible text without Markdown symbols.", 0xFF5B703F, 0xFFD8E36A);
         }
 
         DialogueDefinition.TextRegion region = currentRegion();
 
         if (region == null) {
-            y = addInfoCard(y, "HOW TO CREATE A RICH TEXT REGION", "Drag over one or more characters in the text preview above, then press Create region from selection. The new region can override only that part of the sentence.", 0xFF146C70, 0xFF67F0E6);
-            y = addInfoCard(y, "INHERITANCE", "A region only changes the properties you set. Blank color/effects/animation values inherit the normal line/global style, so old Dialogue Engine styling still works underneath Rich Text.", 0xFF40556A, 0xFF9FB9D1);
+            y = addInfoCard(y, "HOW TO CREATE A RICH TEXT REGION", "Drag over one or more characters in the text preview above, then press Create region from selection. The new region can override only that part of the sentence.", 0xFF3D7438, 0xFFA8F06A);
+            y = addInfoCard(y, "INHERITANCE", "A region only changes the properties you set. Blank color/effects/animation values inherit the normal line/global style, so old Dialogue Engine styling still works underneath Rich Text.", 0xFF526B3D, 0xFFD2C8AA);
 
         } else {
             DialogueRichTextUtil.Range range = DialogueRichTextUtil.resolveRange(region, text);
 
             String snippet = range != null ? safeSubstring(text, range.start(), range.end()) : "<invalid range>";
 
-            y = addInfoCard(y, "SELECTED REGION", "Characters " + (range != null ? range.start() + ".." + range.end() : "?") + "  •  \"" + printable(snippet) + "\"", 0xFF31585B, 0xFFBFEDEA);
+            y = addInfoCard(y, "SELECTED REGION", "Characters " + (range != null ? range.start() + ".." + range.end() : "?") + "  •  \"" + printable(snippet) + "\"", 0xFF4A6F3F, 0xFFECE5C9);
             y = addTextField(y, "Region name (optional)", region.name, 96, value -> region.name = blankToNull(value));
 
             if (locale != null) {
@@ -180,7 +179,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
                     rebuild();
                 });
             } else {
-                y = addInfoCard(y, "SCOPE: LITERAL TEXT", "Literal dialogue has no language-file locale, so this region follows the literal sentence directly.", 0xFF40556A, 0xFF9FB9D1);
+                y = addInfoCard(y, "SCOPE: LITERAL TEXT", "Literal dialogue has no language-file locale, so this region follows the literal sentence directly.", 0xFF526B3D, 0xFFD2C8AA);
             }
 
             y = addColorField(y, region);
@@ -216,7 +215,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
             })));
 
             y = addFullButton(y, "Visual animation parameters...", () -> minecraft.setScreen(new DialogueTextAnimationEditorScreen(this, project, line, region, snippet)));
-            y = addInfoCard(y, "REGION OVERRIDES", "Color, gradient and effect stack are independent. Example: one word can be red + shake while the rest of the line keeps the inherited gold wave.", 0xFF704C86, 0xFFD5A7F0);
+            y = addInfoCard(y, "REGION OVERRIDES", "Color, gradient and effect stack are independent. Example: one word can be red + shake while the rest of the line keeps the inherited gold wave.", 0xFF566B3E, 0xFFD8E36A);
             y = addFullButton(y, "Reset ONLY this region's style to INHERIT", () -> {
                 region.color = null;
 
@@ -244,7 +243,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
         updateScrollVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> {
             DialogueRichTextUtil.repairRegions(line, text, locale);
 
             DialogueEditorHistory.checkpoint(project);
@@ -260,35 +259,35 @@ public final class DialogueRichTextEditorScreen extends Screen {
         int usable = panelW - 32;
         int createW = Math.max(122, usable / 3);
 
-        addRenderableWidget(Button.builder(Component.literal(selectionLength() > 0 ? "Create region from selection" : "Drag-select text first"), button -> createRegionFromSelection()).bounds(left + 16, buttonY, createW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(selectionLength() > 0 ? "Create region from selection" : "Drag-select text first"), button -> createRegionFromSelection()).bounds(left + 16, buttonY, createW, 20).build());
 
         int x = left + 16 + createW + gap;
 
-        addRenderableWidget(Button.builder(Component.literal("<"), button -> moveRegion(-1)).bounds(x, buttonY, 30, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), button -> moveRegion(-1)).bounds(x, buttonY, 30, 20).build());
 
         x += 34;
 
         int navW = Math.max(110, usable - createW - 30 - 30 - 92 - gap * 4);
 
-        addRenderableWidget(Button.builder(Component.literal(regionLabel()), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(regionLabel()), button -> {
         }).bounds(x, buttonY, navW, 20).build());
 
         x += navW + gap;
 
-        addRenderableWidget(Button.builder(Component.literal(">"), button -> moveRegion(1)).bounds(x, buttonY, 30, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), button -> moveRegion(1)).bounds(x, buttonY, 30, 20).build());
 
         x += 34;
 
-        addRenderableWidget(Button.builder(Component.literal("Delete region"), button -> deleteCurrentRegion()).bounds(x, buttonY, Math.max(84, left + panelW - 16 - x), 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Delete region"), button -> deleteCurrentRegion()).bounds(x, buttonY, Math.max(84, left + panelW - 16 - x), 20).build());
     }
 
 
     private int addColorField(int y, DialogueDefinition.TextRegion region) {
-        addLabel("Region color (blank = inherit)", left + 16, y - 11, 0xFF9EA8B5);
+        addLabel("Region color (blank = inherit)", left + 16, y - 11, 0xFFCFC6A6);
 
         int pickerW = 82;
 
-        EditBox box = new EditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Color"));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Color"));
 
         box.setMaxLength(64);
 
@@ -298,7 +297,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
         addScrollableWidget(box);
 
-        addScrollableWidget(Button.builder(Component.literal("Color..."), button -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, region.color != null ? region.color : inheritedBaseColor(), color -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Color..."), button -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, region.color != null ? region.color : inheritedBaseColor(), color -> {
             region.color = color;
 
             rebuild();
@@ -309,9 +308,9 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
 
     private int addGradientField(int y, DialogueDefinition.TextRegion region) {
-        addLabel("Region gradient: blank=inherit, none=disable, comma-separated colors", left + 16, y - 11, 0xFF9EA8B5);
+        addLabel("Region gradient: blank=inherit, none=disable, comma-separated colors", left + 16, y - 11, 0xFFCFC6A6);
 
-        EditBox box = new EditBox(font, left + 16, y, panelW - 32, 20, Component.literal("Gradient"));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, panelW - 32, 20, Component.literal("Gradient"));
 
         box.setMaxLength(512);
         box.setValue(gradientText(region.gradient));
@@ -324,9 +323,9 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
 
     private int addTextField(int y, String label, String value, int maxLength, java.util.function.Consumer<String> responder) {
-        addLabel(label, left + 16, y - 11, 0xFF9EA8B5);
+        addLabel(label, left + 16, y - 11, 0xFFCFC6A6);
 
-        EditBox box = new EditBox(font, left + 16, y, panelW - 32, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, panelW - 32, 20, Component.literal(label));
 
         box.setMaxLength(maxLength);
         box.setValue(value != null ? value : "");
@@ -338,7 +337,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
 
     private int addFullButton(int y, String text, Runnable action) {
-        addScrollableWidget(Button.builder(Component.literal(text), button -> action.run()).bounds(left + 16, y, panelW - 32, 20).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal(text), button -> action.run()).bounds(left + 16, y, panelW - 32, 20).build());
 
         return y + 28;
     }
@@ -357,7 +356,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
         for (String row : wrapped) {
 
-            addLabel(row, left + 28, ty, 0xFFD2D8E0);
+            addLabel(row, left + 28, ty, 0xFFF0E8D0);
 
             ty += 11;
         }
@@ -395,12 +394,12 @@ public final class DialogueRichTextEditorScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 10, left + panelW, height - 8, 0xF010151D);
-        graphics.drawString(font, "RICH TEXT EDITOR", left + 16, 18, 0xFF6FF8E9, false);
-        graphics.drawString(font, trimToWidth(heading + (locale != null ? "  •  " + locale : "  •  literal"), panelW - 32), left + 16, 29, 0xFF8E9AA8, false);
+        graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
+        graphics.drawString(font, "RICH TEXT EDITOR", left + 16, 18, 0xFFB8FF72, false);
+        graphics.drawString(font, trimToWidth(heading + (locale != null ? "  •  " + locale : "  •  literal"), panelW - 32), left + 16, 29, 0xFFBDB497, false);
         renderTextCanvas(graphics, mouseX, mouseY, partialTick);
         String selectionInfo = selectionLength() > 0 ? "Selection " + selectionStart() + ".." + selectionEnd() + ": \"" + printable(safeSubstring(text, selectionStart(), selectionEnd())) + "\"" : "Drag over text to select a word/phrase. Existing region ranges are underlined.";
-        graphics.drawString(font, trimToWidth(selectionInfo, previewWidth), previewLeft, previewTop + previewHeight + 4, selectionLength() > 0 ? 0xFFFFD45A : 0xFF87909D, false);
+        graphics.drawString(font, trimToWidth(selectionInfo, previewWidth), previewLeft, previewTop + previewHeight + 4, selectionLength() > 0 ? 0xFFFFD45A : 0xFFABA389, false);
         graphics.enableScissor(left, settingsTop, left + panelW, settingsBottom);
 
         for (Card card : cards) {
@@ -425,17 +424,17 @@ public final class DialogueRichTextEditorScreen extends Screen {
         graphics.disableScissor();
         renderScrollbar(graphics);
 
-        graphics.fill(left, settingsBottom + 1, left + panelW, height - 8, 0xF00B0F15);
-        graphics.fill(left, settingsBottom, left + panelW, settingsBottom + 1, 0xFF39414C);
+        graphics.fill(left, settingsBottom + 1, left + panelW, height - 8, 0xF0090C08);
+        graphics.fill(left, settingsBottom, left + panelW, settingsBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 
 
     private void renderTextCanvas(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(previewLeft, previewTop, previewLeft + previewWidth, previewTop + previewHeight, 0xFF0A0E14);
+        graphics.fill(previewLeft, previewTop, previewLeft + previewWidth, previewTop + previewHeight, 0xFF0B1009);
 
-        graphics.fill(previewLeft + 1, previewTop + 1, previewLeft + previewWidth - 1, previewTop + previewHeight - 1, 0xFF111821);
+        graphics.fill(previewLeft + 1, previewTop + 1, previewLeft + previewWidth - 1, previewTop + previewHeight - 1, 0xFF141C11);
 
         graphics.enableScissor(previewLeft + 1, previewTop + 1, previewLeft + previewWidth - 1, previewTop + previewHeight - 1);
 
@@ -455,7 +454,7 @@ public final class DialogueRichTextEditorScreen extends Screen {
             int regionIndex = topRegionAt(glyph.index);
 
             if (regionIndex >= 0) {
-                int underlineColor = regionIndex == selectedRegion ? 0xFFFFD45A : 0xFF42F2E1;
+                int underlineColor = regionIndex == selectedRegion ? 0xFFFFD45A : 0xFF93E85D;
                 graphics.fill(gx, gy + font.lineHeight + 1, gx + Math.max(1, glyph.width), gy + font.lineHeight + 2, underlineColor);
             }
         }
@@ -882,9 +881,9 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
         int thumbY = trackTop + Math.round(travel * (scrollOffset / (float) max));
 
-        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
     }
 
 
@@ -934,8 +933,8 @@ public final class DialogueRichTextEditorScreen extends Screen {
     private int addTwoButtons(int y, String leftText, Runnable leftAction, String rightText, Runnable rightAction) {
         int gap = 4;
         int w = (panelW - 32 - gap) / 2;
-        addScrollableWidget(Button.builder(Component.literal(leftText), b -> leftAction.run()).bounds(left + 16, y, w, 20).build());
-        addScrollableWidget(Button.builder(Component.literal(rightText), b -> rightAction.run()).bounds(left + 16 + w + gap, y, w, 20).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal(leftText), b -> leftAction.run()).bounds(left + 16, y, w, 20).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal(rightText), b -> rightAction.run()).bounds(left + 16 + w + gap, y, w, 20).build());
         return y + 28;
     }
 
@@ -971,13 +970,13 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
     private int addLineOutlineFields(int y) {
         int pickerW = 82;
-        addLabel("Line outline color (blank = inherit global)", left + 16, y - 11, 0xFF9EA8B5);
-        EditBox color = new EditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Outline color"));
+        addLabel("Line outline color (blank = inherit global)", left + 16, y - 11, 0xFFCFC6A6);
+        EditBox color = new DialogueRetroEditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Outline color"));
         color.setMaxLength(64);
         color.setValue(line.text_outline_color != null ? line.text_outline_color : "");
         color.setResponder(value -> line.text_outline_color = blankToNull(value));
         addScrollableWidget(color);
-        addScrollableWidget(Button.builder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, line.text_outline_color != null ? line.text_outline_color : "black", picked -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, line.text_outline_color != null ? line.text_outline_color : "black", picked -> {
             line.text_outline_color = picked;
             rebuild();
         }))).bounds(left + panelW - 16 - pickerW, y, pickerW, 20).build());
@@ -990,13 +989,13 @@ public final class DialogueRichTextEditorScreen extends Screen {
 
     private int addRegionOutlineFields(int y, DialogueDefinition.TextRegion region) {
         int pickerW = 82;
-        addLabel("Region outline color (blank = inherit)", left + 16, y - 11, 0xFF9EA8B5);
-        EditBox color = new EditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Region outline color"));
+        addLabel("Region outline color (blank = inherit)", left + 16, y - 11, 0xFFCFC6A6);
+        EditBox color = new DialogueRetroEditBox(font, left + 16, y, panelW - 32 - pickerW - 4, 20, Component.literal("Region outline color"));
         color.setMaxLength(64);
         color.setValue(region.outline_color != null ? region.outline_color : "");
         color.setResponder(value -> region.outline_color = blankToNull(value));
         addScrollableWidget(color);
-        addScrollableWidget(Button.builder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, region.outline_color != null ? region.outline_color : "black", picked -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Color..."), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, region.outline_color != null ? region.outline_color : "black", picked -> {
             region.outline_color = picked;
             rebuild();
         }))).bounds(left + panelW - 16 - pickerW, y, pickerW, 20).build());

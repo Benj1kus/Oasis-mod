@@ -8,7 +8,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -31,7 +30,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 
-public final class DialogueEditorScreen extends Screen {
+public final class DialogueEditorScreen extends DialogueRetroScreen {
 
     public enum Tab {
         PROJECT("Project"), DIALOGUE("Dialogue"), VISUALS("Visuals"), LINES("Lines"), LINE_OVERRIDES("Line+"), NODES("Nodes"), LAYOUT("Layout"), TRIGGERS("Triggers"), ZONE("Zone"), ZONE_FX("Zone FX"), GAMEPLAY("Gameplay"), EXPORT("Export");
@@ -154,7 +153,7 @@ public final class DialogueEditorScreen extends Screen {
             int x = margin + column * (tabW + gap);
             int y = 6 + row * (tabH + rowGap);
 
-            Button tabButton = Button.builder(Component.literal((t == tab ? "[" : "") + t.label + (t == tab ? "]" : "")), b -> reopen(t)).bounds(x, y, tabW, tabH).build();
+            Button tabButton = DialogueRetroButton.retroBuilder(Component.literal(t.label), b -> reopen(t)).bounds(x, y, tabW, tabH).selected(t == tab).tabStyle(true).build();
 
             if (project.definition.graph_enabled && (t == Tab.LINES || t == Tab.LINE_OVERRIDES)) {
                 tabButton.active = false;
@@ -175,9 +174,9 @@ public final class DialogueEditorScreen extends Screen {
         int resetW = Math.min(78, Math.max(60, LEFT / 4));
         int allW = Math.min(72, Math.max(58, LEFT / 4));
 
-        addRenderableWidget(Button.builder(Component.literal("Reset tab"), b -> confirmResetCurrentTab()).bounds(LEFT - resetW - allW - 18, y, resetW, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Reset tab"), b -> confirmResetCurrentTab()).bounds(LEFT - resetW - allW - 18, y, resetW, buttonH).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Reset all"), b -> confirmResetAll()).bounds(LEFT - allW - 12, y, allW, buttonH).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Reset all"), b -> confirmResetAll()).bounds(LEFT - allW - 12, y, allW, buttonH).build());
     }
 
     private void initProject() {
@@ -765,7 +764,7 @@ public final class DialogueEditorScreen extends Screen {
         visual.preset = normalized;
 
         switch (normalized) {
-            case "gta_marker" -> {
+            case "san_marker" -> {
                 visual.show_default_zone = true;
                 visual.style = "outline";
                 visual.color = "#FFD45A";
@@ -1011,10 +1010,20 @@ public final class DialogueEditorScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
-        graphics.fill(4, bodyTop, LEFT, height - 4, 0xD5141820);
-        graphics.fill(LEFT + 4, bodyTop, width - 4, height - 4, 0xD5090B10);
-        graphics.drawString(font, "Dialogue.jar :D", 12, bodyTop + 7, 0xFF6FF8E9, false);
-        graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 24)), 12, height - 14, 0xFF8E9AA8, false);
+
+        DialogueRetroTheme.drawPanel(graphics, 4, bodyTop, LEFT, height - 4);
+        DialogueRetroTheme.drawTitleBar(graphics, 7, bodyTop + 3, LEFT - 3, 18);
+        DialogueRetroTheme.drawDarkInset(graphics, 8, bodyTop + 24, LEFT - 4, height - 21);
+
+        DialogueRetroTheme.drawPanel(graphics, LEFT + 4, bodyTop, width - 4, height - 4);
+        DialogueRetroTheme.drawDarkInset(graphics, LEFT + 8, bodyTop + 4, width - 8, height - 8);
+
+        graphics.drawString(font, "DIALOGUE STUDIO", 12, bodyTop + 8, DialogueRetroTheme.LIME, false);
+
+        graphics.fill(8, height - 20, LEFT - 4, height - 7, DialogueRetroTheme.BEIGE);
+        graphics.fill(8, height - 20, LEFT - 4, height - 19, DialogueRetroTheme.CREAM_LIGHT);
+        graphics.fill(8, height - 8, LEFT - 4, height - 7, DialogueRetroTheme.BLACK);
+        graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 28)), 12, height - 17, DialogueRetroTheme.TEXT_DARK_MUTED, false);
 
         int inspectorClipTop = inspectorContentTop();
         int inspectorClipBottom = inspectorContentBottom();
@@ -1072,8 +1081,10 @@ public final class DialogueEditorScreen extends Screen {
 
     private void renderTriggerCard(GuiGraphics graphics, int x, int y, int w, int h, int mouseX, int mouseY) {
         DialogueDefinition.Trigger t = project.currentTrigger();
-        graphics.fill(x, y, x + w, y + h, 0xFF101620);
-        graphics.drawString(font, "TRIGGER / WORLD PREVIEW", x + 9, y + 8, 0xFF6FF8E9, false);
+        DialogueRetroTheme.drawPanel(graphics, x, y, x + w, y + h);
+        DialogueRetroTheme.drawTitleBar(graphics, x + 3, y + 3, x + w - 3, 20);
+        DialogueRetroTheme.drawDarkInset(graphics, x + 6, y + 25, x + w - 6, y + h - 6);
+        graphics.drawString(font, "TRIGGER / WORLD PREVIEW", x + 9, y + 8, DialogueRetroTheme.LIME, false);
 
         String target = triggerPreviewTarget(t);
         boolean hasModelPreview = target != null && !target.startsWith("#") && !target.equals("*");
@@ -1083,7 +1094,7 @@ public final class DialogueEditorScreen extends Screen {
 
         cursorY += drawWrappedText(graphics, "type: " + t.type, x + 9, cursorY, textWidth, 0xFFFFFFFF, 1);
         cursorY += 2;
-        cursorY += drawWrappedText(graphics, "target: " + (target != null ? target : "<none>"), x + 9, cursorY, textWidth, 0xFF9EA8B5, 2);
+        cursorY += drawWrappedText(graphics, "target: " + (target != null ? target : "<none>"), x + 9, cursorY, textWidth, 0xFFCFC6A6, 2);
 
         if ("zone".equalsIgnoreCase(t.type)) {
             cursorY += 2;
@@ -1092,7 +1103,7 @@ public final class DialogueEditorScreen extends Screen {
 
             if (t.visual != null) {
                 cursorY += 2;
-                drawWrappedText(graphics, "visual: " + t.visual.style + "  " + t.visual.color, x + 9, cursorY, textWidth, 0xFF42F2E1, 2);
+                drawWrappedText(graphics, "visual: " + t.visual.style + "  " + t.visual.color, x + 9, cursorY, textWidth, 0xFF93E85D, 2);
             }
         }
 
@@ -1183,11 +1194,11 @@ public final class DialogueEditorScreen extends Screen {
         int y = Math.round(previewTransform.screenY(cy));
         graphics.hLine(x, x + 38, y, 0xFFFF4D55);
         graphics.fill(x + 34, y - 3, x + 40, y + 4, 0xFFFF4D55);
-        graphics.vLine(x, y - 38, y, 0xFF55E878);
-        graphics.fill(x - 3, y - 40, x + 4, y - 34, 0xFF55E878);
+        graphics.vLine(x, y - 38, y, 0xFF86D955);
+        graphics.fill(x - 3, y - 40, x + 4, y - 34, 0xFF86D955);
         graphics.fill(x + 12, y - 16, x + 20, y - 8, 0xFF4AA3FF);
         graphics.drawString(font, "X", x + 42, y - 4, 0xFFFF4D55, false);
-        graphics.drawString(font, "Y", x - 4, y - 51, 0xFF55E878, false);
+        graphics.drawString(font, "Y", x - 4, y - 51, 0xFF86D955, false);
         graphics.drawString(font, "S", x + 22, y - 18, 0xFF4AA3FF, false);
     }
 
@@ -1744,8 +1755,8 @@ public final class DialogueEditorScreen extends Screen {
 
     private void field(String label, String value, int row, Consumer<String> responder, int maxLength) {
         int y = rowY(row);
-        labels.add(new Label(label, 12, y - 10, 0xFFB7C0CC));
-        EditBox box = new EditBox(font, 12, y, LEFT - 24, controlHeight, Component.literal(label));
+        labels.add(new Label(label, 12, y - 10, 0xFFE8E0C3));
+        EditBox box = new DialogueRetroEditBox(font, 12, y, LEFT - 24, controlHeight, Component.literal(label));
         box.setMaxLength(maxLength);
         box.setValue(value != null ? value : "");
         box.setResponder(responder);
@@ -1755,13 +1766,13 @@ public final class DialogueEditorScreen extends Screen {
 
     private void assetField(String label, String value, int row, String extension, boolean sound, Consumer<String> responder) {
         int y = rowY(row);
-        labels.add(new Label(label, 12, y - 10, 0xFFB7C0CC));
-        EditBox box = new EditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
+        labels.add(new Label(label, 12, y - 10, 0xFFE8E0C3));
+        EditBox box = new DialogueRetroEditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
         box.setMaxLength(512);
         box.setValue(value != null ? value : "");
         box.setResponder(responder);
         addScrollableWidget(box);
-        addScrollableWidget(Button.builder(Component.literal("Browse"), b -> pickFile(extension, path -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Browse"), b -> pickFile(extension, path -> {
             try {
                 String id = sound ? DialogueEditorWorkspace.importSound(project, path) : DialogueEditorWorkspace.importTexture(project, path);
                 responder.accept(id);
@@ -1777,15 +1788,15 @@ public final class DialogueEditorScreen extends Screen {
 
     private void colorField(String label, String value, int row, Consumer<String> responder) {
         int y = rowY(row);
-        labels.add(new Label(label, 12, y - 10, 0xFFB7C0CC));
+        labels.add(new Label(label, 12, y - 10, 0xFFE8E0C3));
 
-        EditBox box = new EditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
         box.setMaxLength(64);
         box.setValue(value != null ? value : "");
         box.setResponder(responder);
         addScrollableWidget(box);
 
-        addScrollableWidget(Button.builder(Component.literal("Color"), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, value, picked -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Color"), b -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, value, picked -> {
             responder.accept(picked);
             reopen(tab);
         }))).bounds(LEFT - 86, y, 74, controlHeight).build());
@@ -1795,25 +1806,25 @@ public final class DialogueEditorScreen extends Screen {
 
     private void targetField(String label, String value, int row, Consumer<String> responder) {
         int y = rowY(row);
-        labels.add(new Label(label, 12, y - 10, 0xFFB7C0CC));
-        EditBox box = new EditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
+        labels.add(new Label(label, 12, y - 10, 0xFFE8E0C3));
+        EditBox box = new DialogueRetroEditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
         box.setMaxLength(256);
         box.setValue(value != null ? value : "");
         box.setResponder(responder);
         addScrollableWidget(box);
-        addScrollableWidget(Button.builder(Component.literal("Registry"), b -> openTargetRegistry(responder)).bounds(LEFT - 86, y, 74, controlHeight).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Registry"), b -> openTargetRegistry(responder)).bounds(LEFT - 86, y, 74, controlHeight).build());
         addTip(12, y, LEFT - 24, controlHeight, tooltipText(label));
     }
 
     private void zoneTargetField(String label, String value, int row, Consumer<String> responder) {
         int y = rowY(row);
-        labels.add(new Label(label, 12, y - 10, 0xFFB7C0CC));
-        EditBox box = new EditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
+        labels.add(new Label(label, 12, y - 10, 0xFFE8E0C3));
+        EditBox box = new DialogueRetroEditBox(font, 12, y, LEFT - 104, controlHeight, Component.literal(label));
         box.setMaxLength(256);
         box.setValue(value != null ? value : "");
         box.setResponder(responder);
         addScrollableWidget(box);
-        addScrollableWidget(Button.builder(Component.literal("Registry"), b -> {
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("Registry"), b -> {
             DialogueDefinition.Trigger t = project.currentTrigger();
             if (t.anchor == null) t.anchor = new DialogueDefinition.ZoneAnchor();
             var kind = "block".equalsIgnoreCase(t.anchor.type) ? DialogueEditorRegistryPickerScreen.Kind.BLOCK : DialogueEditorRegistryPickerScreen.Kind.ENTITY;
@@ -1837,13 +1848,13 @@ public final class DialogueEditorScreen extends Screen {
     private void smallFields(String labelA, String valueA, Consumer<String> responderA, String labelB, String valueB, Consumer<String> responderB, int row) {
         int y = rowY(row);
         int w = (LEFT - 34) / 2;
-        labels.add(new Label(labelA, 12, y - 10, 0xFFB7C0CC));
-        labels.add(new Label(labelB, 18 + w, y - 10, 0xFFB7C0CC));
-        EditBox a = new EditBox(font, 12, y, w, controlHeight, Component.literal(labelA));
+        labels.add(new Label(labelA, 12, y - 10, 0xFFE8E0C3));
+        labels.add(new Label(labelB, 18 + w, y - 10, 0xFFE8E0C3));
+        EditBox a = new DialogueRetroEditBox(font, 12, y, w, controlHeight, Component.literal(labelA));
         a.setValue(valueA != null ? valueA : "");
         a.setResponder(responderA);
         addScrollableWidget(a);
-        EditBox b = new EditBox(font, 18 + w, y, w, controlHeight, Component.literal(labelB));
+        EditBox b = new DialogueRetroEditBox(font, 18 + w, y, w, controlHeight, Component.literal(labelB));
         b.setValue(valueB != null ? valueB : "");
         b.setResponder(responderB);
         addScrollableWidget(b);
@@ -1859,8 +1870,8 @@ public final class DialogueEditorScreen extends Screen {
         String[] vs = {va, vb, vc};
         Consumer<String>[] cs = new Consumer[]{ca, cb, cc};
         for (int n = 0; n < 3; n++) {
-            labels.add(new Label(ls[n], xs[n], y - 10, 0xFFB7C0CC));
-            EditBox e = new EditBox(font, xs[n], y, w, controlHeight, Component.literal(ls[n]));
+            labels.add(new Label(ls[n], xs[n], y - 10, 0xFFE8E0C3));
+            EditBox e = new DialogueRetroEditBox(font, xs[n], y, w, controlHeight, Component.literal(ls[n]));
             e.setValue(vs[n] != null ? vs[n] : "");
             e.setResponder(cs[n]);
             addScrollableWidget(e);
@@ -1873,7 +1884,7 @@ public final class DialogueEditorScreen extends Screen {
         double clamped = Mth.clamp(current, min, max);
         double normalized = max <= min ? 0.0D : (clamped - min) / (max - min);
 
-        AbstractSliderButton slider = new AbstractSliderButton(12, y, LEFT - 24, controlHeight, Component.empty(), normalized) {
+        AbstractSliderButton slider = new DialogueRetroSlider(12, y, LEFT - 24, controlHeight, Component.empty(), normalized) {
             {
                 updateMessage();
             }
@@ -1897,7 +1908,7 @@ public final class DialogueEditorScreen extends Screen {
 
     private void button(String text, int row, Button.OnPress press) {
         int y = rowY(row);
-        addScrollableWidget(Button.builder(Component.literal(text), press).bounds(12, y, LEFT - 24, controlHeight).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal(text), press).bounds(12, y, LEFT - 24, controlHeight).build());
         addTip(12, y, LEFT - 24, controlHeight, tooltipText(text));
     }
 
@@ -1931,11 +1942,11 @@ public final class DialogueEditorScreen extends Screen {
 
     private void navButtons(String label, int index, int size, int row, Runnable prev, Runnable next, Runnable add, Runnable remove) {
         int y = rowY(row);
-        labels.add(new Label(label + " " + (index + 1) + "/" + size, 12, y - 10, 0xFFB7C0CC));
-        addScrollableWidget(Button.builder(Component.literal("<"), b -> prev.run()).bounds(12, y, 42, controlHeight).build());
-        addScrollableWidget(Button.builder(Component.literal(">"), b -> next.run()).bounds(58, y, 42, controlHeight).build());
-        addScrollableWidget(Button.builder(Component.literal("+"), b -> add.run()).bounds(104, y, 42, controlHeight).build());
-        addScrollableWidget(Button.builder(Component.literal("-"), b -> remove.run()).bounds(150, y, 42, controlHeight).build());
+        labels.add(new Label(label + " " + (index + 1) + "/" + size, 12, y - 10, 0xFFE8E0C3));
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), b -> prev.run()).bounds(12, y, 42, controlHeight).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), b -> next.run()).bounds(58, y, 42, controlHeight).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("+"), b -> add.run()).bounds(104, y, 42, controlHeight).build());
+        addScrollableWidget(DialogueRetroButton.retroBuilder(Component.literal("-"), b -> remove.run()).bounds(150, y, 42, controlHeight).build());
     }
 
     private void help(int row, String text) {
@@ -1963,7 +1974,7 @@ public final class DialogueEditorScreen extends Screen {
                 shown = ellipsize(shown + " …", maxWidth);
             }
 
-            labels.add(new Label(shown, 12, y + line * lineStep, 0xFF87909D));
+            labels.add(new Label(shown, 12, y + line * lineStep, 0xFFABA389));
         }
     }
 
@@ -2012,7 +2023,8 @@ public final class DialogueEditorScreen extends Screen {
     }
 
     private void renderLineTimeline(GuiGraphics graphics, int x, int y, int w, int h, int mouseX, int mouseY) {
-        graphics.fill(x, y, x + w, y + h, 0xF00D1219);
+        DialogueRetroTheme.drawPanel(graphics, x, y, x + w, y + h);
+        DialogueRetroTheme.drawDarkInset(graphics, x + 4, y + 18, x + w - 4, y + h - 4);
         graphics.enableScissor(x, y, x + w, y + h);
 
         int cardW = 106;
@@ -2025,7 +2037,7 @@ public final class DialogueEditorScreen extends Screen {
 
         String title = "LINE / SPRITE TIMELINE";
 
-        graphics.drawString(font, ellipsize(title, Math.max(40, w - 16)), x + 8, y + 5, 0xFF6FF8E9, false);
+        graphics.drawString(font, ellipsize(title, Math.max(40, w - 16)), x + 8, y + 5, 0xFFB8FF72, false);
         if (project.definition.lines.size() > visible) {
 
             String hint = "wheel: scroll";
@@ -2036,7 +2048,7 @@ public final class DialogueEditorScreen extends Screen {
 
             if (titleW + hintW + 32 <= w) {
 
-                graphics.drawString(font, hint, x + w - hintW - 8, y + 5, 0xFF778493, false);
+                graphics.drawString(font, hint, x + w - hintW - 8, y + 5, 0xFF9C957B, false);
             }
         }
 
@@ -2052,15 +2064,15 @@ public final class DialogueEditorScreen extends Screen {
 
             int cy = y + 20;
 
-            int color = index == project.selected_line ? 0xFF263941 : 0xFF171E28;
+            int color = index == project.selected_line ? 0xFF344B2B : 0xFF1C2418;
 
             if (index == dragLineIndex) {
-                color = 0xFF314A54;
+                color = 0xFF4A6339;
             }
 
             graphics.fill(cx, cy, cx + cardW, cy + 40, color);
 
-            graphics.fill(cx + 1, cy + 1, cx + cardW - 1, cy + 39, 0xFF0E141C);
+            graphics.fill(cx + 1, cy + 1, cx + cardW - 1, cy + 39, 0xFF11170E);
 
             ResourceLocation sprite = DialogueEditorTextureCache.resolve(project, line.sprite, EDITOR_DEFAULT_SPRITE);
 
@@ -2068,15 +2080,15 @@ public final class DialogueEditorScreen extends Screen {
                 graphics.blit(sprite, cx + 4, cy + 4, 0, 0, 30, 30, 30, 30);
             }
 
-            graphics.drawString(font, "#" + (index + 1), cx + 38, cy + 4, index == project.selected_line ? 0xFF6FF8E9 : 0xFFFFFFFF, false);
+            graphics.drawString(font, "#" + (index + 1), cx + 38, cy + 4, index == project.selected_line ? 0xFFB8FF72 : 0xFFFFFFFF, false);
 
             String text = line.literal != null ? line.literal : project.getLocalizedText(project.preview_locale, line, index);
 
-            graphics.drawString(font, shortText(text, 11), cx + 38, cy + 15, 0xFFADB7C3, false);
+            graphics.drawString(font, shortText(text, 11), cx + 38, cy + 15, 0xFFD8CFB0, false);
 
             String transition = line.sprite_transition != null ? line.sprite_transition : project.definition.sprite_transition;
 
-            graphics.drawString(font, shortText(transition != null ? transition : "none", 11), cx + 38, cy + 27, 0xFF778493, false);
+            graphics.drawString(font, shortText(transition != null ? transition : "none", 11), cx + 38, cy + 27, 0xFF9C957B, false);
         }
 
         graphics.disableScissor();
@@ -2220,12 +2232,15 @@ public final class DialogueEditorScreen extends Screen {
         int borderAlpha = Math.max(0, Math.min(255, Math.round(235.0F * alpha)));
         int textAlpha = Math.max(0, Math.min(255, Math.round(255.0F * alpha)));
 
-        graphics.fill(x, y, x + boxW, y + boxH, (bgAlpha << 24) | 0x101820);
-        graphics.fill(x, y, x + boxW, y + 1, (borderAlpha << 24) | 0x42F2E1);
+        int shadow = (Math.max(0, Math.min(255, Math.round(150.0F * alpha))) << 24);
+        graphics.fill(x + 3, y + 3, x + boxW + 3, y + boxH + 3, shadow);
+        graphics.fill(x, y, x + boxW, y + boxH, (bgAlpha << 24) | 0xE9E2C8);
+        graphics.fill(x, y, x + boxW, y + 1, (borderAlpha << 24) | 0x080A07);
+        graphics.fill(x, y + 1, x + boxW, y + 3, (borderAlpha << 24) | 0x87D653);
 
         String shown = ellipsize(toastText, boxW - 18);
         int tx = x + (boxW - font.width(shown)) / 2;
-        graphics.drawString(font, shown, tx, y + 8, (textAlpha << 24) | 0x7FFFEF, false);
+        graphics.drawString(font, shown, tx, y + 8, (textAlpha << 24) | 0x151812, false);
     }
 
     private void addTip(int x, int y, int w, int h, String text) {

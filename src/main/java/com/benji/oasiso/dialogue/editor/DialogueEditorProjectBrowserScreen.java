@@ -1,13 +1,12 @@
 package com.benji.oasiso.dialogue.editor;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-public final class DialogueEditorProjectBrowserScreen extends Screen {
+public final class DialogueEditorProjectBrowserScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private List<DialogueEditorProject> projects = List.of();
@@ -37,27 +36,27 @@ public final class DialogueEditorProjectBrowserScreen extends Screen {
             int index = i;
             int y = 48 + (i - start) * 36;
             String prefix = index == selected ? "> " : "";
-            addRenderableWidget(Button.builder(Component.literal(prefix + project.project_name + "  [" + project.dialogueId() + "]"), b -> {
+            addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(prefix + project.project_name + "  [" + project.dialogueId() + "]"), b -> {
                 selected = index;
                 rebuild();
             }).bounds(14, y, listW - 28, 30).build());
         }
 
         int pages = Math.max(1, (projects.size() + ROWS - 1) / ROWS);
-        addRenderableWidget(Button.builder(Component.literal("<"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), b -> {
             page = Math.max(0, page - 1);
             rebuild();
         }).bounds(14, height - 30, 30, 20).build());
-        addRenderableWidget(Button.builder(Component.literal((page + 1) + "/" + pages), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal((page + 1) + "/" + pages), b -> {
         }).bounds(48, height - 30, 70, 20).build());
-        addRenderableWidget(Button.builder(Component.literal(">"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), b -> {
             page = Math.min(pages - 1, page + 1);
             rebuild();
         }).bounds(122, height - 30, 30, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("New project"), b -> minecraft.setScreen(new DialogueEditorScreen(DialogueEditorProject.createDefault(), DialogueEditorScreen.Tab.PROJECT))).bounds(listW + 16, height - 30, 92, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("New project"), b -> minecraft.setScreen(new DialogueEditorScreen(DialogueEditorProject.createDefault(), DialogueEditorScreen.Tab.PROJECT))).bounds(listW + 16, height - 30, 92, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Open selected"), b -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Open selected"), b -> {
             if (selected >= 0 && selected < projects.size()) {
                 DialogueEditorProject project = projects.get(selected);
                 try {
@@ -68,7 +67,7 @@ public final class DialogueEditorProjectBrowserScreen extends Screen {
             }
         }).bounds(listW + 112, height - 30, 104, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Back"), b -> minecraft.setScreen(parent)).bounds(width - 82, height - 30, 68, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Back"), b -> minecraft.setScreen(parent)).bounds(width - 82, height - 30, 68, 20).build());
     }
 
     private void rebuild() {
@@ -86,9 +85,9 @@ public final class DialogueEditorProjectBrowserScreen extends Screen {
         renderBackground(graphics);
         int listW = Math.min(300, Math.max(210, width / 3));
 
-        graphics.fill(8, 8, listW, height - 38, 0xE010141C);
-        graphics.drawString(font, "DIALOGUE PROJECTS", 16, 18, 0xFF6FF8E9, false);
-        graphics.drawString(font, projects.size() + " project(s)", 16, 31, 0xFF8E9AA8, false);
+        graphics.fill(8, 8, listW, height - 38, 0xE011170E);
+        graphics.drawString(font, "DIALOGUE PROJECTS", 16, 18, 0xFFB8FF72, false);
+        graphics.drawString(font, projects.size() + " project(s)", 16, 31, 0xFFBDB497, false);
 
         int px = listW + 12;
         int py = 12;
@@ -100,8 +99,8 @@ public final class DialogueEditorProjectBrowserScreen extends Screen {
             DialogueEditorPreview.render(project, graphics, px, py, pw, ph, ticks, partialTick);
             graphics.drawString(font, project.project_name, px + 12, py + ph - 17, 0xFFFFFFFF, false);
         } else {
-            graphics.fill(px, py, px + pw, py + ph, 0xCC0C1118);
-            graphics.drawCenteredString(font, "No saved projects yet", px + pw / 2, py + ph / 2, 0xFFB7C0CC);
+            graphics.fill(px, py, px + pw, py + ph, 0xCC0D120B);
+            graphics.drawCenteredString(font, "No saved projects yet", px + pw / 2, py + ph / 2, 0xFFE8E0C3);
         }
 
         super.render(graphics, mouseX, mouseY, partialTick);

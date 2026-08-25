@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public final class DialogueEditorFontPickerScreen extends Screen {
+public final class DialogueEditorFontPickerScreen extends DialogueRetroScreen {
 
     private final Screen parent;
     private final DialogueEditorProject project;
@@ -61,8 +61,8 @@ public final class DialogueEditorFontPickerScreen extends Screen {
 
         int innerW = panelW - 32;
 
-        addRenderableWidget(Button.builder(Component.literal("Import TTF..."), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), ".ttf", this::importTtf))).bounds(left + 16, 48, innerW / 2 - 4, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("Import MSDF JSON + PNG..."), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), ".json", this::importMsdf))).bounds(left + 20 + innerW / 2, 48, innerW / 2 - 4, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Import TTF..."), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), ".ttf", this::importTtf))).bounds(left + 16, 48, innerW / 2 - 4, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Import MSDF JSON + PNG..."), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), ".json", this::importMsdf))).bounds(left + 20 + innerW / 2, 48, innerW / 2 - 4, 20).build());
 
         List<FontRow> rows = rows();
 
@@ -77,7 +77,7 @@ public final class DialogueEditorFontPickerScreen extends Screen {
         for (FontRow row : rows) {
 
             String selected = sameFont(current, row.id) ? "✓ " : "";
-            Button button = Button.builder(Component.literal(selected + row.title), b -> callback.accept(row.id)).bounds(left + 16, y, innerW, 20).build();
+            Button button = DialogueRetroButton.retroBuilder(Component.literal(selected + row.title), b -> callback.accept(row.id)).bounds(left + 16, y, innerW, 20).build();
 
             contentWidgets.add(button);
             addRenderableWidget(button);
@@ -87,7 +87,7 @@ public final class DialogueEditorFontPickerScreen extends Screen {
 
         updateVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(left + 16, height - 30, innerW, 20).build());
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Cancel"), b -> minecraft.setScreen(parent)).bounds(left + 16, height - 30, innerW, 20).build());
     }
 
     private List<FontRow> rows() {
@@ -181,9 +181,9 @@ public final class DialogueEditorFontPickerScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 10, left + panelW, height - 8, 0xF010151D);
-        graphics.drawString(font, "TEXT FONT", left + 16, 18, 0xFF6FF8E9, false);
-        graphics.drawString(font, allowInherit ? "INHERIT and VANILLA are different: vanilla explicitly cancels a parent custom font." : "Default: Minecraft. Import TTF or MSDF atlas.", left + 16, 30, 0xFF8E9AA8, false);
+        graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
+        graphics.drawString(font, "TEXT FONT", left + 16, 18, 0xFFB8FF72, false);
+        graphics.drawString(font, allowInherit ? "INHERIT and VANILLA are different: vanilla explicitly cancels a parent custom font." : "Default: Minecraft. Import TTF or MSDF atlas.", left + 16, 30, 0xFFBDB497, false);
         graphics.drawString(font, DialogueEditorFontPreviewPack.statusLine(project), left + 16, 39, 0xFFFFD45A, false);
 
         if (errorMessage != null && !errorMessage.isBlank()) {
@@ -197,7 +197,7 @@ public final class DialogueEditorFontPickerScreen extends Screen {
 
         for (FontRow row : rows()) {
 
-            graphics.drawString(font, row.kind, left + 24, y + 22, 0xFF778493, false);
+            graphics.drawString(font, row.kind, left + 24, y + 22, 0xFF9C957B, false);
 
             y += 34;
         }
@@ -208,8 +208,8 @@ public final class DialogueEditorFontPickerScreen extends Screen {
             renderScrollbar(graphics);
         }
 
-        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF00B0F15);
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF0090C08);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -230,9 +230,9 @@ public final class DialogueEditorFontPickerScreen extends Screen {
         int travel = Math.max(1, trackH - thumbH);
         int thumbY = trackTop + Math.round(travel * scrollOffset / (float) max);
 
-        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
     }
 
     private boolean sameFont(String a, String b) {

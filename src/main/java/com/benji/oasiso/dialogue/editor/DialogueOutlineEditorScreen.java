@@ -4,7 +4,6 @@ import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import com.benji.oasiso.dialogue.text.DialogueTextRenderUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public final class DialogueOutlineEditorScreen extends Screen {
+public final class DialogueOutlineEditorScreen extends DialogueRetroScreen {
 
     private enum Scope {
         GLOBAL, LINE, REGION
@@ -112,7 +111,7 @@ public final class DialogueOutlineEditorScreen extends Screen {
 
         updateContentVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> {
             DialogueEditorHistory.checkpoint(project);
 
             minecraft.setScreen(parent);
@@ -120,19 +119,19 @@ public final class DialogueOutlineEditorScreen extends Screen {
     }
 
     private int addContentButton(int y, String title, Runnable action) {
-        addContentWidget(Button.builder(Component.literal(title), button -> action.run()).bounds(left + 16, y, panelW - 32, 20).build());
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal(title), button -> action.run()).bounds(left + 16, y, panelW - 32, 20).build());
 
         return y + 30;
     }
 
     private int addColorRow(int y, int innerW) {
-        addContentLabel(scope == Scope.GLOBAL ? "Color (blank = black)" : "Color (blank = INHERIT)", left + 16, y, 0xFF9EA8B5);
+        addContentLabel(scope == Scope.GLOBAL ? "Color (blank = black)" : "Color (blank = INHERIT)", left + 16, y, 0xFFCFC6A6);
 
         y += 11;
 
         int pickerW = 86;
 
-        EditBox color = new EditBox(font, left + 16, y, innerW - pickerW - 4, 20, Component.literal("Outline color"));
+        EditBox color = new DialogueRetroEditBox(font, left + 16, y, innerW - pickerW - 4, 20, Component.literal("Outline color"));
 
         color.setMaxLength(64);
         color.setValue(colorValue());
@@ -141,20 +140,19 @@ public final class DialogueOutlineEditorScreen extends Screen {
 
         addContentWidget(color);
 
-        addContentWidget(Button.builder(Component.literal("Color..."), button -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, colorValue().isBlank() ? effectiveColor() : colorValue(), picked -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Color..."), button -> minecraft.setScreen(new DialogueEditorColorPickerScreen(this, colorValue().isBlank() ? effectiveColor() : colorValue(), picked -> {
             setColor(picked);
             rebuild();
         }))).bounds(left + 16 + innerW - pickerW, y, pickerW, 20).build());
-
         return y + 30;
     }
 
     private int addGradientRow(int y, int innerW) {
-        addContentLabel(scope == Scope.GLOBAL ? "Gradient: blank = use color" : "Gradient: blank = INHERIT, none = disable", left + 16, y, 0xFF9EA8B5);
+        addContentLabel(scope == Scope.GLOBAL ? "Gradient: blank = use color" : "Gradient: blank = INHERIT, none = disable", left + 16, y, 0xFFCFC6A6);
 
         y += 11;
 
-        EditBox gradient = new EditBox(font, left + 16, y, innerW, 20, Component.literal("Outline gradient"));
+        EditBox gradient = new DialogueRetroEditBox(font, left + 16, y, innerW, 20, Component.literal("Outline gradient"));
 
         gradient.setMaxLength(512);
         gradient.setValue(gradientText(gradientValue()));
@@ -167,19 +165,19 @@ public final class DialogueOutlineEditorScreen extends Screen {
     }
 
     private int addThicknessRow(int y, int innerW) {
-        addContentLabel(scope == Scope.GLOBAL ? "Thickness: 0 = OFF, 1..4 = crisp pixel radius" : "Thickness: blank = INHERIT, 0 = OFF, 1..4 = crisp", left + 16, y, 0xFF9EA8B5);
+        addContentLabel(scope == Scope.GLOBAL ? "Thickness: 0 = OFF, 1..4 = crisp pixel radius" : "Thickness: blank = INHERIT, 0 = OFF, 1..4 = crisp", left + 16, y, 0xFFCFC6A6);
 
         y += 11;
 
         int small = 66;
 
-        addContentWidget(Button.builder(Component.literal("- 0.25"), button -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("- 0.25"), button -> {
             setThickness(Math.max(0.0F, resolvedEditableThickness() - 0.25F));
 
             rebuild();
         }).bounds(left + 16, y, small, 20).build());
 
-        EditBox thickness = new EditBox(font, left + 16 + small + 4, y, innerW - small * 2 - 8, 20, Component.literal("Outline thickness"));
+        EditBox thickness = new DialogueRetroEditBox(font, left + 16 + small + 4, y, innerW - small * 2 - 8, 20, Component.literal("Outline thickness"));
 
         thickness.setValue(thicknessText());
 
@@ -200,7 +198,7 @@ public final class DialogueOutlineEditorScreen extends Screen {
 
         addContentWidget(thickness);
 
-        addContentWidget(Button.builder(Component.literal("+ 0.25"), button -> {
+        addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("+ 0.25"), button -> {
             setThickness(Math.min(4.0F, resolvedEditableThickness() + 0.25F));
 
             rebuild();
@@ -259,11 +257,11 @@ public final class DialogueOutlineEditorScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 8, left + panelW, height - 8, 0xF010151D);
-        graphics.drawString(font, "TEXT OUTLINE • " + scope.name(), left + 16, 16, 0xFF6FF8E9, false);
-        graphics.drawString(font, scopeHelp(), left + 16, 29, 0xFF8E9AA8, false);
-        graphics.fill(left + 16, previewTop, left + panelW - 16, previewBottom, 0xFF0A0E14);
-        graphics.drawString(font, "LIVE PREVIEW", left + 26, previewTop + 8, 0xFF778493, false);
+        graphics.fill(left, 8, left + panelW, height - 8, 0xF0121710);
+        graphics.drawString(font, "TEXT OUTLINE • " + scope.name(), left + 16, 16, 0xFFB8FF72, false);
+        graphics.drawString(font, scopeHelp(), left + 16, 29, 0xFFBDB497, false);
+        graphics.fill(left + 16, previewTop, left + panelW - 16, previewBottom, 0xFF0B1009);
+        graphics.drawString(font, "LIVE PREVIEW", left + 26, previewTop + 8, 0xFF9C957B, false);
 
         renderPreviewText(graphics);
 
@@ -283,8 +281,8 @@ public final class DialogueOutlineEditorScreen extends Screen {
             renderScrollbar(graphics);
         }
 
-        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF00B0F15);
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF0090C08);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -369,9 +367,9 @@ public final class DialogueOutlineEditorScreen extends Screen {
         int travel = Math.max(1, trackH - thumbH);
         int thumbY = trackTop + Math.round(travel * scrollOffset / (float) max);
 
-        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
     }
 
     private String modeLabel() {

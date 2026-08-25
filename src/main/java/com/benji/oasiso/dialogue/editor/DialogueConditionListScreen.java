@@ -3,7 +3,6 @@ package com.benji.oasiso.dialogue.editor;
 import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public final class DialogueConditionListScreen extends Screen {
+public final class DialogueConditionListScreen extends DialogueRetroScreen {
 
     private static final List<String> TYPES = List.of("always", "player_tag", "source_tag", "score", "has_item", "dimension", "source_type", "mod_loaded", "quest_state");
 
@@ -79,10 +78,10 @@ public final class DialogueConditionListScreen extends Screen {
 
         y = addInfoCard(y, "THIS RULE MEANS:", humanSentence(condition), 0xFFD8E36A, 0xFFFFD45A);
 
-        y = addInfoCard(y, "HOW THIS RULE IS USED", typeHelp(normalizeType(condition.type)), 0xFF40556A, 0xFF9FB9D1);
+        y = addInfoCard(y, "HOW THIS RULE IS USED", typeHelp(normalizeType(condition.type)), 0xFF526B3D, 0xFFD2C8AA);
 
         if (conditions.size() > 1) {
-            y = addInfoCard(y, "AND GROUP", "All " + conditions.size() + " rules in this list must be TRUE. If even one rule is FALSE, this branch/choice is unavailable.", 0xFF2F6F69, 0xFF67F0E6);
+            y = addInfoCard(y, "AND GROUP", "All " + conditions.size() + " rules in this list must be TRUE. If even one rule is FALSE, this branch/choice is unavailable.", 0xFF4B7840, 0xFFA8F06A);
         }
 
         y = buildFieldsForType(condition, y);
@@ -92,7 +91,7 @@ public final class DialogueConditionListScreen extends Screen {
 
         updateContentVisibility();
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Done"), button -> {
             DialogueEditorHistory.checkpoint(project);
 
             minecraft.setScreen(parent);
@@ -106,7 +105,7 @@ public final class DialogueConditionListScreen extends Screen {
 
         y += 34;
 
-        addRenderableWidget(Button.builder(Component.literal("Rule type: " + friendlyType(condition.type)), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Rule type: " + friendlyType(condition.type)), button -> {
             condition.type = next(normalizeType(condition.type), TYPES);
 
             normalizeForType(condition);
@@ -115,7 +114,7 @@ public final class DialogueConditionListScreen extends Screen {
             rebuild();
         }).bounds(left + 16, y, innerW / 2 - 4, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal(condition.invert ? "NOT / Invert: ON" : "NOT / Invert: OFF"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(condition.invert ? "NOT / Invert: ON" : "NOT / Invert: OFF"), button -> {
             condition.invert = !condition.invert;
 
             scrollOffset = 0;
@@ -126,7 +125,7 @@ public final class DialogueConditionListScreen extends Screen {
     private void buildNavigator(int y) {
         int x = left + 16;
 
-        addRenderableWidget(Button.builder(Component.literal("<"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("<"), button -> {
             selected = Math.max(0, selected - 1);
 
             scrollOffset = 0;
@@ -135,12 +134,12 @@ public final class DialogueConditionListScreen extends Screen {
 
         x += 44;
 
-        addRenderableWidget(Button.builder(Component.literal("Rule " + (selected + 1) + " / " + conditions.size()), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("Rule " + (selected + 1) + " / " + conditions.size()), button -> {
         }).bounds(x, y, 146, 20).build());
 
         x += 150;
 
-        addRenderableWidget(Button.builder(Component.literal(">"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal(">"), button -> {
             selected = Math.min(conditions.size() - 1, selected + 1);
 
             scrollOffset = 0;
@@ -149,7 +148,7 @@ public final class DialogueConditionListScreen extends Screen {
 
         x += 48;
 
-        addRenderableWidget(Button.builder(Component.literal("+ Add rule"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("+ Add rule"), button -> {
             conditions.add(new DialogueDefinition.Condition());
 
             selected = conditions.size() - 1;
@@ -160,7 +159,7 @@ public final class DialogueConditionListScreen extends Screen {
 
         x += 98;
 
-        addRenderableWidget(Button.builder(Component.literal("- Remove"), button -> {
+        addRenderableWidget(DialogueRetroButton.retroBuilder(Component.literal("- Remove"), button -> {
             if (conditions.size() > 1) {
                 conditions.remove(selected);
 
@@ -183,7 +182,7 @@ public final class DialogueConditionListScreen extends Screen {
         String type = normalizeType(condition.type);
 
         if ("always".equals(type)) {
-            return addInfoCard(y, "NO INPUT REQUIRED", "Always true has no extra fields. This rule never blocks the path unless NOT / Invert is enabled.", 0xFF40556A, 0xFF9FB9D1);
+            return addInfoCard(y, "NO INPUT REQUIRED", "Always true has no extra fields. This rule never blocks the path unless NOT / Invert is enabled.", 0xFF526B3D, 0xFFD2C8AA);
         }
 
         switch (type) {
@@ -192,17 +191,17 @@ public final class DialogueConditionListScreen extends Screen {
 
                 int rowY = y;
 
-                addLabel("Comparison operator", left + 16, rowY - 11, 0xFF9EA8B5);
+                addLabel("Comparison operator", left + 16, rowY - 11, 0xFFCFC6A6);
 
-                addLabel("Score value", left + 20 + innerW / 2, rowY - 11, 0xFF9EA8B5);
+                addLabel("Score value", left + 20 + innerW / 2, rowY - 11, 0xFFCFC6A6);
 
-                addContentWidget(Button.builder(Component.literal("Compare: " + nullToDefault(condition.operator, ">=")), button -> {
+                addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("Compare: " + nullToDefault(condition.operator, ">=")), button -> {
                     condition.operator = next(nullToDefault(condition.operator, ">="), OPERATORS);
 
                     rebuild();
                 }).bounds(left + 16, rowY, innerW / 2 - 4, 20).build());
 
-                EditBox value = new EditBox(font, left + 20 + innerW / 2, rowY, innerW / 2 - 4, 20, Component.literal("Score value"));
+                EditBox value = new DialogueRetroEditBox(font, left + 20 + innerW / 2, rowY, innerW / 2 - 4, 20, Component.literal("Score value"));
 
                 value.setValue(String.valueOf(condition.value));
 
@@ -244,9 +243,9 @@ public final class DialogueConditionListScreen extends Screen {
 
                 int rowY = y;
 
-                addLabel("Required quest state", left + 16, rowY - 11, 0xFF9EA8B5);
+                addLabel("Required quest state", left + 16, rowY - 11, 0xFFCFC6A6);
 
-                addContentWidget(Button.builder(Component.literal("State: " + nullToDefault(condition.state, "active")), button -> {
+                addContentWidget(DialogueRetroButton.retroBuilder(Component.literal("State: " + nullToDefault(condition.state, "active")), button -> {
                     condition.state = next(nullToDefault(condition.state, "active"), List.of("not_started", "active", "completed", "failed", "started"));
 
                     rebuild();
@@ -275,7 +274,7 @@ public final class DialogueConditionListScreen extends Screen {
 
         for (String line : wrapped) {
 
-            addLabel(line, left + 28, ty, 0xFFD2D8E0);
+            addLabel(line, left + 28, ty, 0xFFF0E8D0);
 
             ty += 12;
         }
@@ -284,9 +283,9 @@ public final class DialogueConditionListScreen extends Screen {
     }
 
     private int addField(int y, String label, String value, int maxLength, Consumer<String> responder) {
-        addLabel(label, left + 16, y - 11, 0xFF9EA8B5);
+        addLabel(label, left + 16, y - 11, 0xFFCFC6A6);
 
-        EditBox box = new EditBox(font, left + 16, y, innerW, 20, Component.literal(label));
+        EditBox box = new DialogueRetroEditBox(font, left + 16, y, innerW, 20, Component.literal(label));
 
         box.setMaxLength(maxLength);
         box.setValue(value != null ? value : "");
@@ -375,9 +374,9 @@ public final class DialogueConditionListScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
 
-        graphics.fill(left, 16, left + panelW, height - 8, 0xF010151D);
+        graphics.fill(left, 16, left + panelW, height - 8, 0xF0121710);
 
-        graphics.drawString(font, heading, left + 16, 24, 0xFF6FF8E9, false);
+        graphics.drawString(font, heading, left + 16, 24, 0xFFB8FF72, false);
         graphics.enableScissor(left, contentTop, left + panelW, contentBottom);
 
         for (Card card : cards) {
@@ -402,13 +401,13 @@ public final class DialogueConditionListScreen extends Screen {
         graphics.disableScissor();
 
         if (maxScroll() > 0) {
-            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 24, 0xFF697585, false);
+            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 24, 0xFF8E876F, false);
 
             renderScrollbar(graphics);
         }
-        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF00B0F15);
+        graphics.fill(left, contentBottom + 1, left + panelW, height - 8, 0xF0090C08);
 
-        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF39414C);
+        graphics.fill(left, contentBottom, left + panelW, contentBottom + 1, 0xFF445438);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -436,9 +435,9 @@ public final class DialogueConditionListScreen extends Screen {
 
         int thumbY = trackTop + Math.round(travel * (scrollOffset / (float) max));
 
-        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x55313A46);
+        graphics.fill(trackX, trackTop, trackX + 2, trackBottom, 0x555B664C);
 
-        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFF6FF8E9);
+        graphics.fill(trackX - 1, thumbY, trackX + 3, thumbY + thumbH, 0xFFB8FF72);
     }
 
     private String humanSentence(DialogueDefinition.Condition condition) {
