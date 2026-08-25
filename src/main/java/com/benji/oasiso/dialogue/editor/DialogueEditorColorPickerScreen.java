@@ -111,9 +111,9 @@ public final class DialogueEditorColorPickerScreen extends DialogueRetroScreen {
         int rgb = Color.HSBtoRGB(hue, saturation, brightness) & 0xFFFFFF;
         graphics.fill(left + 200, top + 30, left + 234, top + 64, 0xFF000000 | rgb);
         graphics.drawString(font, "Preview", left + 194, top + 70, 0xFFE8E0C3, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "H %.0f°", hue * 360.0F), left + 194, top + 90, 0xFFC7BEA0, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "S %.0f%%", saturation * 100.0F), left + 194, top + 102, 0xFFC7BEA0, false);
-        graphics.drawString(font, String.format(Locale.ROOT, "V %.0f%%", brightness * 100.0F), left + 194, top + 114, 0xFFC7BEA0, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "H %.0f°", hue * 360.0F), left + 194, top + 90, DialogueRetroTheme.TEXT_HINT, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "S %.0f%%", saturation * 100.0F), left + 194, top + 102, DialogueRetroTheme.TEXT_HINT, false);
+        graphics.drawString(font, String.format(Locale.ROOT, "V %.0f%%", brightness * 100.0F), left + 194, top + 114, DialogueRetroTheme.TEXT_HINT, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

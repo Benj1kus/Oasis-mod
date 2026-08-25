@@ -37,6 +37,6 @@ public abstract class DialogueRetroSlider extends AbstractSliderButton {
 
         Minecraft minecraft = Minecraft.getInstance();
         String shown = minecraft.font.plainSubstrByWidth(getMessage().getString(), Math.max(8, width - 10));
-        graphics.drawCenteredString(minecraft.font, shown, x0 + width / 2, y0 + 3, this.active ? DialogueRetroTheme.TEXT_DARK : 0xFF5A574A);
+        graphics.drawCenteredString(minecraft.font, shown, x0 + width / 2, y0 + 3, this.active ? DialogueRetroTheme.TEXT_ACCENT : DialogueRetroTheme.TEXT_DARK_MUTED);
     }
 }

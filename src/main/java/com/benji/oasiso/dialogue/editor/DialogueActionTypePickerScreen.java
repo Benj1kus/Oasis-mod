@@ -142,10 +142,10 @@ public final class DialogueActionTypePickerScreen extends DialogueRetroScreen {
 
         graphics.drawString(font, "CHOOSE WHAT THIS ACTION DOES", left + 16, 22, 0xFFB8FF72, false);
 
-        graphics.drawString(font, "Items / quests / entity state / world effects / integration", left + 16, 36, 0xFFBDB497, false);
+        graphics.drawString(font, "Items / quests / entity state / world effects / integration", left + 16, 36, DialogueRetroTheme.TEXT_HINT, false);
 
         if (maxScroll() > 0) {
-            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 49, 0xFF8E876F, false);
+            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 49, DialogueRetroTheme.TEXT_HINT, false);
         }
 
         graphics.enableScissor(left, CONTENT_TOP, left + panelW, contentBottom);

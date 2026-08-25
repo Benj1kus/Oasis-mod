@@ -112,7 +112,7 @@ public final class DialogueEditorTextEffectsScreen extends DialogueRetroScreen {
         graphics.fill(left, top, left + panelW, top + 250, 0xF0141A11);
         graphics.fill(left + 1, top + 1, left + panelW - 1, top + 249, 0xFF0C110A);
         graphics.drawString(font, "COMBINED TEXT EFFECTS", left + 16, top + 12, 0xFFB8FF72, false);
-        graphics.drawString(font, "Multiple effects are applied together.", left + 16, top + 25, 0xFFC7BEA0, false);
+        graphics.drawString(font, "Multiple effects are applied together.", left + 16, top + 25, DialogueRetroTheme.TEXT_HINT, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

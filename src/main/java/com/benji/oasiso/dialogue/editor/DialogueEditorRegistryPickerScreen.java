@@ -393,7 +393,7 @@ public final class DialogueEditorRegistryPickerScreen extends DialogueRetroScree
                 }
             }
         }
-        graphics.drawString(font, "Loaded namespaces: " + Math.max(0, namespaces().size() - 1), 12, 60, 0xFFA09A80, false);
+        graphics.drawString(font, "Loaded namespaces: " + Math.max(0, namespaces().size() - 1), 12, 60, DialogueRetroTheme.TEXT_HINT, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

@@ -61,13 +61,20 @@ public final class DialogueEditorPreview {
         DialogueDefinition.Line line = forceSelectedLegacyLine ? project.currentLine() : project.previewLine();
 
         DialogueRetroTheme.drawPanel(graphics, x, y, x + width, y + height);
-        DialogueRetroTheme.drawTitleBar(graphics, x + 3, y + 3, x + width - 3, 24);
-        DialogueRetroTheme.drawDarkInset(graphics, x + 6, y + 30, x + width - 6, y + height - 6);
+        DialogueRetroTheme.drawTitleBar(graphics, x + 3, y + 3, x + width - 3, 28);
 
-        float scale = Math.min((width - 28) / (float) layout.canvas_width, (height - 52) / (float) layout.canvas_height);
+        int previewTop = y + 36;
+        int previewBottom = y + height - 6;
+
+        DialogueRetroTheme.drawDarkInset(graphics, x + 6, previewTop, x + width - 6, previewBottom);
+
+        float availableHeight = Math.max(1.0F, previewBottom - previewTop - 8.0F);
+        float scale = Math.min((width - 28) / (float) layout.canvas_width, availableHeight / (float) layout.canvas_height);
         scale = Math.max(0.2F, scale);
+
         float originX = x + (width - layout.canvas_width * scale) * 0.5F;
-        float originY = y + 28 + (height - 38 - layout.canvas_height * scale) * 0.5F;
+        float originY = previewTop + (previewBottom - previewTop - layout.canvas_height * scale) * 0.5F;
+
         Transform transform = new Transform(originX, originY, scale, layout.canvas_width, layout.canvas_height);
 
         graphics.drawString(Minecraft.getInstance().font, "LIVE DIALOGUE PREVIEW", x + 10, y + 9, 0xFFA8F06A, false);
@@ -77,9 +84,8 @@ public final class DialogueEditorPreview {
 
         previewLabel = ellipsize(headerFont, previewLabel, Math.max(20, width - 20));
 
-        graphics.drawString(headerFont, previewLabel, x + 10, y + 20, 0xFFABA389, false);
-
-        graphics.enableScissor(x + 1, y + 28, x + width - 1, y + height - 1);
+        graphics.drawString(headerFont, previewLabel, x + 10, y + 21, DialogueRetroTheme.TEXT_LIGHT, false);
+        graphics.enableScissor(x + 1, previewTop, x + width - 1, y + height - 1);
 
         PoseStack pose = graphics.pose();
         pose.pushPose();

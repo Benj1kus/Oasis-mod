@@ -158,8 +158,8 @@ public final class DialogueEditorFilePickerScreen extends DialogueRetroScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
-        graphics.drawString(font, "Folder: " + current, 10, 59, 0xFFF1E9CF, false);
-        graphics.drawString(font, "Mouse wheel changes pages. Showing folders and " + (extension.isBlank() ? "files" : extension + " files") + ". You can also drag files directly into Dialogue Studio.", 10, height - 40, 0xFFAAAAAA, false);
+        graphics.drawString(font, "Folder: " + current, 10, 59, DialogueRetroTheme.TEXT_PATH, false);
+        graphics.drawString(font, "Mouse wheel changes pages. Showing folders and " + (extension.isBlank() ? "files" : extension + " files") + ". You can also drag files directly into Dialogue Studio.", 10, height - 40, DialogueRetroTheme.TEXT_HINT, false);
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 

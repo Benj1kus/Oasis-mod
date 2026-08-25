@@ -26,7 +26,9 @@ public final class DialogueRetroTheme {
     public static final int TEXT_MUTED = 0xFFC6BFA2;
     public static final int TEXT_DARK = 0xFF151812;
     public static final int TEXT_DARK_MUTED = 0xFF4D5446;
-
+    public static final int TEXT_HINT = 0xFF2E5A26;
+    public static final int TEXT_PATH = 0xFF173D15;
+    public static final int TEXT_ACCENT = 0xFF09E62D;
     public static final int ERROR = 0xFFFF746A;
     public static final int WARNING = 0xFFFFD86A;
 

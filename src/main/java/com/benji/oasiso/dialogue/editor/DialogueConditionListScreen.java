@@ -401,7 +401,7 @@ public final class DialogueConditionListScreen extends DialogueRetroScreen {
         graphics.disableScissor();
 
         if (maxScroll() > 0) {
-            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 24, 0xFF8E876F, false);
+            graphics.drawString(font, "mouse wheel: scroll", left + panelW - 118, 24, DialogueRetroTheme.TEXT_HINT, false);
 
             renderScrollbar(graphics);
         }

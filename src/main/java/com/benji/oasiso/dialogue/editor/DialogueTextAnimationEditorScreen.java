@@ -172,7 +172,7 @@ public final class DialogueTextAnimationEditorScreen extends DialogueRetroScreen
 
         graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
         graphics.drawString(font, "TEXT ANIMATION • REGION", left + 16, 18, 0xFFB8FF72, false);
-        graphics.drawString(font, "Drag sliders and watch the selected phrase react immediately.", left + 16, 30, 0xFFBDB497, false);
+        graphics.drawString(font, "Drag sliders and watch the selected phrase react immediately.", left + 16, 30, DialogueRetroTheme.TEXT_HINT, false);
 
         renderAnimationPreview(graphics, partialTick);
         graphics.enableScissor(left, contentTop, left + panelW, contentBottom);

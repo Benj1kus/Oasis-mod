@@ -319,7 +319,7 @@ public final class DialogueNodeEditorScreen extends DialogueRetroScreen {
             minecraft.setScreen(new DialogueConditionListScreen(this, project, choice.conditions, "Choice availability"));
         }).bounds(left + 20 + innerW / 2, rowY, innerW / 2 - 4, 20).build());
 
-        labels.add(new Label("hide = remove the answer; disable = show it greyed out", left + 16, rowY + 23, 0xFFABA389));
+        labels.add(new Label("hide = remove the answer; disable = show it greyed out", left + 16, rowY + 23, DialogueRetroTheme.TEXT_HINT));
 
         y += 42;
 
@@ -681,7 +681,7 @@ public final class DialogueNodeEditorScreen extends DialogueRetroScreen {
         if (contentHeight > contentBottom - contentTop) {
             String hint = "wheel: scroll  " + Math.round(100.0D * scrollOffset / Math.max(1, contentHeight - (contentBottom - contentTop))) + "%";
 
-            graphics.drawString(font, hint, left + panelW - font.width(hint) - 18, height - 42, 0xFF8C856E, false);
+            graphics.drawString(font, hint, left + panelW - font.width(hint) - 18, height - 42, DialogueRetroTheme.TEXT_HINT, false);
         }
     }
 

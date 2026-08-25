@@ -259,9 +259,9 @@ public final class DialogueOutlineEditorScreen extends DialogueRetroScreen {
 
         graphics.fill(left, 8, left + panelW, height - 8, 0xF0121710);
         graphics.drawString(font, "TEXT OUTLINE • " + scope.name(), left + 16, 16, 0xFFB8FF72, false);
-        graphics.drawString(font, scopeHelp(), left + 16, 29, 0xFFBDB497, false);
+        graphics.drawString(font, scopeHelp(), left + 16, 29, DialogueRetroTheme.TEXT_HINT, false);
         graphics.fill(left + 16, previewTop, left + panelW - 16, previewBottom, 0xFF0B1009);
-        graphics.drawString(font, "LIVE PREVIEW", left + 26, previewTop + 8, 0xFF9C957B, false);
+        graphics.drawString(font, "LIVE PREVIEW", left + 26, previewTop + 8, DialogueRetroTheme.TEXT_HINT, false);
 
         renderPreviewText(graphics);
 

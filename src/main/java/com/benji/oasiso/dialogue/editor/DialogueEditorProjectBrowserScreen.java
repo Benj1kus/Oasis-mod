@@ -87,7 +87,7 @@ public final class DialogueEditorProjectBrowserScreen extends DialogueRetroScree
 
         graphics.fill(8, 8, listW, height - 38, 0xE011170E);
         graphics.drawString(font, "DIALOGUE PROJECTS", 16, 18, 0xFFB8FF72, false);
-        graphics.drawString(font, projects.size() + " project(s)", 16, 31, 0xFFBDB497, false);
+        graphics.drawString(font, projects.size() + " project(s)", 16, 31, DialogueRetroTheme.TEXT_HINT, false);
 
         int px = listW + 12;
         int py = 12;

@@ -1023,7 +1023,7 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
         graphics.fill(8, height - 20, LEFT - 4, height - 7, DialogueRetroTheme.BEIGE);
         graphics.fill(8, height - 20, LEFT - 4, height - 19, DialogueRetroTheme.CREAM_LIGHT);
         graphics.fill(8, height - 8, LEFT - 4, height - 7, DialogueRetroTheme.BLACK);
-        graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 28)), 12, height - 17, DialogueRetroTheme.TEXT_DARK_MUTED, false);
+        graphics.drawString(font, ellipsize(STATUS, Math.max(40, LEFT - 28)), 12, height - 17, DialogueRetroTheme.TEXT_HINT, false);
 
         int inspectorClipTop = inspectorContentTop();
         int inspectorClipBottom = inspectorContentBottom();
@@ -1090,7 +1090,7 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
         boolean hasModelPreview = target != null && !target.startsWith("#") && !target.equals("*");
 
         int textWidth = hasModelPreview ? Math.max(90, w / 2 - 22) : Math.max(90, w - 18);
-        int cursorY = y + 22;
+        int cursorY = y + 32;
 
         cursorY += drawWrappedText(graphics, "type: " + t.type, x + 9, cursorY, textWidth, 0xFFFFFFFF, 1);
         cursorY += 2;
@@ -1974,7 +1974,7 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
                 shown = ellipsize(shown + " …", maxWidth);
             }
 
-            labels.add(new Label(shown, 12, y + line * lineStep, 0xFFABA389));
+            labels.add(new Label(shown, 12, y + line * lineStep, DialogueRetroTheme.TEXT_HINT));
         }
     }
 
@@ -2037,7 +2037,7 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
 
         String title = "LINE / SPRITE TIMELINE";
 
-        graphics.drawString(font, ellipsize(title, Math.max(40, w - 16)), x + 8, y + 5, 0xFFB8FF72, false);
+        graphics.drawString(font, ellipsize(title, Math.max(40, w - 16)), x + 8, y + 5, DialogueRetroTheme.TEXT_PATH, false);
         if (project.definition.lines.size() > visible) {
 
             String hint = "wheel: scroll";

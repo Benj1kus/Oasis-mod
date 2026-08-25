@@ -183,7 +183,7 @@ public final class DialogueEditorFontPickerScreen extends DialogueRetroScreen {
 
         graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
         graphics.drawString(font, "TEXT FONT", left + 16, 18, 0xFFB8FF72, false);
-        graphics.drawString(font, allowInherit ? "INHERIT and VANILLA are different: vanilla explicitly cancels a parent custom font." : "Default: Minecraft. Import TTF or MSDF atlas.", left + 16, 30, 0xFFBDB497, false);
+        graphics.drawString(font, allowInherit ? "INHERIT and VANILLA are different: vanilla explicitly cancels a parent custom font." : "Default: Minecraft. Import TTF or MSDF atlas.", left + 16, 30, DialogueRetroTheme.TEXT_HINT, false);
         graphics.drawString(font, DialogueEditorFontPreviewPack.statusLine(project), left + 16, 39, 0xFFFFD45A, false);
 
         if (errorMessage != null && !errorMessage.isBlank()) {

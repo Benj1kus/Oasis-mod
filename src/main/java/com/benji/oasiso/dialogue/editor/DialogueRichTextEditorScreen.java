@@ -396,10 +396,10 @@ public final class DialogueRichTextEditorScreen extends DialogueRetroScreen {
 
         graphics.fill(left, 10, left + panelW, height - 8, 0xF0121710);
         graphics.drawString(font, "RICH TEXT EDITOR", left + 16, 18, 0xFFB8FF72, false);
-        graphics.drawString(font, trimToWidth(heading + (locale != null ? "  •  " + locale : "  •  literal"), panelW - 32), left + 16, 29, 0xFFBDB497, false);
+        graphics.drawString(font, trimToWidth(heading + (locale != null ? "  •  " + locale : "  •  literal"), panelW - 32), left + 16, 29, DialogueRetroTheme.TEXT_HINT, false);
         renderTextCanvas(graphics, mouseX, mouseY, partialTick);
         String selectionInfo = selectionLength() > 0 ? "Selection " + selectionStart() + ".." + selectionEnd() + ": \"" + printable(safeSubstring(text, selectionStart(), selectionEnd())) + "\"" : "Drag over text to select a word/phrase. Existing region ranges are underlined.";
-        graphics.drawString(font, trimToWidth(selectionInfo, previewWidth), previewLeft, previewTop + previewHeight + 4, selectionLength() > 0 ? 0xFFFFD45A : 0xFFABA389, false);
+        graphics.drawString(font, trimToWidth(selectionInfo, previewWidth), previewLeft, previewTop + previewHeight + 4, selectionLength() > 0 ? 0xFFFFD45A : DialogueRetroTheme.TEXT_HINT, false);
         graphics.enableScissor(left, settingsTop, left + panelW, settingsBottom);
 
         for (Card card : cards) {

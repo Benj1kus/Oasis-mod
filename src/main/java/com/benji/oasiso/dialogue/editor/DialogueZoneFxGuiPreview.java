@@ -29,13 +29,14 @@ public final class DialogueZoneFxGuiPreview {
         DialogueRetroTheme.drawDarkInset(graphics, x + 8, y + 28, x + width - 8, y + height - 48);
 
         var font = net.minecraft.client.Minecraft.getInstance().font;
-        graphics.drawString(font, "ZONE FX / LIVE PREVIEW", x + 10, y + 9, 0xFFB8FF72, false);
+        graphics.drawString(font, "LIVE PREVIEW", x + 10, y + 9, 0xFFB8FF72, false);
 
         String shape = normalized(trigger.shape, "cylinder");
         String textureMode = normalized(visual.texture_mode, "plane");
         String preset = visual.preset != null ? visual.preset : "custom";
 
-        graphics.drawString(font, shape + "  |  " + textureMode + "  |  preset: " + preset, x + 10, y + 18, 0xFFC5BCA0, false);
+        String subtitle = shape + " | " + textureMode + " | " + preset;
+        graphics.drawString(font, fitText(font, subtitle, width - 20), x + 10, y + 18, DialogueRetroTheme.TEXT_LIGHT, false);
 
         int vx = x + 8;
         int vy = y + 28;
@@ -86,13 +87,32 @@ public final class DialogueZoneFxGuiPreview {
         graphics.disableScissor();
 
         int infoY = y + height - 40;
-        String layerInfo = "default " + (visual.show_default_zone ? "ON" : "OFF") + "  |  fill " + (visual.fill_enabled ? visual.fill_mode : "OFF") + "  |  texture " + (visual.texture != null && !visual.texture.isBlank() ? "ON" : "OFF");
-        graphics.drawString(font, layerInfo, x + 10, infoY, 0xFFF5EDD4, false);
 
-        String animationInfo = String.format(Locale.ROOT, "pulse %s  bob %s  rot XYZ %.0f/%.0f/%.0f°  alpha %s", visual.pulse ? "ON" : "OFF", visual.bob ? "ON" : "OFF", visual.texture_rotation_x, visual.texture_rotation + (visual.rotate ? seconds * visual.rotate_speed : 0.0D), visual.texture_rotation_z, visual.alpha_breathe ? "ON" : "OFF");
-        graphics.drawString(font, animationInfo, x + 10, infoY + 10, 0xFFA89F83, false);
+        int infoWidth = Math.max(20, width - 20);
 
-        graphics.drawString(font, "Exact world transform: Zone FX -> Edit texture with world gizmo", x + 10, infoY + 20, 0xFF93E85D, false);
+        String layerInfo = "default " + (visual.show_default_zone ? "ON" : "OFF") + " | fill " + (visual.fill_enabled ? visual.fill_mode : "OFF") + " | tex " + (visual.texture != null && !visual.texture.isBlank() ? "ON" : "OFF");
+        graphics.drawString(font, fitText(font, layerInfo, infoWidth), x + 10, infoY, DialogueRetroTheme.TEXT_PATH, false);
+
+        String animationInfo = String.format(Locale.ROOT,
+                "pulse %s | bob %s | rot %.0f/%.0f/%.0f | alpha %s",
+                visual.pulse ? "ON" : "OFF",
+                visual.bob ? "ON" : "OFF",
+                visual.texture_rotation_x,
+                visual.texture_rotation + (visual.rotate ? seconds * visual.rotate_speed : 0.0D),
+                visual.texture_rotation_z,
+                visual.alpha_breathe ? "ON" : "OFF");
+
+        graphics.drawString(font, fitText(font, animationInfo, infoWidth), x + 10, infoY + 10, DialogueRetroTheme.TEXT_HINT, false);
+        graphics.drawString(font, fitText(font, "World gizmo = exact transform", infoWidth), x + 10, infoY + 20, DialogueRetroTheme.TEXT_PATH, false);
+    }
+
+    private static String fitText(net.minecraft.client.gui.Font font, String text, int maxWidth) {
+        if (font.width(text) <= maxWidth) {
+            return text;
+        }
+        String suffix = "...";
+        int available = Math.max(1, maxWidth - font.width(suffix));
+        return font.plainSubstrByWidth(text, available) + suffix;
     }
 
     private static PreviewAnimation animation(DialogueDefinition.ZoneVisual visual, double seconds) {
