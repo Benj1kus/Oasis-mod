@@ -167,7 +167,7 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
         if (pendingLink != null) {
             text = "CONNECTING  " + portLabel(pendingLink) + "  -> click the destination node   |   Esc = cancel link";
         } else {
-            text = "LMB drag node  |  click colored output -> destination  |  RMB/MMB pan  |  wheel zoom  |  double-click = edit";
+            text = "LMB drag node";
         }
 
         graphics.drawString(font, trim(text, Math.max(40, canvasRight - 16)), 8, TOOLBAR_H + 8, pendingLink != null ? 0xFFFFD45A : 0xFFBDB497, false);
