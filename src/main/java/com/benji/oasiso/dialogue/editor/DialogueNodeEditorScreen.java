@@ -20,6 +20,11 @@ public final class DialogueNodeEditorScreen extends Screen {
 
     private static final List<String> UNAVAILABLE_MODES = List.of("hide", "disable");
 
+    private static final List<String> TEXT_EFFECTS = List.of("normal", "wave", "shake", "explode", "linear");
+    private static final List<String> SPRITE_POSITIONS = List.of("left", "center", "right");
+    private static final List<String> SPRITE_TRANSITIONS = List.of("none", "bounce", "sway", "fade_up");
+    private static final List<String> VOICE_SOURCES = List.of("master", "music", "records", "weather", "blocks", "hostile", "neutral", "players", "ambient", "voice");
+
     private final Screen parent;
     private final DialogueEditorProject project;
     private String nodeId;
@@ -163,7 +168,9 @@ public final class DialogueNodeEditorScreen extends Screen {
             y = addTextField(y, "Translation key", project.ensureNodeLangKey(line, nodeId), 256, value -> line.text = blankToNull(value));
         }
 
-        y = addAssetField(y, "Character sprite", line.sprite, id -> line.sprite = id);
+        y = addAssetField(y, "Character sprite", line.sprite, id -> line.sprite = blankToNull(id));
+        y = addSectionTitle(y + 4, "LINE SETTINGS / OVERRIDES", 0xFFE9C46A);
+        y = buildLineOverrides(line, y);
 
         y = addFullButton(y, "Combined text effects: " + effectsSummary(line), () -> minecraft.setScreen(new DialogueEditorTextEffectsScreen(this, line.text_effects, true, effects -> {
             line.text_effects = effects;
@@ -231,6 +238,15 @@ public final class DialogueNodeEditorScreen extends Screen {
                 project.setLocalizedNodeText(project.preview_locale, prompt, nodeId, value);
             }
         });
+
+        if (!promptLiteral) {
+            y = addTextField(y, "Prompt translation key", project.ensureNodeLangKey(prompt, nodeId), 256, value -> prompt.text = blankToNull(value));
+        }
+
+        y = addAssetField(y, "Prompt character sprite", prompt.sprite, id -> prompt.sprite = blankToNull(id));
+
+        y = addSectionTitle(y + 4, "PROMPT SETTINGS / OVERRIDES", 0xFFE9C46A);
+        y = buildLineOverrides(prompt, y);
 
         y = addFullButton(y, "Prompt effects: " + effectsSummary(prompt), () -> minecraft.setScreen(new DialogueEditorTextEffectsScreen(this, prompt.text_effects, true, effects -> {
             prompt.text_effects = effects;
@@ -487,7 +503,61 @@ public final class DialogueNodeEditorScreen extends Screen {
         return y + 32;
     }
 
+    private int buildLineOverrides(DialogueDefinition.Line line, int y) {
+        y = addTextField(y, "Text color override (blank = inherit)", nullToEmpty(line.text_color), 64, value -> line.text_color = blankToNull(value));
+        y = addTextField(y, "Gradient override: blank=inherit, none=disable", gradientOverride(line.text_gradient), 256, value -> line.text_gradient = parseGradient(value, true));
+        y = addNullableCycleButton(y, "Legacy text effect override", line.text_effect, TEXT_EFFECTS, value -> line.text_effect = value);
+
+        y = addAssetField(y, "Voice override (blank = global)", line.voice, ".ogg", true, id -> line.voice = blankToNull(id));
+        y = addTextField(y, "Voice pitch override (blank = inherit)", nullable(line.voice_pitch), 32, value -> line.voice_pitch = nf(value));
+        y = addTextField(y, "Voice volume override (blank = inherit)", nullable(line.voice_volume), 32, value -> line.voice_volume = nf(value));
+        y = addTextField(y, "Voice every override (blank = inherit)", nullable(line.voice_every), 32, value -> line.voice_every = ni(value));
+        y = addNullableCycleButton(y, "Voice source override", line.voice_source, VOICE_SOURCES, value -> line.voice_source = value);
+
+        y = addTextField(y, "Char ticks override (blank = inherit)", nullable(line.char_ticks), 32, value -> line.char_ticks = ni(value));
+        y = addTextField(y, "Hold ticks override (blank = inherit)", nullable(line.hold_ticks), 32, value -> line.hold_ticks = ni(value));
+
+        y = addAssetField(y, "Frame override", line.frame, id -> line.frame = blankToNull(id));
+        y = addAssetField(y, "Background override", line.background, id -> line.background = blankToNull(id));
+
+        y = addNullableCycleButton(y, "Sprite position override", line.sprite_position, SPRITE_POSITIONS, value -> line.sprite_position = value);
+        y = addTextField(y, "Exact sprite X (blank = position preset)", nullable(line.sprite_x), 32, value -> line.sprite_x = nf(value));
+        y = addNullableCycleButton(y, "Sprite transition override", line.sprite_transition, SPRITE_TRANSITIONS, value -> line.sprite_transition = value);
+        y = addTextField(y, "Sprite move ticks (blank = inherit)", nullable(line.sprite_move_ticks), 32, value -> line.sprite_move_ticks = ni(value));
+        y = addTextField(y, "Sprite transition ticks (blank = inherit)", nullable(line.sprite_transition_ticks), 32, value -> line.sprite_transition_ticks = ni(value));
+        y = addTextField(y, "Sprite width (blank = inherit)", nullable(line.sprite_width), 32, value -> line.sprite_width = ni(value));
+        y = addTextField(y, "Sprite height (blank = inherit)", nullable(line.sprite_height), 32, value -> line.sprite_height = ni(value));
+
+        return y;
+    }
+
+    private int addNullableCycleButton(int y, String label, String current, List<String> values, Consumer<String> setter) {
+        String shown = current == null || current.isBlank() ? "INHERIT" : current;
+
+        addContentWidget(Button.builder(Component.literal(label + ": " + shown), b -> {
+            if (current == null || current.isBlank()) {
+                setter.accept(values.get(0));
+            } else {
+                int index = values.indexOf(current);
+
+                if (index < 0 || index >= values.size() - 1) {
+                    setter.accept(null);
+                } else {
+                    setter.accept(values.get(index + 1));
+                }
+            }
+
+            rebuild();
+        }).bounds(left + 16, y, innerW, 20).build());
+
+        return y + 32;
+    }
+
     private int addAssetField(int y, String label, String value, Consumer<String> setter) {
+        return addAssetField(y, label, value, ".png", false, setter);
+    }
+
+    private int addAssetField(int y, String label, String value, String extension, boolean sound, Consumer<String> setter) {
         labels.add(new Label(label, left + 16, y, 0xFF9EA8B5));
 
         y += 12;
@@ -500,14 +570,14 @@ public final class DialogueNodeEditorScreen extends Screen {
 
         addContentWidget(box);
 
-        addContentWidget(Button.builder(Component.literal("Browse"), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), ".png", path -> importSprite(path, setter)))).bounds(left + innerW - 68, y, 84, 20).build());
+        addContentWidget(Button.builder(Component.literal("Browse"), b -> minecraft.setScreen(new DialogueEditorFilePickerScreen(this, minecraft.gameDirectory.toPath(), extension, path -> importAsset(path, sound, setter)))).bounds(left + innerW - 68, y, 84, 20).build());
 
         return y + 32;
     }
 
-    private void importSprite(Path path, Consumer<String> setter) {
+    private void importAsset(Path path, boolean sound, Consumer<String> setter) {
         try {
-            String id = DialogueEditorWorkspace.importTexture(project, path);
+            String id = sound ? DialogueEditorWorkspace.importSound(project, path) : DialogueEditorWorkspace.importTexture(project, path);
 
             setter.accept(id);
             DialogueEditorWorkspace.save(project);
@@ -900,6 +970,43 @@ public final class DialogueNodeEditorScreen extends Screen {
         int index = values.indexOf(current);
 
         return values.get(index < 0 ? 0 : (index + 1) % values.size());
+    }
+
+    private static List<String> parseGradient(String value, boolean allowDisable) {
+        if (value == null || value.isBlank()) return null;
+        if (allowDisable && value.trim().equalsIgnoreCase("none")) return new ArrayList<>();
+
+        List<String> result = new ArrayList<>();
+
+        for (String part : value.split(",")) {
+            if (!part.isBlank()) result.add(part.trim());
+        }
+
+        return result.isEmpty() ? null : result;
+    }
+
+    private static String gradientOverride(List<String> value) {
+        return value == null ? "" : value.isEmpty() ? "none" : String.join(", ", value);
+    }
+
+    private static String nullable(Object value) {
+        return value != null ? String.valueOf(value) : "";
+    }
+
+    private static Integer ni(String value) {
+        try {
+            return value == null || value.isBlank() ? null : Integer.parseInt(value.trim());
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static Float nf(String value) {
+        try {
+            return value == null || value.isBlank() ? null : Float.parseFloat(value.trim());
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private static String blankToNull(String value) {

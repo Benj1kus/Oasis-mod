@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -96,12 +95,6 @@ public final class DialogueEditorScreen extends Screen {
         labels.clear();
         tips.clear();
         scrollWidgets.clear();
-
-        /*
-         * Imported fonts are workspace assets, not Minecraft resources yet.
-         * Keep a tiny font-only Studio preview pack synchronized so the live
-         * preview can use them before the user performs a real Export.
-         */
         DialogueEditorFontPreviewPack.ensureLoaded(project);
 
         uiSettings = DialogueEditorUiSettings.get();
@@ -154,7 +147,13 @@ public final class DialogueEditorScreen extends Screen {
             int x = margin + column * (tabW + gap);
             int y = 6 + row * (tabH + rowGap);
 
-            addRenderableWidget(Button.builder(Component.literal((t == tab ? "[" : "") + t.label + (t == tab ? "]" : "")), b -> reopen(t)).bounds(x, y, tabW, tabH).build());
+            Button tabButton = Button.builder(Component.literal((t == tab ? "[" : "") + t.label + (t == tab ? "]" : "")), b -> reopen(t)).bounds(x, y, tabW, tabH).build();
+
+            if (project.definition.graph_enabled && (t == Tab.LINES || t == Tab.LINE_OVERRIDES)) {
+                tabButton.active = false;
+            }
+
+            addRenderableWidget(tabButton);
 
             index++;
         }
@@ -295,6 +294,11 @@ public final class DialogueEditorScreen extends Screen {
     }
 
     private void initLines() {
+        if (project.definition.graph_enabled) {
+            initLegacyLineTabLocked();
+            return;
+        }
+
         DialogueDefinition.Line line = project.currentLine();
         navButtons("Line", project.selected_line, project.definition.lines.size(), 0, () -> {
             project.selected_line = Math.max(0, project.selected_line - 1);
@@ -351,6 +355,11 @@ public final class DialogueEditorScreen extends Screen {
     }
 
     private void initLineOverrides() {
+        if (project.definition.graph_enabled) {
+            initLegacyLineTabLocked();
+            return;
+        }
+
         DialogueDefinition.Line line = project.currentLine();
         navButtons("Line", project.selected_line, project.definition.lines.size(), 0, () -> {
             project.selected_line = Math.max(0, project.selected_line - 1);
@@ -372,6 +381,13 @@ public final class DialogueEditorScreen extends Screen {
         help(10, "Blank/INHERIT means this line uses the global value.");
     }
 
+    private void initLegacyLineTabLocked() {
+        help(0, "Nodes v3 runtime is ON. Legacy Lines / Line+ are locked so you do not accidentally edit data that the graph runtime ignores.");
+        help(2, "Edit dialogue text, sprite, voice and per-line overrides inside each LINE or CHOICE node instead.");
+        button("Open Nodes", 4, b -> reopen(Tab.NODES));
+        button("Open visual Node Graph", 5, b -> minecraft.setScreen(new DialogueNodeGraphScreen(this, project)));
+    }
+
     private void initNodes() {
         DialogueDefinition d = project.definition;
 
@@ -380,54 +396,57 @@ public final class DialogueEditorScreen extends Screen {
             if (value) d.format = Math.max(3, d.format);
         });
 
-        if (d.nodes == null || d.nodes.isEmpty()) {
-            help(2, "No node graph yet. Your old linear lines are still untouched and fully supported.");
+        int nodeRowOffset = d.graph_enabled ? 1 : 0;
 
-            button("Convert current legacy lines -> Nodes v3", 3, b -> {
+        if (d.graph_enabled) {
+            help(1, "Nodes v3 is ON — legacy Lines / Line+ are locked. Edit text, sprite, voice and overrides inside the nodes.");
+        }
+
+        if (d.nodes == null || d.nodes.isEmpty()) {
+            help(2 + nodeRowOffset, "No node graph yet. Your old linear lines are still untouched and fully supported.");
+
+            button("Convert current legacy lines -> Nodes v3", 3 + nodeRowOffset, b -> {
                 project.convertLegacyLinesToGraph();
                 DialogueEditorHistory.checkpoint(project);
                 reopen(Tab.NODES);
             });
 
-            help(5, "Conversion COPIES the old lines into graph nodes. It does not delete the legacy lines.");
-            help(6, "This makes it safe to test Nodes v3 and switch graph_enabled back OFF if needed.");
+            help(5 + nodeRowOffset, "Conversion COPIES the old lines into graph nodes. It does not delete the legacy lines.");
+            help(6 + nodeRowOffset, "This makes it safe to test Nodes v3 and switch graph_enabled back OFF if needed.");
             return;
         }
 
-        field("Start node", nullToEmpty(d.start_node), 1, s -> d.start_node = blankToNull(s), 96);
-
-        button("Open visual Node Graph", 2, b -> minecraft.setScreen(new DialogueNodeGraphScreen(this, project)));
-
-        button("Selected node: " + (project.selected_node != null ? project.selected_node : "<none>"), 3, b -> minecraft.setScreen(new DialogueNodeGraphScreen(this, project)));
-
-        button("+ LINE node", 4, b -> {
+        field("Start node", nullToEmpty(d.start_node), 1 + nodeRowOffset, s -> d.start_node = blankToNull(s), 96);
+        button("Open visual Node Graph", 2 + nodeRowOffset, b -> minecraft.setScreen(new DialogueNodeGraphScreen(this, project)));
+        button("Selected node: " + (project.selected_node != null ? project.selected_node : "<none>"), 3 + nodeRowOffset, b -> minecraft.setScreen(new DialogueNodeGraphScreen(this, project)));
+        button("+ LINE node", 4 + nodeRowOffset, b -> {
             project.addNode("line");
             reopen(Tab.NODES);
         });
 
-        button("+ CHOICE node", 5, b -> {
+        button("+ CHOICE node", 5 + nodeRowOffset, b -> {
             project.addNode("choice");
             reopen(Tab.NODES);
         });
 
-        button("+ CONDITION node", 6, b -> {
+        button("+ CONDITION node", 6 + nodeRowOffset, b -> {
             project.addNode("condition");
             reopen(Tab.NODES);
         });
 
-        button("+ EVENT node", 7, b -> {
+        button("+ EVENT node", 7 + nodeRowOffset, b -> {
             project.addNode("event");
             reopen(Tab.NODES);
         });
 
-        button("+ END node", 8, b -> {
+        button("+ END node", 8 + nodeRowOffset, b -> {
             project.addNode("end");
             reopen(Tab.NODES);
         });
 
-        help(10, "LINE -> dialogue line | CHOICE -> player answers | CONDITION -> server branch | EVENT -> external event | END -> finish.");
-        help(11, "Graph traversal and choice conditions are server-authoritative; the client only displays the node the server approved.");
-        help(12, "Old 'lines' remain in the JSON and run whenever Nodes v3 runtime is OFF.");
+        help(10 + nodeRowOffset, "LINE -> dialogue line | CHOICE -> player answers | CONDITION -> server branch | EVENT -> external event | END -> finish.");
+        help(11 + nodeRowOffset, "Graph traversal and choice conditions are server-authoritative; the client only displays the node the server approved.");
+        help(12 + nodeRowOffset, "Old 'lines' remain in the JSON and run whenever Nodes v3 runtime is OFF.");
     }
 
 
@@ -1594,7 +1613,7 @@ public final class DialogueEditorScreen extends Screen {
             case VISUALS -> 9;
             case LINES -> 13;
             case LINE_OVERRIDES, LAYOUT, TRIGGERS, ZONE_FX -> 10;
-            case NODES -> 12;
+            case NODES -> 13;
             case ZONE -> 12;
             case GAMEPLAY -> 7;
             case EXPORT -> 12;
@@ -1606,11 +1625,6 @@ public final class DialogueEditorScreen extends Screen {
 
     private void renderLineTimeline(GuiGraphics graphics, int x, int y, int w, int h, int mouseX, int mouseY) {
         graphics.fill(x, y, x + w, y + h, 0xF00D1219);
-
-        /*
-         * Hard clip the entire timeline. Nothing from its title, cards or hints
-         * can spill into the Live Preview above or outside the right panel.
-         */
         graphics.enableScissor(x, y, x + w, y + h);
 
         int cardW = 106;
