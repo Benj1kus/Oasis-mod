@@ -349,37 +349,52 @@ public final class DialogueTriggerEngine {
                     String key = entry.getKey() + "|" + triggerIndex + "|" + zone.key;
 
                     previews.add(new DialogueZonePreviewS2CPacket.Zone(key,
-
                             normalizeShape(trigger.shape),
-
                             zone.center.x, zone.center.y, zone.center.z,
-
                             Math.max(0.1D, trigger.radius),
-
                             Math.max(0.1D, trigger.height),
-
                             Math.max(0.1D, trigger.size_x),
-
                             Math.max(0.1D, trigger.size_y),
-
                             Math.max(0.1D, trigger.size_z),
-
                             visual.style != null ? visual.style : "auto",
-
+                            visual.show_default_zone,
                             visual.texture,
-
+                            visual.texture_mode != null ? visual.texture_mode : "plane",
+                            visual.texture_fit != null ? visual.texture_fit : "stretch",
+                            Math.max(0.01D, visual.texture_repeat_x),
+                            Math.max(0.01D, visual.texture_repeat_y),
+                            visual.texture_scroll_u,
+                            visual.texture_scroll_v,
+                            visual.texture_offset_x,
+                            visual.texture_offset_y,
+                            visual.texture_offset_z,
+                            Math.max(0.05D, visual.texture_scale_x),
+                            Math.max(0.05D, visual.texture_scale_y),
+                            visual.texture_rotation_x,
+                            visual.texture_rotation,
+                            visual.texture_rotation_z,
                             visual.color != null ? visual.color : "cyan",
-
                             Mth.clamp(visual.alpha, 0.0F, 1.0F),
-
                             visual.y_offset,
-
                             Math.max(0.0D, visual.size),
-
                             Math.max(0.0D, visual.visual_height),
-
+                            visual.fill_enabled,
+                            visual.fill_mode != null ? visual.fill_mode : "gradient",
+                            visual.fill_color_bottom != null ? visual.fill_color_bottom : "cyan",
+                            visual.fill_color_top != null ? visual.fill_color_top : "cyan",
+                            Mth.clamp(visual.fill_alpha_bottom, 0.0F, 1.0F),
+                            Mth.clamp(visual.fill_alpha_top, 0.0F, 1.0F),
                             visual.pulse,
-
+                            Math.max(0.0D, visual.pulse_amplitude),
+                            Math.max(0.0D, visual.pulse_speed),
+                            visual.bob,
+                            Math.max(0.0D, visual.bob_amplitude),
+                            Math.max(0.0D, visual.bob_speed),
+                            visual.rotate,
+                            visual.rotate_speed,
+                            visual.alpha_breathe,
+                            Mth.clamp(visual.alpha_breathe_amount, 0.0D, 1.0D),
+                            Math.max(0.0D, visual.alpha_breathe_speed),
                             previewDistance));
 
                     if (previews.size() >= MAX_ZONE_PREVIEWS) {

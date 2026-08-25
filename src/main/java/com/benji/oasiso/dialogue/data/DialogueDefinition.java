@@ -334,15 +334,55 @@ public class DialogueDefinition {
     public static class ZoneVisual {
         public boolean enabled = true;
         public String style = "auto";
-        public String texture;
+        public boolean show_default_zone = true;
 
         public String color = "cyan";
         public float alpha = 0.55F;
         public double y_offset = 0.03D;
         public double size = 0.0D;
-
         public double visual_height = 0.0D;
-        public boolean pulse = true;
         public double preview_distance = 16.0D;
+
+        public String texture;
+        public String texture_mode = "plane";
+        public String texture_fit = "stretch";
+        public double texture_repeat_x = 1.0D;
+        public double texture_repeat_y = 1.0D;
+        public double texture_scroll_u = 0.0D;
+        public double texture_scroll_v = 0.0D;
+
+        public double texture_offset_x = 0.0D;
+        public double texture_offset_y = 0.0D;
+        public double texture_offset_z = 0.0D;
+        public double texture_scale_x = 1.0D;
+        public double texture_scale_y = 1.0D;
+
+        public double texture_rotation_x = 0.0D;
+        public double texture_rotation = 0.0D;
+        public double texture_rotation_z = 0.0D;
+
+        public boolean fill_enabled = false;
+        public String fill_mode = "gradient";
+        public String fill_color_bottom = "cyan";
+        public String fill_color_top = "cyan";
+        public float fill_alpha_bottom = 0.35F;
+        public float fill_alpha_top = 0.0F;
+
+        public boolean pulse = true;
+        public double pulse_amplitude = 0.035D;
+        public double pulse_speed = 1.0D;
+
+        public boolean bob = false;
+        public double bob_amplitude = 0.20D;
+        public double bob_speed = 0.75D;
+
+        public boolean rotate = false;
+        public double rotate_speed = 30.0D;
+
+        public boolean alpha_breathe = false;
+        public double alpha_breathe_amount = 0.18D;
+        public double alpha_breathe_speed = 0.70D;
+
+        public String preset = "custom";
     }
 }

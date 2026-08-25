@@ -32,7 +32,7 @@ import java.util.Locale;
 
 public final class DialogueZoneWorldEditScreen extends Screen {
 
-    public enum EditMode {MOVE, SIZE}
+    public enum EditMode {MOVE, SIZE, TEXTURE_MOVE, TEXTURE_SCALE, TEXTURE_ROTATE}
 
     public enum GizmoAxis {NONE, X, Y, Z}
 
@@ -43,8 +43,13 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
     private final DialogueEditorProject project;
     private final String originalProjectSnapshot;
+    private final DialogueEditorScreen.Tab returnTab;
 
     private EditMode mode = EditMode.MOVE;
+    private boolean uiHidden;
+    private GizmoAxis hoveredRotationAxis = GizmoAxis.NONE;
+    private GizmoAxis dragRotationAxis = GizmoAxis.NONE;
+    private double rotationDragStartAngle;
     private GizmoAxis hoveredAxis = GizmoAxis.NONE;
     private GizmoAxis dragAxis = GizmoAxis.NONE;
     private int hoveredAxisSign = 1;
@@ -73,6 +78,15 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     private double dragStartSizeY;
     private double dragStartSizeZ;
 
+    private double dragStartTextureOffsetX;
+    private double dragStartTextureOffsetY;
+    private double dragStartTextureOffsetZ;
+    private double dragStartTextureScaleX;
+    private double dragStartTextureScaleY;
+    private double dragStartTextureRotationX;
+    private double dragStartTextureRotationY;
+    private double dragStartTextureRotationZ;
+
     private boolean dragChanged;
 
     private double lastMouseX;
@@ -88,13 +102,27 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     private Button modeButton;
     private Button snapButton;
     private Button markerButton;
+    private Button defaultVisualButton;
+    private Button textureFitButton;
+    private Button textureModeButton;
 
     public DialogueZoneWorldEditScreen(DialogueEditorProject project) {
+        this(project, DialogueEditorScreen.Tab.ZONE, false);
+    }
+
+    public DialogueZoneWorldEditScreen(DialogueEditorProject project, DialogueEditorScreen.Tab returnTab, boolean startInTextureMode) {
         super(Component.literal("Oasiso Dialogue Studio - Zone World Edit"));
 
         this.project = project != null ? project : DialogueEditorProject.createDefault();
         this.project.normalize();
+        this.returnTab = returnTab != null ? returnTab : DialogueEditorScreen.Tab.ZONE;
         prepareZone();
+
+        if (startInTextureMode) {
+            this.mode = EditMode.TEXTURE_MOVE;
+            this.uiHidden = true;
+            this.status = "Texture gizmo ready - H shows the full HUD";
+        }
 
         this.originalProjectSnapshot = GSON.toJson(this.project);
     }
@@ -132,6 +160,32 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         x += 48 + gap;
 
         markerButton = addRenderableWidget(Button.builder(markerText(), b -> toggleMarkerPlacement()).bounds(x, row2, 52, buttonH).build());
+        x += 52 + gap;
+
+        defaultVisualButton = addRenderableWidget(Button.builder(defaultVisualText(), b -> toggleDefaultVisual()).bounds(x, row2, 62, buttonH).build());
+        x += 62 + gap;
+
+        textureFitButton = addRenderableWidget(Button.builder(textureFitText(), b -> toggleTextureFit()).bounds(x, row2, 62, buttonH).build());
+        x += 62 + gap;
+
+        textureModeButton = addRenderableWidget(Button.builder(textureModeText(), b -> cycleTextureMode()).bounds(x, row2, 78, buttonH).build());
+
+        int row3 = Math.max(8, row1 - buttonH - 2);
+        x = 8;
+
+        addRenderableWidget(Button.builder(Component.literal("Tex Move"), b -> setMode(EditMode.TEXTURE_MOVE)).bounds(x, row3, 58, buttonH).build());
+        x += 58 + gap;
+
+        addRenderableWidget(Button.builder(Component.literal("Tex Scale"), b -> setMode(EditMode.TEXTURE_SCALE)).bounds(x, row3, 62, buttonH).build());
+        x += 62 + gap;
+
+        addRenderableWidget(Button.builder(Component.literal("Tex Rotate"), b -> setMode(EditMode.TEXTURE_ROTATE)).bounds(x, row3, 66, buttonH).build());
+        x += 66 + gap;
+
+        addRenderableWidget(Button.builder(Component.literal("Reset Tex"), b -> resetTextureTransform()).bounds(x, row3, 60, buttonH).build());
+        x += 60 + gap;
+
+        addRenderableWidget(Button.builder(Component.literal("H HUD"), b -> toggleUi()).bounds(x, row3, 48, buttonH).build());
 
         resolveAnchorNow();
     }
@@ -208,22 +262,37 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         cursorHit = raycastSurface(mouseX, mouseY);
 
         Ray ray = mouseRay(mouseX, mouseY);
-        if (dragAxis != GizmoAxis.NONE) {
+        if (dragRotationAxis != GizmoAxis.NONE) {
+            hoveredAxis = GizmoAxis.NONE;
+            hoveredPlane = GizmoPlane.NONE;
+            hoveredRotationAxis = dragRotationAxis;
+        } else if (dragAxis != GizmoAxis.NONE) {
             hoveredAxis = dragAxis;
             hoveredAxisSign = dragAxisSign;
             hoveredPlane = GizmoPlane.NONE;
+            hoveredRotationAxis = GizmoAxis.NONE;
         } else if (dragPlane != GizmoPlane.NONE) {
             hoveredAxis = GizmoAxis.NONE;
             hoveredPlane = dragPlane;
+            hoveredRotationAxis = GizmoAxis.NONE;
+        } else if (mode == EditMode.TEXTURE_ROTATE) {
+            hoveredAxis = GizmoAxis.NONE;
+            hoveredPlane = GizmoPlane.NONE;
+            hoveredRotationAxis = pickRotationRing(ray);
         } else {
             AxisPick axisPick = pickAxis(ray);
             hoveredAxis = axisPick.axis;
             hoveredAxisSign = axisPick.sign;
-            hoveredPlane = mode == EditMode.MOVE && hoveredAxis == GizmoAxis.NONE ? pickPlane(ray) : GizmoPlane.NONE;
+            hoveredPlane = (mode == EditMode.MOVE || mode == EditMode.TEXTURE_MOVE) && hoveredAxis == GizmoAxis.NONE ? pickPlane(ray) : GizmoPlane.NONE;
+            hoveredRotationAxis = GizmoAxis.NONE;
         }
 
-        renderHud(graphics);
-        super.render(graphics, mouseX, mouseY, partialTick);
+        if (!uiHidden) {
+            renderHud(graphics);
+            super.render(graphics, mouseX, mouseY, partialTick);
+        } else {
+            graphics.drawString(font, "Texture gizmo | 1 move  2 scale  3 rotate XYZ | 4 mode  5 stretch/repeat | 0 reset | H HUD", 8, 8, 0xFFE3F7FF, true);
+        }
     }
 
     private void renderHud(GuiGraphics graphics) {
@@ -232,8 +301,8 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
         int panelX = 8;
         int panelW = Math.min(214, Math.max(186, width / 8));
-        int panelH = 58;
-        int panelY = Math.max(8, height - 98);
+        int panelH = 66;
+        int panelY = Math.max(8, height - 128);
 
         graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0x9A10141C);
         graphics.fill(panelX + 1, panelY + 1, panelX + panelW - 1, panelY + panelH - 1, 0x9A0B1017);
@@ -241,7 +310,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         String anchorState = anchorResolved() ? "OK" : "?";
         int anchorColor = anchorResolved() ? 0xFF7FEA9A : 0xFFFFAA55;
 
-        graphics.drawString(font, "ZONE EDIT  " + mode.name() + "  " + normalizeShape(trigger.shape) + "  A:" + anchorState, panelX + 5, panelY + 5, anchorColor, false);
+        graphics.drawString(font, "ZONE EDIT  " + modeLabel() + "  " + normalizeShape(trigger.shape) + "  A:" + anchorState, panelX + 5, panelY + 5, anchorColor, false);
 
         graphics.drawString(font, String.format(Locale.ROOT, "XYZ %.1f  %.1f  %.1f", center.x, center.y, center.z), panelX + 5, panelY + 15, 0xFFD9E1EA, false);
 
@@ -255,6 +324,10 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         String selection;
         if (markerPlacementMode) {
             selection = "MARKER: click surface";
+        } else if (dragRotationAxis != GizmoAxis.NONE) {
+            selection = "drag " + dragRotationAxis + " rotation";
+        } else if (mode == EditMode.TEXTURE_ROTATE && hoveredRotationAxis != GizmoAxis.NONE) {
+            selection = "hover " + hoveredRotationAxis + " rotation";
         } else if (dragPlane != GizmoPlane.NONE) {
             selection = "drag " + dragPlane;
         } else if (dragAxis != GizmoAxis.NONE) {
@@ -267,18 +340,24 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             selection = "snap " + snapName();
         }
 
+        if (isTextureMode()) {
+            DialogueDefinition.ZoneVisual visual = trigger.visual;
+            dimensions = String.format(Locale.ROOT, "T %.2f %.2f %.2f | S %.2f / %.2f | R %.0f/%.0f/%.0f°", visual.texture_offset_x, visual.texture_offset_y, visual.texture_offset_z, visual.texture_scale_x, visual.texture_scale_y, visual.texture_rotation_x, visual.texture_rotation, visual.texture_rotation_z);
+        }
+
         graphics.drawString(font, dimensions + "  |  " + selection, panelX + 5, panelY + 25, 0xFFFFD45A, false);
 
         String shownStatus = status != null ? status : "Ready";
-        if (shownStatus.length() > 32) shownStatus = shownStatus.substring(0, 31) + "…";
-        graphics.drawString(font, shownStatus, panelX + 5, panelY + 35, 0xFF65C7FF, false);
+        if (shownStatus.length() > 34) shownStatus = shownStatus.substring(0, 33) + "…";
+        graphics.drawString(font, shownStatus, panelX + 5, panelY + 37, 0xFF65C7FF, false);
 
-        graphics.drawString(font, "WASD+RMB | G/T | V snap | M marker", panelX + 5, panelY + 45, markerPlacementMode ? 0xFFFF82D8 : 0xFF8EA2B6, false);
+        graphics.drawString(font, "G zone move | T zone size | 1/2/3 texture", panelX + 5, panelY + 49, 0xFF8EA2B6, false);
+        graphics.drawString(font, "H HUD | V snap | M marker | Enter apply", panelX + 5, panelY + 57, markerPlacementMode ? 0xFFFF82D8 : 0xFF8EA2B6, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (super.mouseClicked(mouseX, mouseY, button)) {
+        if (!uiHidden && super.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
 
@@ -289,13 +368,22 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             }
 
             Ray ray = mouseRay(mouseX, mouseY);
+
+            if (mode == EditMode.TEXTURE_ROTATE) {
+                GizmoAxis rotationAxis = pickRotationRing(ray);
+                if (rotationAxis != GizmoAxis.NONE) {
+                    beginRotationDrag(ray, rotationAxis);
+                    return true;
+                }
+            }
+
             AxisPick axisPick = pickAxis(ray);
             if (axisPick.axis != GizmoAxis.NONE) {
                 beginDrag(axisPick.axis, axisPick.sign, ray);
                 return true;
             }
 
-            if (mode == EditMode.MOVE) {
+            if (mode == EditMode.MOVE || mode == EditMode.TEXTURE_MOVE) {
                 GizmoPlane plane = pickPlane(ray);
                 if (plane != GizmoPlane.NONE) {
                     beginPlaneDrag(plane, ray);
@@ -309,6 +397,11 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0 && dragRotationAxis != GizmoAxis.NONE) {
+            updateRotationDrag(mouseRay(mouseX, mouseY));
+            return true;
+        }
+
         if (button == 0 && dragAxis != GizmoAxis.NONE) {
             updateDrag(mouseRay(mouseX, mouseY));
             return true;
@@ -331,10 +424,11 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0 && (dragAxis != GizmoAxis.NONE || dragPlane != GizmoPlane.NONE)) {
+        if (button == 0 && (dragAxis != GizmoAxis.NONE || dragPlane != GizmoPlane.NONE || dragRotationAxis != GizmoAxis.NONE)) {
             dragAxis = GizmoAxis.NONE;
             dragPlane = GizmoPlane.NONE;
             dragAxisSign = 1;
+            dragRotationAxis = GizmoAxis.NONE;
 
             if (dragChanged) {
                 dragChanged = false;
@@ -347,6 +441,11 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_H) {
+            toggleUi();
+            return true;
+        }
+
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             cancelAndReturn();
             return true;
@@ -365,6 +464,36 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         // S is deliberately left free for normal WASD movement.
         if (keyCode == GLFW.GLFW_KEY_T) {
             setMode(EditMode.SIZE);
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_1 || keyCode == GLFW.GLFW_KEY_KP_1) {
+            setMode(EditMode.TEXTURE_MOVE);
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_2 || keyCode == GLFW.GLFW_KEY_KP_2) {
+            setMode(EditMode.TEXTURE_SCALE);
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_3 || keyCode == GLFW.GLFW_KEY_KP_3) {
+            setMode(EditMode.TEXTURE_ROTATE);
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_4 || keyCode == GLFW.GLFW_KEY_KP_4) {
+            cycleTextureMode();
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_5 || keyCode == GLFW.GLFW_KEY_KP_5) {
+            toggleTextureFit();
+            return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_0 || keyCode == GLFW.GLFW_KEY_KP_0) {
+            resetTextureTransform();
             return true;
         }
 
@@ -410,7 +539,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             status = "Saved in memory; project save failed: " + exception.getMessage();
         }
 
-        minecraft.setScreen(new DialogueEditorScreen(project, DialogueEditorScreen.Tab.ZONE));
+        minecraft.setScreen(new DialogueEditorScreen(project, returnTab));
     }
 
     public void cancelAndReturn() {
@@ -421,9 +550,9 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         DialogueEditorProject restored = GSON.fromJson(originalProjectSnapshot, DialogueEditorProject.class);
         if (restored != null) {
             restored.normalize();
-            minecraft.setScreen(new DialogueEditorScreen(restored, DialogueEditorScreen.Tab.ZONE));
+            minecraft.setScreen(new DialogueEditorScreen(restored, returnTab));
         } else {
-            minecraft.setScreen(new DialogueEditorScreen(project, DialogueEditorScreen.Tab.ZONE));
+            minecraft.setScreen(new DialogueEditorScreen(project, returnTab));
         }
     }
 
@@ -449,7 +578,16 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         hoveredPlane = GizmoPlane.NONE;
         dragAxisSign = 1;
         hoveredAxisSign = 1;
-        status = mode == EditMode.MOVE ? "MOVE: drag red / green / blue axes" : "SIZE: axes now edit radius/height/box dimensions";
+        hoveredRotationAxis = GizmoAxis.NONE;
+        dragRotationAxis = GizmoAxis.NONE;
+
+        status = switch (mode) {
+            case MOVE -> "ZONE MOVE: drag XYZ axes or plane handles";
+            case SIZE -> "ZONE SIZE: drag axes to resize trigger shape";
+            case TEXTURE_MOVE -> "TEXTURE MOVE: drag XYZ axes or planes";
+            case TEXTURE_SCALE -> "TEXTURE SCALE: X/Z horizontal, Y vertical";
+            case TEXTURE_ROTATE -> "TEXTURE ROTATE: drag X(red), Y(green), Z(blue) rotation rings";
+        };
 
         if (modeButton != null) {
             modeButton.setMessage(modeText());
@@ -457,7 +595,92 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     private Component modeText() {
-        return Component.literal("G " + mode.name());
+        return Component.literal(mode == EditMode.SIZE ? "T Z.SIZE" : "G Z.MOVE");
+    }
+
+    private String modeLabel() {
+        return switch (mode) {
+            case MOVE -> "ZONE MOVE";
+            case SIZE -> "ZONE SIZE";
+            case TEXTURE_MOVE -> "TEX MOVE";
+            case TEXTURE_SCALE -> "TEX SCALE";
+            case TEXTURE_ROTATE -> "TEX ROTATE";
+        };
+    }
+
+    private boolean isTextureMode() {
+        return mode == EditMode.TEXTURE_MOVE || mode == EditMode.TEXTURE_SCALE || mode == EditMode.TEXTURE_ROTATE;
+    }
+
+    private void toggleDefaultVisual() {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        visual.show_default_zone = !visual.show_default_zone;
+        visual.preset = "custom";
+        status = "Default marker layer = " + (visual.show_default_zone ? "ON" : "OFF");
+        if (defaultVisualButton != null) defaultVisualButton.setMessage(defaultVisualText());
+    }
+
+    private Component defaultVisualText() {
+        return Component.literal("Def " + (trigger().visual.show_default_zone ? "ON" : "OFF"));
+    }
+
+    private void toggleTextureFit() {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        visual.texture_fit = "repeat".equalsIgnoreCase(visual.texture_fit) ? "stretch" : "repeat";
+        visual.preset = "custom";
+        status = "Texture fit = " + visual.texture_fit;
+        if (textureFitButton != null) textureFitButton.setMessage(textureFitText());
+    }
+
+    private Component textureFitText() {
+        return Component.literal("UV " + ("repeat".equalsIgnoreCase(trigger().visual.texture_fit) ? "REP" : "STR"));
+    }
+
+    private void cycleTextureMode() {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        String current = visual.texture_mode != null ? visual.texture_mode.toLowerCase(Locale.ROOT) : "plane";
+        visual.texture_mode = switch (current) {
+            case "plane" -> "cylinder_wrap";
+            case "cylinder_wrap" -> "box_wrap";
+            default -> "plane";
+        };
+        visual.preset = "custom";
+        status = "Texture mode = " + visual.texture_mode;
+        if (textureModeButton != null) textureModeButton.setMessage(textureModeText());
+    }
+
+    private Component textureModeText() {
+        String mode = trigger().visual.texture_mode != null ? trigger().visual.texture_mode : "plane";
+        String shortMode = switch (mode.toLowerCase(Locale.ROOT)) {
+            case "cylinder_wrap" -> "CYL";
+            case "box_wrap" -> "BOX";
+            default -> "PLANE";
+        };
+        return Component.literal("Tex " + shortMode);
+    }
+
+    private void resetTextureTransform() {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        visual.texture_offset_x = 0.0D;
+        visual.texture_offset_y = 0.0D;
+        visual.texture_offset_z = 0.0D;
+        visual.texture_scale_x = 1.0D;
+        visual.texture_scale_y = 1.0D;
+        visual.texture_rotation_x = 0.0D;
+        visual.texture_rotation = 0.0D;
+        visual.texture_rotation_z = 0.0D;
+        visual.preset = "custom";
+        status = "Texture transform reset";
+    }
+
+    private void toggleUi() {
+        uiHidden = !uiHidden;
+        for (var child : children()) {
+            if (child instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
+                widget.visible = !uiHidden;
+            }
+        }
+        status = uiHidden ? "HUD hidden - press H to show it" : "HUD visible";
     }
 
     private void cycleSnap() {
@@ -488,6 +711,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         dragChanged = false;
 
         captureDragStart();
+        dragStartCenter = gizmoCenter();
         dragStartAxisParameter = axisParameter(ray, dragStartCenter, axisVector(axis).scale(dragAxisSign));
     }
 
@@ -496,7 +720,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             return;
         }
 
-        Vec3 hit = planeIntersection(ray, plane, center());
+        Vec3 hit = planeIntersection(ray, plane, gizmoCenter());
         if (hit == null) {
             return;
         }
@@ -509,7 +733,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     private void captureDragStart() {
-        dragStartCenter = center();
+        dragStartCenter = gizmoCenter();
 
         DialogueDefinition.Trigger trigger = trigger();
         DialogueDefinition.ZoneAnchor anchor = trigger.anchor;
@@ -527,6 +751,16 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         dragStartSizeX = trigger.size_x;
         dragStartSizeY = trigger.size_y;
         dragStartSizeZ = trigger.size_z;
+
+        DialogueDefinition.ZoneVisual visual = trigger.visual;
+        dragStartTextureOffsetX = visual.texture_offset_x;
+        dragStartTextureOffsetY = visual.texture_offset_y;
+        dragStartTextureOffsetZ = visual.texture_offset_z;
+        dragStartTextureScaleX = visual.texture_scale_x;
+        dragStartTextureScaleY = visual.texture_scale_y;
+        dragStartTextureRotationX = visual.texture_rotation_x;
+        dragStartTextureRotationY = visual.texture_rotation;
+        dragStartTextureRotationZ = visual.texture_rotation_z;
     }
 
     private void updateDrag(Ray ray) {
@@ -541,10 +775,14 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             return;
         }
 
-        if (mode == EditMode.MOVE) {
-            applyMoveDelta(delta * dragAxisSign);
-        } else {
-            applySizeDelta(delta);
+        switch (mode) {
+            case MOVE -> applyMoveDelta(delta * dragAxisSign);
+            case SIZE -> applySizeDelta(delta);
+            case TEXTURE_MOVE -> applyTextureMoveDelta(delta * dragAxisSign);
+            case TEXTURE_SCALE -> applyTextureScaleDelta(delta);
+            case TEXTURE_ROTATE -> {
+                return;
+            }
         }
 
         dragChanged = true;
@@ -561,6 +799,28 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         }
 
         Vec3 delta = hit.subtract(dragPlaneStartPoint);
+
+        if (mode == EditMode.TEXTURE_MOVE) {
+            DialogueDefinition.ZoneVisual visual = trigger().visual;
+            switch (dragPlane) {
+                case XY -> {
+                    visual.texture_offset_x = snapped(dragStartTextureOffsetX + delta.x);
+                    visual.texture_offset_y = snapped(dragStartTextureOffsetY + delta.y);
+                }
+                case XZ -> {
+                    visual.texture_offset_x = snapped(dragStartTextureOffsetX + delta.x);
+                    visual.texture_offset_z = snapped(dragStartTextureOffsetZ + delta.z);
+                }
+                case YZ -> {
+                    visual.texture_offset_y = snapped(dragStartTextureOffsetY + delta.y);
+                    visual.texture_offset_z = snapped(dragStartTextureOffsetZ + delta.z);
+                }
+            }
+            visual.preset = "custom";
+            dragChanged = true;
+            return;
+        }
+
         DialogueDefinition.ZoneAnchor anchor = trigger().anchor;
         boolean absolute = "absolute".equalsIgnoreCase(anchor.type);
 
@@ -652,6 +912,157 @@ public final class DialogueZoneWorldEditScreen extends Screen {
                 }
             }
         }
+    }
+
+    private void applyTextureMoveDelta(double delta) {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+
+        switch (dragAxis) {
+            case X -> visual.texture_offset_x = snapped(dragStartTextureOffsetX + delta);
+            case Y -> visual.texture_offset_y = snapped(dragStartTextureOffsetY + delta);
+            case Z -> visual.texture_offset_z = snapped(dragStartTextureOffsetZ + delta);
+        }
+
+        visual.preset = "custom";
+    }
+
+    private void applyTextureScaleDelta(double delta) {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        String mode = visual.texture_mode != null ? visual.texture_mode.toLowerCase(Locale.ROOT) : "plane";
+
+        switch (dragAxis) {
+            case Y -> visual.texture_scale_y = Math.max(0.05D, dragStartTextureScaleY + delta * 0.5D);
+            case X -> visual.texture_scale_x = Math.max(0.05D, dragStartTextureScaleX + delta * 0.5D);
+            case Z -> {
+                if ("plane".equals(mode)) {
+                    visual.texture_scale_y = Math.max(0.05D, dragStartTextureScaleY + delta * 0.5D);
+                } else {
+                    visual.texture_scale_x = Math.max(0.05D, dragStartTextureScaleX + delta * 0.5D);
+                }
+            }
+        }
+
+        visual.preset = "custom";
+    }
+
+    private void beginRotationDrag(Ray ray, GizmoAxis axis) {
+        if (axis == null || axis == GizmoAxis.NONE) return;
+
+        Double angle = rotationAngle(ray, axis);
+        if (angle == null) return;
+
+        captureDragStart();
+        dragRotationAxis = axis;
+        hoveredRotationAxis = axis;
+        rotationDragStartAngle = angle;
+        dragChanged = false;
+    }
+
+    private void updateRotationDrag(Ray ray) {
+        if (dragRotationAxis == GizmoAxis.NONE) return;
+
+        Double angle = rotationAngle(ray, dragRotationAxis);
+        if (angle == null) return;
+
+        double deltaDegrees = Mth.wrapDegrees((float) Math.toDegrees(angle - rotationDragStartAngle));
+
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+
+        switch (dragRotationAxis) {
+            case X -> visual.texture_rotation_x = dragStartTextureRotationX + deltaDegrees;
+            case Y -> visual.texture_rotation = dragStartTextureRotationY + deltaDegrees;
+            case Z -> visual.texture_rotation_z = dragStartTextureRotationZ + deltaDegrees;
+            default -> {
+                return;
+            }
+        }
+
+        visual.preset = "custom";
+        dragChanged = true;
+    }
+
+    private GizmoAxis pickRotationRing(Ray ray) {
+        if (ray == null) return GizmoAxis.NONE;
+
+        GizmoAxis bestAxis = GizmoAxis.NONE;
+        double bestError = Double.MAX_VALUE;
+        double threshold = handleSize() * 1.8D;
+        double radius = rotationRingRadius();
+
+        for (GizmoAxis axis : List.of(GizmoAxis.X, GizmoAxis.Y, GizmoAxis.Z)) {
+            Vec3 hit = rotationPlaneIntersection(ray, axis);
+            if (hit == null) continue;
+
+            Vec3 center = gizmoCenter();
+            double distance = switch (axis) {
+                case X -> Math.sqrt((hit.y - center.y) * (hit.y - center.y) + (hit.z - center.z) * (hit.z - center.z));
+                case Y -> Math.sqrt((hit.x - center.x) * (hit.x - center.x) + (hit.z - center.z) * (hit.z - center.z));
+                case Z -> Math.sqrt((hit.x - center.x) * (hit.x - center.x) + (hit.y - center.y) * (hit.y - center.y));
+                default -> 0.0D;
+            };
+
+            double error = Math.abs(distance - radius);
+            if (error <= threshold && error < bestError) {
+                bestError = error;
+                bestAxis = axis;
+            }
+        }
+
+        return bestAxis;
+    }
+
+    private Vec3 rotationPlaneIntersection(Ray ray, GizmoAxis axis) {
+        Vec3 center = gizmoCenter();
+
+        return switch (axis) {
+            case X -> planeIntersection(ray, GizmoPlane.YZ, center);
+            case Y -> planeIntersection(ray, GizmoPlane.XZ, center);
+            case Z -> planeIntersection(ray, GizmoPlane.XY, center);
+            default -> null;
+        };
+    }
+
+    private Double rotationAngle(Ray ray, GizmoAxis axis) {
+        if (ray == null || axis == null || axis == GizmoAxis.NONE) return null;
+
+        Vec3 center = gizmoCenter();
+        Vec3 hit = rotationPlaneIntersection(ray, axis);
+        if (hit == null) return null;
+
+        return switch (axis) {
+            case X -> {
+                double dy = hit.y - center.y;
+                double dz = hit.z - center.z;
+                yield dy * dy + dz * dz < 1.0E-6D ? null : Math.atan2(dz, dy);
+            }
+            case Y -> {
+                double dx = hit.x - center.x;
+                double dz = hit.z - center.z;
+                yield dx * dx + dz * dz < 1.0E-6D ? null : Math.atan2(dz, dx);
+            }
+            case Z -> {
+                double dx = hit.x - center.x;
+                double dy = hit.y - center.y;
+                yield dx * dx + dy * dy < 1.0E-6D ? null : Math.atan2(dy, dx);
+            }
+            default -> null;
+        };
+    }
+
+    double rotationRingRadius() {
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        String textureMode = visual.texture_mode != null ? visual.texture_mode.toLowerCase(Locale.ROOT) : "plane";
+
+        double base = switch (textureMode) {
+            case "box_wrap" -> Math.max(trigger().size_x, trigger().size_z) * 0.65D;
+            case "cylinder_wrap" -> trigger().radius * 1.25D;
+            default -> {
+                double size = visual.size > 0.0D ? visual.size : Math.max(trigger().radius * 2.0D, Math.max(trigger().size_x, trigger().size_z));
+                yield size * 0.65D * Math.max(visual.texture_scale_x, visual.texture_scale_y);
+            }
+        };
+
+        return Math.max(0.75D, base);
     }
 
     private double snapped(double value) {
@@ -874,6 +1285,10 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         return markerPlacementMode;
     }
 
+    boolean uiHidden() {
+        return uiHidden;
+    }
+
     BlockPos resolvedBlockAnchor() {
         return resolvedBlockAnchor;
     }
@@ -900,6 +1315,54 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         }
 
         return base.add(anchor.offset_x, anchor.offset_y, anchor.offset_z);
+    }
+
+    Vec3 gizmoCenter() {
+        if (!isTextureMode()) {
+            return center();
+        }
+
+        DialogueDefinition.ZoneVisual visual = trigger().visual;
+        Vec3 zone = center();
+        return zone.add(visual.texture_offset_x, visual.y_offset + visual.texture_offset_y, visual.texture_offset_z);
+    }
+
+    double textureHorizontalExtent() {
+        DialogueDefinition.Trigger trigger = trigger();
+        DialogueDefinition.ZoneVisual visual = trigger.visual;
+        String mode = visual.texture_mode != null ? visual.texture_mode.toLowerCase(Locale.ROOT) : "plane";
+
+        return switch (mode) {
+            case "box_wrap" -> Math.max(0.1D, Math.max(trigger.size_x, trigger.size_z) * 0.5D);
+            case "cylinder_wrap" -> Math.max(0.1D, trigger.radius);
+            default -> {
+                double size = visual.size > 0.0D ? visual.size : Math.max(trigger.radius * 2.0D, Math.max(trigger.size_x, trigger.size_z));
+                yield Math.max(0.1D, size * 0.5D);
+            }
+        };
+    }
+
+    double textureVerticalExtent() {
+        DialogueDefinition.Trigger trigger = trigger();
+        DialogueDefinition.ZoneVisual visual = trigger.visual;
+        String mode = visual.texture_mode != null ? visual.texture_mode.toLowerCase(Locale.ROOT) : "plane";
+
+        if ("plane".equals(mode)) {
+            double size = visual.size > 0.0D ? visual.size : Math.max(trigger.radius * 2.0D, Math.max(trigger.size_x, trigger.size_z));
+            return Math.max(0.1D, size * 0.5D);
+        }
+
+        double height = visual.visual_height > 0.0D ? visual.visual_height : ("box".equals(normalizeShape(trigger.shape)) ? trigger.size_y : trigger.height);
+
+        return Math.max(0.1D, height);
+    }
+
+    GizmoAxis hoveredRotationAxis() {
+        return hoveredRotationAxis;
+    }
+
+    GizmoAxis dragRotationAxis() {
+        return dragRotationAxis;
     }
 
     Vec3 anchorBase() {
@@ -943,7 +1406,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     Vec3 gizmoEnd(GizmoAxis axis, int sign) {
-        Vec3 center = center();
+        Vec3 center = gizmoCenter();
         Vec3 direction = axisVector(axis).scale(sign >= 0 ? 1.0D : -1.0D);
         double length = gizmoLength(axis);
         return center.add(direction.scale(length));
@@ -959,11 +1422,27 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     double gizmoLength(GizmoAxis axis) {
         DialogueDefinition.Trigger trigger = trigger();
 
-        if (mode == EditMode.MOVE) {
+        if (mode == EditMode.MOVE || mode == EditMode.TEXTURE_MOVE) {
             Minecraft minecraft = Minecraft.getInstance();
             Camera camera = minecraft.gameRenderer.getMainCamera();
-            double distance = camera.getPosition().distanceTo(center());
+            double distance = camera.getPosition().distanceTo(gizmoCenter());
             return Mth.clamp(distance * 0.18D, 1.35D, 4.5D);
+        }
+
+        if (mode == EditMode.TEXTURE_SCALE) {
+            DialogueDefinition.ZoneVisual visual = trigger.visual;
+            double horizontal = textureHorizontalExtent() * Math.max(0.05D, visual.texture_scale_x);
+            double vertical = textureVerticalExtent() * Math.max(0.05D, visual.texture_scale_y);
+
+            return switch (axis) {
+                case Y -> Math.max(0.45D, vertical);
+                case X, Z -> Math.max(0.45D, horizontal);
+                default -> 0.45D;
+            };
+        }
+
+        if (mode == EditMode.TEXTURE_ROTATE) {
+            return rotationRingRadius();
         }
 
         String shape = normalizeShape(trigger.shape);
@@ -982,7 +1461,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
 
     double handleSize() {
         Minecraft minecraft = Minecraft.getInstance();
-        double distance = minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(center());
+        double distance = minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(gizmoCenter());
         return Mth.clamp(distance * 0.025D, 0.10D, 0.28D);
     }
 
@@ -995,7 +1474,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     Vec3[] planeCorners(GizmoPlane plane) {
-        Vec3 c = center();
+        Vec3 c = gizmoCenter();
         double i = planeInner();
         double o = planeOuter();
 
@@ -1012,7 +1491,11 @@ public final class DialogueZoneWorldEditScreen extends Screen {
             return new AxisPick(GizmoAxis.NONE, 1);
         }
 
-        Vec3 center = center();
+        if (mode == EditMode.TEXTURE_ROTATE) {
+            return new AxisPick(GizmoAxis.NONE, 1);
+        }
+
+        Vec3 center = gizmoCenter();
         double threshold = handleSize() * 1.9D;
 
         GizmoAxis best = GizmoAxis.NONE;
@@ -1040,7 +1523,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     private GizmoPlane pickPlane(Ray ray) {
-        if (ray == null || mode != EditMode.MOVE) {
+        if (ray == null || (mode != EditMode.MOVE && mode != EditMode.TEXTURE_MOVE)) {
             return GizmoPlane.NONE;
         }
 
@@ -1048,7 +1531,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
         double bestRayDistance = Double.MAX_VALUE;
 
         for (GizmoPlane plane : List.of(GizmoPlane.XY, GizmoPlane.XZ, GizmoPlane.YZ)) {
-            Vec3 hit = planeIntersection(ray, plane, center());
+            Vec3 hit = planeIntersection(ray, plane, gizmoCenter());
             if (hit == null || !insidePlaneHandle(hit, plane)) continue;
             double rayDistance = hit.distanceToSqr(ray.origin);
             if (rayDistance < bestRayDistance) {
@@ -1061,7 +1544,7 @@ public final class DialogueZoneWorldEditScreen extends Screen {
     }
 
     private boolean insidePlaneHandle(Vec3 hit, GizmoPlane plane) {
-        Vec3 d = hit.subtract(center());
+        Vec3 d = hit.subtract(gizmoCenter());
         double i = planeInner();
         double o = planeOuter();
         return switch (plane) {

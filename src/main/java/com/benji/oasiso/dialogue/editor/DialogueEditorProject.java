@@ -122,6 +122,10 @@ public class DialogueEditorProject {
             normalizeRichLine(line);
         }
 
+        for (DialogueDefinition.Trigger trigger : definition.triggers) {
+            normalizeZoneVisual(trigger);
+        }
+
         normalizeGraph();
 
         for (DialogueDefinition.Node node : definition.nodes.values()) {
@@ -131,6 +135,46 @@ public class DialogueEditorProject {
         }
     }
 
+
+    private static void normalizeZoneVisual(DialogueDefinition.Trigger trigger) {
+        if (trigger == null) {
+            return;
+        }
+
+        if (trigger.visual == null) {
+            trigger.visual = new DialogueDefinition.ZoneVisual();
+        }
+
+        DialogueDefinition.ZoneVisual visual = trigger.visual;
+
+        if (visual.style == null || visual.style.isBlank()) visual.style = "auto";
+        if (visual.color == null || visual.color.isBlank()) visual.color = "cyan";
+        if (visual.texture_mode == null || visual.texture_mode.isBlank()) visual.texture_mode = "plane";
+        if (visual.texture_fit == null || visual.texture_fit.isBlank()) visual.texture_fit = "stretch";
+        if (visual.fill_mode == null || visual.fill_mode.isBlank()) visual.fill_mode = "gradient";
+        if (visual.fill_color_bottom == null || visual.fill_color_bottom.isBlank()) visual.fill_color_bottom = "cyan";
+        if (visual.fill_color_top == null || visual.fill_color_top.isBlank()) visual.fill_color_top = "cyan";
+        if (visual.preset == null || visual.preset.isBlank()) visual.preset = "custom";
+
+        visual.alpha = Math.max(0.0F, Math.min(1.0F, visual.alpha));
+        visual.fill_alpha_bottom = Math.max(0.0F, Math.min(1.0F, visual.fill_alpha_bottom));
+        visual.fill_alpha_top = Math.max(0.0F, Math.min(1.0F, visual.fill_alpha_top));
+        visual.texture_repeat_x = Math.max(0.01D, visual.texture_repeat_x);
+        visual.texture_repeat_y = Math.max(0.01D, visual.texture_repeat_y);
+        visual.texture_scale_x = Math.max(0.05D, visual.texture_scale_x);
+        visual.texture_scale_y = Math.max(0.05D, visual.texture_scale_y);
+        if (!Double.isFinite(visual.texture_offset_x)) visual.texture_offset_x = 0.0D;
+        if (!Double.isFinite(visual.texture_offset_y)) visual.texture_offset_y = 0.0D;
+        if (!Double.isFinite(visual.texture_offset_z)) visual.texture_offset_z = 0.0D;
+        if (!Double.isFinite(visual.texture_rotation)) visual.texture_rotation = 0.0D;
+        visual.pulse_amplitude = Math.max(0.0D, visual.pulse_amplitude);
+        visual.pulse_speed = Math.max(0.0D, visual.pulse_speed);
+        visual.bob_amplitude = Math.max(0.0D, visual.bob_amplitude);
+        visual.bob_speed = Math.max(0.0D, visual.bob_speed);
+        visual.alpha_breathe_amount = Math.max(0.0D, Math.min(1.0D, visual.alpha_breathe_amount));
+        visual.alpha_breathe_speed = Math.max(0.0D, visual.alpha_breathe_speed);
+        visual.preview_distance = Math.max(1.0D, visual.preview_distance);
+    }
 
     private static void normalizeRichLine(DialogueDefinition.Line line) {
         if (line == null || line.rich_regions == null) {

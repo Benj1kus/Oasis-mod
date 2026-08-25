@@ -5,6 +5,7 @@ import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -13,6 +14,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -99,6 +101,11 @@ public final class DialogueEditorScreen extends Screen {
 
         uiSettings = DialogueEditorUiSettings.get();
         LEFT = uiSettings.resolvedInspectorWidth(width);
+
+        if (tab == Tab.ZONE_FX) {
+            LEFT = Math.min(Math.max(338, width - 300), Math.max(370, LEFT));
+        }
+
         rowSpacing = uiSettings.resolvedRowSpacing(height);
         controlHeight = uiSettings.resolvedControlHeight(height);
         timelineHeight = uiSettings.resolvedTimelineHeight(height);
@@ -552,19 +559,349 @@ public final class DialogueEditorScreen extends Screen {
             help(1, "Select a zone trigger first.");
             return;
         }
+
         if (t.visual == null) t.visual = new DialogueDefinition.ZoneVisual();
         DialogueDefinition.ZoneVisual v = t.visual;
 
-        toggleButton("Preview enabled", v.enabled, 0, value -> v.enabled = value);
-        cycleButton("Style", v.style, 1, List.of("auto", "ring", "outline", "sprite", "pillar"), s -> v.style = s);
-        assetField("Custom floor PNG", v.texture, 2, ".png", false, s -> v.texture = blankToNull(s));
-        colorField("Color", v.color, 3, s -> v.color = s);
-        smallFields("Alpha", String.valueOf(v.alpha), s -> v.alpha = f(s, v.alpha), "Y offset", String.valueOf(v.y_offset), s -> v.y_offset = d(s, v.y_offset), 4);
-        smallFields("Visual size", String.valueOf(v.size), s -> v.size = d(s, v.size), "Visual height", String.valueOf(v.visual_height), s -> v.visual_height = d(s, v.visual_height), 5);
-        toggleButton("Pulse", v.pulse, 6, value -> v.pulse = value);
-        field("Preview distance", String.valueOf(v.preview_distance), 7, s -> v.preview_distance = d(s, v.preview_distance), 32);
-        help(9, "style=auto + texture -> sprite. Without texture cylinder -> ring.");
-        help(10, "visual.size is measured in Minecraft blocks, not pixels.");
+        toggleButton("Preview enabled", v.enabled, 0, value -> {
+            v.enabled = value;
+            markZoneCustom(v);
+        });
+
+        cycleButton("Preset", v.preset, 1, List.of("custom", "gta_marker", "hologram", "danger_zone", "holy_zone", "portal"), preset -> applyZonePreset(t, v, preset));
+
+        cycleButton("Default style", v.style, 2, List.of("auto", "ring", "outline", "pillar"), value -> {
+            v.style = value;
+            markZoneCustom(v);
+        });
+
+        toggleButton("Show default zone", v.show_default_zone, 3, value -> {
+            v.show_default_zone = value;
+            markZoneCustom(v);
+        });
+
+        assetField("Marker texture PNG", v.texture, 4, ".png", false, value -> {
+            v.texture = blankToNull(value);
+            markZoneCustom(v);
+        });
+
+        cycleButton("Texture mode", v.texture_mode, 5, List.of("plane", "cylinder_wrap", "box_wrap"), value -> {
+            v.texture_mode = value;
+            markZoneCustom(v);
+        });
+
+        cycleButton("Texture fit", v.texture_fit, 6, List.of("stretch", "repeat"), value -> {
+            v.texture_fit = value;
+            markZoneCustom(v);
+        });
+
+        smallFields("Repeat U", String.valueOf(v.texture_repeat_x), value -> {
+            v.texture_repeat_x = Math.max(0.01D, d(value, v.texture_repeat_x));
+            markZoneCustom(v);
+        }, "Repeat V", String.valueOf(v.texture_repeat_y), value -> {
+            v.texture_repeat_y = Math.max(0.01D, d(value, v.texture_repeat_y));
+            markZoneCustom(v);
+        }, 7);
+
+        smallFields("UV scroll U/s", String.valueOf(v.texture_scroll_u), value -> {
+            v.texture_scroll_u = d(value, v.texture_scroll_u);
+            markZoneCustom(v);
+        }, "UV scroll V/s", String.valueOf(v.texture_scroll_v), value -> {
+            v.texture_scroll_v = d(value, v.texture_scroll_v);
+            markZoneCustom(v);
+        }, 8);
+
+        toggleButton("Filled sides", v.fill_enabled, 9, value -> {
+            v.fill_enabled = value;
+            markZoneCustom(v);
+        });
+
+        cycleButton("Fill mode", v.fill_mode, 10, List.of("solid", "gradient"), value -> {
+            v.fill_mode = value;
+            markZoneCustom(v);
+        });
+
+        colorField("Fill bottom color", v.fill_color_bottom, 11, value -> {
+            v.fill_color_bottom = value;
+            markZoneCustom(v);
+        });
+
+        colorField("Fill top color", v.fill_color_top, 12, value -> {
+            v.fill_color_top = value;
+            markZoneCustom(v);
+        });
+
+        slider("Bottom alpha", v.fill_alpha_bottom, 0.0D, 1.0D, 13, value -> {
+            v.fill_alpha_bottom = value.floatValue();
+            markZoneCustom(v);
+        });
+
+        slider("Top alpha", v.fill_alpha_top, 0.0D, 1.0D, 14, value -> {
+            v.fill_alpha_top = value.floatValue();
+            markZoneCustom(v);
+        });
+
+        colorField("Outline / ring color", v.color, 15, value -> {
+            v.color = value;
+            markZoneCustom(v);
+        });
+
+        slider("Master alpha", v.alpha, 0.0D, 1.0D, 16, value -> {
+            v.alpha = value.floatValue();
+            markZoneCustom(v);
+        });
+
+        toggleButton("Pulse", v.pulse, 17, value -> {
+            v.pulse = value;
+            markZoneCustom(v);
+        });
+
+        slider("Pulse amount", v.pulse_amplitude, 0.0D, 0.35D, 18, value -> {
+            v.pulse_amplitude = value;
+            markZoneCustom(v);
+        });
+
+        slider("Pulse speed (cycles/s)", v.pulse_speed, 0.05D, 3.0D, 19, value -> {
+            v.pulse_speed = value;
+            markZoneCustom(v);
+        });
+
+        toggleButton("Bob / bounce", v.bob, 20, value -> {
+            v.bob = value;
+            markZoneCustom(v);
+        });
+
+        slider("Bob height", v.bob_amplitude, 0.0D, 2.0D, 21, value -> {
+            v.bob_amplitude = value;
+            markZoneCustom(v);
+        });
+
+        slider("Bob speed (cycles/s)", v.bob_speed, 0.05D, 3.0D, 22, value -> {
+            v.bob_speed = value;
+            markZoneCustom(v);
+        });
+
+        toggleButton("Rotate clockwise", v.rotate, 23, value -> {
+            v.rotate = value;
+            markZoneCustom(v);
+        });
+
+        slider("Rotation speed (deg/s)", v.rotate_speed, -360.0D, 360.0D, 24, value -> {
+            v.rotate_speed = value;
+            markZoneCustom(v);
+        });
+
+        toggleButton("Alpha breathing", v.alpha_breathe, 25, value -> {
+            v.alpha_breathe = value;
+            markZoneCustom(v);
+        });
+
+        slider("Alpha breathe amount", v.alpha_breathe_amount, 0.0D, 1.0D, 26, value -> {
+            v.alpha_breathe_amount = value;
+            markZoneCustom(v);
+        });
+
+        slider("Alpha breathe speed", v.alpha_breathe_speed, 0.05D, 3.0D, 27, value -> {
+            v.alpha_breathe_speed = value;
+            markZoneCustom(v);
+        });
+
+        smallFields("Y offset", String.valueOf(v.y_offset), value -> {
+            v.y_offset = d(value, v.y_offset);
+            markZoneCustom(v);
+        }, "Visual size", String.valueOf(v.size), value -> {
+            v.size = Math.max(0.0D, d(value, v.size));
+            markZoneCustom(v);
+        }, 28);
+
+        smallFields("Visual height", String.valueOf(v.visual_height), value -> {
+            v.visual_height = Math.max(0.0D, d(value, v.visual_height));
+            markZoneCustom(v);
+        }, "Preview distance", String.valueOf(v.preview_distance), value -> {
+            v.preview_distance = Math.max(1.0D, d(value, v.preview_distance));
+            markZoneCustom(v);
+        }, 29);
+
+        tripleFields("Texture offset X", String.valueOf(v.texture_offset_x), value -> {
+            v.texture_offset_x = d(value, v.texture_offset_x);
+            markZoneCustom(v);
+        }, "Y", String.valueOf(v.texture_offset_y), value -> {
+            v.texture_offset_y = d(value, v.texture_offset_y);
+            markZoneCustom(v);
+        }, "Z", String.valueOf(v.texture_offset_z), value -> {
+            v.texture_offset_z = d(value, v.texture_offset_z);
+            markZoneCustom(v);
+        }, 31);
+
+        smallFields("Texture scale X", String.valueOf(v.texture_scale_x), value -> {
+            v.texture_scale_x = Math.max(0.05D, d(value, v.texture_scale_x));
+            markZoneCustom(v);
+        }, "Texture scale Y", String.valueOf(v.texture_scale_y), value -> {
+            v.texture_scale_y = Math.max(0.05D, d(value, v.texture_scale_y));
+            markZoneCustom(v);
+        }, 32);
+
+        field("Texture rotation (degrees)", String.valueOf(v.texture_rotation), 33, value -> {
+            v.texture_rotation = d(value, v.texture_rotation);
+            markZoneCustom(v);
+        }, 32);
+
+        button("Edit texture with world gizmo", 34, b -> openZoneTextureEditor());
+
+        help(36, "RIGHT PREVIEW is live: fill, texture, colors, pulse, bob, rotation and alpha breathing update before export.");
+        help(37, "World texture gizmo: 1 = move, 2 = scale, 3 = rotate. H hides/shows its UI; Reset Tex restores transform.");
+        help(38, "Texture is a separate layer: it stays visible even when Default style is outline / pillar / ring.");
+        help(39, "cylinder_wrap and box_wrap cover side walls. repeat uses Repeat U / V instead of stretching once.");
+        help(40, "Filled sides support solid color or bottom-to-top gradient. Set Top alpha to 0 for a GTA/RPG fade-out marker.");
+        help(41, "Animations affect default geometry, fills and custom textures together. Negative rotation speed rotates counter-clockwise.");
+    }
+
+    private void markZoneCustom(DialogueDefinition.ZoneVisual visual) {
+        visual.preset = "custom";
+    }
+
+    private void applyZonePreset(DialogueDefinition.Trigger trigger, DialogueDefinition.ZoneVisual visual, String preset) {
+        String normalized = preset != null ? preset.toLowerCase(Locale.ROOT) : "custom";
+        visual.preset = normalized;
+
+        switch (normalized) {
+            case "gta_marker" -> {
+                visual.show_default_zone = true;
+                visual.style = "outline";
+                visual.color = "#FFD45A";
+                visual.alpha = 0.90F;
+
+                visual.fill_enabled = true;
+                visual.fill_mode = "gradient";
+                visual.fill_color_bottom = "#FFD45A";
+                visual.fill_color_top = "#FFD45A";
+                visual.fill_alpha_bottom = 0.65F;
+                visual.fill_alpha_top = 0.02F;
+
+                visual.pulse = true;
+                visual.pulse_amplitude = 0.055D;
+                visual.pulse_speed = 0.80D;
+                visual.bob = true;
+                visual.bob_amplitude = 0.16D;
+                visual.bob_speed = 0.65D;
+                visual.rotate = true;
+                visual.rotate_speed = 28.0D;
+                visual.alpha_breathe = false;
+            }
+            case "hologram" -> {
+                visual.show_default_zone = true;
+                visual.style = "outline";
+                visual.color = "#42F2E1";
+                visual.alpha = 0.72F;
+
+                visual.fill_enabled = true;
+                visual.fill_mode = "gradient";
+                visual.fill_color_bottom = "#28F0D0";
+                visual.fill_color_top = "#7EFFFF";
+                visual.fill_alpha_bottom = 0.35F;
+                visual.fill_alpha_top = 0.03F;
+
+                visual.texture_fit = "repeat";
+                visual.texture_repeat_x = 4.0D;
+                visual.texture_repeat_y = 2.0D;
+                visual.texture_scroll_u = 0.08D;
+                visual.texture_scroll_v = -0.12D;
+
+                visual.pulse = true;
+                visual.pulse_amplitude = 0.025D;
+                visual.pulse_speed = 1.15D;
+                visual.bob = true;
+                visual.bob_amplitude = 0.08D;
+                visual.bob_speed = 0.70D;
+                visual.rotate = true;
+                visual.rotate_speed = 14.0D;
+                visual.alpha_breathe = true;
+                visual.alpha_breathe_amount = 0.22D;
+                visual.alpha_breathe_speed = 0.85D;
+            }
+            case "danger_zone" -> {
+                visual.show_default_zone = true;
+                visual.style = "outline";
+                visual.color = "#FF3A22";
+                visual.alpha = 0.92F;
+
+                visual.fill_enabled = true;
+                visual.fill_mode = "gradient";
+                visual.fill_color_bottom = "#FF1600";
+                visual.fill_color_top = "#FFB000";
+                visual.fill_alpha_bottom = 0.50F;
+                visual.fill_alpha_top = 0.05F;
+
+                visual.pulse = true;
+                visual.pulse_amplitude = 0.08D;
+                visual.pulse_speed = 1.65D;
+                visual.bob = false;
+                visual.rotate = true;
+                visual.rotate_speed = 42.0D;
+                visual.alpha_breathe = true;
+                visual.alpha_breathe_amount = 0.25D;
+                visual.alpha_breathe_speed = 1.4D;
+            }
+            case "holy_zone" -> {
+                visual.show_default_zone = true;
+                visual.style = "pillar";
+                visual.color = "#FFE08A";
+                visual.alpha = 0.82F;
+
+                visual.fill_enabled = true;
+                visual.fill_mode = "gradient";
+                visual.fill_color_bottom = "#FFD66B";
+                visual.fill_color_top = "#FFF8D0";
+                visual.fill_alpha_bottom = 0.34F;
+                visual.fill_alpha_top = 0.0F;
+
+                visual.pulse = true;
+                visual.pulse_amplitude = 0.025D;
+                visual.pulse_speed = 0.65D;
+                visual.bob = true;
+                visual.bob_amplitude = 0.10D;
+                visual.bob_speed = 0.50D;
+                visual.rotate = true;
+                visual.rotate_speed = 18.0D;
+                visual.alpha_breathe = true;
+                visual.alpha_breathe_amount = 0.16D;
+                visual.alpha_breathe_speed = 0.55D;
+            }
+            case "portal" -> {
+                visual.show_default_zone = true;
+                visual.style = "outline";
+                visual.color = "#9A5CFF";
+                visual.alpha = 0.80F;
+
+                visual.fill_enabled = true;
+                visual.fill_mode = "gradient";
+                visual.fill_color_bottom = "#3D0A78";
+                visual.fill_color_top = "#B76CFF";
+                visual.fill_alpha_bottom = 0.40F;
+                visual.fill_alpha_top = 0.02F;
+
+                visual.texture_fit = "repeat";
+                visual.texture_repeat_x = 3.0D;
+                visual.texture_repeat_y = 2.0D;
+                visual.texture_scroll_u = 0.12D;
+                visual.texture_scroll_v = 0.05D;
+
+                visual.pulse = true;
+                visual.pulse_amplitude = 0.045D;
+                visual.pulse_speed = 0.90D;
+                visual.bob = true;
+                visual.bob_amplitude = 0.12D;
+                visual.bob_speed = 0.55D;
+                visual.rotate = true;
+                visual.rotate_speed = 36.0D;
+                visual.alpha_breathe = true;
+                visual.alpha_breathe_amount = 0.30D;
+                visual.alpha_breathe_speed = 0.75D;
+            }
+            default -> visual.preset = "custom";
+        }
+
+        reopen(tab);
     }
 
     private void initGameplay() {
@@ -622,7 +959,27 @@ public final class DialogueEditorScreen extends Screen {
         if (trigger.visual == null) trigger.visual = new DialogueDefinition.ZoneVisual();
 
         DialogueEditorHistory.checkpoint(project);
-        minecraft.setScreen(new DialogueZoneWorldEditScreen(project));
+        minecraft.setScreen(new DialogueZoneWorldEditScreen(project, Tab.ZONE, false));
+    }
+
+    private void openZoneTextureEditor() {
+        if (minecraft == null || minecraft.level == null || minecraft.player == null) {
+            STATUS = "Join a world before using the texture gizmo.";
+            return;
+        }
+
+        DialogueDefinition.Trigger trigger = project.currentTrigger();
+        trigger.type = "zone";
+        if (trigger.anchor == null) trigger.anchor = new DialogueDefinition.ZoneAnchor();
+        if (trigger.visual == null) trigger.visual = new DialogueDefinition.ZoneVisual();
+
+        if (trigger.visual.texture == null || trigger.visual.texture.isBlank()) {
+            STATUS = "Import/select a Marker texture PNG before opening the texture gizmo.";
+            return;
+        }
+
+        DialogueEditorHistory.checkpoint(project);
+        minecraft.setScreen(new DialogueZoneWorldEditScreen(project, Tab.ZONE_FX, true));
     }
 
     private void exportProject(boolean openFolder) {
@@ -684,7 +1041,10 @@ public final class DialogueEditorScreen extends Screen {
         boolean lineTimeline = tab == Tab.LINES || tab == Tab.LINE_OVERRIDES;
         timelineY = -1;
 
-        if (triggerView) {
+        if (tab == Tab.ZONE_FX) {
+            previewTransform = null;
+            DialogueZoneFxGuiPreview.render(project, graphics, px, py, pw, ph, previewTicks, partialTick);
+        } else if (triggerView) {
             int cardH = Math.min(170, Math.max(105, ph / 3));
             int previewH = Math.max(80, ph - cardH - 8);
             renderTriggerCard(graphics, px, py, pw, cardH, mouseX, mouseY);
@@ -1508,6 +1868,33 @@ public final class DialogueEditorScreen extends Screen {
         }
     }
 
+    private void slider(String label, double current, double min, double max, int row, Consumer<Double> setter) {
+        int y = rowY(row);
+        double clamped = Mth.clamp(current, min, max);
+        double normalized = max <= min ? 0.0D : (clamped - min) / (max - min);
+
+        AbstractSliderButton slider = new AbstractSliderButton(12, y, LEFT - 24, controlHeight, Component.empty(), normalized) {
+            {
+                updateMessage();
+            }
+
+            @Override
+            protected void updateMessage() {
+                double actual = min + this.value * (max - min);
+                this.setMessage(Component.literal(label + ": " + String.format(Locale.ROOT, "%.3f", actual)));
+            }
+
+            @Override
+            protected void applyValue() {
+                double actual = min + this.value * (max - min);
+                setter.accept(actual);
+            }
+        };
+
+        addScrollableWidget(slider);
+        addTip(12, y, LEFT - 24, controlHeight, tooltipText(label));
+    }
+
     private void button(String text, int row, Button.OnPress press) {
         int y = rowY(row);
         addScrollableWidget(Button.builder(Component.literal(text), press).bounds(12, y, LEFT - 24, controlHeight).build());
@@ -1612,7 +1999,8 @@ public final class DialogueEditorScreen extends Screen {
             case DIALOGUE -> 18;
             case VISUALS -> 9;
             case LINES -> 13;
-            case LINE_OVERRIDES, LAYOUT, TRIGGERS, ZONE_FX -> 10;
+            case LINE_OVERRIDES, LAYOUT, TRIGGERS -> 10;
+            case ZONE_FX -> 36;
             case NODES -> 13;
             case ZONE -> 12;
             case GAMEPLAY -> 7;
