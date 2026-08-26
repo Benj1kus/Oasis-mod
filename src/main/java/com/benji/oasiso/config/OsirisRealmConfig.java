@@ -115,18 +115,12 @@ public final class OsirisRealmConfig {
 
     static {
         BUILDER.push("Azumaal Boss");
-        AZUMAAL_MAX_HEALTH = BUILDER.comment("Maximum health of Azumaal. Requires restart to affect newly created bosses.")
-                .defineInRange("maxHealth", 1500.0D, 1.0D, 1000000.0D);
-        AZUMAAL_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Azumaal. Attack multipliers below are applied to this value.")
-                .defineInRange("attackDamage", 22.0D, 0.0D, 100000.0D);
+        AZUMAAL_MAX_HEALTH = BUILDER.comment("Maximum health of Azumaal. Requires restart to affect newly created bosses.").defineInRange("maxHealth", 1500.0D, 1.0D, 1000000.0D);
+        AZUMAAL_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Azumaal. Attack multipliers below are applied to this value.").defineInRange("attackDamage", 22.0D, 0.0D, 100000.0D);
         BUILDER.pop();
 
         BUILDER.push("Azumaal Damage Scaler");
-        AZUMAAL_DAMAGE_SCALER_MAX_MULTIPLIER = BUILDER.comment(
-                        "Maximum total multiplier that Azumaal Damage Scaler may reach.",
-                        "2.0 = scaler may increase final damage up to 2x the base damage.",
-                        "The scaler formula itself is NOT changed by this config.")
-                .defineInRange("maxDamageMultiplier", 2.0D, 1.0D, 20.0D);
+        AZUMAAL_DAMAGE_SCALER_MAX_MULTIPLIER = BUILDER.comment("Maximum total multiplier that Azumaal Damage Scaler may reach.", "2.0 = scaler may increase final damage up to 2x the base damage.", "The scaler formula itself is NOT changed by this config.").defineInRange("maxDamageMultiplier", 2.0D, 1.0D, 20.0D);
         BUILDER.pop();
 
         BUILDER.push("Azumaal Attack Timing");
@@ -219,14 +213,12 @@ public final class OsirisRealmConfig {
         AZUMAAL_PARKOUR_HOLD_TICKS = intValue("holdTicks", "Time players have to complete the parkour challenge. 500 ticks = 25 seconds.", 500, 1, 72000);
         AZUMAAL_PARKOUR_DESCEND_TICKS = intValue("descendTicks", "Descend duration in ticks.", 30, 1, 12000);
         AZUMAAL_PARKOUR_PARTICIPANT_RANGE = doubleValue("participantRange", "Range used to collect players participating in the parkour attack.", 96.0D, 1.0D, 512.0D);
-        AZUMAAL_PARKOUR_ENTROPY_DURATION = intValue("failureEntropyDuration", "Entropy duration applied to players who fail the parkour challenge, in ticks.", 400, 0, 72000);
+        AZUMAAL_PARKOUR_ENTROPY_DURATION = intValue("failureEntropyDuration", "Entropy duration applied to players who fail the parkour challenge, in ticks.", 200, 0, 72000);
         BUILDER.pop();
 
         BUILDER.push("Paladin Mini Boss");
-        PALADIN_MAX_HEALTH = BUILDER.comment("Maximum health of Paladin.")
-                .defineInRange("maxHealth", 800.0D, 1.0D, 1000000.0D);
-        PALADIN_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Paladin.")
-                .defineInRange("attackDamage", 24.0D, 0.0D, 100000.0D);
+        PALADIN_MAX_HEALTH = BUILDER.comment("Maximum health of Paladin.").defineInRange("maxHealth", 800.0D, 1.0D, 1000000.0D);
+        PALADIN_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Paladin.").defineInRange("attackDamage", 24.0D, 0.0D, 100000.0D);
         BUILDER.pop();
 
         BUILDER.push("Chaos Spawner Waves");

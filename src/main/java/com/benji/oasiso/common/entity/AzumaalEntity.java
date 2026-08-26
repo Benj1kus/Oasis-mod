@@ -13,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import com.benji.oasiso.common.util.DamageNumberSpawner;
@@ -22,6 +23,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.UUID;
 
 import net.minecraft.network.chat.Component;
@@ -71,6 +74,17 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final double HOVER_SPEED = 0.08D;
     private static final double LOOK_RANGE = 30.0D;
 
+    //pressure defense
+    private static final int PRESSURE_HIT_WINDOW_TICKS = 40;
+    private static final int PRESSURE_HIT_THRESHOLD = 6;
+    private static final int PRESSURE_DAMAGE_WINDOW_TICKS = 100;
+    private static final float PRESSURE_DAMAGE_THRESHOLD = 0.12F;
+    private static final int PRESSURE_CHECK_COOLDOWN_TICKS = 80;
+    private static final double PRESSURE_SHOCKWAVE_RADIUS = 10.5D;
+    private static final double PRESSURE_PUSH_MIN = 6.5D;
+    private static final double PRESSURE_PUSH_MAX = 8.5D;
+    private static final byte PRESSURE_SHOCKWAVE_EVENT = 67;
+
     private static final EntityDataAccessor<Integer> ANIM_STATE = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.INT);
 
     private UUID cloneOwnerId;
@@ -106,6 +120,11 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final String HOVER_Y_TAG = "AzumaalHoverY";
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    private final Deque<Long> pressureHitTicks = new ArrayDeque<>();
+    private final Deque<PressureDamageSample> pressureDamageSamples = new ArrayDeque<>();
+    private long pressureDefenseCooldownUntil;
+    private long clientPressureShockwaveStartNanos;
 
 //bossbar
 private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translatable("entity.oasiso.azumaal"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
@@ -756,6 +775,13 @@ public void onIntroPanelFinished(ServerPlayer player) {
                 float actualDamage = healthBefore - this.getHealth();
                 if (actualDamage > 0.0F) {
                     DamageNumberSpawner.spawn(level, this, actualDamage);
+
+                    if (!this.isDeathSequenceActive()
+                            && source.getEntity() instanceof Player attackingPlayer
+                            && !attackingPlayer.isCreative()
+                            && !attackingPlayer.isSpectator()) {
+                        registerPressureDefenseHit(level, actualDamage);
+                    }
                 }
             }
             return damaged;
@@ -772,10 +798,120 @@ public void onIntroPanelFinished(ServerPlayer player) {
         return true;
     }
 
+    private void registerPressureDefenseHit(ServerLevel level, float actualDamage) {
+        long now = level.getGameTime();
+
+        if (now < this.pressureDefenseCooldownUntil) {
+            this.pressureHitTicks.clear();
+            this.pressureDamageSamples.clear();
+            return;
+        }
+
+        this.pressureHitTicks.addLast(now);
+        this.pressureDamageSamples.addLast(new PressureDamageSample(now, actualDamage));
+
+        while (!this.pressureHitTicks.isEmpty()
+                && now - this.pressureHitTicks.peekFirst() > PRESSURE_HIT_WINDOW_TICKS) {
+            this.pressureHitTicks.removeFirst();
+        }
+
+        while (!this.pressureDamageSamples.isEmpty()
+                && now - this.pressureDamageSamples.peekFirst().tick() > PRESSURE_DAMAGE_WINDOW_TICKS) {
+            this.pressureDamageSamples.removeFirst();
+        }
+
+        float recentDamage = 0.0F;
+        for (PressureDamageSample sample : this.pressureDamageSamples) {
+            recentDamage += sample.damage();
+        }
+
+        boolean rapidHits = this.pressureHitTicks.size() >= PRESSURE_HIT_THRESHOLD;
+        boolean burstDamage = recentDamage >= this.getMaxHealth() * PRESSURE_DAMAGE_THRESHOLD;
+
+        if (!rapidHits && !burstDamage) {
+            return;
+        }
+
+        this.pressureHitTicks.clear();
+        this.pressureDamageSamples.clear();
+        this.pressureDefenseCooldownUntil = now + PRESSURE_CHECK_COOLDOWN_TICKS;
+
+        if (this.getRandom().nextBoolean()) {
+            performPressureShockwave(level);
+        }
+    }
+
+    private void performPressureShockwave(ServerLevel level) {
+        level.broadcastEntityEvent(this, PRESSURE_SHOCKWAVE_EVENT);
+
+        level.playSound(
+                null,
+                this.blockPosition(),
+                SoundEvents.WARDEN_SONIC_BOOM,
+                SoundSource.HOSTILE,
+                0.85F,
+                1.25F
+        );
+
+        double radiusSqr = PRESSURE_SHOCKWAVE_RADIUS * PRESSURE_SHOCKWAVE_RADIUS;
+
+        for (ServerPlayer player : level.players()) {
+            if (!player.isAlive() || player.isCreative() || player.isSpectator()) {
+                continue;
+            }
+            if (this.distanceToSqr(player) > radiusSqr) {
+                continue;
+            }
+
+            Vec3 away = new Vec3(
+                    player.getX() - this.getX(),
+                    0.0D,
+                    player.getZ() - this.getZ()
+            );
+
+            if (away.lengthSqr() < 0.0001D) {
+                Vec3 look = this.getLookAngle();
+                away = new Vec3(-look.x, 0.0D, -look.z);
+            }
+
+            if (away.lengthSqr() < 0.0001D) {
+                away = new Vec3(0.0D, 0.0D, 1.0D);
+            }
+
+            double push = Mth.lerp(
+                    this.getRandom().nextDouble(),
+                    PRESSURE_PUSH_MIN,
+                    PRESSURE_PUSH_MAX
+            );
+
+            Vec3 horizontal = away.normalize().scale(push);
+            Vec3 oldMovement = player.getDeltaMovement();
+            player.setDeltaMovement(horizontal.x, oldMovement.y, horizontal.z);
+            player.hasImpulse = true;
+            player.hurtMarked = true;
+        }
+    }
+
+    public long getClientPressureShockwaveStartNanos() {
+        return this.clientPressureShockwaveStartNanos;
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        if (id == PRESSURE_SHOCKWAVE_EVENT) {
+            this.clientPressureShockwaveStartNanos = System.nanoTime();
+            return;
+        }
+
+        super.handleEntityEvent(id);
+    }
+
+    private record PressureDamageSample(long tick, float damage) {
+    }
+
     private void finishCustomDeath(ServerLevel level) {
         ChaosChamberManager.releasePlayers(level.getServer(), this.getUUID());
         // credit player
-
         ServerPlayer killer = this.deathManager.resolveKiller(level);
         DamageSource finalSource;
         if (killer != null) {

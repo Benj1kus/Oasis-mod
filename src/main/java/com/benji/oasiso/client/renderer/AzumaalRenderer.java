@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import com.benji.oasiso.client.layer.AzumaalHologramTrailLayer;
 import com.benji.oasiso.client.layer.AzumaalBladeSlashLayer;
+import com.benji.oasiso.client.layer.AzumaalShockwaveLayer;
 import com.benji.oasiso.client.renderer.effect.AzumaalDeathRayRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,6 +20,7 @@ public class AzumaalRenderer extends GeoEntityRenderer<AzumaalEntity> {
         addRenderLayer(new GlowmaskLayer<>(this));
         addRenderLayer(new AzumaalHologramTrailLayer(this));
         addRenderLayer(new AzumaalBladeSlashLayer(this));
+        addRenderLayer(new AzumaalShockwaveLayer(this));
     }
 
     @Override
