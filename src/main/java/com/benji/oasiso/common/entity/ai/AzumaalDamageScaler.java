@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,13 +15,6 @@ public final class AzumaalDamageScaler {
     private static final double TOUGHNESS_BONUS_PER_POINT = 0.08D;
     private static final double ARMOR_BONUS_PER_POINT = 0.015D;
     private static final double ENCHANTMENT_BONUS_PER_POINT = 0.0125D;
-
-    /*
-     * Даже очень сильная modded armor
-     * не сможет поднять raw damage
-     * более чем в два раза.
-     */
-    private static final double MAX_DAMAGE_MULTIPLIER = 2.0D;
     private static final int MAX_PROTECTION_POINTS = 20;
 
     private AzumaalDamageScaler() {
@@ -42,7 +37,7 @@ public final class AzumaalDamageScaler {
 
         double multiplier = 1.0D + toughnessBonus + armorBonus + enchantmentBonus;
 
-        multiplier = Math.min(multiplier, MAX_DAMAGE_MULTIPLIER);
+        multiplier = Math.min(multiplier, OsirisRealmConfig.AZUMAAL_DAMAGE_SCALER_MAX_MULTIPLIER.get());
 
         return (float) (baseDamage * multiplier);
     }

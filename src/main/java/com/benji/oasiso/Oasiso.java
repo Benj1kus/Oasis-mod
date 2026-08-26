@@ -9,6 +9,9 @@ import com.benji.oasiso.common.entity.projectile.DesertBallEntity;
 import com.benji.oasiso.network.BossPortalTransitionNetwork;
 import com.benji.oasiso.network.ModMessages;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
+import com.benji.oasiso.config.OsirisRealmConfig;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import com.benji.oasiso.network.dialogueengine.DialogueNetwork;
 import com.benji.oasiso.registry.ModBlockEntities;
 import com.benji.oasiso.registry.ModBlocks;
@@ -73,6 +76,7 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_CENTER_SMOKE = PARTICLES.register("chaos_bomb_center_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_FIRE_SMOKE = PARTICLES.register("chaos_bomb_fire_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_SPARKS = PARTICLES.register("chaos_bomb_sparks", () -> new SimpleParticleType(false));
+
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
@@ -301,6 +305,12 @@ public class Oasiso {
     public static final RegistryObject<MobEffect> CHAOS_CHAMBER_EFFECT = ModEffects.CHAOS_CHAMBER_EFFECT;
 
     public Oasiso(FMLJavaModLoadingContext context) {
+        context.registerConfig(
+                ModConfig.Type.COMMON,
+                OsirisRealmConfig.SPEC,
+                "Osiris' Realm Config.toml"
+        );
+
         IEventBus modEventBus = context.getModEventBus();
 
         ModBlocks.register(modEventBus);

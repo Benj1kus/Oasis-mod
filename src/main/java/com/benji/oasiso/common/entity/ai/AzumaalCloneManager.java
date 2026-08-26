@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -11,11 +13,7 @@ import java.util.List;
 
 public final class AzumaalCloneManager {
 
-    private static final int TOTAL_MEMBERS = 6;
-    private static final int CLONE_COUNT = 5;
 
-    private static final double FORMATION_RADIUS = 6.0D;
-    public static final int FORMATION_TICKS = 20;
 
     private static final double CLONE_SEARCH_RANGE = 64.0D;
 
@@ -34,17 +32,22 @@ public final class AzumaalCloneManager {
             return false;
         }
 
+        int cloneCount = OsirisRealmConfig.AZUMAAL_CLONE_COUNT.get();
+        int totalMembers = cloneCount + 1;
+        int formationTicks = OsirisRealmConfig.AZUMAAL_CLONE_FORMATION_TICKS.get();
+        double formationRadius = OsirisRealmConfig.AZUMAAL_CLONE_FORMATION_RADIUS.get();
+
         Vec3 center = boss.position();
         float baseYaw = boss.getYRot();
-        Vec3 originalVertex = radialOffset(baseYaw, FORMATION_RADIUS);
+        Vec3 originalVertex = radialOffset(baseYaw, formationRadius);
 
         this.formationTarget = center.add(originalVertex);
-        this.formationTicksRemaining = FORMATION_TICKS;
+        this.formationTicksRemaining = formationTicks;
 
-        for (int i = 1; i <= CLONE_COUNT; i++) {
-            float cloneYaw = baseYaw + i * (360.0F / TOTAL_MEMBERS);
+        for (int i = 1; i <= cloneCount; i++) {
+            float cloneYaw = baseYaw + i * (360.0F / totalMembers);
 
-            Vec3 cloneVertex = radialOffset(cloneYaw, FORMATION_RADIUS);
+            Vec3 cloneVertex = radialOffset(cloneYaw, formationRadius);
             Vec3 relativeOffset = cloneVertex.subtract(originalVertex);
             AzumaalEntity clone = Oasiso.AZUMAAL.get().create(level);
 
@@ -52,7 +55,7 @@ public final class AzumaalCloneManager {
                 continue;
             }
             clone.moveTo(center.x, boss.getY(), center.z, boss.getYRot(), 0.0F);
-            clone.initializeClone(boss, i, relativeOffset, FORMATION_TICKS);
+            clone.initializeClone(boss, i, relativeOffset, formationTicks);
 
             level.addFreshEntity(clone);
 

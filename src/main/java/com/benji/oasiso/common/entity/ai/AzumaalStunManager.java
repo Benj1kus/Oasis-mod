@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.Oasiso;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -17,8 +19,6 @@ import java.util.UUID;
 
 public final class AzumaalStunManager {
 
-    private static final int STUN_DURATION = 20 * 4;
-    private static final int DEBUFF_DURATION = 20 * 5;
     private static final int PARTICLE_INTERVAL = 2;
     private static final String DATA_TAG = "AzumaalActiveStuns";
 
@@ -26,12 +26,12 @@ public final class AzumaalStunManager {
 
     public void stun(ServerPlayer player) {
 
-        StunData data = new StunData(player.getX(), player.getY(), player.getZ(), STUN_DURATION);
+        StunData data = new StunData(player.getX(), player.getY(), player.getZ(), OsirisRealmConfig.AZUMAAL_STUN_DURATION.get());
         this.activeStuns.put(player.getUUID(), data);
 
-        player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, DEBUFF_DURATION, 0, false, true));
-        player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, DEBUFF_DURATION, 0, false, true));
-        player.addEffect(new MobEffectInstance(Oasiso.ENTROPY_EFFECT.get(), DEBUFF_DURATION, 0, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, OsirisRealmConfig.AZUMAAL_STUN_DEBUFF_DURATION.get(), 0, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, OsirisRealmConfig.AZUMAAL_STUN_DEBUFF_DURATION.get(), 0, false, true));
+        player.addEffect(new MobEffectInstance(Oasiso.ENTROPY_EFFECT.get(), OsirisRealmConfig.AZUMAAL_STUN_DEBUFF_DURATION.get(), 0, false, true));
 
         player.setDeltaMovement(Vec3.ZERO);
 
@@ -88,7 +88,7 @@ public final class AzumaalStunManager {
 
         double radius = Math.max(0.55D, player.getBbWidth() * 0.9D);
         double height = player.getBbHeight();
-        double elapsed = STUN_DURATION - stun.ticksRemaining;
+        double elapsed = OsirisRealmConfig.AZUMAAL_STUN_DURATION.get() - stun.ticksRemaining;
         double mainPhase = elapsed * 0.28D;
 
         for (int ring = 0; ring < rings; ring++) {

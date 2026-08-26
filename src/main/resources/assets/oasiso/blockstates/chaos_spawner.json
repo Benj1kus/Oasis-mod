@@ -1,0 +1,12 @@
+{
+  "multipart": [
+    {
+      "when": { "active": "false" },
+      "apply": { "model": "oasiso:block/chaos_spawner_off" }
+    },
+    {
+      "when": { "active": "true" },
+      "apply": { "model": "oasiso:block/chaos_spawner" }
+    }
+  ]
+}

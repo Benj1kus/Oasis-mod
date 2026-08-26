@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import com.benji.oasiso.common.entity.EyelidEntity;
@@ -9,7 +11,6 @@ import java.util.List;
 
 public final class AzumaalDefenseManager {
 
-    private static final int EYELID_COUNT = 6;
     private static final double SEARCH_RANGE = 96.0D;
 
     private final AzumaalEntity boss;
@@ -24,7 +25,7 @@ public final class AzumaalDefenseManager {
         }
 
         int spawned = 0;
-        for (int i = 0; i < EYELID_COUNT; i++) {
+        for (int i = 0; i < OsirisRealmConfig.AZUMAAL_DEFENSE_EYELID_COUNT.get(); i++) {
             EyelidEntity eyelid = Oasiso.EYELID.get().create(level);
             if (eyelid == null) {
                 continue;

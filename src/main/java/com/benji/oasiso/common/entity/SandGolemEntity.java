@@ -44,6 +44,7 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public static final EntityDataAccessor<Boolean> PLAYER_CREATED = SynchedEntityData.defineId(SandGolemEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> SPAWNER_HOSTILE = SynchedEntityData.defineId(SandGolemEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int decayTimer = 0;
     private int lastStage = -1;
@@ -56,6 +57,7 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(PLAYER_CREATED, false);
+        this.entityData.define(SPAWNER_HOSTILE, false);
     }
 
     public boolean isPlayerCreated() {
@@ -66,10 +68,19 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
         this.entityData.set(PLAYER_CREATED, created);
     }
 
+    public boolean isSpawnerHostile() {
+        return this.entityData.get(SPAWNER_HOSTILE);
+    }
+
+    public void setSpawnerHostile(boolean hostile) {
+        this.entityData.set(SPAWNER_HOSTILE, hostile);
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("PlayerCreated", this.isPlayerCreated());
+        compound.putBoolean("SpawnerHostile", this.isSpawnerHostile());
         compound.putInt("DecayTimer", this.decayTimer);
     }
 
@@ -77,6 +88,7 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.setPlayerCreated(compound.getBoolean("PlayerCreated"));
+        this.setSpawnerHostile(compound.getBoolean("SpawnerHostile"));
         this.decayTimer = compound.getInt("DecayTimer");
     }
 
@@ -92,7 +104,10 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
     @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Monster.class, false, false));
+
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, entity -> this.isSpawnerHostile() && entity instanceof Player player && !player.isCreative() && !player.isSpectator()));
+        this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, entity -> !(entity instanceof SandGolemEntity)));
+
         this.goalSelector.addGoal(2, new SandGolemAttackGoal(this));
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.8D));
     }
@@ -157,6 +172,7 @@ public class SandGolemEntity extends Monster implements GeoEntity, GlowmaskEntit
 
         for (LivingEntity target : targets) {
             if (target == this || !target.isAlive()) continue;
+            if (target instanceof SandGolemEntity) continue;
             if (target instanceof Player p && p.isCreative()) continue;
 
             if (this.isPlayerCreated() && target instanceof Player) continue;

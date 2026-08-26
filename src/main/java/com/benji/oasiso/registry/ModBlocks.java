@@ -30,11 +30,14 @@ public final class ModBlocks {
     public static final RegistryObject<Block> LIE_BLOCK = BLOCKS.register("lie_block", () -> new LieBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.SCULK_CATALYST).strength(80.0F).noOcclusion().explosionResistance(3_600_000.0F).dynamicShape().requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_TILES = BLOCKS.register("sandstone_tiles", () -> new DirectionalPatternBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_POLISHED = BLOCKS.register("sandstone_polished", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> CHAOS_EYE = BLOCKS.register("chaos_eye", () -> new ChaosEyeBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).instabreak().noOcclusion().requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_COLUMN = BLOCKS.register("sandstone_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> SCARLET_LEAVES = BLOCKS.register("scarlet_leaves", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SPONGE).strength(1.0F).noOcclusion()));
     public static final RegistryObject<Block> SCARLET_GRASS = BLOCKS.register("scarlet_grass", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SPONGE).strength(1.0F)));
     public static final RegistryObject<Block> SCARLET_LOG = BLOCKS.register("scarlet_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(4.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_COMPRESSED = BLOCKS.register("nephritis_compressed", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(10.0F).requiresCorrectToolForDrops()));
@@ -42,25 +45,33 @@ public final class ModBlocks {
     public static final RegistryObject<Block> NEPHRITIS_POLISHED = BLOCKS.register("nephritis_polished", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_CORNER = BLOCKS.register("nephritis_corner", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_LINE = BLOCKS.register("nephritis_line", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> SANDSTONE_COLORED = BLOCKS.register("sandstone_colored", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_STRIPE = BLOCKS.register("sandstone_stripe", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_FLOORB = BLOCKS.register("sandstone_floorb", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> KARAKOLIT_BLOCK = BLOCKS.register("karakolit_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK).strength(5.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BLOCK = BLOCKS.register("nephritis_block", () -> new NephritisBlock(BlockBehaviour.Properties.copy(Blocks.RAW_GOLD_BLOCK).strength(5.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> WIZARD_EYE = BLOCKS.register("wizard_eye", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(5.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> WIZARD_COLUMN = BLOCKS.register("wizard_column", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(5.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> SANDSTONE_ROOF = BLOCKS.register("sandstone_roof", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_BRICKED = BLOCKS.register("sandstone_bricked", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_AZAZEL = BLOCKS.register("sandstone_azazel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein", () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN).sound(SoundType.SMALL_AMETHYST_BUD).lightLevel(state -> 10).noCollission().noOcclusion().replaceable().strength(0.2F)));
+    public static final RegistryObject<Block> CHAOS_SPAWNER = BLOCKS.register("chaos_spawner", () -> new ChaosSpawnerBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.CHAIN).strength(50.0F).lightLevel(state -> state.getValue(ChaosSpawnerBlock.ACTIVE) ? 10 : 0).noOcclusion().explosionResistance(3_600_000.0F).dynamicShape().requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_CORNER = BLOCKS.register("sandstone_corner", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_LINE = BLOCKS.register("sandstone_line", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> FLOWERY = BLOCKS.register("flowery", () -> new OasisoFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> CACTULO = BLOCKS.register("cactulo", () -> new CactuloBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH).instabreak().noOcclusion()));
     public static final RegistryObject<Block> POTTED_FLOWERY = BLOCKS.register("potted_flowery", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, FLOWERY, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> POTTED_CACTULO = BLOCKS.register("potted_cactulo", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CACTULO, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
+
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase", () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.DECORATED_POT).sound(SoundType.DECORATED_POT).instabreak().noOcclusion()));
     public static final RegistryObject<Block> BALL_CACTUS = BLOCKS.register("ball_cactus", () -> new com.benji.oasiso.common.block.BallCactusBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).sound(SoundType.WOOL).instabreak().noOcclusion().randomTicks()));
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue", () -> new AzazelDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).strength(2.0F).noOcclusion()));
@@ -76,6 +87,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> CHAOS_ALTAR = BLOCKS.register("chaos_altar", () -> new ChaosAltarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> TITANA_STATUE = BLOCKS.register("titana_statue", () -> new StatueBlock(TITANA_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE).strength(300.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> CACTOS = BLOCKS.register("cactos", () -> new CactosBlock(BlockBehaviour.Properties.copy(Blocks.CACTUS).noOcclusion().instabreak()));
+
     public static final RegistryObject<Block> DOUM_PALM_LOG = BLOCKS.register("doum_palm_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
     public static final RegistryObject<Block> DOUM_PALM_WOOD = BLOCKS.register("doum_palm_wood", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WOOD)));
     public static final RegistryObject<Block> STRIPPED_DOUM_PALM_LOG = BLOCKS.register("stripped_doum_palm_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_LOG)));

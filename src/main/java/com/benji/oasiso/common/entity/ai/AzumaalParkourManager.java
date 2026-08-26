@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import net.minecraft.core.BlockPos;
@@ -16,7 +18,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import com.benji.oasiso.ModSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -34,16 +35,6 @@ import java.util.UUID;
 public final class AzumaalParkourManager {
     //structure
     private static final ResourceLocation STRUCTURE_ID = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "boss_parkour");
-
-
-    private static final double PARKOUR_HEIGHT = 20.0D;
-
-    private static final int RISE_TICKS = 30;
-    private static final int HOLD_TICKS = 25 * 20;
-    private static final int DESCEND_TICKS = 30;
-
-    private static final double PARTICIPANT_RANGE = 96.0D;
-    private static final int ENTROPY_DURATION = 20 * 20;
 
     private final AzumaalEntity boss;
 
@@ -100,7 +91,7 @@ public final class AzumaalParkourManager {
         this.anchorX = boss.getX();
         this.anchorZ = boss.getZ();
         this.returnY = boss.getHoverBaseY();
-        this.topY = this.returnY + PARKOUR_HEIGHT;
+        this.topY = this.returnY + OsirisRealmConfig.AZUMAAL_PARKOUR_HEIGHT.get();
 
         this.currentLayer = 0;
         this.stageTick = 0;
@@ -191,12 +182,12 @@ public final class AzumaalParkourManager {
 
     private void tickRise(ServerLevel level) {
         this.stageTick++;
-        float progress = Mth.clamp(this.stageTick / (float) RISE_TICKS, 0.0F, 1.0F);
+        float progress = Mth.clamp(this.stageTick / (float) OsirisRealmConfig.AZUMAAL_PARKOUR_RISE_TICKS.get(), 0.0F, 1.0F);
 
         progress = smoothstep(progress);
         double y = Mth.lerp(progress, this.returnY, this.topY);
         lockBoss(y);
-        if (this.stageTick < RISE_TICKS) {
+        if (this.stageTick < OsirisRealmConfig.AZUMAAL_PARKOUR_RISE_TICKS.get()) {
             return;
         }
         lockBoss(this.topY);
@@ -214,7 +205,7 @@ public final class AzumaalParkourManager {
             playTimerSound(level);
         }
 
-        if (this.stageTick < HOLD_TICKS) {
+        if (this.stageTick < OsirisRealmConfig.AZUMAAL_PARKOUR_HOLD_TICKS.get()) {
             return;
         }
 
@@ -240,7 +231,7 @@ public final class AzumaalParkourManager {
     private boolean tickDescend(ServerLevel level) {
         this.stageTick++;
 
-        float progress = Mth.clamp(this.stageTick / (float) DESCEND_TICKS, 0.0F, 1.0F);
+        float progress = Mth.clamp(this.stageTick / (float) OsirisRealmConfig.AZUMAAL_PARKOUR_DESCEND_TICKS.get(), 0.0F, 1.0F);
 
         progress = smoothstep(progress);
 
@@ -248,7 +239,7 @@ public final class AzumaalParkourManager {
 
         lockBoss(y);
 
-        if (this.stageTick < DESCEND_TICKS) {
+        if (this.stageTick < OsirisRealmConfig.AZUMAAL_PARKOUR_DESCEND_TICKS.get()) {
             return false;
         }
 
@@ -282,7 +273,7 @@ public final class AzumaalParkourManager {
         this.participants.clear();
         this.successfulPlayers.clear();
 
-        double rangeSqr = PARTICIPANT_RANGE * PARTICIPANT_RANGE;
+        double rangeSqr = OsirisRealmConfig.AZUMAAL_PARKOUR_PARTICIPANT_RANGE.get() * OsirisRealmConfig.AZUMAAL_PARKOUR_PARTICIPANT_RANGE.get();
 
         for (ServerPlayer player : level.players()) {
             if (!isValidParticipant(player)) {
@@ -310,7 +301,7 @@ public final class AzumaalParkourManager {
                 continue;
             }
 
-            player.addEffect(new MobEffectInstance(Oasiso.ENTROPY_EFFECT.get(), ENTROPY_DURATION, 0, false, true));
+            player.addEffect(new MobEffectInstance(Oasiso.ENTROPY_EFFECT.get(), OsirisRealmConfig.AZUMAAL_PARKOUR_ENTROPY_DURATION.get(), 0, false, true));
         }
     }
 

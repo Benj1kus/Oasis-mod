@@ -18,6 +18,7 @@
   "block.oasiso.monki_statue": "Monki Statue",
   "block.oasiso.titana_statue": "Beetan the Hammerer Statue",
   "block.oasiso.cactos": "Cactos",
+  "block.oasiso.chaos_spawner": "Karakolit Spawner",
   "block.oasiso.cactos_corner": "Cactos",
   "block.oasiso.cactos_connector": "Cactos",
   "block.oasiso.karakolit_block": "Block of Karakolit",
@@ -82,6 +83,7 @@
 
   "item.oasiso.karakolit_ingot": "Karakolit Ingot",
   "item.oasiso.nephritis": "Nephritis",
+  "item.oasiso.karakolit_key": "Karakolit Key",
   "item.oasiso.nephritis_core": "Nephritis Core",
   "item.oasiso.bombul_bottle": "Karakolit Bottle",
   "item.oasiso.bombul_bottle_empty": "Karakolit Bottle",

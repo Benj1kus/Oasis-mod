@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.PaladinCombatController;
 import com.benji.oasiso.common.entity.ai.PaladinDeathManager;
@@ -84,11 +86,16 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.combatController = new PaladinCombatController(this);
         this.deathManager = new PaladinDeathManager(this);
         this.setNoAi(true);
+
+        if (!level.isClientSide) {
+            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(OsirisRealmConfig.PALADIN_MAX_HEALTH.get());
+            this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(OsirisRealmConfig.PALADIN_ATTACK_DAMAGE.get());
+            this.setHealth(this.getMaxHealth());
+        }
     }
 
 
     public static AttributeSupplier.Builder createAttributes() {
-
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 800.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.2D)

@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -18,64 +20,8 @@ import java.util.UUID;
 
 public final class AzumaalAttackController {
 
-    private static final double AIR_HOLD_HORIZONTAL_DAMPING = 0.82D;
     private static final int AIR_HOLD_PARTICLE_INTERVAL = 3;
 
-    private static final int MELEE_DURATION = 40;
-
-    private static final int ATTACK_1_PREPARE_TICK = 8;
-    private static final int ATTACK_1_DAMAGE_TICK = 22;
-
-    private static final int ATTACK_2_PREPARE_TICK = 6;
-    private static final int ATTACK_2_DAMAGE_TICK = 24;
-
-    private static final int DASH_MOVE_TICKS = 3;
-    private static final int PREPARE_MOVE_TICKS = 6;
-    private static final double PREPARE_BACK_DISTANCE = 0.95D;
-    private static final double DASH_STOP_DISTANCE = 2.0D;
-
-    private static final double DAMAGE_RANGE = 8.0D;
-    private static final float MELEE_DAMAGE_MULTIPLIER = 1.0F;
-
-    private static final int SUMMON_1_DURATION = 60;
-    private static final int SUMMON_WEAK_TICK = 36;
-    private static final int SUMMON_WARNING_DURATION = 20 * 8;
-    private static final int SUMMON_FINISH_TICK = SUMMON_WEAK_TICK + SUMMON_WARNING_DURATION;
-
-    private static final int SUMMON_2_DURATION = 60;
-    private static final int SUMMON_MEGA_TICK = 36;
-    private static final int MEGA_TRACKING_WAVES = 3;
-    private static final int MEGA_RANDOM_CIRCLES = 5;
-    private static final double MEGA_RANDOM_MIN_RADIUS = 6.0D;
-    private static final double MEGA_RANDOM_MAX_RADIUS = 20.0D;
-    private static final double MEGA_RANDOM_ANGLE_JITTER = 0.35D;
-
-    private static final int DOUBLE_APPROACH_TICKS = 5;
-    private static final double DOUBLE_APPROACH_DISTANCE = 2.0D;
-    private static final int DOUBLE_ATTACK_DURATION = 55;
-    private static final int DOUBLE_DAMAGE_1_TICK = 23;
-    private static final int DOUBLE_DAMAGE_2_TICK = 38;
-    private static final double DOUBLE_DAMAGE_RANGE = 8.0D;
-    private static final float DOUBLE_DAMAGE_MULTIPLIER = 0.80F;
-
-    private static final int THROW_APPROACH_TICKS = 5;
-    private static final double THROW_APPROACH_DISTANCE = 2.0D;
-    private static final int THROW_UP_DURATION = 45;
-    private static final int THROW_UP_TICK = 22;
-    private static final double THROW_UP_RANGE = 10.0D;
-    private static final double THROW_UP_VELOCITY = 1.60D;
-    private static final int AIR_THROW_DURATION = 50;
-    private static final int AIR_CHASE_TICKS = 15;
-    private static final double AIR_HEIGHT_OFFSET = 1.75D;
-    private static final int THROW_DOWN_TICK = 24;
-    private static final double THROW_DOWN_RANGE = 5.0D;
-    private static final float THROW_DOWN_DAMAGE_MULTIPLIER = 1.10F;
-    private static final double THROW_DOWN_HORIZONTAL = 1.15D;
-    private static final double THROW_DOWN_VERTICAL = -1.55D;
-
-    private static final double TARGET_SEARCH_RANGE = 96.0D;
-    private static final int MIN_ATTACK_COOLDOWN = 35;
-    private static final int MAX_ATTACK_COOLDOWN = 70;
 
     private static final String DATA_TAG = "AzumaalAttackController";
 
@@ -87,7 +33,7 @@ public final class AzumaalAttackController {
     private AttackPhase phase = AttackPhase.NONE;
 
     private int attackTick;
-    private int attackCooldown = 40;
+    private int attackCooldown = OsirisRealmConfig.AZUMAAL_POST_SPAWN_ATTACK_COOLDOWN.get();
 
     private UUID targetId;
 
@@ -98,14 +44,6 @@ public final class AzumaalAttackController {
     private int airChaseTicksRemaining;
     private int returnTicksRemaining;
 
-    private static final int CLONE_SUMMON_DURATION = 60;
-    private static final int CLONE_ATTACK_DURATION = CLONE_SUMMON_DURATION + AzumaalCloneManager.FORMATION_TICKS;
-
-    private static final int EYES_DURATION = 45;
-    private static final int EYES_MAGIC_TICK = 25;
-    private static final double EYES_RANGE = 20.0D;
-
-    private static final int DEFENSE_CAST_DURATION = 60;
 
     private boolean throwConnected;
     private boolean summonRadialPattern;
@@ -137,7 +75,7 @@ public final class AzumaalAttackController {
         this.summonMegaScatteredPattern = false;
         this.summonRadialPattern = false;
         this.attackTick = 0;
-        this.attackCooldown = 40;
+        this.attackCooldown = OsirisRealmConfig.AZUMAAL_POST_SPAWN_ATTACK_COOLDOWN.get();
         this.targetId = null;
 
         clearMovement();
@@ -150,7 +88,7 @@ public final class AzumaalAttackController {
     }
 
     public void beginPostSpawnCooldown() {
-        this.attackCooldown = 40;
+        this.attackCooldown = OsirisRealmConfig.AZUMAAL_POST_SPAWN_ATTACK_COOLDOWN.get();
     }
 
 
@@ -312,7 +250,7 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 8.0F);
         }
 
-        if (this.attackTick < DEFENSE_CAST_DURATION) {
+        if (this.attackTick < OsirisRealmConfig.AZUMAAL_DEFENSE_CAST_DURATION.get()) {
             return;
         }
         this.defenseManager.activate(level);
@@ -342,17 +280,17 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 8.0F);
         }
 
-        if (this.attackTick == EYES_MAGIC_TICK) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_EYES_MAGIC_TICK.get()) {
             performEyesMagic(level);
         }
 
-        if (this.attackTick >= EYES_DURATION) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_EYES_DURATION.get()) {
             finishAttack();
         }
     }
 
     private void performEyesMagic(ServerLevel level) {
-        double rangeSqr = EYES_RANGE * EYES_RANGE;
+        double rangeSqr = OsirisRealmConfig.AZUMAAL_EYES_RANGE.get() * OsirisRealmConfig.AZUMAAL_EYES_RANGE.get();
         for (ServerPlayer player : level.players()) {
             if (!isValidTarget(player)) {
                 continue;
@@ -382,7 +320,7 @@ public final class AzumaalAttackController {
 
         ServerPlayer target = resolveTarget(level);
 
-        if (target == null && this.attackTick <= SUMMON_MEGA_TICK) {
+        if (target == null && this.attackTick <= OsirisRealmConfig.AZUMAAL_SUMMON_MEGA_TICK.get()) {
             finishAttack();
             return;
         }
@@ -393,7 +331,7 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 8.0F);
         }
 
-        if (this.attackTick == SUMMON_MEGA_TICK && target != null) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_SUMMON_MEGA_TICK.get() && target != null) {
             if (this.summonMegaScatteredPattern) {
                 spawnScatteredMegaWarnings(level);
             } else {
@@ -401,7 +339,7 @@ public final class AzumaalAttackController {
             }
         }
 
-        if (this.attackTick >= SUMMON_2_DURATION) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_SUMMON_MEGA_DURATION.get()) {
             finishAttack();
         }
     }
@@ -414,7 +352,7 @@ public final class AzumaalAttackController {
         }
 
         circle.moveTo(target.getX(), target.getY(), target.getZ(), 0.0F, 0.0F);
-        circle.startTrackingSequence(boss, target, MEGA_TRACKING_WAVES);
+        circle.startTrackingSequence(boss, target, OsirisRealmConfig.AZUMAAL_MEGA_TRACKING_WAVES.get());
 
         level.addFreshEntity(circle);
     }
@@ -422,13 +360,15 @@ public final class AzumaalAttackController {
     private void spawnScatteredMegaWarnings(ServerLevel level) {
 
         double baseAngle = boss.getRandom().nextDouble() * Math.PI * 2.0D;
-        double angleStep = (Math.PI * 2.0D) / MEGA_RANDOM_CIRCLES;
+        double angleStep = (Math.PI * 2.0D) / OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_CIRCLES.get();
 
-        for (int i = 0; i < MEGA_RANDOM_CIRCLES; i++) {
+        for (int i = 0; i < OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_CIRCLES.get(); i++) {
 
-            double jitter = (boss.getRandom().nextDouble() * 2.0D - 1.0D) * MEGA_RANDOM_ANGLE_JITTER;
+            double jitter = (boss.getRandom().nextDouble() * 2.0D - 1.0D) * OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_ANGLE_JITTER.get();
             double angle = baseAngle + i * angleStep + jitter;
-            double distance = MEGA_RANDOM_MIN_RADIUS + boss.getRandom().nextDouble() * (MEGA_RANDOM_MAX_RADIUS - MEGA_RANDOM_MIN_RADIUS);
+            double minRadius = Math.min(OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_MIN_RADIUS.get(), OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_MAX_RADIUS.get());
+            double maxRadius = Math.max(OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_MIN_RADIUS.get(), OsirisRealmConfig.AZUMAAL_MEGA_RANDOM_MAX_RADIUS.get());
+            double distance = minRadius + boss.getRandom().nextDouble() * (maxRadius - minRadius);
 
             double x = boss.getX() + Math.cos(angle) * distance;
             double z = boss.getZ() + Math.sin(angle) * distance;
@@ -468,7 +408,7 @@ public final class AzumaalAttackController {
 
         ServerPlayer target = resolveTarget(level);
 
-        if (target == null && this.attackTick <= SUMMON_WEAK_TICK) {
+        if (target == null && this.attackTick <= OsirisRealmConfig.AZUMAAL_SUMMON_WEAK_TICK.get()) {
             finishAttack();
             return;
         }
@@ -479,7 +419,7 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 8.0F);
         }
 
-        if (this.attackTick == SUMMON_WEAK_TICK && target != null) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_SUMMON_WEAK_TICK.get() && target != null) {
             if (this.summonRadialPattern) {
                 spawnRadialWarnings(level);
             } else {
@@ -487,11 +427,11 @@ public final class AzumaalAttackController {
             }
         }
 
-        if (this.attackTick == SUMMON_1_DURATION) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_SUMMON_WEAK_ANIMATION_DURATION.get()) {
             boss.setAnimState(AzumaalEntity.STATE_IDLE);
         }
 
-        if (this.attackTick >= SUMMON_FINISH_TICK) {
+        if (this.attackTick >= (OsirisRealmConfig.AZUMAAL_SUMMON_WEAK_TICK.get() + OsirisRealmConfig.AZUMAAL_SUMMON_WARNING_DURATION.get())) {
             finishAttack();
         }
     }
@@ -510,8 +450,9 @@ public final class AzumaalAttackController {
     }
 
     private void spawnRadialWarnings(ServerLevel level) {
-        for (int i = 0; i < 8; i++) {
-            float yaw = i * 45.0F;
+        int arrowCount = OsirisRealmConfig.AZUMAAL_RADIAL_WARNING_ARROWS.get();
+        for (int i = 0; i < arrowCount; i++) {
+            float yaw = i * (360.0F / arrowCount);
 
             BattleHintArrowEntity arrow = Oasiso.BATTLE_HINT_ARROW.get().create(level);
 
@@ -535,7 +476,7 @@ public final class AzumaalAttackController {
         boss.setAnimState(AzumaalEntity.STATE_IDLE);
         boss.lookAtPlayer(target, 180.0F);
 
-        beginDash(target, DOUBLE_APPROACH_DISTANCE, DOUBLE_APPROACH_TICKS);
+        beginDash(target, OsirisRealmConfig.AZUMAAL_DOUBLE_APPROACH_DISTANCE.get(), OsirisRealmConfig.AZUMAAL_DOUBLE_APPROACH_TICKS.get());
     }
 
     private void tickDoubleApproach(ServerLevel level) {
@@ -573,17 +514,17 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 12.0F);
         }
 
-        if (this.attackTick == DOUBLE_DAMAGE_1_TICK) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_DOUBLE_DAMAGE_1_TICK.get()) {
             playBossSound(ModSounds.SWING.get(), 2.5F, 1.0F);
             dealDoubleDamage(level, target);
         }
 
-        if (this.attackTick == DOUBLE_DAMAGE_2_TICK) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_DOUBLE_DAMAGE_2_TICK.get()) {
             playBossSound(ModSounds.SWING.get(), 2.5F, 1.0F);
             dealDoubleDamage(level, target);
         }
 
-        if (this.attackTick >= DOUBLE_ATTACK_DURATION) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_DOUBLE_ATTACK_DURATION.get()) {
             finishAttack();
         }
     }
@@ -593,10 +534,10 @@ public final class AzumaalAttackController {
             return;
         }
 
-        if (!this.cloneManager.isTargetInAttackRange(level, target, DOUBLE_DAMAGE_RANGE)) {
+        if (!this.cloneManager.isTargetInAttackRange(level, target, OsirisRealmConfig.AZUMAAL_DOUBLE_DAMAGE_RANGE.get())) {
             return;
         }
-        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(DOUBLE_DAMAGE_MULTIPLIER));
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(OsirisRealmConfig.AZUMAAL_DOUBLE_DAMAGE_MULTIPLIER.get().floatValue()));
     }
 
     private void startMelee(ServerPlayer target, AttackPhase attackPhase) {
@@ -617,10 +558,10 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 12.0F);
         }
 
-        int prepareTick = attackOne ? ATTACK_1_PREPARE_TICK : ATTACK_2_PREPARE_TICK;
-        int damageTick = attackOne ? ATTACK_1_DAMAGE_TICK : ATTACK_2_DAMAGE_TICK;
+        int prepareTick = attackOne ? OsirisRealmConfig.AZUMAAL_ATTACK_1_PREPARE_TICK.get() : OsirisRealmConfig.AZUMAAL_ATTACK_2_PREPARE_TICK.get();
+        int damageTick = attackOne ? OsirisRealmConfig.AZUMAAL_ATTACK_1_DAMAGE_TICK.get() : OsirisRealmConfig.AZUMAAL_ATTACK_2_DAMAGE_TICK.get();
 
-        int dashStartTick = damageTick - DASH_MOVE_TICKS + 1;
+        int dashStartTick = damageTick - OsirisRealmConfig.AZUMAAL_DASH_MOVE_TICKS.get() + 1;
 
         if (this.attackTick == prepareTick && target != null) {
             beginPrepareMovement(target);
@@ -629,7 +570,7 @@ public final class AzumaalAttackController {
         tickPrepareMovement();
 
         if (this.attackTick == dashStartTick && target != null) {
-            beginDash(target, DASH_STOP_DISTANCE, DASH_MOVE_TICKS);
+            beginDash(target, OsirisRealmConfig.AZUMAAL_DASH_STOP_DISTANCE.get(), OsirisRealmConfig.AZUMAAL_DASH_MOVE_TICKS.get());
         }
 
         tickDashMovement();
@@ -643,7 +584,7 @@ public final class AzumaalAttackController {
         }
 
 
-        if (this.attackTick >= MELEE_DURATION) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_MELEE_DURATION.get()) {
             finishAttack();
         }
     }
@@ -655,7 +596,7 @@ public final class AzumaalAttackController {
         boss.setAnimState(AzumaalEntity.STATE_IDLE);
         boss.lookAtPlayer(target, 180.0F);
 
-        beginDash(target, THROW_APPROACH_DISTANCE, THROW_APPROACH_TICKS);
+        beginDash(target, OsirisRealmConfig.AZUMAAL_THROW_APPROACH_DISTANCE.get(), OsirisRealmConfig.AZUMAAL_THROW_APPROACH_TICKS.get());
     }
 
 
@@ -696,11 +637,11 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 10.0F);
         }
 
-        if (this.attackTick == THROW_UP_TICK) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_THROW_UP_TICK.get()) {
             this.throwConnected = launchTarget(level, target);
         }
 
-        if (this.attackTick < THROW_UP_DURATION) {
+        if (this.attackTick < OsirisRealmConfig.AZUMAAL_THROW_UP_DURATION.get()) {
             return;
         }
 
@@ -717,11 +658,11 @@ public final class AzumaalAttackController {
             return false;
         }
 
-        if (!this.cloneManager.isTargetInAttackRange(level, target, THROW_UP_RANGE)) {
+        if (!this.cloneManager.isTargetInAttackRange(level, target, OsirisRealmConfig.AZUMAAL_THROW_UP_RANGE.get())) {
             return false;
         }
 
-        target.setDeltaMovement(0.0D, THROW_UP_VELOCITY, 0.0D);
+        target.setDeltaMovement(0.0D, OsirisRealmConfig.AZUMAAL_THROW_UP_VELOCITY.get(), 0.0D);
 
         target.hurtMarked = true;
         target.fallDistance = 0.0F;
@@ -734,7 +675,7 @@ public final class AzumaalAttackController {
     private void startAirThrow(ServerPlayer target) {
         this.phase = AttackPhase.AIR_THROW;
         this.attackTick = 0;
-        this.airChaseTicksRemaining = AIR_CHASE_TICKS;
+        this.airChaseTicksRemaining = OsirisRealmConfig.AZUMAAL_AIR_CHASE_TICKS.get();
         this.returnTicksRemaining = 0;
 
         boss.setAnimState(AzumaalEntity.STATE_AIR_THROW);
@@ -748,35 +689,35 @@ public final class AzumaalAttackController {
 
         ServerPlayer target = resolveTarget(level);
 
-        if (target != null && this.attackTick < THROW_DOWN_TICK) {
+        if (target != null && this.attackTick < OsirisRealmConfig.AZUMAAL_THROW_DOWN_TICK.get()) {
             holdTargetInAir(level, target);
         }
 
         if (target != null) {
             boss.lookAtPlayer(target, 20.0F);
 
-            if (this.attackTick <= AIR_CHASE_TICKS) {
+            if (this.attackTick <= OsirisRealmConfig.AZUMAAL_AIR_CHASE_TICKS.get()) {
                 tickAirChase(target);
-            } else if (this.attackTick < THROW_DOWN_TICK) {
+            } else if (this.attackTick < OsirisRealmConfig.AZUMAAL_THROW_DOWN_TICK.get()) {
                 followAirTarget(target);
             }
         }
 
-        if (this.attackTick == THROW_DOWN_TICK) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_THROW_DOWN_TICK.get()) {
 
             playBossSound(ModSounds.SWING.get(), 2.5F, 0.92F);
 
             throwTargetDown(level, target);
 
-            this.returnTicksRemaining = AIR_THROW_DURATION - THROW_DOWN_TICK;
+            this.returnTicksRemaining = OsirisRealmConfig.AZUMAAL_AIR_THROW_DURATION.get() - OsirisRealmConfig.AZUMAAL_THROW_DOWN_TICK.get();
         }
 
-        if (this.attackTick >= THROW_DOWN_TICK) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_THROW_DOWN_TICK.get()) {
             tickReturnToHover();
         }
 
 
-        if (this.attackTick >= AIR_THROW_DURATION) {
+        if (this.attackTick >= OsirisRealmConfig.AZUMAAL_AIR_THROW_DURATION.get()) {
             finishAttack();
         }
     }
@@ -784,7 +725,7 @@ public final class AzumaalAttackController {
     private void holdTargetInAir(ServerLevel level, ServerPlayer target) {
         Vec3 movement = target.getDeltaMovement();
 
-        target.setDeltaMovement(movement.x * AIR_HOLD_HORIZONTAL_DAMPING, 0.0D, movement.z * AIR_HOLD_HORIZONTAL_DAMPING);
+        target.setDeltaMovement(movement.x * OsirisRealmConfig.AZUMAAL_AIR_HOLD_HORIZONTAL_DAMPING.get(), 0.0D, movement.z * OsirisRealmConfig.AZUMAAL_AIR_HOLD_HORIZONTAL_DAMPING.get());
 
         target.hurtMarked = true;
         target.fallDistance = 0.0F;
@@ -798,7 +739,7 @@ public final class AzumaalAttackController {
         int remaining = Math.max(1, this.airChaseTicksRemaining);
 
         double targetX = target.getX();
-        double targetY = target.getY() + AIR_HEIGHT_OFFSET;
+        double targetY = target.getY() + OsirisRealmConfig.AZUMAAL_AIR_HEIGHT_OFFSET.get();
         double targetZ = target.getZ();
 
         double nextX = boss.getX() + (targetX - boss.getX()) / remaining;
@@ -816,10 +757,10 @@ public final class AzumaalAttackController {
 
     private void followAirTarget(ServerPlayer target) {
         double desiredX = target.getX();
-        double desiredY = target.getY() + AIR_HEIGHT_OFFSET;
+        double desiredY = target.getY() + OsirisRealmConfig.AZUMAAL_AIR_HEIGHT_OFFSET.get();
         double desiredZ = target.getZ();
 
-        final double follow = 0.28D;
+        final double follow = OsirisRealmConfig.AZUMAAL_AIR_FOLLOW_FACTOR.get();
 
         boss.setPos(boss.getX() + (desiredX - boss.getX()) * follow, boss.getY() + (desiredY - boss.getY()) * follow, boss.getZ() + (desiredZ - boss.getZ()) * follow);
 
@@ -832,13 +773,13 @@ public final class AzumaalAttackController {
             return;
         }
 
-        if (!this.cloneManager.isTargetInAttackRange(level, target, THROW_DOWN_RANGE)) {
+        if (!this.cloneManager.isTargetInAttackRange(level, target, OsirisRealmConfig.AZUMAAL_THROW_DOWN_RANGE.get())) {
             return;
         }
 
         target.serverLevel().sendParticles(Oasiso.PURPLE_STARS.get(), target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ(), 38, 0.65D, 0.55D, 0.65D, 0.12D);
 
-        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(THROW_DOWN_DAMAGE_MULTIPLIER));
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(OsirisRealmConfig.AZUMAAL_THROW_DOWN_DAMAGE_MULTIPLIER.get().floatValue()));
 
         Vec3 attackOrigin = this.cloneManager.getClosestMemberPosition(level, target);
         Vec3 horizontal = new Vec3(target.getX() - attackOrigin.x, 0.0D, target.getZ() - attackOrigin.z);
@@ -852,9 +793,9 @@ public final class AzumaalAttackController {
             horizontal = new Vec3(0.0D, 0.0D, 1.0D);
         }
 
-        horizontal = horizontal.normalize().scale(THROW_DOWN_HORIZONTAL);
+        horizontal = horizontal.normalize().scale(OsirisRealmConfig.AZUMAAL_THROW_DOWN_HORIZONTAL.get());
 
-        target.setDeltaMovement(horizontal.x, THROW_DOWN_VERTICAL, horizontal.z);
+        target.setDeltaMovement(horizontal.x, OsirisRealmConfig.AZUMAAL_THROW_DOWN_VERTICAL.get(), horizontal.z);
         target.hurtMarked = true;
         target.fallDistance = 0.0F;
     }
@@ -881,8 +822,8 @@ public final class AzumaalAttackController {
             return;
         }
 
-        this.prepareStep = toTarget.normalize().scale(-PREPARE_BACK_DISTANCE / PREPARE_MOVE_TICKS);
-        this.prepareTicksRemaining = PREPARE_MOVE_TICKS;
+        this.prepareStep = toTarget.normalize().scale(-OsirisRealmConfig.AZUMAAL_PREPARE_BACK_DISTANCE.get() / OsirisRealmConfig.AZUMAAL_PREPARE_MOVE_TICKS.get());
+        this.prepareTicksRemaining = OsirisRealmConfig.AZUMAAL_PREPARE_MOVE_TICKS.get();
     }
 
 
@@ -935,11 +876,11 @@ public final class AzumaalAttackController {
         if (target == null || !target.isAlive()) {
             return;
         }
-        if (!this.cloneManager.isTargetInAttackRange(level, target, DAMAGE_RANGE)) {
+        if (!this.cloneManager.isTargetInAttackRange(level, target, OsirisRealmConfig.AZUMAAL_MELEE_DAMAGE_RANGE.get())) {
             return;
         }
 
-        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(MELEE_DAMAGE_MULTIPLIER));
+        target.hurt(boss.damageSources().mobAttack(boss), getAttackDamage(OsirisRealmConfig.AZUMAAL_MELEE_DAMAGE_MULTIPLIER.get().floatValue()));
     }
 
     private void finishAttack() {
@@ -953,7 +894,7 @@ public final class AzumaalAttackController {
         boss.setDeltaMovement(Vec3.ZERO);
         boss.setAnimState(AzumaalEntity.STATE_IDLE);
 
-        this.attackCooldown = randomBetween(MIN_ATTACK_COOLDOWN, MAX_ATTACK_COOLDOWN);
+        this.attackCooldown = randomBetween(OsirisRealmConfig.AZUMAAL_ATTACK_COOLDOWN_MIN.get(), OsirisRealmConfig.AZUMAAL_ATTACK_COOLDOWN_MAX.get());
     }
 
 
@@ -969,7 +910,7 @@ public final class AzumaalAttackController {
     private ServerPlayer findNearestTarget(ServerLevel level) {
         ServerPlayer nearest = null;
 
-        double nearestDistance = TARGET_SEARCH_RANGE * TARGET_SEARCH_RANGE;
+        double nearestDistance = OsirisRealmConfig.AZUMAAL_TARGET_SEARCH_RANGE.get() * OsirisRealmConfig.AZUMAAL_TARGET_SEARCH_RANGE.get();
 
         for (ServerPlayer player : level.players()) {
             if (!isValidTarget(player)) {
@@ -1003,7 +944,9 @@ public final class AzumaalAttackController {
     }
 
     private int randomBetween(int minimum, int maximum) {
-        return minimum + boss.getRandom().nextInt(maximum - minimum + 1);
+        int min = Math.min(minimum, maximum);
+        int max = Math.max(minimum, maximum);
+        return min + boss.getRandom().nextInt(max - min + 1);
     }
 
     private void startRainbowCloneSummon(ServerPlayer target) {
@@ -1023,7 +966,7 @@ public final class AzumaalAttackController {
 
         ServerPlayer target = resolveTarget(level);
 
-        if (target == null && this.attackTick <= CLONE_SUMMON_DURATION) {
+        if (target == null && this.attackTick <= OsirisRealmConfig.AZUMAAL_CLONE_SUMMON_DURATION.get()) {
             finishAttack();
             return;
         }
@@ -1034,7 +977,7 @@ public final class AzumaalAttackController {
             boss.lookAtPlayer(target, 8.0F);
         }
 
-        if (this.attackTick == CLONE_SUMMON_DURATION) {
+        if (this.attackTick == OsirisRealmConfig.AZUMAAL_CLONE_SUMMON_DURATION.get()) {
 
             boss.setAnimState(AzumaalEntity.STATE_IDLE);
             boolean created = this.cloneManager.beginFormation(level);
@@ -1049,12 +992,12 @@ public final class AzumaalAttackController {
             }
         }
 
-        if (this.attackTick > CLONE_SUMMON_DURATION) {
+        if (this.attackTick > OsirisRealmConfig.AZUMAAL_CLONE_SUMMON_DURATION.get()) {
             this.cloneManager.tickFormation();
         }
 
 
-        if (this.attackTick >= CLONE_ATTACK_DURATION) {
+        if (this.attackTick >= (OsirisRealmConfig.AZUMAAL_CLONE_SUMMON_DURATION.get() + OsirisRealmConfig.AZUMAAL_CLONE_FORMATION_TICKS.get())) {
             finishAttack();
         }
     }

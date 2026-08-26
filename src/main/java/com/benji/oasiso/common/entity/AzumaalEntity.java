@@ -1,5 +1,7 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.config.OsirisRealmConfig;
+
 import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.effect.ChaosChamberManager;
@@ -130,6 +132,12 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
         this.deathManager = new AzumaalDeathManager(this);
         this.attackController = new AzumaalAttackController(this);
         this.setNoGravity(true);
+
+        if (!level.isClientSide) {
+            this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(OsirisRealmConfig.AZUMAAL_MAX_HEALTH.get());
+            this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(OsirisRealmConfig.AZUMAAL_ATTACK_DAMAGE.get());
+            this.setHealth(this.getMaxHealth());
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {

@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 public final class AzumaalBossMusic {
 
     // 61 = 61 sec  = 1:01 minutes
-    private static final int INTRO_TICKS = 61 * 20;
+    private static final int INTRO_TICKS = 358 * 20;
     private static MusicStage stage = MusicStage.NONE;
     private static int stageTicks;
     private static SimpleSoundInstance currentSound;
@@ -92,7 +92,7 @@ public final class AzumaalBossMusic {
     }
 
     private static SimpleSoundInstance createGlobalSound(SoundEvent sound, boolean looping) {
-        return new SimpleSoundInstance(sound.getLocation(), SoundSource.HOSTILE, 0.7F, 1.0F, RandomSource.create(), looping, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
+        return new SimpleSoundInstance(sound.getLocation(), SoundSource.HOSTILE, 0.3F, 1.0F, RandomSource.create(), looping, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
     }
 
     private static void stopMusic(Minecraft minecraft) {

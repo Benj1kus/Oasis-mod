@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "top": "oasiso:block/chaos_spawner_bottom",
+    "bottom": "oasiso:block/chaos_spawner_bottom",
+    "side": "oasiso:block/chaos_spawner_side"
+  }
+}
