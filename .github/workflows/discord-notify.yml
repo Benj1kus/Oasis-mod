@@ -21,4 +21,4 @@ jobs:
               \"roles\": [\"1521965623322607618\"]
             }
           }" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+          ${{ secrets.OSIRIS_WEBHOOK }}
