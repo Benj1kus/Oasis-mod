@@ -203,7 +203,7 @@ public final class EntropyGravityTrajectoryRenderer {
         vertex(buffer, matrix, h, h, h, r, g, b, a);
         vertex(buffer, matrix, h, h, -h, r, g, b, a);
         vertex(buffer, matrix, -h, h, -h, r, g, b, a);
-        
+
         vertex(buffer, matrix, -h, -h, -h, r, g, b, a);
         vertex(buffer, matrix, h, -h, -h, r, g, b, a);
         vertex(buffer, matrix, h, -h, h, r, g, b, a);

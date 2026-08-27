@@ -3,6 +3,7 @@ package com.benji.oasiso.common.entity;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.item.EntropyChestplateGloveItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -25,9 +26,11 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -37,6 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class EntropyPhysicsBlockEntity extends Entity implements IEntityAdditionalSpawnData {
@@ -74,6 +78,29 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private static final double SETTLE_SPEED_SQR = 0.010D;
     private static final int MAX_FREE_TICKS = 20 * 45;
 
+    private static final float TNT_EXPLOSION_POWER = 4.0F;
+    private static final int NOTE_IMPACT_COOLDOWN_TICKS = 3;
+    private static final Set<Block> FRAGILE_GLASS_BLOCKS = Set.of(
+            Blocks.GLASS,
+            Blocks.GLASS_PANE,
+            Blocks.WHITE_STAINED_GLASS, Blocks.WHITE_STAINED_GLASS_PANE,
+            Blocks.ORANGE_STAINED_GLASS, Blocks.ORANGE_STAINED_GLASS_PANE,
+            Blocks.MAGENTA_STAINED_GLASS, Blocks.MAGENTA_STAINED_GLASS_PANE,
+            Blocks.LIGHT_BLUE_STAINED_GLASS, Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
+            Blocks.YELLOW_STAINED_GLASS, Blocks.YELLOW_STAINED_GLASS_PANE,
+            Blocks.LIME_STAINED_GLASS, Blocks.LIME_STAINED_GLASS_PANE,
+            Blocks.PINK_STAINED_GLASS, Blocks.PINK_STAINED_GLASS_PANE,
+            Blocks.GRAY_STAINED_GLASS, Blocks.GRAY_STAINED_GLASS_PANE,
+            Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
+            Blocks.CYAN_STAINED_GLASS, Blocks.CYAN_STAINED_GLASS_PANE,
+            Blocks.PURPLE_STAINED_GLASS, Blocks.PURPLE_STAINED_GLASS_PANE,
+            Blocks.BLUE_STAINED_GLASS, Blocks.BLUE_STAINED_GLASS_PANE,
+            Blocks.BROWN_STAINED_GLASS, Blocks.BROWN_STAINED_GLASS_PANE,
+            Blocks.GREEN_STAINED_GLASS, Blocks.GREEN_STAINED_GLASS_PANE,
+            Blocks.RED_STAINED_GLASS, Blocks.RED_STAINED_GLASS_PANE,
+            Blocks.BLACK_STAINED_GLASS, Blocks.BLACK_STAINED_GLASS_PANE
+    );
+
     private BlockState blockState = Blocks.STONE.defaultBlockState();
     private float sourceHardness = 1.5F;
     private CompoundTag blockEntityData;
@@ -86,6 +113,8 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     private int lastHitEntityId = -1;
     private int hitCooldown;
+    private int noteSequence;
+    private int noteImpactCooldown;
 
     private float visualYaw;
     private float visualYawO;
@@ -169,6 +198,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (this.hitCooldown > 0) {
             this.hitCooldown--;
         }
+        if (this.noteImpactCooldown > 0) {
+            this.noteImpactCooldown--;
+        }
 
         switch (getMode()) {
             case MODE_PULLING -> tickPulling(level);
@@ -242,7 +274,15 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             EntityHitResult entityHit = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level, this, start, entityTraceEnd, this.getBoundingBox().expandTowards(velocity).inflate(0.28D), this::canHitEntity);
 
             if (entityHit != null) {
+                if (isTntBlock()) {
+                    explodeTnt(level);
+                    return;
+                }
+
                 velocity = hitLivingEntity(level, entityHit.getEntity(), velocity);
+                if (this.isRemoved()) {
+                    return;
+                }
             }
         }
 
@@ -255,6 +295,22 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         boolean hitZ = Math.abs(actualMovement.z - velocity.z) > 1.0E-4D;
 
         boolean collided = hitX || hitY || hitZ;
+
+        if (isMagmaBlock()) {
+            igniteTouchedBlocks(level);
+        }
+
+        if (collided && getMode() == MODE_THROWN) {
+            if (isTntBlock()) {
+                explodeTnt(level);
+                return;
+            }
+
+            if (isFragileGlassBlock()) {
+                shatterGlass(level);
+                return;
+            }
+        }
 
         if (collided && isHoneyBlock()) {
             this.setDeltaMovement(Vec3.ZERO);
@@ -282,8 +338,19 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             }
         }
 
-        if ((hitX || hitY || hitZ) && velocity.lengthSqr() > 0.08D) {
-            level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 0.55F, 0.85F + this.random.nextFloat() * 0.25F);
+        if (collided && velocity.lengthSqr() > 0.08D) {
+            if (isNoteBlock()) {
+                playNextNote(level);
+            } else {
+                level.playSound(
+                        null,
+                        this.getX(), this.getY(), this.getZ(),
+                        SoundEvents.STONE_HIT,
+                        SoundSource.BLOCKS,
+                        0.55F,
+                        0.85F + this.random.nextFloat() * 0.25F
+                );
+            }
         }
 
         this.setDeltaMovement(nextX, nextY, nextZ);
@@ -385,6 +452,114 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     private boolean isIceBlock() {
         return this.blockState.is(Blocks.ICE) || this.blockState.is(Blocks.PACKED_ICE) || this.blockState.is(Blocks.BLUE_ICE) || this.blockState.is(Blocks.FROSTED_ICE);
+    }
+
+    private boolean isTntBlock() {
+        return this.blockState.is(Blocks.TNT);
+    }
+
+    private boolean isMagmaBlock() {
+        return this.blockState.is(Blocks.MAGMA_BLOCK);
+    }
+
+    private boolean isFragileGlassBlock() {
+        return FRAGILE_GLASS_BLOCKS.contains(this.blockState.getBlock());
+    }
+
+    private boolean isNoteBlock() {
+        return this.blockState.is(Blocks.NOTE_BLOCK);
+    }
+
+    private void explodeTnt(ServerLevel level) {
+        if (this.isRemoved()) {
+            return;
+        }
+
+        clearOwnerReference(level);
+
+        level.explode(
+                this,
+                this.getX(),
+                this.getY() + 0.45D,
+                this.getZ(),
+                TNT_EXPLOSION_POWER,
+                Level.ExplosionInteraction.TNT
+        );
+
+        this.discard();
+    }
+
+    private void shatterGlass(ServerLevel level) {
+        if (this.isRemoved()) {
+            return;
+        }
+
+        level.levelEvent(
+                2001,
+                BlockPos.containing(this.getX(), this.getY() + 0.45D, this.getZ()),
+                Block.getId(this.blockState)
+        );
+
+        clearOwnerReference(level);
+        this.discard();
+    }
+
+    private void igniteTouchedBlocks(ServerLevel level) {
+        AABB touchBox = this.getBoundingBox().inflate(0.055D);
+
+        int minX = Mth.floor(touchBox.minX);
+        int minY = Mth.floor(touchBox.minY);
+        int minZ = Mth.floor(touchBox.minZ);
+        int maxX = Mth.floor(touchBox.maxX);
+        int maxY = Mth.floor(touchBox.maxY);
+        int maxZ = Mth.floor(touchBox.maxZ);
+
+        for (BlockPos touched : BlockPos.betweenClosed(minX, minY, minZ, maxX, maxY, maxZ)) {
+            BlockState touchedState = level.getBlockState(touched);
+            if (touchedState.isAir()) {
+                continue;
+            }
+
+            for (Direction direction : Direction.values()) {
+                BlockPos firePos = touched.relative(direction);
+
+                if (!level.getBlockState(firePos).canBeReplaced() || !level.getFluidState(firePos).isEmpty()) {
+                    continue;
+                }
+
+                BlockState fireState = BaseFireBlock.getState(level, firePos);
+                if (!fireState.canSurvive(level, firePos)) {
+                    continue;
+                }
+
+                level.setBlock(firePos, fireState, Block.UPDATE_ALL);
+            }
+        }
+    }
+
+    private void playNextNote(ServerLevel level) {
+        if (this.noteImpactCooldown > 0) {
+            return;
+        }
+
+        int baseNote = this.blockState.hasProperty(NoteBlock.NOTE)
+                ? this.blockState.getValue(NoteBlock.NOTE)
+                : 0;
+
+        int note = Math.floorMod(baseNote + this.noteSequence, 25);
+        float pitch = (float) Math.pow(2.0D, (note - 12) / 12.0D);
+
+        level.playSound(
+                null,
+                this.getX(), this.getY() + 0.5D, this.getZ(),
+                this.blockState.getValue(NoteBlock.INSTRUMENT).getSoundEvent().value(),
+                SoundSource.RECORDS,
+                1.0F,
+                pitch
+        );
+
+        this.noteSequence = (this.noteSequence + 1) % 25;
+        this.noteImpactCooldown = NOTE_IMPACT_COOLDOWN_TICKS;
     }
 
     public void throwFrom(ServerPlayer player) {
@@ -581,6 +756,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         tag.putInt("PullTicks", this.pullTicks);
         tag.putInt("SettleTicks", this.settleTicks);
         tag.putInt("FreeTicks", this.freeTicks);
+        tag.putInt("NoteSequence", this.noteSequence);
 
         if (this.blockEntityData != null) {
             tag.put("CarriedBlockEntityData", this.blockEntityData.copy());
@@ -601,6 +777,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         this.pullTicks = tag.getInt("PullTicks");
         this.settleTicks = tag.getInt("SettleTicks");
         this.freeTicks = tag.getInt("FreeTicks");
+        this.noteSequence = tag.getInt("NoteSequence");
         this.blockEntityData = tag.contains("CarriedBlockEntityData") ? tag.getCompound("CarriedBlockEntityData").copy() : null;
         this.ownerId = tag.hasUUID("GravityOwner") ? tag.getUUID("GravityOwner") : null;
 
