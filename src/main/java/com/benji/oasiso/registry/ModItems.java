@@ -85,7 +85,7 @@ public final class ModItems {
     public static final RegistryObject<Item> KARAKOLIT_KEY = ITEMS.register("karakolit_key", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CHAOS_BOMB_ITEM = ITEMS.register("chaos_bomb_item", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> CACTUS_SPIKE = ITEMS.register("cactus_spike", () -> new Item(new Item.Properties().stacksTo(64)));
-
+    public static final RegistryObject<Item> ENTROPY_CHESTPLATE_GLOVE = ITEMS.register("entropy_chestplate_glove", () -> new EntropyChestplateGloveItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENCHANTED_BOOK_HAMMER = ITEMS.register("enchanted_book_hammer", () -> new HammerEnchantmentBookItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final RegistryObject<Item> BOMBUL_BOTTLE = ITEMS.register("bombul_bottle", () -> new BombulBottleItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY = ITEMS.register("bombul_bottle_empty", () -> new Item(new Item.Properties().stacksTo(16)));
