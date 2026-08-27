@@ -80,26 +80,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     private static final float TNT_EXPLOSION_POWER = 4.0F;
     private static final int NOTE_IMPACT_COOLDOWN_TICKS = 3;
-    private static final Set<Block> FRAGILE_GLASS_BLOCKS = Set.of(
-            Blocks.GLASS,
-            Blocks.GLASS_PANE,
-            Blocks.WHITE_STAINED_GLASS, Blocks.WHITE_STAINED_GLASS_PANE,
-            Blocks.ORANGE_STAINED_GLASS, Blocks.ORANGE_STAINED_GLASS_PANE,
-            Blocks.MAGENTA_STAINED_GLASS, Blocks.MAGENTA_STAINED_GLASS_PANE,
-            Blocks.LIGHT_BLUE_STAINED_GLASS, Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
-            Blocks.YELLOW_STAINED_GLASS, Blocks.YELLOW_STAINED_GLASS_PANE,
-            Blocks.LIME_STAINED_GLASS, Blocks.LIME_STAINED_GLASS_PANE,
-            Blocks.PINK_STAINED_GLASS, Blocks.PINK_STAINED_GLASS_PANE,
-            Blocks.GRAY_STAINED_GLASS, Blocks.GRAY_STAINED_GLASS_PANE,
-            Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
-            Blocks.CYAN_STAINED_GLASS, Blocks.CYAN_STAINED_GLASS_PANE,
-            Blocks.PURPLE_STAINED_GLASS, Blocks.PURPLE_STAINED_GLASS_PANE,
-            Blocks.BLUE_STAINED_GLASS, Blocks.BLUE_STAINED_GLASS_PANE,
-            Blocks.BROWN_STAINED_GLASS, Blocks.BROWN_STAINED_GLASS_PANE,
-            Blocks.GREEN_STAINED_GLASS, Blocks.GREEN_STAINED_GLASS_PANE,
-            Blocks.RED_STAINED_GLASS, Blocks.RED_STAINED_GLASS_PANE,
-            Blocks.BLACK_STAINED_GLASS, Blocks.BLACK_STAINED_GLASS_PANE
-    );
+    private static final Set<Block> FRAGILE_GLASS_BLOCKS = Set.of(Blocks.GLASS, Blocks.GLASS_PANE, Blocks.WHITE_STAINED_GLASS, Blocks.WHITE_STAINED_GLASS_PANE, Blocks.ORANGE_STAINED_GLASS, Blocks.ORANGE_STAINED_GLASS_PANE, Blocks.MAGENTA_STAINED_GLASS, Blocks.MAGENTA_STAINED_GLASS_PANE, Blocks.LIGHT_BLUE_STAINED_GLASS, Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, Blocks.YELLOW_STAINED_GLASS, Blocks.YELLOW_STAINED_GLASS_PANE, Blocks.LIME_STAINED_GLASS, Blocks.LIME_STAINED_GLASS_PANE, Blocks.PINK_STAINED_GLASS, Blocks.PINK_STAINED_GLASS_PANE, Blocks.GRAY_STAINED_GLASS, Blocks.GRAY_STAINED_GLASS_PANE, Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE, Blocks.CYAN_STAINED_GLASS, Blocks.CYAN_STAINED_GLASS_PANE, Blocks.PURPLE_STAINED_GLASS, Blocks.PURPLE_STAINED_GLASS_PANE, Blocks.BLUE_STAINED_GLASS, Blocks.BLUE_STAINED_GLASS_PANE, Blocks.BROWN_STAINED_GLASS, Blocks.BROWN_STAINED_GLASS_PANE, Blocks.GREEN_STAINED_GLASS, Blocks.GREEN_STAINED_GLASS_PANE, Blocks.RED_STAINED_GLASS, Blocks.RED_STAINED_GLASS_PANE, Blocks.BLACK_STAINED_GLASS, Blocks.BLACK_STAINED_GLASS_PANE);
 
     private BlockState blockState = Blocks.STONE.defaultBlockState();
     private float sourceHardness = 1.5F;
@@ -342,14 +323,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             if (isNoteBlock()) {
                 playNextNote(level);
             } else {
-                level.playSound(
-                        null,
-                        this.getX(), this.getY(), this.getZ(),
-                        SoundEvents.STONE_HIT,
-                        SoundSource.BLOCKS,
-                        0.55F,
-                        0.85F + this.random.nextFloat() * 0.25F
-                );
+                level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 0.55F, 0.85F + this.random.nextFloat() * 0.25F);
             }
         }
 
@@ -404,6 +378,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     public float getImpactDamage() {
         return Mth.clamp(5.0F + this.sourceHardness * 1.5F, 5.0F, 30.0F);
     }
+
     private double getHardnessFactor() {
         double capped = Mth.clamp(this.sourceHardness, 0.0F, 50.0F);
         return Math.log1p(capped) / Math.log1p(50.0D);
@@ -477,14 +452,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         clearOwnerReference(level);
 
-        level.explode(
-                this,
-                this.getX(),
-                this.getY() + 0.45D,
-                this.getZ(),
-                TNT_EXPLOSION_POWER,
-                Level.ExplosionInteraction.TNT
-        );
+        level.explode(this, this.getX(), this.getY() + 0.45D, this.getZ(), TNT_EXPLOSION_POWER, Level.ExplosionInteraction.TNT);
 
         this.discard();
     }
@@ -494,11 +462,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return;
         }
 
-        level.levelEvent(
-                2001,
-                BlockPos.containing(this.getX(), this.getY() + 0.45D, this.getZ()),
-                Block.getId(this.blockState)
-        );
+        level.levelEvent(2001, BlockPos.containing(this.getX(), this.getY() + 0.45D, this.getZ()), Block.getId(this.blockState));
 
         clearOwnerReference(level);
         this.discard();
@@ -542,21 +506,12 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return;
         }
 
-        int baseNote = this.blockState.hasProperty(NoteBlock.NOTE)
-                ? this.blockState.getValue(NoteBlock.NOTE)
-                : 0;
+        int baseNote = this.blockState.hasProperty(NoteBlock.NOTE) ? this.blockState.getValue(NoteBlock.NOTE) : 0;
 
         int note = Math.floorMod(baseNote + this.noteSequence, 25);
         float pitch = (float) Math.pow(2.0D, (note - 12) / 12.0D);
 
-        level.playSound(
-                null,
-                this.getX(), this.getY() + 0.5D, this.getZ(),
-                this.blockState.getValue(NoteBlock.INSTRUMENT).getSoundEvent().value(),
-                SoundSource.RECORDS,
-                1.0F,
-                pitch
-        );
+        level.playSound(null, this.getX(), this.getY() + 0.5D, this.getZ(), this.blockState.getValue(NoteBlock.INSTRUMENT).getSoundEvent().value(), SoundSource.RECORDS, 1.0F, pitch);
 
         this.noteSequence = (this.noteSequence + 1) % 25;
         this.noteImpactCooldown = NOTE_IMPACT_COOLDOWN_TICKS;

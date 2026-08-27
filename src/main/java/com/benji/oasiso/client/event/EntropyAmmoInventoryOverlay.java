@@ -94,9 +94,14 @@ public final class EntropyAmmoInventoryOverlay {
             return;
         }
 
-        renderPanel(event.getGuiGraphics(), chest, event.getMouseX(), event.getMouseY(), screen.getMenu().getCarried().isEmpty());
+        boolean carriedEmpty = screen.getMenu().getCarried().isEmpty();
+
+        renderPanel(event.getGuiGraphics(), chest, event.getMouseX(), event.getMouseY(), carriedEmpty);
+
         if (isInsidePanel(event.getMouseX(), event.getMouseY())) {
             renderCarriedStackOnTop(event.getGuiGraphics(), screen.getMenu().getCarried(), event.getMouseX(), event.getMouseY());
+        } else if (carriedEmpty) {
+            renderHoveredVanillaSlotTooltipOnTop(event.getGuiGraphics(), screen, event.getMouseX(), event.getMouseY());
         }
     }
 
@@ -192,9 +197,26 @@ public final class EntropyAmmoInventoryOverlay {
             ItemStack hoveredAmmo = EntropyAmmoStorage.getItem(chest, hoveredInternalSlot);
 
             if (!hoveredAmmo.isEmpty()) {
-                graphics.renderTooltip(Minecraft.getInstance().font, hoveredAmmo, mouseX, mouseY);
+                renderTooltipOnTop(graphics, hoveredAmmo, mouseX, mouseY);
             }
         }
+    }
+
+    private static void renderHoveredVanillaSlotTooltipOnTop(GuiGraphics graphics, AbstractContainerScreen<?> screen, int mouseX, int mouseY) {
+        Slot hoveredSlot = screen.getSlotUnderMouse();
+
+        if (hoveredSlot == null || !hoveredSlot.hasItem()) {
+            return;
+        }
+
+        renderTooltipOnTop(graphics, hoveredSlot.getItem(), mouseX, mouseY);
+    }
+
+    private static void renderTooltipOnTop(GuiGraphics graphics, ItemStack stack, int mouseX, int mouseY) {
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, 0.0F, 800.0F);
+        graphics.renderTooltip(Minecraft.getInstance().font, stack, mouseX, mouseY);
+        graphics.pose().popPose();
     }
 
     private static void renderCarriedStackOnTop(GuiGraphics graphics, ItemStack carried, int mouseX, int mouseY) {
@@ -207,7 +229,6 @@ public final class EntropyAmmoInventoryOverlay {
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, 0.0F, 700.0F);
-
         graphics.renderItem(carried, x, y);
         graphics.renderItemDecorations(Minecraft.getInstance().font, carried, x, y);
 
@@ -263,6 +284,7 @@ public final class EntropyAmmoInventoryOverlay {
     private static int slotX(int slot) {
         return panelX + SLOT_X + (slot % 4) * SLOT_STEP;
     }
+
     private static int slotY(int slot) {
         return panelY + SLOT_Y + (slot / 4) * SLOT_STEP;
     }
