@@ -158,6 +158,9 @@
   "gui.oasiso.azumaal.title": "OSIRIS",
   "gui.oasiso.azumaal.subtitle": "CHAOS CREATURE",
 
+  "item.oasiso.entropy_chestplate": "Entropy Backpack",
+  "key.oasiso.turret_mode": "Turret mode",
+
   "key.categories.oasiso": "Oasiso",
   "key.oasiso.dialogue_editor": "Open Dialogue Studio",
 

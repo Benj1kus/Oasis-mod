@@ -19,6 +19,7 @@ public class ModMessages {
 
         INSTANCE = net;
 
+        net.messageBuilder(EntropyTurretTogglePacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyTurretTogglePacket::new).encoder(EntropyTurretTogglePacket::toBytes).consumerMainThread(EntropyTurretTogglePacket::handle).add();
         net.messageBuilder(SuperGoldShockwavePacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(SuperGoldShockwavePacket::new).encoder(SuperGoldShockwavePacket::toBytes).consumerMainThread(SuperGoldShockwavePacket::handle).add();
     }
 

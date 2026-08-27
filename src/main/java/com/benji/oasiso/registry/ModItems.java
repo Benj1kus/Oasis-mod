@@ -94,6 +94,8 @@ public final class ModItems {
     public static final RegistryObject<Item> SUPER_GOLD_LEGGINGS = ITEMS.register("super_gold_leggings", () -> new SuperGoldArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SUPER_GOLD_BOOTS = ITEMS.register("super_gold_boots", () -> new SuperGoldArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> ENTROPY_CHESTPLATE = ITEMS.register("entropy_chestplate", () -> new EntropyChestplateItem(new Item.Properties().stacksTo(1).fireResistant()));
+
     public static final RegistryObject<Item> CASSASIN_SPAWN_EGG = ITEMS.register("cassasin_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_ASSASIN, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CTANK_SPAWN_EGG = ITEMS.register("ctank_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_TANK, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CWARRIOR_SPAWN_EGG = ITEMS.register("cwarrior_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_WARRIOR, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
