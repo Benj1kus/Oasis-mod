@@ -21,11 +21,11 @@ import java.util.WeakHashMap;
 
 public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
 
-    private static final float MAX_YAW = 80.0F;
     private static final float MAX_UP_PITCH = 42.0F;
-    // Degrees 20 t ~ 1 s
+
     private static final float YAW_SPEED = 6.0F;
     private static final float PITCH_SPEED = 3.5F;
+    private static final float FIRE_RECOIL_DEGREES = -12.5F;
 
     private final Map<Player, TurretAimState> aimStates = new WeakHashMap<>();
 
@@ -61,7 +61,6 @@ public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
         TurretAimState state = this.aimStates.computeIfAbsent(player, ignored -> new TurretAimState());
 
         long gameTime = player.level().getGameTime();
-
         if (!EntropyChestplateItem.areTurretsOperational(chest, gameTime)) {
             state.reset(gameTime);
             return;
@@ -70,14 +69,15 @@ public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
         updateAimState(player, state, gameTime);
 
         float partialTick = Minecraft.getInstance().getFrameTime();
+
         float leftYaw = Mth.rotLerp(partialTick, state.previousLeftYaw, state.leftYaw);
         float rightYaw = Mth.rotLerp(partialTick, state.previousRightYaw, state.rightYaw);
         float leftPitch = Mth.lerp(partialTick, state.previousLeftPitch, state.leftPitch);
         float rightPitch = Mth.lerp(partialTick, state.previousRightPitch, state.rightPitch);
 
-        applyTurretAim("turret_left", "turret_left_head", leftYaw, leftPitch);
+        applyTurretAim(player, EntropyTurretHelper.Side.LEFT, "turret_left", "turret_left_head", leftYaw, leftPitch, gameTime, partialTick);
 
-        applyTurretAim("turret_right", "turret_right_head", rightYaw, rightPitch);
+        applyTurretAim(player, EntropyTurretHelper.Side.RIGHT, "turret_right", "turret_right_head", rightYaw, rightPitch, gameTime, partialTick);
     }
 
     private void updateAimState(Player player, TurretAimState state, long gameTime) {
@@ -94,9 +94,10 @@ public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
         state.previousLeftPitch = state.leftPitch;
         state.previousRightPitch = state.rightPitch;
 
-        LivingEntity leftTarget = EntropyTurretHelper.findTarget(player, EntropyTurretHelper.Side.LEFT);
+        EntropyTurretHelper.TargetPair targets = EntropyTurretHelper.findTargets(player);
 
-        LivingEntity rightTarget = EntropyTurretHelper.findTarget(player, EntropyTurretHelper.Side.RIGHT);
+        LivingEntity leftTarget = targets.left();
+        LivingEntity rightTarget = targets.right();
 
         float targetLeftYaw = getTargetYaw(player, leftTarget);
         float targetRightYaw = getTargetYaw(player, rightTarget);
@@ -109,6 +110,7 @@ public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
 
         state.leftYaw = approachAngle(state.leftYaw, targetLeftYaw, yawStep);
         state.rightYaw = approachAngle(state.rightYaw, targetRightYaw, yawStep);
+
         state.leftPitch = Mth.approach(state.leftPitch, targetLeftPitch, pitchStep);
         state.rightPitch = Mth.approach(state.rightPitch, targetRightPitch, pitchStep);
     }
@@ -117,29 +119,55 @@ public class EntropyChestplateModel extends GeoModel<EntropyChestplateItem> {
         if (target == null) {
             return 0.0F;
         }
-
-        return Mth.clamp(EntropyTurretHelper.getRelativeYawDegrees(player, target), -MAX_YAW, MAX_YAW);
+        return -EntropyTurretHelper.getRelativeYawDegrees(player, target);
     }
 
     private float getTargetUpPitch(Player player, LivingEntity target) {
         if (target == null) {
             return 0.0F;
         }
-
         float modelPitch = -EntropyTurretHelper.getPitchDegrees(player, target);
         return Mth.clamp(modelPitch, 0.0F, MAX_UP_PITCH);
     }
 
-    private void applyTurretAim(String baseBoneName, String headBoneName, float yawDegrees, float upPitchDegrees) {
+    private void applyTurretAim(Player player, EntropyTurretHelper.Side side, String baseBoneName, String headBoneName, float yawDegrees, float upPitchDegrees, long gameTime, float partialTick) {
         CoreGeoBone base = getAnimationProcessor().getBone(baseBoneName);
         CoreGeoBone head = getAnimationProcessor().getBone(headBoneName);
 
         if (base == null || head == null) {
             return;
         }
+        base.setRotX(0.0F);
+        base.setRotZ(0.0F);
         base.setRotY(yawDegrees * Mth.DEG_TO_RAD);
-        float recoilX = head.getRotX();
-        head.setRotX(recoilX + upPitchDegrees * Mth.DEG_TO_RAD);
+        float recoilDegrees = getFireRecoilDegrees(player, side, gameTime, partialTick);
+
+        head.setRotY(0.0F);
+        head.setRotZ(0.0F);
+        head.setRotX((upPitchDegrees + recoilDegrees) * Mth.DEG_TO_RAD);
+    }
+
+    private float getFireRecoilDegrees(Player player, EntropyTurretHelper.Side side, long gameTime, float partialTick) {
+        long fireUntil = player.getPersistentData().getLong(EntropyChestplateItem.CLIENT_FIRE_UNTIL);
+
+        if (fireUntil <= gameTime) {
+            return 0.0F;
+        }
+
+        int fireMask = player.getPersistentData().getInt(EntropyChestplateItem.CLIENT_FIRE_MASK);
+        int requiredMask = side == EntropyTurretHelper.Side.LEFT ? EntropyChestplateItem.FIRE_LEFT_MASK : EntropyChestplateItem.FIRE_RIGHT_MASK;
+
+        if ((fireMask & requiredMask) == 0) {
+            return 0.0F;
+        }
+
+        double startTime = fireUntil - EntropyChestplateItem.FIRE_ANIMATION_TICKS;
+        double now = gameTime + partialTick;
+
+        float progress = Mth.clamp((float) ((now - startTime) / EntropyChestplateItem.FIRE_ANIMATION_TICKS), 0.0F, 1.0F);
+        float pulse = progress <= 0.5F ? progress * 2.0F : (1.0F - progress) * 2.0F;
+
+        return FIRE_RECOIL_DEGREES * Mth.clamp(pulse, 0.0F, 1.0F);
     }
 
     private static float approachAngle(float current, float target, float maxStep) {

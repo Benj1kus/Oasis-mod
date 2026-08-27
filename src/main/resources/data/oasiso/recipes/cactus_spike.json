@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:cactos"
+    }
+  ],
+  "result": {
+    "item": "oasiso:cactus_spike",
+    "count": 16
+  }
+}

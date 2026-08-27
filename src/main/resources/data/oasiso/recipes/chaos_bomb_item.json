@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " . ",
+    "#G#",
+    " # "
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:blaze_powder"
+    },
+    "#": {
+      "item": "oasiso:nephritis"
+    },
+    "G":{
+      "item": "minecraft:gunpowder"
+    }
+  },
+  "result": {
+    "item": "oasiso:chaos_bomb_item",
+    "count": 4
+  }
+}

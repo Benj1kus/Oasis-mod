@@ -21,7 +21,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
-public class EntropyChestplateItem extends ArmorItem implements GeoItem, GlowmaskEntity {
+public class EntropyChestplateItem extends ArmorItem implements GeoItem {
 
     public static final String TAG_TURRETS_ON = "EntropyTurretsOn";
     private static final String TAG_TRANSITION = "EntropyTurretTransition";
@@ -34,8 +34,8 @@ public class EntropyChestplateItem extends ArmorItem implements GeoItem, Glowmas
     public static final int TRANSITION_ON = 1;
     public static final int TRANSITION_OFF = 2;
 
-    public static final int TRANSITION_TICKS = 60; // 3 seconds
-    public static final int FIRE_ANIMATION_TICKS = 5; // 0.25 seconds
+    public static final int TRANSITION_TICKS = 60;
+    public static final int FIRE_ANIMATION_TICKS = 5;
 
     public static final int FIRE_LEFT_MASK = 1;
     public static final int FIRE_RIGHT_MASK = 2;
@@ -97,16 +97,10 @@ public class EntropyChestplateItem extends ArmorItem implements GeoItem, Glowmas
             private com.benji.oasiso.client.renderer.EntropyChestplateRenderer renderer;
 
             @Override
-            public HumanoidModel<?> getHumanoidArmorModel(
-                    LivingEntity livingEntity,
-                    ItemStack itemStack,
-                    EquipmentSlot equipmentSlot,
-                    HumanoidModel<?> original
-            ) {
+            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if (this.renderer == null) {
                     this.renderer = new com.benji.oasiso.client.renderer.EntropyChestplateRenderer();
                 }
-
                 this.renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return this.renderer;
             }
@@ -116,8 +110,7 @@ public class EntropyChestplateItem extends ArmorItem implements GeoItem, Glowmas
     @Override
     public void registerControllers(software.bernie.geckolib.core.animation.AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "mode_controller", 0, this::modePredicate));
-        controllers.add(new AnimationController<>(this, "physics_controller", 5,
-                state -> state.setAndContinue(PHYSIC)));
+        controllers.add(new AnimationController<>(this, "physics_controller", 5, state -> state.setAndContinue(PHYSIC)));
     }
 
     private PlayState modePredicate(AnimationState<EntropyChestplateItem> event) {
@@ -149,8 +142,7 @@ public class EntropyChestplateItem extends ArmorItem implements GeoItem, Glowmas
             return event.setAndContinue(IDLE_OFF);
         }
 
-        if (entity.level().isClientSide
-                && entity.getPersistentData().getLong(CLIENT_FIRE_UNTIL) > gameTime) {
+        if (entity.level().isClientSide && entity.getPersistentData().getLong(CLIENT_FIRE_UNTIL) > gameTime) {
 
             int fireMask = entity.getPersistentData().getInt(CLIENT_FIRE_MASK);
 
@@ -168,14 +160,6 @@ public class EntropyChestplateItem extends ArmorItem implements GeoItem, Glowmas
         }
 
         return event.setAndContinue(IDLE_ON);
-    }
-
-    @Override
-    public ResourceLocation getGlowmaskTexture() {
-        return ResourceLocation.fromNamespaceAndPath(
-                Oasiso.MODID,
-                "textures/models/armor/entropy_chestplate_emissive.png"
-        );
     }
 
     @Override
