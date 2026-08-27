@@ -48,7 +48,7 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<CactoEntity>> CACTO = ENTITIES.register("cacto", () -> EntityType.Builder.of(CactoEntity::new, MobCategory.MONSTER).sized(0.625F, 1.5F).build(ResourceLocation.fromNamespaceAndPath(MODID, "cacto").toString()));
     public static final RegistryObject<EntityType<DoumPalmBoatEntity>> DOUM_PALM_BOAT = ENTITIES.register("doum_palm_boat", () -> EntityType.Builder.<DoumPalmBoatEntity>of(DoumPalmBoatEntity::new, MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10).build(ResourceLocation.fromNamespaceAndPath(MODID, "doum_palm_boat").toString()));
     public static final RegistryObject<EntityType<DoumPalmChestBoatEntity>> DOUM_PALM_CHEST_BOAT = ENTITIES.register("doum_palm_chest_boat", () -> EntityType.Builder.<DoumPalmChestBoatEntity>of(DoumPalmChestBoatEntity::new, MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10).build(ResourceLocation.fromNamespaceAndPath(MODID, "doum_palm_chest_boat").toString()));
-
+    public static final RegistryObject<EntityType<EntropyPhysicsBlockEntity>> ENTROPY_PHYSICS_BLOCK = ENTITIES.register("entropy_physics_block", () -> EntityType.Builder.<EntropyPhysicsBlockEntity>of(EntropyPhysicsBlockEntity::new, MobCategory.MISC).sized(0.98F, 0.98F).clientTrackingRange(12).updateInterval(1).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_physics_block").toString()));
     private ModEntities() {
     }
 
