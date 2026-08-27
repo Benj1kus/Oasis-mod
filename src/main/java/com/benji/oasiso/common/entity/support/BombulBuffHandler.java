@@ -2,6 +2,11 @@ package com.benji.oasiso.common.entity.support;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.BombulEntity;
+import com.benji.oasiso.common.entity.CrusaderAssasinEntity;
+import com.benji.oasiso.common.entity.CrusaderTankEntity;
+import com.benji.oasiso.common.entity.CrusaderWarriorEntity;
+import com.benji.oasiso.common.entity.CrusaderWizardEntity;
+import com.benji.oasiso.common.entity.PaladinEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
@@ -169,7 +174,10 @@ public final class BombulBuffHandler {
         if (damagedEntity.level().isClientSide) {
             return;
         }
-        if (event.getAmount() > 0.0F && isBuffed(damagedEntity) && damagedEntity.level() instanceof ServerLevel serverLevel) {
+        if (event.getAmount() > 0.0F
+                && (isBuffed(damagedEntity) || alwaysSpawnsGoldenHearts(damagedEntity))
+                && damagedEntity.level() instanceof ServerLevel serverLevel) {
+
             spawnGoldenHearts(serverLevel, damagedEntity);
         }
 
@@ -185,6 +193,14 @@ public final class BombulBuffHandler {
         }
 
         event.setAmount(event.getAmount() * 2.0F);
+    }
+    
+    private static boolean alwaysSpawnsGoldenHearts(LivingEntity entity) {
+        return entity instanceof CrusaderAssasinEntity
+                || entity instanceof CrusaderTankEntity
+                || entity instanceof CrusaderWarriorEntity
+                || entity instanceof CrusaderWizardEntity
+                || entity instanceof PaladinEntity;
     }
 
     private static void spawnGoldenHearts(ServerLevel level, LivingEntity entity) {
