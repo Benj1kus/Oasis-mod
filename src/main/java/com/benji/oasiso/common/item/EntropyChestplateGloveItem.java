@@ -2,6 +2,7 @@ package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.client.renderer.EntropyChestplateGloveRenderer;
 import com.benji.oasiso.common.entity.EntropyPhysicsBlockEntity;
+import com.benji.oasiso.common.world.MeltedNephritisSavedData;
 import com.benji.oasiso.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -113,9 +114,20 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         BlockEntity sourceBlockEntity = serverLevel.getBlockEntity(pos);
         CompoundTag blockEntityData = sourceBlockEntity == null ? null : sourceBlockEntity.saveWithFullMetadata();
 
+        MeltedNephritisSavedData nephritisData = MeltedNephritisSavedData.get(serverLevel);
+        boolean nephritisCoated = nephritisData.isCoated(pos);
+
         EntropyPhysicsBlockEntity physicsBlock = new EntropyPhysicsBlockEntity(ModEntities.ENTROPY_PHYSICS_BLOCK.get(), serverLevel);
 
-        physicsBlock.initializeFromBlock(state, hardness, blockEntityData, serverPlayer, context.getHand(), pos);
+        physicsBlock.initializeFromBlock(
+                state,
+                hardness,
+                blockEntityData,
+                serverPlayer,
+                context.getHand(),
+                pos,
+                nephritisCoated
+        );
         if (sourceBlockEntity != null) {
             serverLevel.removeBlockEntity(pos);
         }
@@ -130,6 +142,10 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         if (!serverLevel.addFreshEntity(physicsBlock)) {
             restoreBlock(serverLevel, pos, state, blockEntityData);
             return InteractionResult.FAIL;
+        }
+
+        if (nephritisCoated) {
+            nephritisData.remove(pos);
         }
 
         bindHeldBlock(glove, physicsBlock.getUUID());
@@ -167,21 +183,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         return InteractionResultHolder.pass(glove);
     }
     public static boolean canLiftBlock(Level level, BlockPos pos, BlockState state) {
-        if (state.isAir() || !state.getFluidState().isEmpty()) {
-            return false;
-        }
-
-        if (state.is(Blocks.BEDROCK) || state.is(Blocks.BARRIER) || state.is(Blocks.STRUCTURE_BLOCK) || state.is(Blocks.JIGSAW) || state.is(Blocks.END_PORTAL) || state.is(Blocks.END_GATEWAY) || state.is(Blocks.END_PORTAL_FRAME)) {
-            return false;
-        }
-
-        Block block = state.getBlock();
-        if (block instanceof TorchBlock || block instanceof WallTorchBlock || block instanceof DoorBlock || block instanceof BedBlock || block instanceof DoublePlantBlock || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
-            return false;
-        }
-
-        float hardness = state.getDestroySpeed(level, pos);
-        if (hardness < 0.0F || hardness > MAX_PICKUP_HARDNESS) {
+        if (!passesBaseLiftRules(level, pos, state)) {
             return false;
         }
 
@@ -191,10 +193,45 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
             if (blockEntity instanceof GeoBlockEntity) {
                 return false;
             }
+
             return blockEntity instanceof Container;
         }
 
         return state.getRenderShape() == RenderShape.MODEL;
+    }
+
+    public static boolean canAttachBlockState(Level level, BlockPos referencePos, BlockState state) {
+        return passesBaseLiftRules(level, referencePos, state)
+                && state.getRenderShape() == RenderShape.MODEL;
+    }
+
+    private static boolean passesBaseLiftRules(Level level, BlockPos pos, BlockState state) {
+        if (state.isAir() || !state.getFluidState().isEmpty()) {
+            return false;
+        }
+
+        if (state.is(Blocks.BEDROCK)
+                || state.is(Blocks.BARRIER)
+                || state.is(Blocks.STRUCTURE_BLOCK)
+                || state.is(Blocks.JIGSAW)
+                || state.is(Blocks.END_PORTAL)
+                || state.is(Blocks.END_GATEWAY)
+                || state.is(Blocks.END_PORTAL_FRAME)) {
+            return false;
+        }
+
+        Block block = state.getBlock();
+        if (block instanceof TorchBlock
+                || block instanceof WallTorchBlock
+                || block instanceof DoorBlock
+                || block instanceof BedBlock
+                || block instanceof DoublePlantBlock
+                || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+            return false;
+        }
+
+        float hardness = state.getDestroySpeed(level, pos);
+        return hardness >= 0.0F && hardness <= MAX_PICKUP_HARDNESS;
     }
 
     private static void restoreBlock(ServerLevel level, BlockPos pos, BlockState state, CompoundTag blockEntityData) {

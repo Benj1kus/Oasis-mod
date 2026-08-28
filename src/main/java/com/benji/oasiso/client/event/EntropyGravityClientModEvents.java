@@ -2,6 +2,7 @@ package com.benji.oasiso.client.event;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.particle.EntropyGravityTrailParticle;
+import com.benji.oasiso.client.particle.MeltedSplashParticle;
 import com.benji.oasiso.client.renderer.EntropyPhysicsBlockRenderer;
 import com.benji.oasiso.registry.ModEntities;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,5 +25,6 @@ public final class EntropyGravityClientModEvents {
     @SubscribeEvent
     public static void registerParticles(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(Oasiso.ENTROPY_GRAVITY_TRAIL.get(), EntropyGravityTrailParticle.Provider::new);
+        event.registerSpriteSet(Oasiso.MELTED_SPLASH.get(), MeltedSplashParticle.Provider::new);
     }
 }

@@ -8,12 +8,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +29,8 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
 
     private final BlockRenderDispatcher blockRenderer;
     private final ItemRenderer itemRenderer;
-    private final MultiBufferSource.BufferSource outlineBuffers = MultiBufferSource.immediate(new BufferBuilder(1024));
+
+    private final MultiBufferSource.BufferSource outlineBuffers = MultiBufferSource.immediate(new BufferBuilder(4096));
 
     public EntropyPhysicsBlockRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -40,8 +41,6 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
 
     @Override
     public void render(EntropyPhysicsBlockEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        BlockState state = entity.getCarriedBlockState();
-
         poseStack.pushPose();
 
         double wiggle = entity.getPullWiggle(partialTick);
@@ -51,37 +50,43 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         poseStack.mulPose(Axis.XP.rotationDegrees(entity.getVisualPitch(partialTick)));
         poseStack.mulPose(Axis.ZP.rotationDegrees(entity.getVisualRoll(partialTick)));
 
-        renderCarriedBlock(entity, state, poseStack, bufferSource, packedLight);
+        renderPart(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack, bufferSource, packedLight);
 
-        renderCyanOutline(entity, state, poseStack);
+        for (EntropyPhysicsBlockEntity.StructurePart part : entity.getAttachedParts()) {
+            renderPart(entity, part.state(), part.offset().getX(), part.offset().getY(), part.offset().getZ(), poseStack, bufferSource, packedLight);
+        }
+
+        renderOutline(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack);
+
+        for (EntropyPhysicsBlockEntity.StructurePart part : entity.getAttachedParts()) {
+            renderOutline(entity, part.state(), part.offset().getX(), part.offset().getY(), part.offset().getZ(), poseStack);
+        }
 
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
     }
 
-    private void renderCarriedBlock(EntropyPhysicsBlockEntity entity, BlockState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    private void renderPart(EntropyPhysicsBlockEntity entity, BlockState state, int offsetX, int offsetY, int offsetZ, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.translate(offsetX, offsetY, offsetZ);
+
         if (state.getRenderShape() == RenderShape.MODEL) {
-            poseStack.pushPose();
             poseStack.translate(-0.5D, -0.5D, -0.5D);
-
             this.blockRenderer.renderSingleBlock(state, poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
-
             poseStack.popPose();
             return;
         }
 
         ItemStack stack = new ItemStack(state.getBlock());
-        if (stack.isEmpty()) {
-            return;
+        if (!stack.isEmpty()) {
+            this.itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, bufferSource, entity.level(), entity.getId());
         }
 
-        poseStack.pushPose();
-        this.itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, bufferSource, entity.level(), entity.getId());
         poseStack.popPose();
     }
 
-    private void renderCyanOutline(EntropyPhysicsBlockEntity entity, BlockState state, PoseStack poseStack) {
+    private void renderOutline(EntropyPhysicsBlockEntity entity, BlockState state, int offsetX, int offsetY, int offsetZ, PoseStack poseStack) {
         VoxelShape shape = state.getShape(entity.level(), entity.blockPosition(), CollisionContext.empty());
 
         if (shape.isEmpty()) {
@@ -89,7 +94,7 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         }
 
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        poseStack.translate(offsetX - 0.5D, offsetY - 0.5D, offsetZ - 0.5D);
 
         RenderType lineType = RenderType.lines();
         VertexConsumer lines = this.outlineBuffers.getBuffer(lineType);
@@ -101,7 +106,6 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
 
         this.outlineBuffers.endBatch(lineType);
         RenderSystem.lineWidth(1.0F);
-
         poseStack.popPose();
     }
 

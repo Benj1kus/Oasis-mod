@@ -79,6 +79,7 @@ public final class ModItems {
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MELTED_NEPHRITIS = ITEMS.register("melted_nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new Item(new Item.Properties().stacksTo(1)));
