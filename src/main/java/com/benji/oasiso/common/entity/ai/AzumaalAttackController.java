@@ -953,13 +953,6 @@ public final class AzumaalAttackController {
             return null;
         }
 
-        /*
-         * Multiplayer fairness:
-         * if at least two valid players are in the encounter, never select the
-         * exact same player for two attacks in a row. Among the remaining
-         * players the closest one still wins, so the boss keeps natural
-         * positioning instead of choosing somebody across the arena randomly.
-         */
         ServerPlayer best = null;
         double bestDistance =
                 Double.MAX_VALUE;
@@ -997,9 +990,6 @@ public final class AzumaalAttackController {
             return best;
         }
 
-        /*
-         * Fallback for the one-player case.
-         */
         for (ServerPlayer player :
                 candidates) {
 
