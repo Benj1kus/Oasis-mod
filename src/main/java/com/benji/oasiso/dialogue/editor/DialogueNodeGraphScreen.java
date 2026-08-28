@@ -4,9 +4,11 @@ import com.benji.oasiso.dialogue.data.DialogueDefinition;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,6 +45,8 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
     private PortRef pendingLink;
     private int renderMouseX;
     private int renderMouseY;
+
+    private final Map<String, NodeJuiceState> nodeJuiceStates = new HashMap<>();
 
     public DialogueNodeGraphScreen(Screen parent, DialogueEditorProject project) {
         super(Component.literal("Oasiso Dialogue Studio - Node Graph"));
@@ -245,7 +249,10 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
 
     private void renderNode(GuiGraphics graphics, String id, DialogueDefinition.Node node, int mouseX, int mouseY) {
         DialogueEditorProject.NodePosition p = project.node_positions.get(id);
-        if (p == null || node == null) return;
+
+        if (p == null || node == null) {
+            return;
+        }
 
         int x = screenX(p.x);
         int y = screenY(p.y);
@@ -253,36 +260,82 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
         int h = scaled(nodeHeightWorld(node));
 
         if (x + w < 0 || y + h < CANVAS_TOP || x > width - INSPECTOR_W || y > height) {
+
             return;
         }
 
+        boolean hovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h && mouseX < width - INSPECTOR_W;
+
+        long now = System.currentTimeMillis();
+
+        NodeJuiceState juice = nodeJuiceStates.computeIfAbsent(id, ignored -> new NodeJuiceState());
+
+        if (hovered && !juice.wasHovered) {
+
+            juice.hoverStartedAt = now;
+            DialogueJuiceSound.nodeHoverClick();
+        }
+
+        juice.wasHovered = hovered;
+        updateNodeHoverAmount(juice, hovered, now);
+
+        float hoverJelly = nodeHoverJelly(juice, now);
+        float pressJelly = nodePressJelly(juice, now);
+
+        boolean dragging = id.equals(draggingNode);
+
+        float scaleX = 1.0F + juice.hoverAmount * 0.008F + hoverJelly + pressJelly + (dragging ? 0.012F : 0.0F);
+        float scaleY = 1.0F + juice.hoverAmount * 0.006F - hoverJelly * 0.30F + pressJelly * 0.72F + (dragging ? -0.005F : 0.0F);
+
+        float centerX = x + w * 0.5F;
+        float centerY = y + h * 0.5F;
+
+        graphics.pose().pushPose();
+        graphics.pose().translate(centerX, centerY, 0.0F);
+        graphics.pose().scale(scaleX, scaleY, 1.0F);
+        graphics.pose().translate(-centerX, -centerY, 0.0F);
+
         String type = nodeType(node);
+
         int headerColor = nodeHeaderColor(type);
+
         boolean selected = id.equals(project.selected_node);
+
+        if (hovered || dragging) {
+            graphics.fill(x + 3, y + 3, x + w + 3, y + h + 3, 0x75000000);
+        }
 
         graphics.fill(x, y, x + w, y + h, selected ? 0xFF34442C : 0xFF1A2116);
 
         int headerH = Math.max(7, scaled(22));
+
         graphics.fill(x, y, x + w, y + headerH, headerColor);
 
         if (selected) {
             outline(graphics, x, y, x + w, y + h, 0xFFFFD45A);
+        } else if (hovered && zoom >= 0.40D) {
+            outline(graphics, x, y, x + w, y + h, 0x669EFF77);
         }
 
         if (zoom >= 0.48D && w >= 86) {
+
             graphics.drawString(font, trim(id, Math.max(20, w - 10)), x + 5, y + 6, 0xFFFFFFFF, false);
 
             renderNodeBody(graphics, id, node, x, y, w, h);
         } else if (zoom >= 0.30D && w >= 56) {
+
             graphics.drawString(font, trim(id, Math.max(15, w - 8)), x + 4, y + Math.max(3, headerH / 2 - 4), 0xFFFFFFFF, false);
         }
 
         renderPorts(graphics, node, x, y, w);
 
         if (id.equals(project.definition.start_node) && zoom >= 0.42D) {
-            String start = "START";
-            graphics.drawString(font, start, x + 5, y + h - 11, 0xFF86D955, false);
+
+            graphics.drawString(font, "START", x + 5, y + h - 11, 0xFF86D955, false);
         }
+
+        drawNodePressFlash(graphics, x, y, w, h, juice, now);
+        graphics.pose().popPose();
     }
 
     private void renderNodeBody(GuiGraphics graphics, String id, DialogueDefinition.Node node, int x, int y, int w, int h) {
@@ -579,6 +632,7 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
 
             if (port != null) {
                 pendingLink = port;
+                markNodePressed(port.nodeId);
                 return true;
             }
         }
@@ -589,12 +643,14 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
 
             applyLink(pendingLink, hit);
             pendingLink = null;
+            markNodePressed(hit);
             DialogueEditorHistory.checkpoint(project);
             return true;
         }
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && hit != null) {
             project.selected_node = hit;
+            markNodePressed(hit);
 
             DialogueEditorProject.NodePosition position = project.node_positions.get(hit);
             if (position == null) return true;
@@ -789,6 +845,78 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
         graphics.hLine(Math.min(x, middle), Math.max(x, middle), y, color);
         graphics.vLine(middle, Math.min(y, renderMouseY), Math.max(y, renderMouseY), color);
         graphics.hLine(Math.min(middle, renderMouseX), Math.max(middle, renderMouseX), renderMouseY, color);
+    }
+
+    private void markNodePressed(String id) {
+        if (id == null) {
+            return;
+        }
+
+        NodeJuiceState state = nodeJuiceStates.computeIfAbsent(id, ignored -> new NodeJuiceState());
+        state.pressStartedAt = System.currentTimeMillis();
+
+        DialogueJuiceSound.nodePressClick();
+    }
+
+    private static void updateNodeHoverAmount(NodeJuiceState state, boolean hovered, long now) {
+        if (state.lastRenderAt < 0L) {
+            state.lastRenderAt = now;
+        }
+
+        long elapsed = Math.min(60L, Math.max(0L, now - state.lastRenderAt));
+
+        state.lastRenderAt = now;
+
+        float target = hovered ? 1.0F : 0.0F;
+        float response = 1.0F - (float) Math.exp(-elapsed * 0.019D);
+
+        state.hoverAmount += (target - state.hoverAmount) * response;
+    }
+
+    private static float nodeHoverJelly(NodeJuiceState state, long now) {
+        if (state.hoverStartedAt < 0L) {
+            return 0.0F;
+        }
+
+        float t = (now - state.hoverStartedAt) / 340.0F;
+        if (t < 0.0F || t >= 1.0F) {
+
+            return 0.0F;
+        }
+
+        return Mth.sin(t * Mth.PI * 3.1F) * (float) Math.exp(-4.0F * t) * 0.022F;
+    }
+
+    private static float nodePressJelly(NodeJuiceState state, long now) {
+        if (state.pressStartedAt < 0L) {
+            return 0.0F;
+        }
+
+        float t = (now - state.pressStartedAt) / 440.0F;
+        if (t < 0.0F || t >= 1.0F) {
+
+            return 0.0F;
+        }
+
+        return (0.021F + Mth.sin(t * Mth.PI * 4.0F) * 0.039F) * (float) Math.exp(-4.7F * t);
+    }
+
+    private static void drawNodePressFlash(GuiGraphics graphics, int x, int y, int w, int h, NodeJuiceState state, long now) {
+        if (state.pressStartedAt < 0L) {
+            return;
+        }
+
+        float t = (now - state.pressStartedAt) / 235.0F;
+        if (t < 0.0F || t >= 1.0F) {
+
+            return;
+        }
+
+        float fade = 1.0F - t;
+        fade *= fade;
+        int alpha = Mth.clamp(Math.round(fade * 92.0F), 0, 92);
+
+        graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, alpha << 24 | 0x00FFFFFF);
     }
 
     private String nodeAt(double mouseX, double mouseY) {
@@ -1123,6 +1251,14 @@ public final class DialogueNodeGraphScreen extends DialogueRetroScreen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    private static final class NodeJuiceState {
+        private boolean wasHovered;
+        private long hoverStartedAt = -1L;
+        private long pressStartedAt = -1L;
+        private long lastRenderAt = -1L;
+        private float hoverAmount;
     }
 
     private record PortRef(String nodeId, String type, int index) {
