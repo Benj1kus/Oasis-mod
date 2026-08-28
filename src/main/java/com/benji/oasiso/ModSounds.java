@@ -20,6 +20,12 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> GASTER = registerSoundEvent("gaster");
     public static final RegistryObject<SoundEvent> SANDSTORM = registerSoundEvent("sandstorm");
 
+    //TURRETMODE
+    public static final RegistryObject<SoundEvent> TURRET_MODE_ON = registerSoundEvent("turret_mode_on");
+    public static final RegistryObject<SoundEvent> TURRET_MODE_OFF = registerSoundEvent("turret_mode_off");
+    public static final RegistryObject<SoundEvent> ON_EA = registerSoundEvent("on_ea");
+    public static final RegistryObject<SoundEvent> OFF_EA = registerSoundEvent("off_ea");
+
     //AZUMAAL
 
     public static final RegistryObject<SoundEvent> AZUMAAL_IDLE1 = registerSoundEvent("azumaal_idle1");

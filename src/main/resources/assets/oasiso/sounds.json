@@ -20,6 +20,11 @@
   "osiris_voice": { "sounds": [ "oasiso:osiris_voice" ] },
   "paladin_voice": { "sounds": [ "oasiso:paladin_voice" ] },
 
+  "turret_mode_on": { "sounds": [ "oasiso:turret_mode_on" ] },
+  "turret_mode_off": { "sounds": [ "oasiso:turret_mode_off" ] },
+  "on_ea": { "sounds": [ "oasiso:on_ea" ] },
+  "off_ea": { "sounds": [ "oasiso:off_ea" ] },
+
   "gaster": { "sounds": [ "oasiso:gaster" ] },
   "honk": { "sounds": [ "oasiso:honk" ] },
   "tower_place": { "sounds": [ "oasiso:tower_place" ] },

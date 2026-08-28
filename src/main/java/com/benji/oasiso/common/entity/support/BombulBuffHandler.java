@@ -194,7 +194,7 @@ public final class BombulBuffHandler {
 
         event.setAmount(event.getAmount() * 2.0F);
     }
-    
+
     private static boolean alwaysSpawnsGoldenHearts(LivingEntity entity) {
         return entity instanceof CrusaderAssasinEntity
                 || entity instanceof CrusaderTankEntity
