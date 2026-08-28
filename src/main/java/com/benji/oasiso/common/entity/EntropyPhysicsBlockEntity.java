@@ -735,6 +735,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         return InteractionResult.CONSUME;
     }
+
     public InteractionResult bondCurrentStructure(ServerLevel level, ServerPlayer player, ItemStack meltedNephritis) {
         if (!isNephritisCoated() || getMode() != MODE_SETTLED) {
             return InteractionResult.PASS;
@@ -796,27 +797,14 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return InteractionResult.PASS;
         }
 
-        Vec3 localRootCentered = new Vec3(localHit.x, localHit.y - 0.5D, localHit.z);
+        AttachmentPreview preview = getAttachmentPreview(level, localHit);
 
-        Vec3 structureHit = inverseRotateWorld(localRootCentered);
-        BlockPos anchor = findNearestStructureOffset(structureHit);
-
-        Vec3 anchorCenter = new Vec3(anchor.getX(), anchor.getY(), anchor.getZ());
-
-        Direction face = inferClickedFace(structureHit.subtract(anchorCenter));
-        BlockPos targetOffset = anchor.relative(face);
-
-        if (Math.abs(targetOffset.getX()) > MAX_STRUCTURE_RADIUS || Math.abs(targetOffset.getY()) > MAX_STRUCTURE_RADIUS || Math.abs(targetOffset.getZ()) > MAX_STRUCTURE_RADIUS) {
+        if (preview == null) {
             return InteractionResult.FAIL;
         }
 
-        if (isOffsetOccupied(targetOffset)) {
-            return InteractionResult.FAIL;
-        }
-
-        if (!canAttachAtWorldPosition(level, targetOffset)) {
-            return InteractionResult.FAIL;
-        }
+        BlockPos targetOffset = preview.targetOffset();
+        Direction face = preview.face();
 
         state = prepareAttachedState(state, player, face);
 
@@ -836,8 +824,39 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         return InteractionResult.CONSUME;
     }
+    
+    public AttachmentPreview getAttachmentPreview(Level level, Vec3 localHit) {
+        if (!isNephritisCoated() || getMode() != MODE_SETTLED || localHit == null || this.attachedParts.size() >= MAX_ATTACHED_BLOCKS) {
+            return null;
+        }
 
-    private boolean canAttachAtWorldPosition(ServerLevel level, BlockPos localOffset) {
+        Vec3 localRootCentered = new Vec3(localHit.x, localHit.y - 0.5D, localHit.z);
+
+        Vec3 structureHit = inverseRotateWorld(localRootCentered);
+        BlockPos anchor = findNearestStructureOffset(structureHit);
+
+        Vec3 anchorCenter = new Vec3(anchor.getX(), anchor.getY(), anchor.getZ());
+
+        Direction face = inferClickedFace(structureHit.subtract(anchorCenter));
+
+        BlockPos targetOffset = anchor.relative(face);
+
+        if (Math.abs(targetOffset.getX()) > MAX_STRUCTURE_RADIUS || Math.abs(targetOffset.getY()) > MAX_STRUCTURE_RADIUS || Math.abs(targetOffset.getZ()) > MAX_STRUCTURE_RADIUS) {
+            return null;
+        }
+
+        if (isOffsetOccupied(targetOffset)) {
+            return null;
+        }
+
+        if (!canAttachAtWorldPosition(level, targetOffset)) {
+            return null;
+        }
+
+        return new AttachmentPreview(targetOffset.immutable(), face);
+    }
+
+    private boolean canAttachAtWorldPosition(Level level, BlockPos localOffset) {
         Vec3 center = this.position().add(0.0D, 0.5D, 0.0D).add(rotateLocal(new Vec3(localOffset.getX(), localOffset.getY(), localOffset.getZ())));
 
         AABB cube = new AABB(center.x - 0.49D, center.y - 0.49D, center.z - 0.49D, center.x + 0.49D, center.y + 0.49D, center.z + 0.49D);
@@ -1510,6 +1529,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         return false;
     }
 
+
+    public record AttachmentPreview(BlockPos targetOffset, Direction face) {
+    }
 
     public static final class StructurePart {
         private final BlockPos offset;
