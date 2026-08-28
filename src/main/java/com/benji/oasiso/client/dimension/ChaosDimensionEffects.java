@@ -1,6 +1,5 @@
 package com.benji.oasiso.client.dimension;
 
-import com.benji.oasiso.client.dimension.ChaosSkyRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;

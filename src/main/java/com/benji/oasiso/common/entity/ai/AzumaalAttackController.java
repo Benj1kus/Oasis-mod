@@ -16,6 +16,8 @@ import com.benji.oasiso.common.entity.BattleHintArrowEntity;
 import com.benji.oasiso.common.entity.CircleHintEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public final class AzumaalAttackController {
@@ -36,6 +38,7 @@ public final class AzumaalAttackController {
     private int attackCooldown = OsirisRealmConfig.AZUMAAL_POST_SPAWN_ATTACK_COOLDOWN.get();
 
     private UUID targetId;
+    private UUID lastTargetId;
 
     private Vec3 prepareStep = Vec3.ZERO;
     private int prepareTicksRemaining;
@@ -77,6 +80,7 @@ public final class AzumaalAttackController {
         this.attackTick = 0;
         this.attackCooldown = OsirisRealmConfig.AZUMAAL_POST_SPAWN_ATTACK_COOLDOWN.get();
         this.targetId = null;
+        this.lastTargetId = null;
 
         clearMovement();
 
@@ -120,6 +124,8 @@ public final class AzumaalAttackController {
 
     private void startRandomAttack(ServerLevel level, ServerPlayer target) {
         this.targetId = target.getUUID();
+        this.lastTargetId = target.getUUID();
+
         clearMovement();
         this.throwConnected = false;
 
@@ -907,24 +913,110 @@ public final class AzumaalAttackController {
         this.returnTicksRemaining = 0;
     }
 
-    private ServerPlayer findNearestTarget(ServerLevel level) {
-        ServerPlayer nearest = null;
+    private ServerPlayer findNearestTarget(
+            ServerLevel level
+    ) {
+        double rangeSqr =
+                OsirisRealmConfig
+                        .AZUMAAL_TARGET_SEARCH_RANGE
+                        .get()
+                        * OsirisRealmConfig
+                        .AZUMAAL_TARGET_SEARCH_RANGE
+                        .get();
 
-        double nearestDistance = OsirisRealmConfig.AZUMAAL_TARGET_SEARCH_RANGE.get() * OsirisRealmConfig.AZUMAAL_TARGET_SEARCH_RANGE.get();
+        List<ServerPlayer> candidates =
+                new ArrayList<>();
 
-        for (ServerPlayer player : level.players()) {
+        for (ServerPlayer player :
+                level.players()) {
+
             if (!isValidTarget(player)) {
                 continue;
             }
 
-            double distance = boss.distanceToSqr(player);
-            if (distance >= nearestDistance) {
+            if (!boss.isEncounterParticipant(
+                    player
+            )) {
                 continue;
             }
-            nearest = player;
-            nearestDistance = distance;
+
+            if (boss.distanceToSqr(player)
+                    > rangeSqr) {
+
+                continue;
+            }
+
+            candidates.add(player);
         }
-        return nearest;
+
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
+        /*
+         * Multiplayer fairness:
+         * if at least two valid players are in the encounter, never select the
+         * exact same player for two attacks in a row. Among the remaining
+         * players the closest one still wins, so the boss keeps natural
+         * positioning instead of choosing somebody across the arena randomly.
+         */
+        ServerPlayer best = null;
+        double bestDistance =
+                Double.MAX_VALUE;
+
+        boolean canAvoidPrevious =
+                candidates.size() > 1
+                        && this.lastTargetId != null;
+
+        for (ServerPlayer player :
+                candidates) {
+
+            if (canAvoidPrevious
+                    && player.getUUID()
+                    .equals(
+                            this.lastTargetId
+                    )) {
+
+                continue;
+            }
+
+            double distance =
+                    boss.distanceToSqr(
+                            player
+                    );
+
+            if (distance >= bestDistance) {
+                continue;
+            }
+
+            best = player;
+            bestDistance = distance;
+        }
+
+        if (best != null) {
+            return best;
+        }
+
+        /*
+         * Fallback for the one-player case.
+         */
+        for (ServerPlayer player :
+                candidates) {
+
+            double distance =
+                    boss.distanceToSqr(
+                            player
+                    );
+
+            if (distance >= bestDistance) {
+                continue;
+            }
+
+            best = player;
+            bestDistance = distance;
+        }
+
+        return best;
     }
 
 
@@ -940,7 +1032,10 @@ public final class AzumaalAttackController {
     }
 
     private boolean isValidTarget(ServerPlayer player) {
-        return player.isAlive() && !player.isSpectator() && !player.isCreative();
+        return player.isAlive()
+                && !player.isSpectator()
+                && !player.isCreative()
+                && boss.isEncounterParticipant(player);
     }
 
     private int randomBetween(int minimum, int maximum) {
@@ -1065,6 +1160,10 @@ public final class AzumaalAttackController {
             tag.putUUID("Target", this.targetId);
         }
 
+        if (this.lastTargetId != null) {
+            tag.putUUID("LastTarget", this.lastTargetId);
+        }
+
         if (this.dashLanding != null) {
 
             tag.putBoolean("HasDashLanding", true);
@@ -1110,6 +1209,7 @@ public final class AzumaalAttackController {
         this.airChaseTicksRemaining = tag.getInt("AirChaseTicks");
         this.returnTicksRemaining = tag.getInt("ReturnTicks");
         this.targetId = tag.hasUUID("Target") ? tag.getUUID("Target") : null;
+        this.lastTargetId = tag.hasUUID("LastTarget") ? tag.getUUID("LastTarget") : null;
         if (tag.getBoolean("HasDashLanding")) {
             this.dashLanding = new Vec3(tag.getDouble("DashX"), tag.getDouble("DashY"), tag.getDouble("DashZ"));
         } else {

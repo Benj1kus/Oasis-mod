@@ -95,7 +95,11 @@ public final class ChaosDimensionClientEvents {
         spawnAtmosphere(minecraft.level, minecraft.player);
     }
     private static void updateBossArenaState(ClientLevel level, Player player) {
-        boolean insideArena = BossArenaEncounter.isInsideArenaArea(player.getUUID(), player.getX(), player.getZ());
+        boolean insideArena =
+                BossArenaEncounter.isInsideAnyArenaArea(
+                        player.getX(),
+                        player.getZ()
+                );
 
         boolean azumaalAlive = !level.getEntitiesOfClass(AzumaalEntity.class, player.getBoundingBox().inflate(AZUMAAL_PAUSE_RADIUS), azumaal -> azumaal.isAlive() && !azumaal.isClone()).isEmpty();
         boolean returnPortalExists = !level.getEntitiesOfClass(BossPortalEntity.class, player.getBoundingBox().inflate(RETURN_PORTAL_RADIUS), portal -> portal.isAlive() && portal.isChaosReturnPortal() && portal.getAnimState() != BossPortalEntity.STATE_DESPAWN).isEmpty();

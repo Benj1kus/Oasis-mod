@@ -28,9 +28,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBlockEntity> {
 
@@ -65,10 +62,8 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
             renderPart(entity, part.state(), part.offset().getX(), part.offset().getY(), part.offset().getZ(), poseStack, bufferSource, packedLight);
         }
 
-        renderOutline(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack);
-
-        for (EntropyPhysicsBlockEntity.StructurePart part : entity.getAttachedParts()) {
-            renderOutline(entity, part.state(), part.offset().getX(), part.offset().getY(), part.offset().getZ(), poseStack);
+        if (entity.getCarriedBlockState().getRenderShape() != RenderShape.MODEL) {
+            renderShapeFallback(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack, partialTick);
         }
 
         renderAttachmentPreview(entity, partialTick, poseStack);
@@ -97,26 +92,37 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         poseStack.popPose();
     }
 
-    private void renderOutline(EntropyPhysicsBlockEntity entity, BlockState state, int offsetX, int offsetY, int offsetZ, PoseStack poseStack) {
-        VoxelShape shape = state.getShape(entity.level(), entity.blockPosition(), CollisionContext.empty());
+    private void renderShapeFallback(EntropyPhysicsBlockEntity entity, BlockState state, int offsetX, int offsetY, int offsetZ, PoseStack poseStack, float partialTick) {
+        var shape = state.getShape(entity.level(), entity.blockPosition(), net.minecraft.world.phys.shapes.CollisionContext.empty());
 
         if (shape.isEmpty()) {
-            shape = Shapes.block();
+            shape = net.minecraft.world.phys.shapes.Shapes.block();
         }
 
+        float time = entity.tickCount + partialTick;
+
+        float pulse = 0.5F + 0.5F * net.minecraft.util.Mth.sin(time * 0.16F);
+        float green = 0.80F + pulse * 0.20F;
+        float blue = 0.88F + pulse * 0.12F;
+        float alpha = 0.72F + pulse * 0.28F;
+
         poseStack.pushPose();
+
         poseStack.translate(offsetX - 0.5D, offsetY - 0.5D, offsetZ - 0.5D);
 
         RenderType lineType = RenderType.lines();
+
         VertexConsumer lines = this.outlineBuffers.getBuffer(lineType);
 
         RenderSystem.enableDepthTest();
-        RenderSystem.lineWidth(4.5F);
+        RenderSystem.lineWidth(3.7F + pulse * 1.3F);
 
-        LevelRenderer.renderVoxelShape(poseStack, lines, shape, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, 1.0F, 1.0F, false);
+        LevelRenderer.renderVoxelShape(poseStack, lines, shape, 0.0D, 0.0D, 0.0D, 0.0F, green, blue, alpha, false);
 
         this.outlineBuffers.endBatch(lineType);
+
         RenderSystem.lineWidth(1.0F);
+
         poseStack.popPose();
     }
 
@@ -129,7 +135,7 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
 
         LocalPlayer player = minecraft.player;
 
-        if (player == null) {
+        if (player == null || player.isShiftKeyDown()) {
             return;
         }
 

@@ -11,7 +11,6 @@ import com.benji.oasiso.common.entity.GasterEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import com.benji.oasiso.common.dimension.BossArenaEncounter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;

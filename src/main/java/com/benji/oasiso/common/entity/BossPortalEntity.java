@@ -2,6 +2,7 @@ package com.benji.oasiso.common.entity;
 
 import com.benji.oasiso.Oasiso;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -9,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import com.benji.oasiso.common.dimension.BossPortalTransitionServer;
-import com.benji.oasiso.common.dimension.BossArenaEncounter;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.entity.EntityType;
@@ -24,6 +24,9 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
@@ -48,6 +51,8 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
     private static final String SPAWN_TICKS_TAG = "PortalSpawnTicks";
     private static final String PORTAL_PURPOSE_TAG = "PortalPurpose";
     private static final String BOSS_SPAWNED_TAG = "BossSpawned";
+    private static final String ARENA_SESSION_TAG = "ArenaSessionId";
+    private static final String ARENA_PREPARED_TAG = "ArenaPrepared";
 
     private static final String ANIM_STATE_TAG = "PortalAnimState";
 
@@ -55,9 +60,13 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     private int spawnTicks;
 
+    private UUID arenaSessionId;
+    private boolean arenaPrepared;
+
     public enum PortalPurpose {
         CHAOS, DOMINATION, CHAOS_RETURN
     }
+
     private boolean bossSpawned;
 
     public BossPortalEntity(EntityType<? extends Monster> type, Level level) {
@@ -107,8 +116,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     public boolean isChaosPortal() {
         PortalPurpose purpose = this.getPortalPurpose();
-        return purpose == PortalPurpose.CHAOS
-                || purpose == PortalPurpose.CHAOS_RETURN;
+        return purpose == PortalPurpose.CHAOS || purpose == PortalPurpose.CHAOS_RETURN;
     }
 
     public boolean isChaosEntryPortal() {
@@ -120,7 +128,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
     }
 
     public void startOpening() {
-        startOpening(PortalPurpose.DOMINATION);
+        startOpening(PortalPurpose.DOMINATION, null);
     }
 
     @Override
@@ -128,15 +136,64 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
     }
 
     public void startOpening(PortalPurpose purpose) {
+        startOpening(purpose, null);
+    }
+
+    public void startOpening(PortalPurpose purpose, UUID sessionId) {
         this.spawnTicks = 0;
         this.bossSpawned = false;
         this.despawnTicks = 0;
+
         this.setPortalPurpose(purpose);
+
+        if (purpose == PortalPurpose.CHAOS) {
+            this.arenaSessionId = sessionId != null ? sessionId : createChaosEntrySessionId();
+
+            this.arenaPrepared = false;
+        } else {
+            this.arenaSessionId = sessionId;
+            this.arenaPrepared = false;
+        }
+
         this.setAnimState(STATE_SPAWN);
         this.setNoGravity(true);
         this.setInvulnerable(true);
         this.noPhysics = true;
         this.setDeltaMovement(Vec3.ZERO);
+    }
+
+
+    private UUID createChaosEntrySessionId() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return this.getUUID();
+        }
+
+        BlockPos portalPos = BlockPos.containing(this.getX(), this.getY(), this.getZ());
+        long openingBucket = serverLevel.getGameTime() / 20L;
+
+        String identity = serverLevel.dimension().location().toString() + "|" + portalPos.asLong() + "|" + openingBucket;
+
+        return UUID.nameUUIDFromBytes(identity.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public UUID getOrCreateArenaSessionId() {
+        if (this.arenaSessionId == null) {
+            this.arenaSessionId = this.getUUID();
+        }
+
+        return this.arenaSessionId;
+    }
+
+    public UUID getArenaSessionId() {
+        return this.arenaSessionId;
+    }
+
+    public boolean isArenaPrepared() {
+        return this.arenaPrepared;
+    }
+
+    public void markArenaPrepared() {
+        this.arenaPrepared = true;
     }
 
     // types of portals
@@ -202,9 +259,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
             return;
         }
         for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, getTeleportArea(), candidate -> candidate.isAlive() && !candidate.isSpectator())) {
-            if (BossPortalTransitionServer.beginEnter(player, this)) {
-                return;
-            }
+            BossPortalTransitionServer.beginEnter(player, this);
         }
     }
 
@@ -213,19 +268,12 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
             return;
         }
         for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, getTeleportArea(), candidate -> candidate.isAlive() && !candidate.isSpectator())) {
-            if (BossPortalTransitionServer.beginReturn(player, this)) {
-                return;
-            }
+            BossPortalTransitionServer.beginReturn(player, this);
         }
     }
 
     private AABB getTeleportArea() {
-        return new AABB(this.getX() - 0.85D,
-                this.getY() - 0.20D,
-                this.getZ() - 0.85D,
-                this.getX() + 0.85D,
-                this.getY() + 2.5D,
-                this.getZ() + 0.85D);
+        return new AABB(this.getX() - 0.85D, this.getY() - 0.20D, this.getZ() - 0.85D, this.getX() + 0.85D, this.getY() + 2.5D, this.getZ() + 0.85D);
     }
 
     private boolean spawnAzumaal(ServerLevel level) {
@@ -237,6 +285,7 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
         boss.moveTo(this.getX(), hoverY, this.getZ(), this.getYRot(), 0.0F);
         boss.startSpawnSequence(hoverY);
         boss.setBossPortal(this);
+        boss.setArenaSessionId(this.arenaSessionId);
         level.addFreshEntity(boss);
 
         return true;
@@ -290,13 +339,17 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putInt(PORTAL_PURPOSE_TAG,
-                this.getPortalPurpose().ordinal());
+        tag.putInt(PORTAL_PURPOSE_TAG, this.getPortalPurpose().ordinal());
 
         tag.putInt(DESPAWN_TICKS_TAG, this.despawnTicks);
         tag.putInt(SPAWN_TICKS_TAG, this.spawnTicks);
         tag.putBoolean(BOSS_SPAWNED_TAG, this.bossSpawned);
         tag.putInt(ANIM_STATE_TAG, this.getAnimState());
+        tag.putBoolean(ARENA_PREPARED_TAG, this.arenaPrepared);
+
+        if (this.arenaSessionId != null) {
+            tag.putUUID(ARENA_SESSION_TAG, this.arenaSessionId);
+        }
     }
 
     @Override
@@ -307,6 +360,8 @@ public class BossPortalEntity extends Monster implements GeoEntity, GlowmaskEnti
         this.spawnTicks = tag.getInt(SPAWN_TICKS_TAG);
         this.bossSpawned = tag.getBoolean(BOSS_SPAWNED_TAG);
         this.setAnimState(tag.contains(ANIM_STATE_TAG) ? tag.getInt(ANIM_STATE_TAG) : STATE_SPAWN);
+        this.arenaPrepared = tag.getBoolean(ARENA_PREPARED_TAG);
+        this.arenaSessionId = tag.hasUUID(ARENA_SESSION_TAG) ? tag.getUUID(ARENA_SESSION_TAG) : null;
 
         if (tag.contains(PORTAL_PURPOSE_TAG)) {
             int purpose = tag.getInt(PORTAL_PURPOSE_TAG);

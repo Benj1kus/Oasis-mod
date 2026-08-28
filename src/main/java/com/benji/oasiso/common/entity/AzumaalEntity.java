@@ -5,6 +5,7 @@ import com.benji.oasiso.config.OsirisRealmConfig;
 import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.effect.ChaosChamberManager;
+import com.benji.oasiso.common.dimension.BossArenaEncounter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -25,6 +26,9 @@ import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.network.chat.Component;
@@ -126,8 +130,8 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private long pressureDefenseCooldownUntil;
     private long clientPressureShockwaveStartNanos;
 
-//bossbar
-private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translatable("entity.oasiso.azumaal"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    //bossbar
+    private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translatable("entity.oasiso.azumaal"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
 
     private final AzumaalAttackController attackController;
     private final AzumaalDeathManager deathManager;
@@ -139,12 +143,21 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
     private static final int INTRO_FAILSAFE_TICKS = 20 * 45;
 
     private boolean introLocked;
-    private boolean introPanelFinished;
-    private boolean introDialogueStarted;
-
     private int introDialogueTicks;
 
-    private UUID introPlayerId;
+    /*
+     * Multiplayer intro state is per player.
+     *
+     * Previously one mutable introPlayerId was overwritten by whichever client
+     * finished the spawn panel last. That made only one client receive dialogue
+     * and could leave the boss locked until the 45 second failsafe.
+     */
+    private final Set<UUID> introParticipants = new HashSet<>();
+    private final Set<UUID> introPanelFinishedPlayers = new HashSet<>();
+    private final Set<UUID> introDialogueStartedPlayers = new HashSet<>();
+    private final Set<UUID> introDialogueFinishedPlayers = new HashSet<>();
+
+    private UUID arenaSessionId;
 
     public AzumaalEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -160,16 +173,31 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 1500.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.4D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 22.0D)
-                .add(Attributes.FOLLOW_RANGE, LOOK_RANGE);
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 1500.0D).add(Attributes.MOVEMENT_SPEED, 0.4D).add(Attributes.KNOCKBACK_RESISTANCE, 1.0D).add(Attributes.ATTACK_DAMAGE, 22.0D).add(Attributes.FOLLOW_RANGE, LOOK_RANGE);
     }
 
     public void setBossPortal(BossPortalEntity portal) {
         this.deathManager.setPortal(portal);
+    }
+
+    public void setArenaSessionId(UUID sessionId) {
+        this.arenaSessionId = sessionId;
+    }
+
+    public UUID getArenaSessionId() {
+        return this.arenaSessionId;
+    }
+
+    public boolean isEncounterParticipant(ServerPlayer player) {
+        if (player == null || player.serverLevel() != this.level() || !player.isAlive() || player.isSpectator()) {
+            return false;
+        }
+
+        if (this.arenaSessionId == null) {
+            return true;
+        }
+
+        return BossArenaEncounter.isPlayerInSession(player, this.arenaSessionId);
     }
 
     public boolean isDeathSequenceActive() {
@@ -277,11 +305,12 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
         this.attackController.reset();
 
         this.introLocked = true;
-        this.introPanelFinished = false;
-        this.introDialogueStarted = false;
-
         this.introDialogueTicks = 0;
-        this.introPlayerId = null;
+
+        this.introParticipants.clear();
+        this.introPanelFinishedPlayers.clear();
+        this.introDialogueStartedPlayers.clear();
+        this.introDialogueFinishedPlayers.clear();
 
         this.setDefending(false);
         this.setDeathVisualTicks(0);
@@ -306,7 +335,7 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
             float progress = this.isDeathSequenceActive() || this.getMaxHealth() <= 0.0F ? 0.0F : this.getHealth() / this.getMaxHealth();
             this.bossEvent.setProgress(Mth.clamp(progress, 0.0F, 1.0F));
         }
-        if (!this.level().isClientSide && !this.isClone() && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide && !this.isClone() && this.level() instanceof ServerLevel serverLevel && this.tickCount % 10 == 0) {
             ChaosChamberManager.captureNearbyPlayers(serverLevel, this);
         }
         this.setNoGravity(true);
@@ -340,22 +369,17 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
                     this.setInvulnerable(true);
 
                     if (this.level() instanceof ServerLevel serverLevel) {
-                        tryStartIntroDialogue(
-                                serverLevel
-                        );
+                        collectIntroParticipants(serverLevel);
+                        tryStartIntroDialogues(serverLevel, false);
                     }
                 }
             }
             return;
         }
 
-        if (!this.level().isClientSide
-                && this.introLocked
-                && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide && this.introLocked && this.level() instanceof ServerLevel serverLevel) {
 
-            tickIntroDialogue(
-                    serverLevel
-            );
+            tickIntroDialogue(serverLevel);
 
             return;
         }
@@ -449,106 +473,218 @@ private final ServerBossEvent bossEvent = new ServerBossEvent(Component.translat
         lookAtPlayer(nearestPlayer, 5.0F);
     }
 // dialogue methods
-public void onIntroPanelFinished(ServerPlayer player) {
-    if (this.isClone() || !this.introLocked) {
-        return;
-    }
-    this.introPanelFinished = true;
-    this.introPlayerId = player.getUUID();
 
-    if (this.level() instanceof ServerLevel level) {
-        tryStartIntroDialogue(level);
-    }
-}
+    public void onIntroPanelFinished(ServerPlayer player) {
+        if (this.isClone() || !this.introLocked || !isIntroCandidate(player)) {
 
-
-    private void tryStartIntroDialogue(ServerLevel level) {
-        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished || this.getAnimState() == STATE_SPAWN) {
             return;
         }
 
-        ServerPlayer player = resolveIntroPlayer(level);
+        this.introParticipants.add(player.getUUID());
 
-        if (player == null) {
-            Player nearest = level.getNearestPlayer(this, 96.0D);
+        this.introPanelFinishedPlayers.add(player.getUUID());
 
-            if (nearest instanceof ServerPlayer serverPlayer) {
-                player = serverPlayer;
-                this.introPlayerId = serverPlayer.getUUID();
+        if (this.level() instanceof ServerLevel level) {
+
+            tryStartIntroDialogues(level, false);
+        }
+    }
+
+    private void collectIntroParticipants(ServerLevel level) {
+        double rangeSqr = 96.0D * 96.0D;
+
+        for (ServerPlayer player : level.players()) {
+
+            if (!isIntroCandidate(player)) {
+                continue;
             }
+
+            if (this.distanceToSqr(player) > rangeSqr) {
+
+                continue;
+            }
+
+            this.introParticipants.add(player.getUUID());
         }
-        if (player == null) {
+    }
+
+    private boolean isIntroCandidate(ServerPlayer player) {
+        if (player == null || player.serverLevel() != this.level() || !player.isAlive() || player.isSpectator()) {
+
+            return false;
+        }
+
+        if (this.arenaSessionId == null) {
+            return true;
+        }
+
+        return BossArenaEncounter.isPlayerInSession(player, this.arenaSessionId);
+    }
+
+    private void tryStartIntroDialogues(ServerLevel level, boolean forceWithoutPanel) {
+        if (!this.introLocked || this.getAnimState() == STATE_SPAWN) {
+
             return;
         }
 
-        this.introDialogueStarted = true;
-        this.introDialogueTicks = 0;
-        this.setInvulnerable(true);
-        this.setDeltaMovement(Vec3.ZERO);
+        collectIntroParticipants(level);
 
-        BossDialogueNetwork.startDialogue(player, this.getUUID(), "azumaal");
+        for (UUID playerId : new HashSet<>(this.introParticipants)) {
+
+            if (this.introDialogueStartedPlayers.contains(playerId)) {
+
+                continue;
+            }
+
+            if (!forceWithoutPanel && !this.introPanelFinishedPlayers.contains(playerId)) {
+
+                continue;
+            }
+
+            ServerPlayer player = level.getServer().getPlayerList().getPlayer(playerId);
+
+            if (player == null || !isIntroCandidate(player)) {
+
+                continue;
+            }
+
+            this.introDialogueStartedPlayers.add(playerId);
+
+            BossDialogueNetwork.startDialogue(player, this.getUUID(), "azumaal");
+        }
     }
 
     private void tickIntroDialogue(ServerLevel level) {
         this.setInvulnerable(true);
         this.setDeltaMovement(Vec3.ZERO);
         this.fallDistance = 0.0F;
-        ServerPlayer player = resolveIntroPlayer(level);
-
-        if (player != null) {
-            this.lookAtPlayer(player, 5.0F);
-        }
 
         this.introDialogueTicks++;
 
-        if (!this.introPanelFinished && this.introDialogueTicks >= 120) {
-            this.introPanelFinished = true;
-            tryStartIntroDialogue(level);
-            this.introDialogueTicks = 0;
+        if (this.introDialogueTicks % 10 == 0) {
+            collectIntroParticipants(level);
+            pruneUnavailableIntroParticipants(level);
+        }
+
+        boolean forceStart = this.introDialogueTicks >= 120;
+
+        tryStartIntroDialogues(level, forceStart);
+
+        ServerPlayer lookTarget = findClosestIntroParticipant(level);
+
+        if (lookTarget != null) {
+            this.lookAtPlayer(lookTarget, 5.0F);
+        }
+
+        if (!this.introParticipants.isEmpty() && allIntroParticipantsFinished()) {
+
+            finishIntroDialogueInternal();
             return;
         }
 
-        if (this.introDialogueStarted && this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
+        if (this.introParticipants.isEmpty() && this.introDialogueTicks >= 120) {
+
+            finishIntroDialogueInternal();
+            return;
+        }
+
+        if (this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
+
             finishIntroDialogueInternal();
         }
     }
 
+    private void pruneUnavailableIntroParticipants(ServerLevel level) {
+        Iterator<UUID> iterator = this.introParticipants.iterator();
 
-    private ServerPlayer resolveIntroPlayer(ServerLevel level) {
-        if (this.introPlayerId == null) {
-            return null;
+        while (iterator.hasNext()) {
+            UUID playerId = iterator.next();
+
+            ServerPlayer player = level.getServer().getPlayerList().getPlayer(playerId);
+
+            if (player != null && isIntroCandidate(player)) {
+
+                continue;
+            }
+
+            iterator.remove();
+            this.introPanelFinishedPlayers.remove(playerId);
+            this.introDialogueStartedPlayers.remove(playerId);
+            this.introDialogueFinishedPlayers.remove(playerId);
         }
-        ServerPlayer player = level.getServer().getPlayerList().getPlayer(this.introPlayerId);
-        if (player == null || player.serverLevel() != level) {
-            return null;
-        }
-        return player;
     }
 
+    private ServerPlayer findClosestIntroParticipant(ServerLevel level) {
+        ServerPlayer closest = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        for (UUID playerId : this.introParticipants) {
+
+            ServerPlayer player = level.getServer().getPlayerList().getPlayer(playerId);
+
+            if (player == null || !isIntroCandidate(player)) {
+
+                continue;
+            }
+
+            double distance = this.distanceToSqr(player);
+
+            if (distance >= closestDistance) {
+                continue;
+            }
+
+            closest = player;
+            closestDistance = distance;
+        }
+
+        return closest;
+    }
+
+    private boolean allIntroParticipantsFinished() {
+        for (UUID playerId : this.introParticipants) {
+            if (!this.introDialogueStartedPlayers.contains(playerId) || !this.introDialogueFinishedPlayers.contains(playerId)) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public void finishIntroDialogue(ServerPlayer player) {
-        if (!this.introLocked || !this.introDialogueStarted) {
-            return;
-        }
-        if (this.introPlayerId != null && !this.introPlayerId.equals(player.getUUID())) {
-            return;
-        }
-        finishIntroDialogueInternal();
-    }
+        if (!this.introLocked || player == null) {
 
+            return;
+        }
+
+        UUID playerId = player.getUUID();
+
+        if (!this.introParticipants.contains(playerId) && !this.introDialogueStartedPlayers.contains(playerId)) {
+
+            return;
+        }
+
+        this.introDialogueFinishedPlayers.add(playerId);
+
+        if (allIntroParticipantsFinished()) {
+            finishIntroDialogueInternal();
+        }
+    }
 
     private void finishIntroDialogueInternal() {
         this.introLocked = false;
-        this.introPanelFinished = false;
-        this.introDialogueStarted = false;
-
         this.introDialogueTicks = 0;
-        this.introPlayerId = null;
+
+        this.introParticipants.clear();
+        this.introPanelFinishedPlayers.clear();
+        this.introDialogueStartedPlayers.clear();
+        this.introDialogueFinishedPlayers.clear();
 
         this.setInvulnerable(false);
         this.setDeltaMovement(Vec3.ZERO);
 
         if (this.level() instanceof ServerLevel serverLevel) {
+
             ChaosChamberManager.captureNearbyPlayers(serverLevel, this);
         }
 
@@ -662,6 +798,13 @@ public void onIntroPanelFinished(ServerPlayer player) {
 
         tag.putFloat(HOVER_Y_TAG, this.entityData.get(HOVER_BASE_Y));
 
+        if (this.arenaSessionId != null) {
+            tag.putUUID("AzumaalArenaSession", this.arenaSessionId);
+        }
+
+        tag.putBoolean("AzumaalIntroLocked", this.introLocked);
+        tag.putInt("AzumaalIntroTicks", this.introDialogueTicks);
+
         this.deathManager.save(tag);
 
         if (!this.isClone()) {
@@ -695,13 +838,21 @@ public void onIntroPanelFinished(ServerPlayer player) {
         } else {
             this.entityData.set(HOVER_BASE_Y, (float) this.getY());
         }
+        this.arenaSessionId = tag.hasUUID("AzumaalArenaSession") ? tag.getUUID("AzumaalArenaSession") : null;
+
+        this.introLocked = tag.getBoolean("AzumaalIntroLocked");
+
+        this.introDialogueTicks = tag.getInt("AzumaalIntroTicks");
+
         this.setNoGravity(true);
-        this.setInvulnerable(this.getAnimState() == STATE_SPAWN);
+        this.setInvulnerable(this.getAnimState() == STATE_SPAWN || this.introLocked);
+
         this.deathManager.load(tag);
         if (!this.isClone()) {
             this.attackController.load(tag);
         }
     }
+
     public boolean hasBladeParticleAura() {
         int state = this.getAnimState();
         return state == STATE_ATTACK_THROW || state == STATE_AIR_THROW;
@@ -710,9 +861,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        AnimationController<AzumaalEntity> controller = new AnimationController<>(this,
-                "controller",
-                0,
+        AnimationController<AzumaalEntity> controller = new AnimationController<>(this, "controller", 0,
 
                 state -> {
                     return switch (this.getAnimState()) {
@@ -741,8 +890,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!this.isClone()
-                && this.introLocked) {
+        if (!this.isClone() && this.introLocked) {
             return false;
         }
         if (!this.isClone() && this.isDeathSequenceActive()) {
@@ -776,10 +924,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
                 if (actualDamage > 0.0F) {
                     DamageNumberSpawner.spawn(level, this, actualDamage);
 
-                    if (!this.isDeathSequenceActive()
-                            && source.getEntity() instanceof Player attackingPlayer
-                            && !attackingPlayer.isCreative()
-                            && !attackingPlayer.isSpectator()) {
+                    if (!this.isDeathSequenceActive() && source.getEntity() instanceof Player attackingPlayer && !attackingPlayer.isCreative() && !attackingPlayer.isSpectator()) {
                         registerPressureDefenseHit(level, actualDamage);
                     }
                 }
@@ -810,13 +955,11 @@ public void onIntroPanelFinished(ServerPlayer player) {
         this.pressureHitTicks.addLast(now);
         this.pressureDamageSamples.addLast(new PressureDamageSample(now, actualDamage));
 
-        while (!this.pressureHitTicks.isEmpty()
-                && now - this.pressureHitTicks.peekFirst() > PRESSURE_HIT_WINDOW_TICKS) {
+        while (!this.pressureHitTicks.isEmpty() && now - this.pressureHitTicks.peekFirst() > PRESSURE_HIT_WINDOW_TICKS) {
             this.pressureHitTicks.removeFirst();
         }
 
-        while (!this.pressureDamageSamples.isEmpty()
-                && now - this.pressureDamageSamples.peekFirst().tick() > PRESSURE_DAMAGE_WINDOW_TICKS) {
+        while (!this.pressureDamageSamples.isEmpty() && now - this.pressureDamageSamples.peekFirst().tick() > PRESSURE_DAMAGE_WINDOW_TICKS) {
             this.pressureDamageSamples.removeFirst();
         }
 
@@ -844,14 +987,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
     private void performPressureShockwave(ServerLevel level) {
         level.broadcastEntityEvent(this, PRESSURE_SHOCKWAVE_EVENT);
 
-        level.playSound(
-                null,
-                this.blockPosition(),
-                SoundEvents.WARDEN_SONIC_BOOM,
-                SoundSource.HOSTILE,
-                0.85F,
-                1.25F
-        );
+        level.playSound(null, this.blockPosition(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 0.85F, 1.25F);
 
         double radiusSqr = PRESSURE_SHOCKWAVE_RADIUS * PRESSURE_SHOCKWAVE_RADIUS;
 
@@ -863,11 +999,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
                 continue;
             }
 
-            Vec3 away = new Vec3(
-                    player.getX() - this.getX(),
-                    0.0D,
-                    player.getZ() - this.getZ()
-            );
+            Vec3 away = new Vec3(player.getX() - this.getX(), 0.0D, player.getZ() - this.getZ());
 
             if (away.lengthSqr() < 0.0001D) {
                 Vec3 look = this.getLookAngle();
@@ -878,11 +1010,7 @@ public void onIntroPanelFinished(ServerPlayer player) {
                 away = new Vec3(0.0D, 0.0D, 1.0D);
             }
 
-            double push = Mth.lerp(
-                    this.getRandom().nextDouble(),
-                    PRESSURE_PUSH_MIN,
-                    PRESSURE_PUSH_MAX
-            );
+            double push = Mth.lerp(this.getRandom().nextDouble(), PRESSURE_PUSH_MIN, PRESSURE_PUSH_MAX);
 
             Vec3 horizontal = away.normalize().scale(push);
             Vec3 oldMovement = player.getDeltaMovement();

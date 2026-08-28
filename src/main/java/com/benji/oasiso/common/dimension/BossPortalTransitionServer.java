@@ -22,7 +22,7 @@ public final class BossPortalTransitionServer {
 
     private static final int TELEPORT_DELAY = 30;
 
-    private static final int POST_TELEPORT_HOLD = 4;
+    private static final int POST_TELEPORT_HOLD = 20;
 
     private static final Map<UUID, Transition> ACTIVE = new HashMap<>();
 
@@ -48,6 +48,14 @@ public final class BossPortalTransitionServer {
             return false;
         }
 
+        UUID playerSession = BossArenaEncounter.getArenaSessionId(player);
+
+        UUID portalSession = portal.getArenaSessionId();
+
+        if (portalSession != null && !portalSession.equals(playerSession)) {
+            return false;
+        }
+
         return begin(player, portal, TravelType.RETURN);
     }
 
@@ -57,7 +65,23 @@ public final class BossPortalTransitionServer {
             return true;
         }
 
-        ACTIVE.put(player.getUUID(), new Transition(type, portal.getUUID()));
+        UUID sessionId;
+
+        if (type == TravelType.ENTER) {
+            sessionId = portal.getOrCreateArenaSessionId();
+        } else {
+            sessionId = portal.getArenaSessionId();
+
+            if (sessionId == null) {
+                sessionId = BossArenaEncounter.getArenaSessionId(player);
+            }
+        }
+
+        if (sessionId == null) {
+            return false;
+        }
+
+        ACTIVE.put(player.getUUID(), new Transition(type, portal.getUUID(), sessionId));
 
         BossPortalTransitionNetwork.send(player, BossPortalTransitionS2CPacket.Action.CLOSE);
 
@@ -118,7 +142,7 @@ public final class BossPortalTransitionServer {
         }
 
         return switch (transition.type) {
-            case ENTER -> BossArenaEncounter.enterArenaNow(player, portal);
+            case ENTER -> BossArenaEncounter.enterArenaNow(player, portal, transition.sessionId);
 
             case RETURN -> BossArenaEncounter.returnToEntranceNow(player, portal);
         };
@@ -163,13 +187,15 @@ public final class BossPortalTransitionServer {
 
         private final TravelType type;
         private final UUID portalId;
+        private final UUID sessionId;
 
         private int ticks;
         private boolean teleported;
 
-        private Transition(TravelType type, UUID portalId) {
+        private Transition(TravelType type, UUID portalId, UUID sessionId) {
             this.type = type;
             this.portalId = portalId;
+            this.sessionId = sessionId;
         }
     }
 }

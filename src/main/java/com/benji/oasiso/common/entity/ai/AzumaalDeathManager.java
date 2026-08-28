@@ -116,28 +116,62 @@ public final class AzumaalDeathManager {
         }
         portal.moveTo(portalPosition.x, portalPosition.y, portalPosition.z, 0.0F, 0.0F);
         level.addFreshEntity(portal);
-        portal.startOpening(BossPortalEntity.PortalPurpose.CHAOS_RETURN);
+        portal.startOpening(
+                BossPortalEntity.PortalPurpose.CHAOS_RETURN,
+                boss.getArenaSessionId()
+        );
 
         level.playSound(null, portal.getX(), portal.getY(), portal.getZ(), ModSounds.PORTAL_OPEN.get(), SoundSource.BLOCKS, 1.25F, 1.0F);
     }
 
     private ServerPlayer findArenaPlayer(ServerLevel level) {
 
-        ServerPlayer killer = resolveKiller(level);
-        if (killer != null && BossArenaEncounter.isArenaSession(killer)) {
+        UUID sessionId =
+                boss.getArenaSessionId();
+
+        ServerPlayer killer =
+                resolveKiller(level);
+
+        if (killer != null
+                && BossArenaEncounter.isArenaSession(killer)
+                && (sessionId == null
+                || BossArenaEncounter.isPlayerInSession(
+                killer,
+                sessionId
+        ))) {
+
             return killer;
         }
 
         ServerPlayer nearest = null;
+        double nearestDistance =
+                Double.MAX_VALUE;
 
-        double nearestDistance = Double.MAX_VALUE;
+        for (ServerPlayer player :
+                level.players()) {
 
-        for (ServerPlayer player : level.players()) {
-            if (!player.isAlive() || !BossArenaEncounter.isArenaSession(player)) {
+            if (!player.isAlive()
+                    || !BossArenaEncounter.isArenaSession(
+                    player
+            )) {
+
                 continue;
             }
 
-            double distance = boss.distanceToSqr(player);
+            if (sessionId != null
+                    && !BossArenaEncounter.isPlayerInSession(
+                    player,
+                    sessionId
+            )) {
+
+                continue;
+            }
+
+            double distance =
+                    boss.distanceToSqr(
+                            player
+                    );
+
             if (distance >= nearestDistance) {
                 continue;
             }

@@ -782,6 +782,61 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         return InteractionResult.CONSUME;
     }
 
+    public InteractionResult detachAttachedBlock(ServerLevel level, ServerPlayer player, InteractionHand hand, Vec3 localHit) {
+        if (!isNephritisCoated() || getMode() != MODE_SETTLED || localHit == null || this.attachedParts.isEmpty()) {
+
+            return InteractionResult.PASS;
+        }
+        Vec3 localRootCentered = new Vec3(localHit.x, localHit.y - 0.5D, localHit.z);
+
+        Vec3 structureHit = inverseRotateWorld(localRootCentered);
+
+        StructurePart selected = null;
+        double selectedDistance = Double.MAX_VALUE;
+        double rootDistance = structureHit.distanceToSqr(Vec3.ZERO);
+
+        for (StructurePart part : this.attachedParts) {
+
+            Vec3 center = new Vec3(part.offset.getX(), part.offset.getY(), part.offset.getZ());
+
+            double distance = structureHit.distanceToSqr(center);
+
+            if (distance < selectedDistance) {
+                selectedDistance = distance;
+                selected = part;
+            }
+        }
+
+        if (selected == null || rootDistance <= selectedDistance) {
+
+            return InteractionResult.FAIL;
+        }
+
+        this.attachedParts.remove(selected);
+        syncStructureData();
+
+        Vec3 worldPosition = this.position().add(0.0D, 0.5D, 0.0D).add(rotateLocal(new Vec3(selected.offset.getX(), selected.offset.getY(), selected.offset.getZ())));
+
+        level.playSound(null, worldPosition.x, worldPosition.y, worldPosition.z, selected.state.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.72F, 1.10F);
+
+        if (!player.getAbilities().instabuild) {
+            ItemStack returned = new ItemStack(selected.state.getBlock());
+
+            if (!returned.isEmpty() && !player.getInventory().add(returned)) {
+
+                player.drop(returned, false);
+            }
+        }
+
+        player.swing(hand, true);
+
+        player.getInventory().setChanged();
+
+        player.containerMenu.broadcastChanges();
+
+        return InteractionResult.CONSUME;
+    }
+
     public InteractionResult attachBlock(ServerLevel level, ServerPlayer player, InteractionHand hand, ItemStack heldStack, BlockItem blockItem, Vec3 localHit) {
         if (!isNephritisCoated() || getMode() != MODE_SETTLED) {
             return InteractionResult.PASS;
@@ -824,7 +879,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         return InteractionResult.CONSUME;
     }
-    
+
     public AttachmentPreview getAttachmentPreview(Level level, Vec3 localHit) {
         if (!isNephritisCoated() || getMode() != MODE_SETTLED || localHit == null || this.attachedParts.size() >= MAX_ATTACHED_BLOCKS) {
             return null;
@@ -1015,21 +1070,11 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     private boolean canReplaceForStructure(ServerLevel level, BlockPos pos, BlockState state) {
         BlockState replaced = level.getBlockState(pos);
-
-        if (!replaced.canBeReplaced() || !level.getFluidState(pos).isEmpty()) {
-            return false;
-        }
-
-        if (!state.canSurvive(level, pos)) {
-            return false;
-        }
-
-        AABB placeBox = new AABB(pos).deflate(0.035D);
-        return level.noCollision(this, placeBox);
+        return replaced.canBeReplaced() && level.getFluidState(pos).isEmpty();
     }
 
     private static void placeSinglePart(ServerLevel level, BlockPos pos, BlockState state, CompoundTag data) {
-        level.setBlock(pos, state, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+        level.setBlock(pos, state, Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS);
 
         restoreBlockEntityData(level, pos, state, data);
     }

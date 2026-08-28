@@ -1,6 +1,5 @@
 package com.benji.oasiso.client.layer;
 
-import com.benji.oasiso.client.model.AzumaalModel;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

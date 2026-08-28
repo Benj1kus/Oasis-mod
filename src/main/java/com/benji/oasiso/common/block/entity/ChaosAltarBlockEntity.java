@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import com.benji.oasiso.common.entity.BossPortalEntity;
+import com.benji.oasiso.common.dimension.BossArenaEncounter;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -133,8 +134,42 @@ public class ChaosAltarBlockEntity extends BlockEntity implements GeoBlockEntity
 
         portal.moveTo(pos.getX() + 0.5D, pos.getY() + 0.03D, pos.getZ() + 0.5D, 0.0F, 0.0F);
 
+        /*
+         * Configure synchronized portal state BEFORE adding the entity to the
+         * world. Remote clients should never observe a CHAOS portal for its
+         * first tracking packet as the default DOMINATION portal.
+         */
+        if (purpose == BossPortalEntity.PortalPurpose.DOMINATION
+                && level.dimension().equals(Oasiso.CHAOS_DIMENSION)) {
+
+            java.util.UUID sessionId =
+                    BossArenaEncounter.findNearbySessionId(
+                            level,
+                            portal.position(),
+                            240.0D
+                    );
+
+            portal.startOpening(
+                    purpose,
+                    sessionId
+            );
+        } else {
+            portal.startOpening(purpose);
+        }
+
         level.addFreshEntity(portal);
-        portal.startOpening(purpose);
+
+        /*
+         * Build/load the remote boss arena while the portal opening animation
+         * is still playing. By the time a party can step into the portal, the
+         * destination already exists server-side.
+         */
+        if (purpose == BossPortalEntity.PortalPurpose.CHAOS) {
+            BossArenaEncounter.prepareArenaForPortal(
+                    level.getServer(),
+                    portal
+            );
+        }
 
         level.playSound(null, portal.getX(), portal.getY(), portal.getZ(), ModSounds.PORTAL_OPEN.get(), SoundSource.BLOCKS, 1.25F, 1.0F);
     }
