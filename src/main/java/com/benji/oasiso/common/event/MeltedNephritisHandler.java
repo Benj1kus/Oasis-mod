@@ -99,15 +99,53 @@ public final class MeltedNephritisHandler {
 
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
-        if (!(event.getTarget() instanceof EntropyPhysicsBlockEntity physics) || !physics.isNephritisCoated() || !physics.isSettledPhysical()) {
+        if (!(event.getTarget() instanceof EntropyPhysicsBlockEntity physics)) {
             return;
         }
 
         ItemStack stack = event.getItemStack();
+        boolean glove = stack.getItem() instanceof EntropyChestplateGloveItem;
+        boolean settledCoated = physics.isNephritisCoated() && physics.isSettledPhysical();
+        if (glove) {
+            boolean detach = event.getEntity().isShiftKeyDown() && settledCoated;
 
-        boolean detach = event.getEntity().isShiftKeyDown();
+            if (!detach && !physics.canBeGrabbedWithGlove()) {
+                return;
+            }
 
-        boolean supported = detach || stack.getItem() instanceof EntropyChestplateGloveItem || stack.is(ModItems.MELTED_NEPHRITIS.get()) || stack.getItem() instanceof AxeItem || stack.getItem() instanceof BlockItem;
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+
+            if (event.getLevel().isClientSide) {
+                return;
+            }
+
+            if (!(event.getLevel() instanceof ServerLevel level) || !(event.getEntity() instanceof ServerPlayer player)) {
+                return;
+            }
+
+            boolean releasingCurrent = !detach && physics.isHeldBy(player) && physics.getUUID().equals(EntropyChestplateGloveItem.getHeldBlockId(stack));
+
+            InteractionResult result;
+
+            if (releasingCurrent) {
+                physics.releaseHolder(player);
+                result = InteractionResult.CONSUME;
+            } else if (detach) {
+                result = physics.detachAttachedBlock(level, player, event.getHand(), stack);
+            } else {
+                result = physics.grabWithGlove(player, event.getHand(), stack);
+            }
+
+            event.setCancellationResult(result);
+            return;
+        }
+
+        if (!settledCoated) {
+            return;
+        }
+
+        boolean supported = stack.is(ModItems.MELTED_NEPHRITIS.get()) || stack.getItem() instanceof AxeItem || stack.getItem() instanceof BlockItem;
 
         if (!supported) {
             return;
@@ -126,11 +164,7 @@ public final class MeltedNephritisHandler {
 
         InteractionResult result;
 
-        if (player.isShiftKeyDown()) {
-            result = physics.detachAttachedBlock(level, player, event.getHand(), event.getLocalPos());
-        } else if (stack.getItem() instanceof EntropyChestplateGloveItem) {
-            result = physics.pickupSettled(player, event.getHand(), stack);
-        } else if (stack.is(ModItems.MELTED_NEPHRITIS.get())) {
+        if (stack.is(ModItems.MELTED_NEPHRITIS.get())) {
             result = physics.bondCurrentStructure(level, player, stack);
         } else if (stack.getItem() instanceof AxeItem) {
             result = physics.removeNephritis(level, player, event.getHand(), stack);

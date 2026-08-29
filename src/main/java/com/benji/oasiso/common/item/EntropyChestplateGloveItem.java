@@ -93,7 +93,10 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
         EntropyPhysicsBlockEntity held = resolveHeldBlock(serverLevel, glove);
         if (held != null) {
-            held.releaseFromPlayer();
+            if (held.isHeldBy(serverPlayer)) {
+                held.releaseHolder(serverPlayer);
+            }
+
             clearHeldBlock(glove);
             syncInventory(serverPlayer);
             return InteractionResult.CONSUME;
@@ -119,15 +122,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
         EntropyPhysicsBlockEntity physicsBlock = new EntropyPhysicsBlockEntity(ModEntities.ENTROPY_PHYSICS_BLOCK.get(), serverLevel);
 
-        physicsBlock.initializeFromBlock(
-                state,
-                hardness,
-                blockEntityData,
-                serverPlayer,
-                context.getHand(),
-                pos,
-                nephritisCoated
-        );
+        physicsBlock.initializeFromBlock(state, hardness, blockEntityData, serverPlayer, context.getHand(), pos, nephritisCoated);
         if (sourceBlockEntity != null) {
             serverLevel.removeBlockEntity(pos);
         }
@@ -168,7 +163,10 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
             EntropyPhysicsBlockEntity held = resolveHeldBlock(serverLevel, glove);
 
             if (held != null) {
-                held.releaseFromPlayer();
+                if (held.isHeldBy(serverPlayer)) {
+                    held.releaseHolder(serverPlayer);
+                }
+
                 clearHeldBlock(glove);
                 syncInventory(serverPlayer);
                 return InteractionResultHolder.consume(glove);
@@ -182,6 +180,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
         return InteractionResultHolder.pass(glove);
     }
+
     public static boolean canLiftBlock(Level level, BlockPos pos, BlockState state) {
         if (!passesBaseLiftRules(level, pos, state)) {
             return false;
@@ -201,8 +200,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
     }
 
     public static boolean canAttachBlockState(Level level, BlockPos referencePos, BlockState state) {
-        return passesBaseLiftRules(level, referencePos, state)
-                && state.getRenderShape() == RenderShape.MODEL;
+        return passesBaseLiftRules(level, referencePos, state) && state.getRenderShape() == RenderShape.MODEL;
     }
 
     private static boolean passesBaseLiftRules(Level level, BlockPos pos, BlockState state) {
@@ -210,23 +208,12 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
             return false;
         }
 
-        if (state.is(Blocks.BEDROCK)
-                || state.is(Blocks.BARRIER)
-                || state.is(Blocks.STRUCTURE_BLOCK)
-                || state.is(Blocks.JIGSAW)
-                || state.is(Blocks.END_PORTAL)
-                || state.is(Blocks.END_GATEWAY)
-                || state.is(Blocks.END_PORTAL_FRAME)) {
+        if (state.is(Blocks.BEDROCK) || state.is(Blocks.BARRIER) || state.is(Blocks.STRUCTURE_BLOCK) || state.is(Blocks.JIGSAW) || state.is(Blocks.END_PORTAL) || state.is(Blocks.END_GATEWAY) || state.is(Blocks.END_PORTAL_FRAME)) {
             return false;
         }
 
         Block block = state.getBlock();
-        if (block instanceof TorchBlock
-                || block instanceof WallTorchBlock
-                || block instanceof DoorBlock
-                || block instanceof BedBlock
-                || block instanceof DoublePlantBlock
-                || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+        if (block instanceof TorchBlock || block instanceof WallTorchBlock || block instanceof DoorBlock || block instanceof BedBlock || block instanceof DoublePlantBlock || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
             return false;
         }
 

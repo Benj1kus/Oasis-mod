@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBlockEntity> {
 
@@ -66,6 +65,7 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
             renderShapeFallback(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack, partialTick);
         }
 
+        renderDetachmentPreview(entity, partialTick, poseStack);
         renderAttachmentPreview(entity, partialTick, poseStack);
 
         poseStack.popPose();
@@ -157,9 +157,7 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
             return;
         }
 
-        Vec3 localHit = entityHit.getLocation().subtract(entity.position());
-
-        EntropyPhysicsBlockEntity.AttachmentPreview preview = entity.getAttachmentPreview(entity.level(), localHit);
+        EntropyPhysicsBlockEntity.AttachmentPreview preview = entity.getAttachmentPreview(entity.level(), player);
 
         if (preview == null) {
             return;
@@ -202,6 +200,83 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         RenderSystem.disableBlend();
 
         poseStack.popPose();
+    }
+
+    private void renderDetachmentPreview(EntropyPhysicsBlockEntity entity, float partialTick, PoseStack poseStack) {
+        if (!entity.isNephritisCoated() || !entity.isSettledPhysical()) {
+            return;
+        }
+
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
+
+        if (player == null || !player.isShiftKeyDown()) {
+            return;
+        }
+
+        ItemStack glove = findFreeGlove(player);
+        if (glove.isEmpty()) {
+            return;
+        }
+
+        HitResult hitResult = minecraft.hitResult;
+        if (!(hitResult instanceof EntityHitResult entityHit) || entityHit.getEntity() != entity) {
+            return;
+        }
+
+        EntropyPhysicsBlockEntity.DetachmentPreview preview = entity.getDetachmentPreview(player);
+        if (preview == null) {
+            return;
+        }
+
+        int ox = preview.sourceOffset().getX();
+        int oy = preview.sourceOffset().getY();
+        int oz = preview.sourceOffset().getZ();
+
+        float time = entity.tickCount + partialTick;
+        float pulse = 0.5F + 0.5F * net.minecraft.util.Mth.sin(time * 0.42F);
+        float fillAlpha = 0.075F + pulse * 0.11F;
+        float lineAlpha = 0.64F + pulse * 0.36F;
+        float inset = 0.020F + (1.0F - pulse) * 0.012F;
+
+        poseStack.pushPose();
+        poseStack.translate(ox, oy, oz);
+
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+
+        RenderType fillType = RenderType.debugFilledBox();
+        VertexConsumer fill = this.previewBuffers.getBuffer(fillType);
+
+        LevelRenderer.addChainedFilledBoxVertices(poseStack, fill, -0.5F + inset, -0.5F + inset, -0.5F + inset, 0.5F - inset, 0.5F - inset, 0.5F - inset, 0.08F, 1.00F, 0.62F, fillAlpha);
+
+        this.previewBuffers.endBatch(fillType);
+
+        RenderType lineType = RenderType.lines();
+        VertexConsumer lines = this.outlineBuffers.getBuffer(lineType);
+        RenderSystem.lineWidth(4.8F + pulse * 2.2F);
+
+        LevelRenderer.renderLineBox(poseStack, lines, new AABB(-0.5D + inset, -0.5D + inset, -0.5D + inset, 0.5D - inset, 0.5D - inset, 0.5D - inset), 0.00F, 1.00F, 0.72F, lineAlpha);
+
+        this.outlineBuffers.endBatch(lineType);
+
+        RenderSystem.lineWidth(1.0F);
+        RenderSystem.disableBlend();
+        poseStack.popPose();
+    }
+
+    private static ItemStack findFreeGlove(LocalPlayer player) {
+        ItemStack main = player.getMainHandItem();
+        if (main.getItem() instanceof EntropyChestplateGloveItem && !EntropyChestplateGloveItem.hasHeldBlock(main)) {
+            return main;
+        }
+
+        ItemStack off = player.getOffhandItem();
+        if (off.getItem() instanceof EntropyChestplateGloveItem && !EntropyChestplateGloveItem.hasHeldBlock(off)) {
+            return off;
+        }
+
+        return ItemStack.EMPTY;
     }
 
     private static ItemStack findHeldPlaceableBlock(LocalPlayer player) {
