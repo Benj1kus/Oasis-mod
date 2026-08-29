@@ -23,6 +23,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -76,6 +79,13 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
     private static final double HOVER_AMPLITUDE = 0.18D;
     private static final double HOVER_SPEED = 0.08D;
+
+    private static final double HOVER_GROUND_CLEARANCE = 2.0D;
+    private static final double HOVER_GROUND_SCAN = 8.0D;
+
+    private static final double HOVER_FALL_ACCELERATION = 0.018D;
+    private static final double HOVER_MAX_FALL_SPEED = 0.22D;
+
     private static final double LOOK_RANGE = 30.0D;
 
     //pressure defense
@@ -92,7 +102,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final EntityDataAccessor<Integer> ANIM_STATE = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.INT);
 
     private UUID cloneOwnerId;
-
+    private double hoverFallSpeed;
     private double cloneOffsetX;
     private double cloneOffsetZ;
 
@@ -458,11 +468,52 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
 
     private void tickHover() {
-        double hoverOffset = Math.sin(this.tickCount * HOVER_SPEED) * HOVER_AMPLITUDE;
-        double targetY = this.getHoverBaseY() + hoverOffset;
 
-        this.setPos(this.getX(), targetY, this.getZ());
+        double baseY = this.getHoverBaseY();
+
+        Double groundY = findGroundBelow(baseY);
+        if (groundY != null) {
+
+            double desiredBaseY = groundY + HOVER_GROUND_CLEARANCE;
+            if (desiredBaseY < baseY - 0.03D) {
+
+                this.hoverFallSpeed = Math.min(HOVER_MAX_FALL_SPEED, this.hoverFallSpeed + HOVER_FALL_ACCELERATION);
+
+                baseY = Math.max(desiredBaseY, baseY - this.hoverFallSpeed);
+
+                this.entityData.set(HOVER_BASE_Y, (float) baseY);
+
+            } else {
+
+                this.hoverFallSpeed = 0.0D;
+            }
+
+        } else {
+            this.hoverFallSpeed = Math.min(HOVER_MAX_FALL_SPEED, this.hoverFallSpeed + HOVER_FALL_ACCELERATION);
+
+            baseY -= this.hoverFallSpeed;
+
+            this.entityData.set(HOVER_BASE_Y, (float) baseY);
+        }
+
+        double hoverOffset = Math.sin(this.tickCount * HOVER_SPEED) * HOVER_AMPLITUDE;
+        this.setPos(this.getX(), baseY + hoverOffset, this.getZ());
         this.setDeltaMovement(Vec3.ZERO);
+    }
+
+    private Double findGroundBelow(double baseY) {
+
+        Vec3 start = new Vec3(this.getX(), baseY + 0.25D, this.getZ());
+        Vec3 end = new Vec3(this.getX(), baseY - HOVER_GROUND_SCAN, this.getZ());
+
+        BlockHitResult hit = this.level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+
+        if (hit.getType() == HitResult.Type.MISS) {
+
+            return null;
+        }
+
+        return hit.getLocation().y;
     }
 
     private void lookAtNearestPlayer(ServerLevel level) {

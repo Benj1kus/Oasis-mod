@@ -20,6 +20,8 @@ import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -39,6 +41,28 @@ public final class EntropyChestplateTurretHandler {
     private static final double CHAOS_BOMB_SPEED = 1.15D;
 
     private EntropyChestplateTurretHandler() {
+    }
+
+    @SubscribeEvent
+    public static void onPlayerAttack(AttackEntityEvent event) {
+        Player player = event.getEntity();
+
+        if (!(event.getTarget() instanceof LivingEntity target)) {
+            return;
+        }
+
+        ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
+
+        if (!(chest.getItem() instanceof EntropyChestplateItem)) {
+            return;
+        }
+
+        EntropyTurretHelper.rememberAttackedTarget(player, target);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        EntropyTurretHelper.clearRememberedTargets(event.getEntity());
     }
 
     @SubscribeEvent

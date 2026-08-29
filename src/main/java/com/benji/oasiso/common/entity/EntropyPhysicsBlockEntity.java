@@ -52,6 +52,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -114,6 +115,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private static final float TNT_EXPLOSION_SCALE = 1.55F;
     private static final float TNT_EXPLOSION_MAX = 13.0F;
     private static final int NOTE_IMPACT_COOLDOWN_TICKS = 3;
+    private static final int THROW_PLAYER_IMMUNITY_TICKS = 8;
 
     private static final int MAX_ATTACHED_BLOCKS = 64;
     private static final int MAX_STRUCTURE_RADIUS = 5;
@@ -144,6 +146,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private int hitCooldown;
     private int noteSequence;
     private int noteImpactCooldown;
+    private final Set<UUID> throwProtectedPlayers = new HashSet<>();
 
     private float visualYaw;
     private float visualYawO;
@@ -365,12 +368,6 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         StructurePhysicsProfile profile = getStructurePhysicsProfile();
         double liftRatio = getLiftRatio(profile.totalMass(), holders.size());
-
-        /*
-         * A structure that is too heavy does not simply refuse to move. It
-         * follows sluggishly and visibly sags. Additional players increase the
-         * combined lift ratio until normal control is restored.
-         */
         double sag = Mth.clamp((1.0D - liftRatio) * MAX_HEAVY_SAG, 0.0D, MAX_HEAVY_SAG);
         target = target.add(0.0D, -sag, 0.0D);
 
@@ -379,8 +376,6 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         double follow = Mth.clamp(baseFollow * Mth.clamp(liftRatio, 0.09D, 1.15D), MIN_HOLD_FOLLOW_FACTOR, 0.68D);
 
         Vec3 step = difference.scale(follow);
-
-        /* Very underpowered holders can drag a huge object, but cannot snap it upward. */
         if (liftRatio < 0.55D && step.y > 0.0D) {
             step = new Vec3(step.x, step.y * Mth.clamp(liftRatio / 0.55D, 0.08D, 1.0D), step.z);
         }
@@ -556,8 +551,14 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (!(entity instanceof LivingEntity) || !entity.isAlive() || entity == this) {
             return false;
         }
-        if (entity instanceof Player) {
-            return false;
+
+        if (entity instanceof Player player) {
+            if (player.isSpectator() || player.getAbilities().instabuild) {
+                return false;
+            }
+            if (this.freeTicks <= THROW_PLAYER_IMMUNITY_TICKS && this.throwProtectedPlayers.contains(player.getUUID())) {
+                return false;
+            }
         }
 
         ServerPlayer owner = this.level() instanceof ServerLevel level ? resolveOwner(level) : null;
@@ -954,6 +955,11 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         Vec3 velocity = look.scale(getThrowSpeed()).add(player.getDeltaMovement().scale(0.35D)).add(0.0D, THROW_UP_BONUS, 0.0D);
 
         this.setDeltaMovement(velocity);
+        this.throwProtectedPlayers.clear();
+        for (HolderControl holder : activeHolders) {
+            this.throwProtectedPlayers.add(holder.player().getUUID());
+        }
+
         clearOwnerReference(level);
 
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 0.8F, 1.15F);
@@ -1054,6 +1060,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         boolean alreadyControlled = !this.holderHands.isEmpty() && (getMode() == MODE_HELD || getMode() == MODE_PULLING);
 
         this.holderHands.put(player.getUUID(), handIndex);
+        this.throwProtectedPlayers.clear();
         if (this.ownerId == null) {
             this.ownerId = player.getUUID();
             this.heldHand = handIndex;
@@ -1914,7 +1921,6 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
         this.settledPoseChosen = false;
 
-        // Non-coated blocks keep exactly the old minimum 5 degree spin.
         double minSpin = isNephritisCoated() ? 0.8D : 5.0D;
         double speedFactor = isNephritisCoated() ? 13.0D : 11.0D;
         float spin = (float) Mth.clamp(minSpin + speed * speedFactor, minSpin, 24.0D);

@@ -8,21 +8,45 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class EntropyTurretHelper {
 
     public static final double RANGE = 15.0D;
+    private static final long ATTACKED_TARGET_MEMORY_TICKS = 20L * 5L;
 
     private static final double MUZZLE_SIDE_OFFSET = 7.75D / 16.0D;
     private static final double MUZZLE_FORWARD_OFFSET = 0.08D;
     private static final double MUZZLE_HEIGHT = 1.72D;
+
+    private static final Map<UUID, TargetMemory> ATTACKED_TARGETS = new HashMap<>();
 
     private EntropyTurretHelper() {
     }
 
     public enum Side {
         LEFT, RIGHT
+    }
+
+    public static void rememberAttackedTarget(Player player, LivingEntity target) {
+        if (target == player || !target.isAlive()) {
+            return;
+        }
+
+        long gameTime = player.level().getGameTime();
+
+        TargetMemory memory = ATTACKED_TARGETS.computeIfAbsent(player.getUUID(), ignored -> new TargetMemory());
+
+        memory.prepareForTime(gameTime);
+        memory.targets.put(target.getUUID(), gameTime + ATTACKED_TARGET_MEMORY_TICKS);
+    }
+
+    public static void clearRememberedTargets(Player player) {
+        ATTACKED_TARGETS.remove(player.getUUID());
     }
 
     public static TargetPair findTargets(Player player) {
@@ -64,6 +88,7 @@ public final class EntropyTurretHelper {
         if (nearest == null) {
             return new TargetPair(null, null);
         }
+
         return new TargetPair(nearest, secondNearest != null ? secondNearest : nearest);
     }
 
@@ -75,6 +100,14 @@ public final class EntropyTurretHelper {
     private static boolean isValidEnemy(Player player, LivingEntity entity) {
         if (entity == player || !entity.isAlive()) {
             return false;
+        }
+
+        if (entity instanceof Player targetPlayer && targetPlayer.isSpectator()) {
+            return false;
+        }
+
+        if (isRememberedTarget(player, entity)) {
+            return true;
         }
 
         if (!(entity instanceof Enemy)) {
@@ -90,6 +123,38 @@ public final class EntropyTurretHelper {
         }
 
         return true;
+    }
+
+    private static boolean isRememberedTarget(Player player, LivingEntity entity) {
+        TargetMemory memory = ATTACKED_TARGETS.get(player.getUUID());
+
+        if (memory == null) {
+            return false;
+        }
+
+        long gameTime = player.level().getGameTime();
+        memory.prepareForTime(gameTime);
+
+        Long expireTick = memory.targets.get(entity.getUUID());
+
+        if (expireTick == null) {
+            cleanupEmptyMemory(player, memory);
+            return false;
+        }
+
+        if (expireTick <= gameTime) {
+            memory.targets.remove(entity.getUUID());
+            cleanupEmptyMemory(player, memory);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void cleanupEmptyMemory(Player player, TargetMemory memory) {
+        if (memory.targets.isEmpty()) {
+            ATTACKED_TARGETS.remove(player.getUUID());
+        }
     }
 
     public static Vec3 getMuzzlePosition(Player player, Side side) {
@@ -135,5 +200,28 @@ public final class EntropyTurretHelper {
     }
 
     public record TargetPair(LivingEntity left, LivingEntity right) {
+    }
+
+    private static final class TargetMemory {
+
+        private final Map<UUID, Long> targets = new HashMap<>();
+        private long lastGameTime = Long.MIN_VALUE;
+
+        private void prepareForTime(long gameTime) {
+
+            if (this.lastGameTime != Long.MIN_VALUE && gameTime < this.lastGameTime) {
+                this.targets.clear();
+            }
+
+            this.lastGameTime = gameTime;
+
+            Iterator<Map.Entry<UUID, Long>> iterator = this.targets.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                if (iterator.next().getValue() <= gameTime) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 }
