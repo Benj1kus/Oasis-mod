@@ -44,6 +44,11 @@ public class ClientModEvents {
         );
 
         event.registerSpriteSet(
+                Oasiso.ARM_SMOKE.get(),
+                ArmSmokeParticle.Provider::new
+        );
+
+        event.registerSpriteSet(
                 Oasiso.CHAOS_BOMB_FIRE_SMOKE.get(),
                 ChaosBombFireSmokeParticle.Provider::new
         );

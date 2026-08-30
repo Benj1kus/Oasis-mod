@@ -78,6 +78,8 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_SPARKS = PARTICLES.register("chaos_bomb_sparks", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ENTROPY_GRAVITY_TRAIL = PARTICLES.register("entropy_gravity_trail", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> MELTED_SPLASH = PARTICLES.register("melted_splash", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ARM_SMOKE = PARTICLES.register("arm_smoke", () -> new SimpleParticleType(false));
+
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
             output.accept(item.get());
@@ -224,6 +226,10 @@ public class Oasiso {
     public static final RegistryObject<Item> SUPER_GOLD_CHESTPLATE = ModItems.SUPER_GOLD_CHESTPLATE;
     public static final RegistryObject<Item> SUPER_GOLD_LEGGINGS = ModItems.SUPER_GOLD_LEGGINGS;
     public static final RegistryObject<Item> SUPER_GOLD_BOOTS = ModItems.SUPER_GOLD_BOOTS;
+    public static final RegistryObject<Item> AZUMALIT_HELMET = ModItems.AZUMALIT_HELMET;
+    public static final RegistryObject<Item> AZUMALIT_CHESTPLATE = ModItems.AZUMALIT_CHESTPLATE;
+    public static final RegistryObject<Item> AZUMALIT_LEGGINGS = ModItems.AZUMALIT_LEGGINGS;
+    public static final RegistryObject<Item> AZUMALIT_BOOTS = ModItems.AZUMALIT_BOOTS;
     public static final RegistryObject<Item> CASSASIN_SPAWN_EGG = ModItems.CASSASIN_SPAWN_EGG;
     public static final RegistryObject<Item> CTANK_SPAWN_EGG = ModItems.CTANK_SPAWN_EGG;
     public static final RegistryObject<Item> CWARRIOR_SPAWN_EGG = ModItems.CWARRIOR_SPAWN_EGG;
