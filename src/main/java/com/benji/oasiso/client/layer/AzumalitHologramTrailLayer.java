@@ -28,6 +28,12 @@ public class AzumalitHologramTrailLayer extends GeoRenderLayer<AzumalitArmorItem
 
     private static final float MAX_ALPHA = 0.30F;
     private static final float MIN_ALPHA = 0.035F;
+    private static final double MIN_HOLOGRAM_DISTANCE = 0.25D;
+    private static final double MIN_HOLOGRAM_DISTANCE_SQR = MIN_HOLOGRAM_DISTANCE * MIN_HOLOGRAM_DISTANCE;
+    private static final double HOLOGRAM_BACK_OFFSET_MIN = 0.30D;
+    private static final double HOLOGRAM_BACK_OFFSET_MAX = 0.70D;
+
+    private static final double VERTICAL_TRAIL_SCALE = 0.55D;
 
     private final AzumalitArmorRenderer armorRenderer;
 
@@ -92,11 +98,18 @@ public class AzumalitHologramTrailLayer extends GeoRenderLayer<AzumalitArmorItem
             float green = ((rgb >> 8) & 0xFF) / 255.0F;
             float blue = (rgb & 0xFF) / 255.0F;
 
-            poseStack.pushPose();
-
             double deltaX = snapshot.position.x - currentX;
             double deltaY = snapshot.position.y - currentY;
             double deltaZ = snapshot.position.z - currentZ;
+
+            double distanceSqr = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+
+            if (distanceSqr < MIN_HOLOGRAM_DISTANCE_SQR) {
+                snapshotIndex++;
+                continue;
+            }
+
+            poseStack.pushPose();
 
             double yawRadians = Math.toRadians(currentYaw - 180.0F);
 
@@ -105,8 +118,12 @@ public class AzumalitHologramTrailLayer extends GeoRenderLayer<AzumalitArmorItem
 
             double localX = deltaX * cos - deltaZ * sin;
             double localZ = deltaX * sin + deltaZ * cos;
+            double backOffset = Mth.lerp(progress, HOLOGRAM_BACK_OFFSET_MIN, HOLOGRAM_BACK_OFFSET_MAX);
 
-            poseStack.translate(localX, deltaY, localZ);
+            localZ += backOffset;
+            double trailY = deltaY * VERTICAL_TRAIL_SCALE;
+
+            poseStack.translate(localX, trailY, localZ);
 
             poseStack.mulPose(Axis.YP.rotationDegrees(currentYaw - snapshot.bodyYaw));
 
