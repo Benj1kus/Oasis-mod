@@ -85,6 +85,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> SKELET_BELIEVER = BLOCKS.register("skelet_believer", () -> new SkeletBlock(BlockBehaviour.Properties.copy(Blocks.SOUL_SAND).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> SAND_GOOSE = BLOCKS.register("sand_goose", () -> new AnnoyingGooseBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(2.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> CHAOS_ALTAR = BLOCKS.register("chaos_altar", () -> new ChaosAltarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> MOUTH_POINT = BLOCKS.register("mouth_point", () -> new MouthPointBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(50.0F).requiresCorrectToolForDrops().noOcclusion().dynamicShape()));
     public static final RegistryObject<Block> TITANA_STATUE = BLOCKS.register("titana_statue", () -> new StatueBlock(TITANA_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE).strength(300.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> CACTOS = BLOCKS.register("cactos", () -> new CactosBlock(BlockBehaviour.Properties.copy(Blocks.CACTUS).noOcclusion().instabreak()));
 

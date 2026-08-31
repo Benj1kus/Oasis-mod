@@ -50,8 +50,6 @@ import java.util.function.Consumer;
 
 public class ChaosSpawnerBlockEntity extends BlockEntity {
 
-    // Радиус считается по X/Z. По Y оставляем узкую полосу,
-    // чтобы спавнеры на соседних этажах не включались одновременно.
     private static final double PLAYER_RADIUS = 40.0D;
     private static final double PLAYER_VERTICAL_RANGE = 4.0D;
 
@@ -73,38 +71,21 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
     private ChaosSpawnerBlock.Difficulty waveDifficulty = ChaosSpawnerBlock.Difficulty.NOVICE;
     private int rewardPopCooldown = 0;
 
-    private static final EquipmentSlot[] ARMOR_SLOTS = {
-            EquipmentSlot.HEAD,
-            EquipmentSlot.CHEST,
-            EquipmentSlot.LEGS,
-            EquipmentSlot.FEET
-    };
+    private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 
     public ChaosSpawnerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CHAOS_SPAWNER_BE.get(), pos, state);
     }
 
-    public static void serverTick(
-            Level level,
-            BlockPos pos,
-            BlockState state,
-            ChaosSpawnerBlockEntity blockEntity
-    ) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, ChaosSpawnerBlockEntity blockEntity) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
 
         blockEntity.tickRewardDispense(serverLevel, pos);
-
-        // После победы спавнер навсегда остаётся выключенным,
-        // пока сам блок не будет сломан/поставлен заново.
         if (blockEntity.completed) {
             if (state.getValue(ChaosSpawnerBlock.ACTIVE)) {
-                serverLevel.setBlock(
-                        pos,
-                        state.setValue(ChaosSpawnerBlock.ACTIVE, false),
-                        3
-                );
+                serverLevel.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, false), 3);
             }
             return;
         }
@@ -115,33 +96,18 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
 
         Player player = findNearestPlayer(serverLevel, pos);
         boolean active = state.getValue(ChaosSpawnerBlock.ACTIVE);
-
-        // Если волна уже была вызвана, новые мобы больше не создаются.
-        // ACTIVE в этот момент отвечает только за визуальное состояние блока.
         if (blockEntity.waveActive) {
             blockEntity.removeDeadWaveMobs(serverLevel);
 
             if (blockEntity.waveMobs.isEmpty()) {
-                blockEntity.completeWave(
-                        serverLevel,
-                        pos,
-                        state
-                );
+                blockEntity.completeWave(serverLevel, pos, state);
                 return;
             }
 
             if (player == null && active) {
-                serverLevel.setBlock(
-                        pos,
-                        state.setValue(ChaosSpawnerBlock.ACTIVE, false),
-                        3
-                );
+                serverLevel.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, false), 3);
             } else if (player != null && !active) {
-                serverLevel.setBlock(
-                        pos,
-                        state.setValue(ChaosSpawnerBlock.ACTIVE, true),
-                        3
-                );
+                serverLevel.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, true), 3);
             }
 
             return;
@@ -149,31 +115,18 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
 
         if (player == null) {
             if (active) {
-                serverLevel.setBlock(
-                        pos,
-                        state.setValue(ChaosSpawnerBlock.ACTIVE, false),
-                        3
-                );
+                serverLevel.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, false), 3);
             }
             return;
         }
 
         if (!active) {
-            serverLevel.setBlock(
-                    pos,
-                    state.setValue(ChaosSpawnerBlock.ACTIVE, true),
-                    3
-            );
+            serverLevel.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, true), 3);
 
             playActivationEffects(serverLevel, pos);
         }
 
-        blockEntity.beginWave(
-                serverLevel,
-                pos,
-                state.getValue(ChaosSpawnerBlock.DIFFICULTY),
-                player
-        );
+        blockEntity.beginWave(serverLevel, pos, state.getValue(ChaosSpawnerBlock.DIFFICULTY), player);
     }
 
     private static Player findNearestPlayer(ServerLevel level, BlockPos pos) {
@@ -182,14 +135,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         double centerZ = pos.getZ() + 0.5D;
         double maxHorizontalSqr = PLAYER_RADIUS * PLAYER_RADIUS;
 
-        AABB searchBox = new AABB(
-                centerX - PLAYER_RADIUS,
-                centerY - PLAYER_VERTICAL_RANGE,
-                centerZ - PLAYER_RADIUS,
-                centerX + PLAYER_RADIUS,
-                centerY + PLAYER_VERTICAL_RANGE,
-                centerZ + PLAYER_RADIUS
-        );
+        AABB searchBox = new AABB(centerX - PLAYER_RADIUS, centerY - PLAYER_VERTICAL_RANGE, centerZ - PLAYER_RADIUS, centerX + PLAYER_RADIUS, centerY + PLAYER_VERTICAL_RANGE, centerZ + PLAYER_RADIUS);
 
         Player nearest = null;
         double nearestDistance = Double.MAX_VALUE;
@@ -217,35 +163,11 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         double y = pos.getY() + 0.65D;
         double z = pos.getZ() + 0.5D;
 
-        level.playSound(
-                null,
-                pos,
-                SoundEvents.IRON_TRAPDOOR_OPEN,
-                SoundSource.BLOCKS,
-                1.1F,
-                0.75F
-        );
-
-        level.sendParticles(
-                ParticleTypes.SOUL,
-                x,
-                y,
-                z,
-                45,
-                0.55D,
-                0.45D,
-                0.55D,
-                0.035D
-        );
+        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 1.1F, 0.75F);
+        level.sendParticles(ParticleTypes.SOUL, x, y, z, 45, 0.55D, 0.45D, 0.55D, 0.035D);
     }
 
-    private static void spawnWave(
-            ChaosSpawnerBlockEntity blockEntity,
-            ServerLevel level,
-            BlockPos origin,
-            ChaosSpawnerBlock.Difficulty difficulty,
-            Player triggerPlayer
-    ) {
+    private static void spawnWave(ChaosSpawnerBlockEntity blockEntity, ServerLevel level, BlockPos origin, ChaosSpawnerBlock.Difficulty difficulty, Player triggerPlayer) {
         List<SpawnEntry> directEntries = new ArrayList<>();
         Map<String, List<SpawnEntry>> randomGroups = new LinkedHashMap<>();
 
@@ -315,14 +237,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private static void spawnConfiguredEntry(
-            ChaosSpawnerBlockEntity blockEntity,
-            ServerLevel level,
-            BlockPos origin,
-            ChaosSpawnerBlock.Difficulty difficulty,
-            Player triggerPlayer,
-            SpawnEntry entry
-    ) {
+    private static void spawnConfiguredEntry(ChaosSpawnerBlockEntity blockEntity, ServerLevel level, BlockPos origin, ChaosSpawnerBlock.Difficulty difficulty, Player triggerPlayer, SpawnEntry entry) {
         EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(entry.entityId());
         if (entityType == null) {
             return;
@@ -336,27 +251,15 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
                 continue;
             }
 
-            Mob spawned = finishSpawn(
-                    blockEntity,
-                    level,
-                    origin,
-                    mob,
-                    configuredMob -> configureSpawnedMob(difficulty, configuredMob, triggerPlayer)
-            );
+            Mob spawned = finishSpawn(blockEntity, level, origin, mob, configuredMob -> configureSpawnedMob(difficulty, configuredMob, triggerPlayer));
 
-            if (spawned instanceof Spider spider
-                    && difficulty == ChaosSpawnerBlock.Difficulty.NORMAL
-                    && level.random.nextFloat() < 0.20F) {
+            if (spawned instanceof Spider spider && difficulty == ChaosSpawnerBlock.Difficulty.NORMAL && level.random.nextFloat() < 0.20F) {
                 spawnSpiderJockey(blockEntity, level, spider);
             }
         }
     }
 
-    private static void configureSpawnedMob(
-            ChaosSpawnerBlock.Difficulty difficulty,
-            Mob mob,
-            Player triggerPlayer
-    ) {
+    private static void configureSpawnedMob(ChaosSpawnerBlock.Difficulty difficulty, Mob mob, Player triggerPlayer) {
         if (mob instanceof SandGolemEntity golem) {
             golem.setPlayerCreated(false);
             golem.setSpawnerHostile(true);
@@ -390,33 +293,15 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private static <T extends Mob> T finishSpawn(
-            ChaosSpawnerBlockEntity blockEntity,
-            ServerLevel level,
-            BlockPos origin,
-            T mob,
-            Consumer<T> config
-    ) {
+    private static <T extends Mob> T finishSpawn(ChaosSpawnerBlockEntity blockEntity, ServerLevel level, BlockPos origin, T mob, Consumer<T> config) {
         BlockPos spawnPos = findSpawnPos(level, origin, mob);
         if (spawnPos == null) {
             return null;
         }
 
-        mob.moveTo(
-                spawnPos.getX() + 0.5D,
-                spawnPos.getY(),
-                spawnPos.getZ() + 0.5D,
-                level.random.nextFloat() * 360.0F,
-                0.0F
-        );
+        mob.moveTo(spawnPos.getX() + 0.5D, spawnPos.getY(), spawnPos.getZ() + 0.5D, level.random.nextFloat() * 360.0F, 0.0F);
 
-        mob.finalizeSpawn(
-                level,
-                level.getCurrentDifficultyAt(spawnPos),
-                MobSpawnType.TRIGGERED,
-                null,
-                null
-        );
+        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos), MobSpawnType.TRIGGERED, null, null);
 
         if (config != null) {
             config.accept(mob);
@@ -433,11 +318,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         return mob;
     }
 
-    private static BlockPos findSpawnPos(
-            ServerLevel level,
-            BlockPos origin,
-            Mob mob
-    ) {
+    private static BlockPos findSpawnPos(ServerLevel level, BlockPos origin, Mob mob) {
         RandomSource random = level.random;
         int[] yOffsets = {0, 1, -1, 2, -2, 3, -3};
 
@@ -464,13 +345,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
                     continue;
                 }
 
-                mob.moveTo(
-                        candidate.getX() + 0.5D,
-                        candidate.getY(),
-                        candidate.getZ() + 0.5D,
-                        0.0F,
-                        0.0F
-                );
+                mob.moveTo(candidate.getX() + 0.5D, candidate.getY(), candidate.getZ() + 0.5D, 0.0F, 0.0F);
 
                 if (level.noCollision(mob)) {
                     return candidate;
@@ -482,26 +357,9 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
     }
 
     private static void playSpawnEffects(ServerLevel level, Mob mob) {
-        level.sendParticles(
-                ParticleTypes.SOUL,
-                mob.getX(),
-                mob.getY() + mob.getBbHeight() * 0.5D,
-                mob.getZ(),
-                28,
-                Math.max(0.25D, mob.getBbWidth() * 0.45D),
-                Math.max(0.4D, mob.getBbHeight() * 0.35D),
-                Math.max(0.25D, mob.getBbWidth() * 0.45D),
-                0.035D
-        );
+        level.sendParticles(ParticleTypes.SOUL, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(), 28, Math.max(0.25D, mob.getBbWidth() * 0.45D), Math.max(0.4D, mob.getBbHeight() * 0.35D), Math.max(0.25D, mob.getBbWidth() * 0.45D), 0.035D);
 
-        level.playSound(
-                null,
-                mob.blockPosition(),
-                SoundEvents.EVOKER_PREPARE_SUMMON,
-                SoundSource.HOSTILE,
-                0.75F,
-                0.9F + level.random.nextFloat() * 0.2F
-        );
+        level.playSound(null, mob.blockPosition(), SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.HOSTILE, 0.75F, 0.9F + level.random.nextFloat() * 0.2F);
     }
 
     private static void spawnSpiderJockey(ChaosSpawnerBlockEntity blockEntity, ServerLevel level, Spider spider) {
@@ -512,21 +370,9 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
 
         BlockPos pos = spider.blockPosition();
 
-        skeleton.moveTo(
-                spider.getX(),
-                spider.getY(),
-                spider.getZ(),
-                spider.getYRot(),
-                0.0F
-        );
+        skeleton.moveTo(spider.getX(), spider.getY(), spider.getZ(), spider.getYRot(), 0.0F);
 
-        skeleton.finalizeSpawn(
-                level,
-                level.getCurrentDifficultyAt(pos),
-                MobSpawnType.TRIGGERED,
-                null,
-                null
-        );
+        skeleton.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.TRIGGERED, null, null);
 
         configureNormalSkeleton(skeleton);
 
@@ -539,26 +385,12 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private void beginWave(
-            ServerLevel level,
-            BlockPos origin,
-            ChaosSpawnerBlock.Difficulty difficulty,
-            Player triggerPlayer
-    ) {
+    private void beginWave(ServerLevel level, BlockPos origin, ChaosSpawnerBlock.Difficulty difficulty, Player triggerPlayer) {
         this.waveMobs.clear();
         this.waveActive = true;
         this.waveDifficulty = difficulty;
 
-        spawnWave(
-                this,
-                level,
-                origin,
-                difficulty,
-                triggerPlayer
-        );
-
-        // Если вообще ни одному мобу не удалось найти место для спавна,
-        // награда не выдаётся. На следующей проверке спавнер попробует снова.
+        spawnWave(this, level, origin, difficulty, triggerPlayer);
         if (this.waveMobs.isEmpty()) {
             this.waveActive = false;
         }
@@ -582,39 +414,22 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private void completeWave(
-            ServerLevel level,
-            BlockPos pos,
-            BlockState state
-    ) {
+    private void completeWave(ServerLevel level, BlockPos pos, BlockState state) {
         this.waveActive = false;
         this.completed = true;
         this.waveMobs.clear();
 
-        level.setBlock(
-                pos,
-                state.setValue(ChaosSpawnerBlock.ACTIVE, false),
-                3
-        );
+        level.setBlock(pos, state.setValue(ChaosSpawnerBlock.ACTIVE, false), 3);
 
         prepareRewards(level, pos, this.waveDifficulty);
         setChanged();
     }
 
-    private void prepareRewards(
-            ServerLevel level,
-            BlockPos pos,
-            ChaosSpawnerBlock.Difficulty difficulty
-    ) {
+    private void prepareRewards(ServerLevel level, BlockPos pos, ChaosSpawnerBlock.Difficulty difficulty) {
         ResourceLocation tableId = getRewardTable(difficulty);
         LootTable lootTable = level.getServer().getLootData().getLootTable(tableId);
 
-        LootParams params = new LootParams.Builder(level)
-                .withParameter(
-                        LootContextParams.ORIGIN,
-                        Vec3.atCenterOf(pos)
-                )
-                .create(LootContextParamSets.CHEST);
+        LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).create(LootContextParamSets.CHEST);
 
         this.rewardQueue.clear();
 
@@ -645,43 +460,14 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         double y = pos.getY() + 1.15D;
         double z = pos.getZ() + 0.5D;
 
-        ItemEntity item = new ItemEntity(
-                level,
-                x,
-                y,
-                z,
-                reward
-        );
+        ItemEntity item = new ItemEntity(level, x, y, z, reward);
 
         item.setDefaultPickUpDelay();
-        item.setDeltaMovement(
-                (level.random.nextDouble() - 0.5D) * 0.10D,
-                0.32D + level.random.nextDouble() * 0.08D,
-                (level.random.nextDouble() - 0.5D) * 0.10D
-        );
+        item.setDeltaMovement((level.random.nextDouble() - 0.5D) * 0.10D, 0.32D + level.random.nextDouble() * 0.08D, (level.random.nextDouble() - 0.5D) * 0.10D);
 
         level.addFreshEntity(item);
-
-        level.sendParticles(
-                ParticleTypes.LARGE_SMOKE,
-                x,
-                y,
-                z,
-                8,
-                0.16D,
-                0.08D,
-                0.16D,
-                0.015D
-        );
-
-        level.playSound(
-                null,
-                pos,
-                SoundEvents.ITEM_PICKUP,
-                SoundSource.BLOCKS,
-                0.65F,
-                1.15F + level.random.nextFloat() * 0.20F
-        );
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, 8, 0.16D, 0.08D, 0.16D, 0.015D);
+        level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.65F, 1.15F + level.random.nextFloat() * 0.20F);
 
         this.rewardPopCooldown = REWARD_POP_INTERVAL;
         setChanged();
@@ -774,10 +560,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
 
         if (random.nextFloat() < 0.45F) {
-            zombie.setItemSlot(
-                    EquipmentSlot.MAINHAND,
-                    new ItemStack(random.nextBoolean() ? Items.IRON_SWORD : Items.GOLDEN_SWORD)
-            );
+            zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(random.nextBoolean() ? Items.IRON_SWORD : Items.GOLDEN_SWORD));
         }
     }
 
@@ -803,11 +586,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
 
         if (random.nextFloat() < 0.65F) {
-            ItemStack sword = new ItemStack(
-                    random.nextFloat() < 0.75F
-                            ? Items.IRON_SWORD
-                            : Items.GOLDEN_SWORD
-            );
+            ItemStack sword = new ItemStack(random.nextFloat() < 0.75F ? Items.IRON_SWORD : Items.GOLDEN_SWORD);
 
             if (random.nextFloat() < 0.65F) {
                 sword = enchant(random, sword);
@@ -841,12 +620,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private static void equipRandomArmor(
-            Mob mob,
-            RandomSource random,
-            boolean allowDiamond,
-            boolean allowEnchantments
-    ) {
+    private static void equipRandomArmor(Mob mob, RandomSource random, boolean allowDiamond, boolean allowEnchantments) {
         int pieces = randomBetween(random, 2, 3);
         List<EquipmentSlot> available = new ArrayList<>(List.of(ARMOR_SLOTS));
 
@@ -862,21 +636,13 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
         }
     }
 
-    private static ItemStack createArmorPiece(
-            EquipmentSlot slot,
-            RandomSource random,
-            boolean allowDiamond
-    ) {
+    private static ItemStack createArmorPiece(EquipmentSlot slot, RandomSource random, boolean allowDiamond) {
         ArmorMaterial material;
 
         if (allowDiamond) {
-            material = random.nextFloat() < 0.15F
-                    ? ArmorMaterial.DIAMOND
-                    : ArmorMaterial.IRON;
+            material = random.nextFloat() < 0.15F ? ArmorMaterial.DIAMOND : ArmorMaterial.IRON;
         } else {
-            material = random.nextBoolean()
-                    ? ArmorMaterial.IRON
-                    : ArmorMaterial.GOLD;
+            material = random.nextBoolean() ? ArmorMaterial.IRON : ArmorMaterial.GOLD;
         }
 
         return switch (material) {
@@ -907,12 +673,7 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
     }
 
     private static ItemStack enchant(RandomSource random, ItemStack stack) {
-        return EnchantmentHelper.enchantItem(
-                random,
-                stack,
-                randomBetween(random, 5, 30),
-                false
-        );
+        return EnchantmentHelper.enchantItem(random, stack, randomBetween(random, 5, 30), false);
     }
 
     private static int randomBetween(RandomSource random, int min, int max) {
@@ -923,8 +684,6 @@ public class ChaosSpawnerBlockEntity extends BlockEntity {
     }
 
     private enum ArmorMaterial {
-        GOLD,
-        IRON,
-        DIAMOND
+        GOLD, IRON, DIAMOND
     }
 }

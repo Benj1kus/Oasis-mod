@@ -17,6 +17,10 @@ public class ArmSmokeParticle extends TextureSheetParticle {
     private final float spinSpeed;
 
     protected ArmSmokeParticle(ClientLevel level, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteSet sprites) {
+        this(level, x, y, z, velocityX, velocityY, velocityZ, sprites, 1.0F);
+    }
+
+    protected ArmSmokeParticle(ClientLevel level, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteSet sprites, float sizeScale) {
         super(level, x, y, z);
 
         this.sprites = sprites;
@@ -27,7 +31,8 @@ public class ArmSmokeParticle extends TextureSheetParticle {
 
         this.lifetime = 22 + this.random.nextInt(15);
 
-        this.baseSize = 0.18F + this.random.nextFloat() * 0.24F;
+        float normalizedScale = Math.max(0.05F, sizeScale);
+        this.baseSize = (0.18F + this.random.nextFloat() * 0.24F) * normalizedScale;
 
         this.quadSize = this.baseSize;
 

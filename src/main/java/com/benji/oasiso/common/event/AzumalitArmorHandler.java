@@ -2,6 +2,7 @@ package com.benji.oasiso.common.event;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.item.AzumalitArmorItem;
+import com.benji.oasiso.common.waypoint.AzumalitWaypointManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -189,6 +190,7 @@ public final class AzumalitArmorHandler {
         event.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
 
         cancelActiveArmAttack(player);
+        AzumalitWaypointManager.cancelCast(player);
 
         AzumalitArmorItem.triggerChestAnimation(player, AzumalitArmorItem.TRIGGER_DEFEND_PROJECTILE);
 
@@ -197,6 +199,7 @@ public final class AzumalitArmorHandler {
 
     private static void activateDefense(ServerPlayer player, ServerLevel level, long gameTime) {
         cancelActiveArmAttack(player);
+        AzumalitWaypointManager.cancelCast(player);
 
         CompoundTag data = player.getPersistentData();
 
@@ -262,6 +265,11 @@ public final class AzumalitArmorHandler {
         ServerLevel level = player.serverLevel();
         long gameTime = level.getGameTime();
 
+        if (AzumalitWaypointManager.isCasting(player) || AzumalitArmorItem.isWaypointAnimationActive(player)) {
+            cancelActiveArmAttack(player);
+            return;
+        }
+
         if (isDefenseActive(player, gameTime) || AzumalitArmorItem.isGuardAnimationActive(player)) {
 
             cancelActiveArmAttack(player);
@@ -287,7 +295,7 @@ public final class AzumalitArmorHandler {
         ServerLevel level = player.serverLevel();
         long gameTime = level.getGameTime();
 
-        if (isDefenseActive(player, gameTime) || AzumalitArmorItem.isGuardAnimationActive(player)) {
+        if (AzumalitWaypointManager.isCasting(player) || AzumalitArmorItem.isWaypointAnimationActive(player) || isDefenseActive(player, gameTime) || AzumalitArmorItem.isGuardAnimationActive(player)) {
             return;
         }
 
@@ -465,7 +473,7 @@ public final class AzumalitArmorHandler {
         return true;
     }
 
-    private static void cancelActiveArmAttack(ServerPlayer player) {
+    public static void cancelActiveArmAttack(ServerPlayer player) {
         clearActiveArmAttackData(player.getPersistentData());
     }
 

@@ -30,6 +30,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     public static final String TRIGGER_ATTACK_LEFT = "attack_left";
     public static final String TRIGGER_ATTACK_RIGHT = "attack_right";
     public static final String TRIGGER_ATTACK_BOTH = "attack_both";
+    public static final String TRIGGER_WAYPOINT = "waypont";
 
     public static final int ATTACK_MODE_NONE = 0;
     public static final int ATTACK_MODE_LEFT = 1;
@@ -45,8 +46,10 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     private static final int ARMOR_ANIMATION_ATTACK_LEFT = 3;
     private static final int ARMOR_ANIMATION_ATTACK_RIGHT = 4;
     private static final int ARMOR_ANIMATION_ATTACK_BOTH = 5;
+    private static final int ARMOR_ANIMATION_WAYPOINT = 6;
 
     public static final int ATTACK_ANIMATION_TICKS = 25;
+    public static final int WAYPOINT_ANIMATION_TICKS = 70;
     public static final int ATTACK_DAMAGE_KEY_TICK = 10;
 
     private static final int DEFEND_ANIMATION_TICKS = 40;
@@ -58,6 +61,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     private static final RawAnimation ATTACK_LEFT = RawAnimation.begin().thenPlay("attack_left");
     private static final RawAnimation ATTACK_RIGHT = RawAnimation.begin().thenPlay("attack_right");
     private static final RawAnimation ATTACK_BOTH = RawAnimation.begin().thenPlay("attack_both");
+    private static final RawAnimation WAYPOINT = RawAnimation.begin().thenPlay("waypont");
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -102,6 +106,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
             case ARMOR_ANIMATION_ATTACK_LEFT -> state.setAndContinue(ATTACK_LEFT);
             case ARMOR_ANIMATION_ATTACK_RIGHT -> state.setAndContinue(ATTACK_RIGHT);
             case ARMOR_ANIMATION_ATTACK_BOTH -> state.setAndContinue(ATTACK_BOTH);
+            case ARMOR_ANIMATION_WAYPOINT -> state.setAndContinue(WAYPOINT);
 
             default -> state.setAndContinue(IDLE);
         };
@@ -136,6 +141,9 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
         } else if (TRIGGER_ATTACK_BOTH.equals(animationName)) {
             animation = ARMOR_ANIMATION_ATTACK_BOTH;
             durationTicks = ATTACK_ANIMATION_TICKS;
+        } else if (TRIGGER_WAYPOINT.equals(animationName)) {
+            animation = ARMOR_ANIMATION_WAYPOINT;
+            durationTicks = WAYPOINT_ANIMATION_TICKS;
         } else {
             animation = ARMOR_ANIMATION_NONE;
             durationTicks = 0;
@@ -152,6 +160,10 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
         int animation = getActiveArmorAnimation(wearer);
 
         return animation == ARMOR_ANIMATION_DEFEND || animation == ARMOR_ANIMATION_DEFEND_PROJECTILE;
+    }
+
+    public static boolean isWaypointAnimationActive(LivingEntity wearer) {
+        return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_WAYPOINT;
     }
 
     public static int getAttackMode(LivingEntity wearer) {

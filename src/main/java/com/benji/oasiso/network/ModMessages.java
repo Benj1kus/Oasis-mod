@@ -23,6 +23,7 @@ public class ModMessages {
         net.messageBuilder(EntropyAmmoInsertPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyAmmoInsertPacket::new).encoder(EntropyAmmoInsertPacket::toBytes).consumerMainThread(EntropyAmmoInsertPacket::handle).add();
         net.messageBuilder(EntropyAmmoExtractPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyAmmoExtractPacket::new).encoder(EntropyAmmoExtractPacket::toBytes).consumerMainThread(EntropyAmmoExtractPacket::handle).add();
         net.messageBuilder(EntropyTurretTogglePacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyTurretTogglePacket::new).encoder(EntropyTurretTogglePacket::toBytes).consumerMainThread(EntropyTurretTogglePacket::handle).add();
+        net.messageBuilder(AzumalitWaypointRequestPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(AzumalitWaypointRequestPacket::new).encoder(AzumalitWaypointRequestPacket::toBytes).consumerMainThread(AzumalitWaypointRequestPacket::handle).add();
         net.messageBuilder(SuperGoldShockwavePacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(SuperGoldShockwavePacket::new).encoder(SuperGoldShockwavePacket::toBytes).consumerMainThread(SuperGoldShockwavePacket::handle).add();
     }
 

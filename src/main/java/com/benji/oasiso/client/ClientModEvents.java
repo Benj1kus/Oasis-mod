@@ -3,6 +3,7 @@ package com.benji.oasiso.client;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.particle.*;
 import com.benji.oasiso.client.renderer.*;
+import com.benji.oasiso.registry.ModBlockEntities;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import com.benji.oasiso.client.dimension.ChaosDimensionEffects;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
@@ -46,6 +47,11 @@ public class ClientModEvents {
         event.registerSpriteSet(
                 Oasiso.ARM_SMOKE.get(),
                 ArmSmokeParticle.Provider::new
+        );
+
+        event.registerSpriteSet(
+                Oasiso.MOUTH_SMOKE.get(),
+                MouthSmokeParticleProvider::new
         );
 
         event.registerSpriteSet(
@@ -267,6 +273,11 @@ public class ClientModEvents {
         event.registerBlockEntityRenderer(
                 Oasiso.CHAOS_ALTAR_BE.get(),
                 ChaosAltarRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.MOUTH_POINT_BE.get(),
+                MouthPointRenderer::new
         );
 
     }
