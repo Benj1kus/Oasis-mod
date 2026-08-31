@@ -46,6 +46,8 @@ public final class OasisoTooltipRenderer {
     private static final int PREVIEW_COLUMN_W = 34;
     private static final int PREVIEW_INNER_GAP = 5;
 
+    private static final int TOOLTIP_X_OFFSET = PREVIEW_COLUMN_W + PAD_X + 4;
+
     private static ItemStack lastHoveredStack = ItemStack.EMPTY;
     private static long hoverStartedAtMs;
     private static long lastTooltipFrameMs;
@@ -54,6 +56,16 @@ public final class OasisoTooltipRenderer {
     private static final float INTRO_DURATION_MS = 260.0F;
 
     private OasisoTooltipRenderer() {
+    }
+
+    @SubscribeEvent
+    public static void onTooltipPre(RenderTooltipEvent.Pre event) {
+        ItemStack stack = event.getItemStack();
+
+        if (!shouldUseCustomTooltip(stack)) {
+            return;
+        }
+        event.setX(event.getX() + TOOLTIP_X_OFFSET);
     }
 
     @SubscribeEvent
