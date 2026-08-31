@@ -45,6 +45,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> NEPHRITIS_POLISHED = BLOCKS.register("nephritis_polished", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_CORNER = BLOCKS.register("nephritis_corner", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_LINE = BLOCKS.register("nephritis_line", () -> new DirectionalPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(2.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> AZUMALIT_BLOCK = BLOCKS.register("azumalit_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).strength(10.0F).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> SANDSTONE_COLORED = BLOCKS.register("sandstone_colored", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_STRIPE = BLOCKS.register("sandstone_stripe", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
