@@ -83,13 +83,14 @@
   "item.oasiso.super_gold_leggings": "Karakol-um Leggings",
   "item.oasiso.super_gold_boots": "Karakol-um Boots",
 
-  "item.oasiso.azumalit_helmet": "Azumalit Helmet",
+  "item.oasiso.azumalit_helmet": "Azumalite Helmet",
   "item.oasiso.azumalit_chestplate": "Azumalit Chestplate",
-  "item.oasiso.azumalit_leggings": "Azumalit Leggings",
-  "item.oasiso.azumalit_boots": "Azumalit Boots",
+  "item.oasiso.azumalit_leggings": "Azumalite Leggings",
+  "item.oasiso.azumalit_boots": "Azumalite Boots",
 
-  "item.oasiso.azumalit_shard": "Azumalit Shard",
-  "item.oasiso.azumalit_upgrade": "Azumalit Upgrade",
+  "item.oasiso.azumalit_shard": "Azumalite Shard",
+  "item.oasiso.azumalit_upgrade": "Azumalite Upgrade",
+  "item.oasiso.azumalit_piece": "Piece of Azumalite",
 
   "item.oasiso.karakolit_ingot": "Karakolit Ingot",
   "item.oasiso.nephritis": "Nephritis",
@@ -176,7 +177,7 @@
 
   "key.categories.oasiso": "Oasiso",
   "key.oasiso.dialogue_editor": "Open Dialogue Studio",
-  "key.oasiso.azumalit_chain": "Azumalit Chain Attack",
+  "key.oasiso.azumalit_chain": "Azumalite Chain Attack",
 
   "tooltip.oasiso.azumalit_chestplate.line1": "SHIFT + RMB create Waypoint",
   "tooltip.oasiso.azumalit_chestplate.line2": "Press H for chain attack",
