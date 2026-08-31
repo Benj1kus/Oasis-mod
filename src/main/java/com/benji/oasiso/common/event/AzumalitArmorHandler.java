@@ -2,6 +2,7 @@ package com.benji.oasiso.common.event;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.item.AzumalitArmorItem;
+import com.benji.oasiso.common.chain.AzumalitChainManager;
 import com.benji.oasiso.common.waypoint.AzumalitWaypointManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -191,6 +192,7 @@ public final class AzumalitArmorHandler {
 
         cancelActiveArmAttack(player);
         AzumalitWaypointManager.cancelCast(player);
+        AzumalitChainManager.cancel(player);
 
         AzumalitArmorItem.triggerChestAnimation(player, AzumalitArmorItem.TRIGGER_DEFEND_PROJECTILE);
 
@@ -200,6 +202,7 @@ public final class AzumalitArmorHandler {
     private static void activateDefense(ServerPlayer player, ServerLevel level, long gameTime) {
         cancelActiveArmAttack(player);
         AzumalitWaypointManager.cancelCast(player);
+        AzumalitChainManager.cancel(player);
 
         CompoundTag data = player.getPersistentData();
 
@@ -265,7 +268,10 @@ public final class AzumalitArmorHandler {
         ServerLevel level = player.serverLevel();
         long gameTime = level.getGameTime();
 
-        if (AzumalitWaypointManager.isCasting(player) || AzumalitArmorItem.isWaypointAnimationActive(player)) {
+        if (AzumalitWaypointManager.isCasting(player)
+                || AzumalitArmorItem.isWaypointAnimationActive(player)
+                || AzumalitChainManager.isCasting(player)
+                || AzumalitArmorItem.isChainAnimationActive(player)) {
             cancelActiveArmAttack(player);
             return;
         }
@@ -295,7 +301,12 @@ public final class AzumalitArmorHandler {
         ServerLevel level = player.serverLevel();
         long gameTime = level.getGameTime();
 
-        if (AzumalitWaypointManager.isCasting(player) || AzumalitArmorItem.isWaypointAnimationActive(player) || isDefenseActive(player, gameTime) || AzumalitArmorItem.isGuardAnimationActive(player)) {
+        if (AzumalitWaypointManager.isCasting(player)
+                || AzumalitArmorItem.isWaypointAnimationActive(player)
+                || AzumalitChainManager.isCasting(player)
+                || AzumalitArmorItem.isChainAnimationActive(player)
+                || isDefenseActive(player, gameTime)
+                || AzumalitArmorItem.isGuardAnimationActive(player)) {
             return;
         }
 

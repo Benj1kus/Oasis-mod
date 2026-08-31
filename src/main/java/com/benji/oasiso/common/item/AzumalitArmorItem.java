@@ -2,13 +2,17 @@ package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.client.renderer.AzumalitArmorRenderer;
 import com.benji.oasiso.registry.ModItems;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -21,6 +25,8 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class AzumalitArmorItem extends ArmorItem implements GeoItem {
@@ -31,6 +37,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     public static final String TRIGGER_ATTACK_RIGHT = "attack_right";
     public static final String TRIGGER_ATTACK_BOTH = "attack_both";
     public static final String TRIGGER_WAYPOINT = "waypont";
+    public static final String TRIGGER_CHAIN = "chain";
 
     public static final int ATTACK_MODE_NONE = 0;
     public static final int ATTACK_MODE_LEFT = 1;
@@ -47,9 +54,11 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     private static final int ARMOR_ANIMATION_ATTACK_RIGHT = 4;
     private static final int ARMOR_ANIMATION_ATTACK_BOTH = 5;
     private static final int ARMOR_ANIMATION_WAYPOINT = 6;
+    private static final int ARMOR_ANIMATION_CHAIN = 7;
 
     public static final int ATTACK_ANIMATION_TICKS = 25;
     public static final int WAYPOINT_ANIMATION_TICKS = 70;
+    public static final int CHAIN_ANIMATION_TICKS = 50;
     public static final int ATTACK_DAMAGE_KEY_TICK = 10;
 
     private static final int DEFEND_ANIMATION_TICKS = 40;
@@ -62,6 +71,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     private static final RawAnimation ATTACK_RIGHT = RawAnimation.begin().thenPlay("attack_right");
     private static final RawAnimation ATTACK_BOTH = RawAnimation.begin().thenPlay("attack_both");
     private static final RawAnimation WAYPOINT = RawAnimation.begin().thenPlay("waypont");
+    private static final RawAnimation CHAIN = RawAnimation.begin().thenPlay("chain");
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -107,6 +117,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
             case ARMOR_ANIMATION_ATTACK_RIGHT -> state.setAndContinue(ATTACK_RIGHT);
             case ARMOR_ANIMATION_ATTACK_BOTH -> state.setAndContinue(ATTACK_BOTH);
             case ARMOR_ANIMATION_WAYPOINT -> state.setAndContinue(WAYPOINT);
+            case ARMOR_ANIMATION_CHAIN -> state.setAndContinue(CHAIN);
 
             default -> state.setAndContinue(IDLE);
         };
@@ -144,6 +155,9 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
         } else if (TRIGGER_WAYPOINT.equals(animationName)) {
             animation = ARMOR_ANIMATION_WAYPOINT;
             durationTicks = WAYPOINT_ANIMATION_TICKS;
+        } else if (TRIGGER_CHAIN.equals(animationName)) {
+            animation = ARMOR_ANIMATION_CHAIN;
+            durationTicks = CHAIN_ANIMATION_TICKS;
         } else {
             animation = ARMOR_ANIMATION_NONE;
             durationTicks = 0;
@@ -164,6 +178,25 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
 
     public static boolean isWaypointAnimationActive(LivingEntity wearer) {
         return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_WAYPOINT;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+
+        ArmorItem.Type type = this.getType();
+
+        switch (type) {
+            case CHESTPLATE -> {
+                tooltipComponents.add(Component.translatable("tooltip.oasiso.azumalit_chestplate.line1").withStyle(ChatFormatting.BLUE));
+                tooltipComponents.add(Component.translatable("tooltip.oasiso.azumalit_chestplate.line2").withStyle(ChatFormatting.AQUA));
+            }
+        }
+
+        tooltipComponents.add(Component.empty());
+    }
+
+    public static boolean isChainAnimationActive(LivingEntity wearer) {
+        return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_CHAIN;
     }
 
     public static int getAttackMode(LivingEntity wearer) {

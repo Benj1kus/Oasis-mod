@@ -12,6 +12,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import com.benji.oasiso.ModSounds;
 import net.minecraft.sounds.SoundSource;
+import com.benji.oasiso.common.chain.AzumalitChainManager;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -59,7 +60,7 @@ public final class AzumalitWaypointManager {
 
         long gameTime = player.serverLevel().getGameTime();
 
-        if (isCasting(player) || AzumalitArmorItem.isGuardAnimationActive(player) || AzumalitArmorItem.isWaypointAnimationActive(player)) {
+        if (isCasting(player) || AzumalitArmorItem.isGuardAnimationActive(player) || AzumalitArmorItem.isWaypointAnimationActive(player) || AzumalitChainManager.isCasting(player) || AzumalitArmorItem.isChainAnimationActive(player)) {
             return false;
         }
 

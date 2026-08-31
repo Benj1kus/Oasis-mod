@@ -1,0 +1,30 @@
+{
+  "vertex": "oasiso:azumalit_chain_target",
+  "fragment": "oasiso:azumalit_chain_target",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "OutlineMask"
+    },
+    {
+      "name": "PulseMask"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "TexelSize",
+      "type": "float",
+      "count": 2,
+      "values": [ 0.001, 0.001 ]
+    },
+    {
+      "name": "PulseStrength",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    }
+  ]
+}

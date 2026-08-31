@@ -65,6 +65,7 @@
   "block.oasiso.sand_goose": "Annoying Goose",
   "block.oasiso.wizard_eye": "Osiris core",
   "block.oasiso.wizard_column": "Osiris column",
+  "block.oasiso.mouth_point": "Nephritis saver",
 
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
@@ -175,6 +176,10 @@
 
   "key.categories.oasiso": "Oasiso",
   "key.oasiso.dialogue_editor": "Open Dialogue Studio",
+  "key.oasiso.azumalit_chain": "Azumalit Chain Attack",
+
+  "tooltip.oasiso.azumalit_chestplate.line1": "SHIFT + RMB create Waypoint",
+  "tooltip.oasiso.azumalit_chestplate.line2": "Press H for chain attack",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",
