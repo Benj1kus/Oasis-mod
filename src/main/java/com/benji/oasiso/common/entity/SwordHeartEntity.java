@@ -22,6 +22,8 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -138,6 +140,7 @@ public class SwordHeartEntity extends Monster implements GeoEntity, GlowmaskEnti
             return false;
         }
         this.destroyed = true;
+        level.playSound(null, this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ(), ModSounds.HEART_KILL.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         level.sendParticles(Oasiso.PURPLE_STARS.get(), this.getX(), this.getY() + this.getBbHeight() * 0.5D, this.getZ(), 35, 0.35D, 0.35D, 0.35D, 0.08D);
 
 

@@ -77,7 +77,7 @@ public final class AzumalitWaypointManager {
         data.putLong(DATA_CAST_END_AT, gameTime + WAYPOINT_ANIMATION_TICKS);
         data.putBoolean(DATA_CAST_SPAWN_DONE, false);
 
-        player.serverLevel().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), ModSounds.CAST.get(), SoundSource.PLAYERS, 1.15F, 1.0F);
+        player.serverLevel().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), ModSounds.SUMMON_CAST.get(), SoundSource.PLAYERS, 1.15F, 1.0F);
 
         AzumalitArmorItem.triggerChestAnimation(player, AzumalitArmorItem.TRIGGER_WAYPOINT);
         return true;

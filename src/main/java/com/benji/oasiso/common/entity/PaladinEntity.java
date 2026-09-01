@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.config.OsirisRealmConfig;
 
 import com.benji.oasiso.Oasiso;
@@ -12,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -30,6 +32,7 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
+import com.benji.oasiso.common.effect.SmellOfSinManager;
 
 import java.util.UUID;
 
@@ -56,11 +59,11 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int STATE_WAIT = 6;
     public static final int STATE_AWAKE = 7;
     public static final int STATE_DEATH = 8;
-// 1,25 sec
+    // 1,25 sec
     private static final int AWAKE_DURATION = 25;
 
     private static final EntityDataAccessor<Integer> ANIM_STATE = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.INT);
-//anims
+    //anims
     private static final RawAnimation WAIT_ANIMATION = RawAnimation.begin().thenLoop("wait");
     private static final RawAnimation AWAKE_ANIMATION = RawAnimation.begin().thenPlay("awake");
     private static final RawAnimation DEATH_ANIMATION = RawAnimation.begin().thenPlay("death");
@@ -96,12 +99,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 800.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.2D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 24.0D)
-                .add(Attributes.FOLLOW_RANGE, 30.0D);
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 800.0D).add(Attributes.MOVEMENT_SPEED, 0.2D).add(Attributes.KNOCKBACK_RESISTANCE, 1.0D).add(Attributes.ATTACK_DAMAGE, 24.0D).add(Attributes.FOLLOW_RANGE, 30.0D);
     }
 
 
@@ -114,11 +112,9 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     @Override
     protected void registerGoals() {
 
-        this.targetSelector.addGoal(1,
-                new NearestAttackableTargetGoal<>(this, Player.class, false, false));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, false, false));
 
-        this.goalSelector.addGoal(3,
-                new WaterAvoidingRandomStrollGoal(this, 0.8D));
+        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.8D));
     }
 
     @Override
@@ -191,23 +187,16 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
                 this.awakeTicks++;
 
                 if (this.awakeTicks >= AWAKE_DURATION) {
-                    this.awakeTicks =
-                            AWAKE_DURATION;
-                    this.setAnimState(
-                            STATE_IDLE
-                    );
+                    this.awakeTicks = AWAKE_DURATION;
+                    this.setAnimState(STATE_IDLE);
                 }
             }
             return;
         }
 
-        if (!this.level().isClientSide
-                && this.introLocked
-                && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide && this.introLocked && this.level() instanceof ServerLevel serverLevel) {
 
-            tickIntroDialogue(
-                    serverLevel
-            );
+            tickIntroDialogue(serverLevel);
 
             return;
         }
@@ -246,8 +235,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.setDeltaMovement(Vec3.ZERO);
         if (source.getEntity() instanceof Player player) {
 
-            this.introPlayerId =
-                    player.getUUID();
+            this.introPlayerId = player.getUUID();
 
             this.setTarget(player);
             this.lookAtPlayer(player, 180.0F);
@@ -272,8 +260,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
 
     private void tryStartIntroDialogue(ServerLevel level) {
-        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished
-                || this.getAnimState() != STATE_IDLE) {
+        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished || this.getAnimState() != STATE_IDLE) {
 
             return;
         }
@@ -352,18 +339,23 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
 
     private void finishIntroDialogueInternal() {
+        ServerPlayer combatPlayer = null;
+        if (this.level() instanceof ServerLevel level) {
+
+            combatPlayer = resolveIntroPlayer(level);
+        }
         this.introLocked = false;
         this.introPanelFinished = false;
         this.introDialogueStarted = false;
-
         this.introDialogueTicks = 0;
         this.introPlayerId = null;
 
         this.setAnimState(STATE_IDLE);
-
         this.setDeltaMovement(Vec3.ZERO);
-
         this.setNoAi(false);
+        if (combatPlayer != null) {
+            SmellOfSinManager.bindPlayer(combatPlayer, this);
+        }
     }
 
 // anim states
@@ -371,9 +363,11 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public int getAnimState() {
         return this.entityData.get(ANIM_STATE);
     }
+
     public void setAnimState(int state) {
         this.entityData.set(ANIM_STATE, state);
     }
+
     public boolean isDeathSequenceActive() {
 
         return this.getAnimState() == STATE_DEATH;
@@ -437,11 +431,11 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         if (this.isDeathSequenceActive()) {
             return;
         }
-
         if (!(this.level() instanceof ServerLevel level)) {
+
             return;
         }
-        //stop all
+        SmellOfSinManager.releasePlayers(level.getServer(), this.getUUID());
         this.combatController.prepareForDeath(level);
         this.deathManager.begin(level, source);
     }
@@ -472,11 +466,9 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public float applyQteBacklash(float amount) {
         float healthBefore = this.getHealth();
         this.invulnerableTime = 0;
-        super.hurt(this.damageSources().magic(),
-                amount);
+        super.hurt(this.damageSources().magic(), amount);
         this.invulnerableTime = 0;
-        return Math.max(0.0F,
-                healthBefore - this.getHealth());
+        return Math.max(0.0F, healthBefore - this.getHealth());
     }
 
 
@@ -505,9 +497,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         double rotatedX = local.x * cos - local.z * sin;
         double rotatedZ = local.x * sin + local.z * cos;
 
-        return new Vec3(this.getX() + rotatedX,
-                this.getY() + local.y,
-                this.getZ() + rotatedZ);
+        return new Vec3(this.getX() + rotatedX, this.getY() + local.y, this.getZ() + rotatedZ);
     }
 
     public boolean isSwordSplashActive() {
@@ -532,27 +522,24 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        AnimationController<PaladinEntity> controller = new AnimationController<>(this,
-                "controller",
-                0,
-                state -> {
-                    return switch (this.getAnimState()) {
-                        case STATE_WAIT -> state.setAndContinue(WAIT_ANIMATION);
-                        case STATE_AWAKE -> state.setAndContinue(AWAKE_ANIMATION);
-                        case STATE_DEATH -> state.setAndContinue(DEATH_ANIMATION);
-                        case STATE_SHIELD -> state.setAndContinue(SHIELD_ANIMATION);
-                        case STATE_ATTACK_1 -> state.setAndContinue(ATTACK_1_ANIMATION);
-                        case STATE_ATTACK_2 -> state.setAndContinue(ATTACK_2_ANIMATION);
-                        case STATE_SPIN_ATTACK -> state.setAndContinue(SPIN_ATTACK_ANIMATION);
-                        case STATE_GRAB -> state.setAndContinue(GRAB_ANIMATION);
-                        default -> {
-                            if (state.isMoving()) {
-                                yield state.setAndContinue(WALK_ANIMATION);
-                            }
-                            yield state.setAndContinue(IDLE_ANIMATION);
-                        }
-                    };
-                });
+        AnimationController<PaladinEntity> controller = new AnimationController<>(this, "controller", 0, state -> {
+            return switch (this.getAnimState()) {
+                case STATE_WAIT -> state.setAndContinue(WAIT_ANIMATION);
+                case STATE_AWAKE -> state.setAndContinue(AWAKE_ANIMATION);
+                case STATE_DEATH -> state.setAndContinue(DEATH_ANIMATION);
+                case STATE_SHIELD -> state.setAndContinue(SHIELD_ANIMATION);
+                case STATE_ATTACK_1 -> state.setAndContinue(ATTACK_1_ANIMATION);
+                case STATE_ATTACK_2 -> state.setAndContinue(ATTACK_2_ANIMATION);
+                case STATE_SPIN_ATTACK -> state.setAndContinue(SPIN_ATTACK_ANIMATION);
+                case STATE_GRAB -> state.setAndContinue(GRAB_ANIMATION);
+                default -> {
+                    if (state.isMoving()) {
+                        yield state.setAndContinue(WALK_ANIMATION);
+                    }
+                    yield state.setAndContinue(IDLE_ANIMATION);
+                }
+            };
+        });
 
         controller.setCustomInstructionKeyframeHandler(event -> {
             if (!this.level().isClientSide) {
@@ -576,9 +563,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        int state = tag.contains("AnimState")
-                ? tag.getInt("AnimState")
-                : STATE_WAIT;
+        int state = tag.contains("AnimState") ? tag.getInt("AnimState") : STATE_WAIT;
 
         this.setAnimState(state);
         this.awakeTicks = tag.getInt("AwakeTicks");
@@ -589,6 +574,27 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.setNoAi(state == STATE_WAIT || state == STATE_AWAKE || state == STATE_DEATH);
     }
 
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {
+                ModSounds.PALADIN_IDLE1.get(),
+                ModSounds.PALADIN_IDLE2.get(),
+                ModSounds.PALADIN_IDLE3.get()
+        };
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.PALADIN_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.PALADIN_DEATH.get();
+    }
 
     @Override
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {

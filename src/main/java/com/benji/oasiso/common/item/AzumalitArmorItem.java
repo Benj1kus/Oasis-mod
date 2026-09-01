@@ -199,6 +199,19 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
         return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_CHAIN;
     }
 
+    public static long getChainAnimationStartTick(LivingEntity wearer) {
+        if (!isChainAnimationActive(wearer)) {
+            return Long.MIN_VALUE;
+        }
+        ItemStack chest = wearer.getItemBySlot(EquipmentSlot.CHEST);
+        CompoundTag tag = chest.getTag();
+
+        if (tag == null) {
+            return Long.MIN_VALUE;
+        }
+        return tag.getLong(TAG_GUARD_ANIMATION_UNTIL) - CHAIN_ANIMATION_TICKS;
+    }
+
     public static int getAttackMode(LivingEntity wearer) {
         return switch (getActiveArmorAnimation(wearer)) {
             case ARMOR_ANIMATION_ATTACK_LEFT -> ATTACK_MODE_LEFT;

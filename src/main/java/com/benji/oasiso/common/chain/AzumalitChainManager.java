@@ -289,7 +289,7 @@ public final class AzumalitChainManager {
             if (target != null) {
                 float pitch = Math.min(2.0F, 0.82F + session.nextChimeIndex * 0.10F);
 
-                level.playSound(null, target.getX(), target.getY() + target.getBbHeight() * 0.55D, target.getZ(), ModSounds.TIMER.get(), SoundSource.PLAYERS, 1.25F, pitch);
+                level.playSound(null, target.getX(), target.getY() + target.getBbHeight() * 0.55D, target.getZ(), ModSounds.BOMB_SPAWN.get(), SoundSource.PLAYERS, 1.25F, pitch);
             }
 
             session.nextChimeIndex++;

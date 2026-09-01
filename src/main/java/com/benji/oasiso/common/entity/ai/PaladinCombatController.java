@@ -18,6 +18,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -158,7 +160,7 @@ public final class PaladinCombatController {
         if (boss.getRandom().nextBoolean()) {
             startTeleportSequence(level, target);
         } else {
-            startShieldAttack(target);
+            startShieldAttack(level, target);
         }
     }
 
@@ -261,7 +263,7 @@ public final class PaladinCombatController {
         this.attackCooldown = Math.max(this.attackCooldown, 20);
     }
 
-    private void startShieldAttack(ServerPlayer target) {
+    private void startShieldAttack(ServerLevel level, ServerPlayer target) {
         this.attackTick = 0;
         this.targetId = target.getUUID();
         this.qteActive = false;
@@ -271,6 +273,7 @@ public final class PaladinCombatController {
         boss.getNavigation().stop();
         boss.setDeltaMovement(0.0D, boss.getDeltaMovement().y, 0.0D);
         boss.setAnimState(PaladinEntity.STATE_SHIELD);
+        playBossSound(level, ModSounds.SWORD_SHIELD.get(), 1.0F, 1.0F);
         boss.lookAtPlayer(target, 180.0F);
     }
 
@@ -384,6 +387,8 @@ public final class PaladinCombatController {
         }
         // pal 2
         if (this.attackTick == ATTACK_2_DAMAGE_TICK) {
+            SoundEvent attackSound = boss.getRandom().nextBoolean() ? ModSounds.PALADIN_ATTACK1.get() : ModSounds.PALADIN_ATTACK2.get();
+            playBossSound(level, attackSound, 1.0F, 1.0F);
             performDirectAttack(target);
         }
         if (this.attackTick >= ATTACK_2_DURATION) {
@@ -393,6 +398,9 @@ public final class PaladinCombatController {
 
 
     private void tickSpinAttack(ServerLevel level, ServerPlayer target) {
+        if (this.attackTick == SPIN_START_TICK) {
+            playBossSound(level, ModSounds.HEART_KILL.get(), 1.0F, 1.0F);
+        }
         if (this.attackTick < SPIN_START_TICK) {
             boss.setDeltaMovement(0.0D, boss.getDeltaMovement().y, 0.0D);
             if (target != null) {
@@ -572,6 +580,7 @@ public final class PaladinCombatController {
     }
 
     private void performShockwaveAttack(ServerLevel level) {
+        playBossSound(level, ModSounds.PALADIN_SHOCK.get(), 1.0F, 1.0F);
         float damage = (float) boss.getAttributeValue(Attributes.ATTACK_DAMAGE);
         AABB area = boss.getBoundingBox().inflate(SHOCKWAVE_RADIUS);
         List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area, entity -> canShockwaveHit(entity));
@@ -706,6 +715,13 @@ public final class PaladinCombatController {
             return;
         }
         this.heartsDestroyed = Math.min(3, this.heartsDestroyed + 1);
+    }
+
+    private void playBossSound(ServerLevel level, SoundEvent sound, float volume, float pitch) {
+        level.playSound(null,
+                boss.getX(), boss.getY() + boss.getBbHeight() * 0.5D, boss.getZ(),
+                sound, SoundSource.HOSTILE,
+                volume, pitch);
     }
 
     public void save(CompoundTag parent) {

@@ -16,6 +16,9 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
@@ -31,6 +34,11 @@ public class MouthPointBlockEntity extends BlockEntity implements GeoBlockEntity
     private static final String TAG_SPAWN_UNTIL = "SpawnUntil";
 
     private static final int SPAWN_ANIMATION_TICKS = 49;
+
+    private static final int IDLE_SOUND_MIN_TICKS = 8 * 20;
+    private static final int IDLE_SOUND_MAX_TICKS = 18 * 20;
+
+    private long nextIdleSoundGameTime = Long.MIN_VALUE;
 
     private static final RawAnimation IDLE_ANIMATION = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation SPAWN_ANIMATION = RawAnimation.begin().thenPlay("spawn");
@@ -68,11 +76,42 @@ public class MouthPointBlockEntity extends BlockEntity implements GeoBlockEntity
         }
 
         this.spawnUntilGameTime = this.level.getGameTime() + SPAWN_ANIMATION_TICKS;
+        this.nextIdleSoundGameTime = this.spawnUntilGameTime + IDLE_SOUND_MIN_TICKS;
+
         this.sync();
 
         if (!this.level.isClientSide) {
+            this.level.playSound(null, this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 1.25D, this.worldPosition.getZ() + 0.5D, ModSounds.EYE_ATTACK.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
             this.triggerAnim(CONTROLLER_NAME, SPAWN_TRIGGER);
         }
+    }
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, MouthPointBlockEntity mouthPoint) {
+        if (level.isClientSide) {
+            return;
+        }
+        if (mouthPoint.isSpawnAnimationActive()) {
+            return;
+        }
+
+        long gameTime = level.getGameTime();
+        if (mouthPoint.nextIdleSoundGameTime == Long.MIN_VALUE) {
+
+            mouthPoint.scheduleNextIdleSound(level, gameTime);
+            return;
+        }
+
+        if (gameTime < mouthPoint.nextIdleSoundGameTime) {
+            return;
+        }
+        float pitch = 0.82F + level.random.nextFloat() * 0.36F;
+        level.playSound(null, pos.getX() + 0.5D, pos.getY() + 1.25D, pos.getZ() + 0.5D, ModSounds.MOUTH_IDLE.get(), SoundSource.BLOCKS, 0.85F, pitch);
+        mouthPoint.scheduleNextIdleSound(level, gameTime);
+    }
+
+    private void scheduleNextIdleSound(Level level, long gameTime) {
+        int delay = IDLE_SOUND_MIN_TICKS + level.random.nextInt(IDLE_SOUND_MAX_TICKS - IDLE_SOUND_MIN_TICKS + 1);
+        this.nextIdleSoundGameTime = gameTime + delay;
     }
 
     public boolean isSpawnAnimationActive() {

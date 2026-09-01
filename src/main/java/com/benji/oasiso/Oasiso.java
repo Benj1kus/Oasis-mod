@@ -310,6 +310,7 @@ public class Oasiso {
     public static final RegistryObject<MobEffect> ENTROPY_EFFECT = ModEffects.ENTROPY_EFFECT;
     public static final RegistryObject<MobEffect> BOMBUL_BUFF_EFFECT = ModEffects.BOMBUL_BUFF_EFFECT;
     public static final RegistryObject<MobEffect> CHAOS_CHAMBER_EFFECT = ModEffects.CHAOS_CHAMBER_EFFECT;
+    public static final RegistryObject<MobEffect> SMELL_OF_SIN_EFFECT = ModEffects.SMELL_OF_SIN_EFFECT;
 
     public Oasiso(FMLJavaModLoadingContext context) {
         context.registerConfig(

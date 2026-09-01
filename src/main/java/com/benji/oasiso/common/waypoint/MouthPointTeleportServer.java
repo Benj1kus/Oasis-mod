@@ -53,7 +53,9 @@ public final class MouthPointTeleportServer {
         }
 
         ACTIVE.put(player.getUUID(), new Transition(sourceRef, targetRef));
+        BossPortalTransitionNetwork.sendMouthUseSound(player);
         BossPortalTransitionNetwork.send(player, BossPortalTransitionS2CPacket.Action.CLOSE);
+
         return true;
     }
 

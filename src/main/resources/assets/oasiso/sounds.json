@@ -25,11 +25,25 @@
   "on_ea": { "sounds": [ "oasiso:on_ea" ] },
   "off_ea": { "sounds": [ "oasiso:off_ea" ] },
 
+  "mouth_idle": { "sounds": [ "oasiso:mouth_idle" ] },
+  "mouth_use": { "sounds": [ "oasiso:mouth_use" ] },
+
   "gaster": { "sounds": [ "oasiso:gaster" ] },
   "honk": { "sounds": [ "oasiso:honk" ] },
   "tower_place": { "sounds": [ "oasiso:tower_place" ] },
   "cast": { "sounds": [ "oasiso:cast" ] },
 
+  "paladin_idle1": { "sounds": [ "oasiso:paladin_idle1" ] },
+  "paladin_idle2": { "sounds": [ "oasiso:paladin_idle2" ] },
+  "paladin_idle3": { "sounds": [ "oasiso:paladin_idle3" ] },
+  "paladin_death": { "sounds": [ "oasiso:paladin_death" ] },
+  "paladin_shock": { "sounds": [ "oasiso:paladin_shock" ] },
+  "paladin_attack1": { "sounds": [ "oasiso:paladin_attack1" ] },
+  "paladin_attack2": { "sounds": [ "oasiso:paladin_attack2" ] },
+  "sword_shield": { "sounds": [ "oasiso:sword_shield" ] },
+  "heart_kill": { "sounds": [ "oasiso:heart_kill" ] },
+  "paladin_hurt": { "sounds": [ "oasiso:paladin_hurt" ] },
+  "paladin_theme": { "sounds": [ "oasiso:paladin_theme" ] },
 
   "azumaal_idle1": { "sounds": [ "oasiso:azumaal_idle1" ] },
   "azumaal_idle2": { "sounds": [ "oasiso:azumaal_idle2" ] },

@@ -16,6 +16,20 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
 
+    public static final RegistryObject<SoundEvent> PALADIN_THEME = registerSoundEvent("paladin_theme");
+    public static final RegistryObject<SoundEvent> PALADIN_IDLE1 = registerSoundEvent("paladin_idle1");
+    public static final RegistryObject<SoundEvent> PALADIN_IDLE2 = registerSoundEvent("paladin_idle2");
+    public static final RegistryObject<SoundEvent> PALADIN_IDLE3 = registerSoundEvent("paladin_idle3");
+    public static final RegistryObject<SoundEvent> PALADIN_ATTACK1 = registerSoundEvent("paladin_attack1");
+    public static final RegistryObject<SoundEvent> PALADIN_ATTACK2 = registerSoundEvent("paladin_attack2");
+    public static final RegistryObject<SoundEvent> PALADIN_DEATH = registerSoundEvent("paladin_death");
+    public static final RegistryObject<SoundEvent> PALADIN_SHOCK = registerSoundEvent("paladin_shock");
+    public static final RegistryObject<SoundEvent> SWORD_SHIELD = registerSoundEvent("sword_shield");
+    public static final RegistryObject<SoundEvent> HEART_KILL = registerSoundEvent("heart_kill");
+    public static final RegistryObject<SoundEvent> PALADIN_HURT = registerSoundEvent("paladin_hurt");
+
+    public static final RegistryObject<SoundEvent> MOUTH_USE = registerSoundEvent("mouth_use");
+    public static final RegistryObject<SoundEvent> MOUTH_IDLE = registerSoundEvent("mouth_idle");
 
     public static final RegistryObject<SoundEvent> GASTER = registerSoundEvent("gaster");
     public static final RegistryObject<SoundEvent> SANDSTORM = registerSoundEvent("sandstorm");

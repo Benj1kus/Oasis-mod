@@ -18,6 +18,18 @@ public final class BossPortalTransitionNetwork {
 
     public static void register() {
         CHANNEL.registerMessage(0, BossPortalTransitionS2CPacket.class, BossPortalTransitionS2CPacket::encode, BossPortalTransitionS2CPacket::decode, BossPortalTransitionS2CPacket::handle);
+        CHANNEL.registerMessage(1, MouthUseSoundS2CPacket.class, MouthUseSoundS2CPacket::encode, MouthUseSoundS2CPacket::decode, MouthUseSoundS2CPacket::handle);
+    }
+
+    public static void sendMouthUseSound(
+            ServerPlayer player
+    ) {
+        CHANNEL.send(
+                PacketDistributor.PLAYER.with(
+                        () -> player
+                ),
+                new MouthUseSoundS2CPacket()
+        );
     }
 
     public static void send(ServerPlayer player, BossPortalTransitionS2CPacket.Action action) {

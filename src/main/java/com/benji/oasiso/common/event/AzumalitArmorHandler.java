@@ -25,6 +25,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.benji.oasiso.ModSounds;
 
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +46,9 @@ public final class AzumalitArmorHandler {
 
     private static final int MAX_DEFENSES_BEFORE_COOLDOWN = 3;
     private static final int DEFENSE_COOLDOWN_TICKS = 60 * 20;
+
+    private static final int CHAIN_SUM_KEY_TICK = 17;
+    private static final String DATA_CHAIN_SUM_SOUND_START = "OasisoAzumalitChainSumSoundStart";
 
     private static final float PROJECTILE_REFLECT_CHANCE = 0.50F;
     private static final double PROJECTILE_REFLECT_SPEED_MULTIPLIER = 1.05D;
@@ -267,11 +271,8 @@ public final class AzumalitArmorHandler {
 
         ServerLevel level = player.serverLevel();
         long gameTime = level.getGameTime();
-
-        if (AzumalitWaypointManager.isCasting(player)
-                || AzumalitArmorItem.isWaypointAnimationActive(player)
-                || AzumalitChainManager.isCasting(player)
-                || AzumalitArmorItem.isChainAnimationActive(player)) {
+        tickChainSummonSound(level, player, gameTime);
+        if (AzumalitWaypointManager.isCasting(player) || AzumalitArmorItem.isWaypointAnimationActive(player) || AzumalitChainManager.isCasting(player) || AzumalitArmorItem.isChainAnimationActive(player)) {
             cancelActiveArmAttack(player);
             return;
         }
@@ -367,8 +368,12 @@ public final class AzumalitArmorHandler {
             data.putBoolean(DATA_ATTACK_DAMAGE_DONE, true);
 
             if (attackType == ATTACK_BOTH) {
+
+                level.playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), ModSounds.PALADIN_SHOCK.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 performStrongArmAttack(level, player);
+
             } else {
+                level.playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), ModSounds.SWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 performRegularArmAttack(level, player);
             }
         }
@@ -482,6 +487,26 @@ public final class AzumalitArmorHandler {
         }
 
         return true;
+    }
+
+    private static void tickChainSummonSound(ServerLevel level, ServerPlayer player, long gameTime) {
+        if (!AzumalitArmorItem.isChainAnimationActive(player)) {
+            return;
+        }
+        long animationStart = AzumalitArmorItem.getChainAnimationStartTick(player);
+        if (animationStart == Long.MIN_VALUE) {
+            return;
+        }
+        long soundAt = animationStart + CHAIN_SUM_KEY_TICK;
+        if (gameTime < soundAt) {
+            return;
+        }
+        CompoundTag data = player.getPersistentData();
+        if (data.contains(DATA_CHAIN_SUM_SOUND_START) && data.getLong(DATA_CHAIN_SUM_SOUND_START) == animationStart) {
+            return;
+        }
+        data.putLong(DATA_CHAIN_SUM_SOUND_START, animationStart);
+        level.playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), ModSounds.SUMMON_CAST.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     public static void cancelActiveArmAttack(ServerPlayer player) {

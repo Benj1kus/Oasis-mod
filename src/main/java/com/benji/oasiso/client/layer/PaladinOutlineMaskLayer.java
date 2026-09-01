@@ -20,9 +20,11 @@ public class PaladinOutlineMaskLayer extends GeoRenderLayer<PaladinEntity> {
 
     private final MultiBufferSource.BufferSource maskBuffers = MultiBufferSource.immediate(new BufferBuilder(512));
 
+
     public PaladinOutlineMaskLayer(GeoRenderer<PaladinEntity> renderer) {
         super(renderer);
     }
+
 
     @Override
     public void render(PoseStack poseStack, PaladinEntity entity, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
@@ -30,30 +32,33 @@ public class PaladinOutlineMaskLayer extends GeoRenderLayer<PaladinEntity> {
             return;
         }
 
-        renderSwordMask(poseStack, entity, bakedModel, partialTick, PaladinOutlineSystem.swordMask());
+        renderMask(poseStack, entity, bakedModel, partialTick, PaladinOutlineSystem.goldMask(), PaladinRenderer.OutlineMaskMode.GOLD);
+        renderMask(poseStack, entity, bakedModel, partialTick, PaladinOutlineSystem.swordMask(), PaladinRenderer.OutlineMaskMode.SWORD);
 
         PaladinOutlineSystem.markCaptured();
     }
 
-    private void renderSwordMask(PoseStack poseStack, PaladinEntity entity, BakedGeoModel model, float partialTick, RenderTarget target) {
+
+    private void renderMask(PoseStack poseStack, PaladinEntity entity, BakedGeoModel model, float partialTick, RenderTarget target, PaladinRenderer.OutlineMaskMode mode) {
         PaladinOutlineSystem.copySceneDepth(target);
         target.bindWrite(false);
 
         RenderSystem.enableDepthTest();
         RenderSystem.depthMask(false);
 
-        PaladinRenderer renderer = (PaladinRenderer) getRenderer();
 
-        renderer.setOutlineMaskMode(PaladinRenderer.OutlineMaskMode.SWORD);
+        PaladinRenderer renderer = (PaladinRenderer) getRenderer();
+        renderer.setOutlineMaskMode(mode);
 
         try {
-            RenderType type = RenderType.entityCutoutNoCull(renderer.getTextureLocation(entity));
+            RenderType maskRenderType = RenderType.entityCutoutNoCull(renderer.getTextureLocation(entity));
 
-            VertexConsumer maskBuffer = this.maskBuffers.getBuffer(type);
+            VertexConsumer maskBuffer = this.maskBuffers.getBuffer(maskRenderType);
 
-            renderer.reRender(model, poseStack, this.maskBuffers, entity, type, maskBuffer, partialTick, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            renderer.reRender(model, poseStack, this.maskBuffers, entity, maskRenderType, maskBuffer, partialTick, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                    1.0F, 1.0F, 1.0F, 1.0F);
 
-            this.maskBuffers.endBatch(type);
+            this.maskBuffers.endBatch(maskRenderType);
 
         } finally {
             renderer.clearOutlineMaskMode();
