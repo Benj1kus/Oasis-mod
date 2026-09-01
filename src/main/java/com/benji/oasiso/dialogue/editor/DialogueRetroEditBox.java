@@ -13,6 +13,7 @@ public final class DialogueRetroEditBox extends EditBox {
         setTextColorUneditable(DialogueRetroTheme.TEXT_MUTED);
     }
 
+
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
         String before = getValue();
@@ -20,11 +21,13 @@ public final class DialogueRetroEditBox extends EditBox {
         boolean handled = super.charTyped(codePoint, modifiers);
 
         if (handled && !before.equals(getValue())) {
+
             DialogueJuiceSound.typingClick();
         }
 
         return handled;
     }
+
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -33,6 +36,7 @@ public final class DialogueRetroEditBox extends EditBox {
         boolean handled = super.keyPressed(keyCode, scanCode, modifiers);
 
         if (handled && !before.equals(getValue())) {
+
             DialogueJuiceSound.typingClick();
         }
 
