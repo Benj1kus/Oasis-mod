@@ -918,15 +918,20 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
         button("Save Studio project", 0, b -> saveProject());
         button("Export datapack + resource pack", 1, b -> exportProject(false));
         button("Export and open folder", 2, b -> exportProject(true));
-        button("Install into current instance/world", 3, b -> {
+        button("Export for Mods", 3, b -> exportForMods());
+
+        button("Install into current instance/world", 4, b -> {
             try {
                 DialogueEditorExporter.installToCurrentInstance(project);
-                STATUS = minecraft.getSingleplayerServer() != null ? "Installed. Enable OasisoDialogue_* resource pack and run /reload." : "Resource pack installed locally. Datapack install requires singleplayer.";
+                STATUS = minecraft.getSingleplayerServer() != null
+                        ? "Installed. Enable OasisoDialogue_* resource pack and run /reload."
+                        : "Resource pack installed locally. Datapack install requires singleplayer.";
             } catch (Exception e) {
                 STATUS = "Install failed: " + e.getMessage();
             }
         });
-        button("Open Studio export folder", 4, b -> {
+
+        button("Open Studio export folder", 5, b -> {
             try {
                 Files.createDirectories(DialogueEditorWorkspace.exportsRoot());
                 Util.getPlatform().openFile(DialogueEditorWorkspace.exportsRoot().toFile());
@@ -935,15 +940,35 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
                 STATUS = "Could not open folder: " + e.getMessage();
             }
         });
-        button("Copy dialogue JSON to clipboard", 5, b -> {
+
+        button("Copy dialogue JSON to clipboard", 6, b -> {
             minecraft.keyboardHandler.setClipboard(DialogueRegistry.toJson(project.definition));
             STATUS = "Dialogue JSON copied to clipboard.";
         });
-        help(7, "IMPORTANT: project.json is NOT a datapack. It only lets Studio reopen your work.");
-        help(8, "Export creates editable folders plus datapack.zip and resourcepack.zip.");
-        help(9, "Export root: .minecraft/oasiso_dialogue_editor/exports/<namespace_dialogue>/");
-        help(10, "For testing: use Install in singleplayer, enable generated resource pack, then /reload.");
-        help(12, "Dedicated multiplayer servers cannot be written to from the client.");
+
+        help(8, "IMPORTANT: project.json is NOT a datapack. It only lets Studio reopen your work.");
+        help(9, "Export creates editable folders plus datapack.zip and resourcepack.zip.");
+        help(10, "Export for Mods creates ready data/ + assets/ folders. Copy them into your mod's src/main/resources.");
+        help(11, "Mod export is cumulative per namespace: more Dialogue Studio projects can be exported into the same template.");
+        help(13, "For testing: use Install in singleplayer, enable generated resource pack, then /reload.");
+    }
+
+    private void exportForMods() {
+        Path initial = minecraft.gameDirectory.toPath();
+
+        minecraft.setScreen(new DialogueEditorFilePickerScreen(this, initial, "", destination -> {
+            try {
+                var result = DialogueEditorExporter.exportForMod(project, destination);
+
+                STATUS = "Mod template ready: " + result.root();
+                showToast("Mod export complete  •  copy data + assets into src/main/resources");
+
+                Util.getPlatform().openFile(result.root().toFile());
+            } catch (Exception e) {
+                STATUS = "Mod export failed: " + e.getMessage();
+                showToast("Mod export failed");
+            }
+        }, true));
     }
 
     private void openZoneWorldEditor() {
@@ -2015,7 +2040,7 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
             case NODES -> 13;
             case ZONE -> 12;
             case GAMEPLAY -> 7;
-            case EXPORT -> 12;
+            case EXPORT -> 13;
         };
 
         int contentBottom = bodyTop + 38 + maxRow * rowSpacing + controlHeight + 10;
@@ -2260,6 +2285,8 @@ public final class DialogueEditorScreen extends DialogueRetroScreen {
 
     private static String tooltipText(String label) {
         String key = label != null ? label.toLowerCase(Locale.ROOT) : "";
+        if (key.startsWith("export for mods"))
+            return "Builds a mod-ready data/ + assets/ template for src/main/resources. No datapack/resourcepack installation is needed.";
         if (key.startsWith("save studio"))
             return "Saves project.json for reopening in Dialogue Studio. This is not the datapack used by Minecraft.";
         if (key.startsWith("quick export") || key.startsWith("export datapack") || key.startsWith("export and"))
