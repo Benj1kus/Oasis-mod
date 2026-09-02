@@ -1,13 +1,17 @@
 package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.Oasiso;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.constant.DataTickets;
@@ -19,6 +23,8 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
@@ -59,6 +65,20 @@ public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
                 return this.renderer;
             }
         });
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+
+        ArmorItem.Type type = this.getType();
+
+        switch (type) {
+            case CHESTPLATE -> {
+                tooltipComponents.add(Component.translatable("tooltip.oasiso.karak_chest").withStyle(ChatFormatting.GOLD));
+            }
+        }
+
+        tooltipComponents.add(Component.empty());
     }
 
     @Override

@@ -379,9 +379,13 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        Component gloveb = Component.translatable("tooltip.oasiso.glove")
+        Component glove = Component.translatable("tooltip.oasiso.glove")
                 .withStyle(ChatFormatting.AQUA);
-        tooltipComponents.add(gloveb);
+
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove2", glove)
+                .withStyle(ChatFormatting.DARK_AQUA));
+
+        tooltipComponents.add(glove);
     }
 
     private static void syncInventory(ServerPlayer player) {

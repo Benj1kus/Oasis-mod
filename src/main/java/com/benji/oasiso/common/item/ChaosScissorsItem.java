@@ -5,6 +5,8 @@ import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.dimension.PocketDimensionManager;
 import com.benji.oasiso.common.entity.ChaosPortalEntity;
 import com.benji.oasiso.registry.ModEntities;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -14,11 +16,15 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ChaosScissorsItem extends Item {
 
@@ -98,6 +104,17 @@ public class ChaosScissorsItem extends Item {
 
         player.getCooldowns().addCooldown(this, COOLDOWN_TICKS);
         return InteractionResultHolder.consume(stack);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        Component scis = Component.translatable("tooltip.oasiso.scis")
+                .withStyle(ChatFormatting.AQUA);
+
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.scis2", scis)
+                .withStyle(ChatFormatting.BLUE));
+
+        tooltipComponents.add(scis);
     }
 
 
