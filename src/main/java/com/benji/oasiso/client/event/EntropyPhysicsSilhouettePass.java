@@ -34,6 +34,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.opengl.GL11;
+import com.benji.oasiso.client.event.EntropyGloveFillRenderer;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class EntropyPhysicsSilhouettePass {
@@ -64,7 +65,7 @@ public final class EntropyPhysicsSilhouettePass {
         if (composite == null) {
             return;
         }
-        boolean foundAny = false;
+        boolean foundAny = EntropyGloveFillRenderer.hasVisibleSelection();
 
         for (Entity entity : minecraft.level.entitiesForRendering()) {
 
@@ -98,6 +99,8 @@ public final class EntropyPhysicsSilhouettePass {
 
         renderAllPhysicsMasks(minecraft, event);
         MASK_BUFFERS.endBatch();
+
+        EntropyGloveFillRenderer.renderSelectionMask(event);
 
         RenderSystem.polygonOffset(0.0F, 0.0F);
 

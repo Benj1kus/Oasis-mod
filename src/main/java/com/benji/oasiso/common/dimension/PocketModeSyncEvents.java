@@ -1,6 +1,7 @@
 package com.benji.oasiso.common.dimension;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.entity.ChaosPortalEntity;
 import com.benji.oasiso.network.ModMessages;
 import com.benji.oasiso.network.PocketModeS2CPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,6 +27,9 @@ public final class PocketModeSyncEvents {
     public static void onChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
+        }
+        if (event.getFrom().equals(Oasiso.CHAOS_DIMENSION) && !event.getTo().equals(Oasiso.CHAOS_DIMENSION)) {
+            ChaosPortalEntity.discardOwnedReturnPortals(player.getServer(), player.getUUID());
         }
         sync(player);
     }

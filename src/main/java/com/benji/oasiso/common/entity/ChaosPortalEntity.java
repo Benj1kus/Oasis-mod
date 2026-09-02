@@ -316,6 +316,39 @@ public class ChaosPortalEntity extends Entity {
         }
     }
 
+    public static void discardOwnedReturnPortals(MinecraftServer server, UUID playerId) {
+        java.util.List<ChaosPortalEntity> toRemove = new java.util.ArrayList<>();
+
+        for (ServerLevel level : server.getAllLevels()) {
+            for (Entity entity : level.getAllEntities()) {
+
+                if (!(entity instanceof ChaosPortalEntity portal)) {
+                    continue;
+                }
+
+                if (!portal.isAlive()) {
+                    continue;
+                }
+
+                if (!portal.isReturnPortal()) {
+                    continue;
+                }
+
+                if (!portal.belongsTo(playerId)) {
+                    continue;
+                }
+
+                toRemove.add(portal);
+            }
+        }
+
+
+        for (ChaosPortalEntity portal : toRemove) {
+
+            portal.discard();
+        }
+    }
+
     @Nullable
     public static ChaosPortalEntity findOwnedEntrancePortal(MinecraftServer server, UUID playerId) {
         for (ServerLevel level : server.getAllLevels()) {

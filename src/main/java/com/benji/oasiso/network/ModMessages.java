@@ -21,6 +21,9 @@ public class ModMessages {
         SimpleChannel net = NetworkRegistry.ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "messages")).networkProtocolVersion(() -> "1.0").clientAcceptedVersions(s -> true).serverAcceptedVersions(s -> true).simpleChannel();
 
         INSTANCE = net;
+        net.messageBuilder(EntropyGloveFillActionPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyGloveFillActionPacket::new).encoder(EntropyGloveFillActionPacket::toBytes).consumerMainThread(EntropyGloveFillActionPacket::handle).add();
+        net.messageBuilder(EntropyGloveFillSelectionSyncPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT).decoder(EntropyGloveFillSelectionSyncPacket::new).encoder(EntropyGloveFillSelectionSyncPacket::toBytes).consumerMainThread(EntropyGloveFillSelectionSyncPacket::handle).add();
+        net.messageBuilder(EntropyGloveFillAnimationPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT).decoder(EntropyGloveFillAnimationPacket::new).encoder(EntropyGloveFillAnimationPacket::toBytes).consumerMainThread(EntropyGloveFillAnimationPacket::handle).add();
         net.messageBuilder(PocketModeS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT).decoder(PocketModeS2CPacket::new).encoder(PocketModeS2CPacket::toBytes).consumerMainThread(PocketModeS2CPacket::handle).add();
         net.messageBuilder(EntropyGloveThrowPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyGloveThrowPacket::new).encoder(EntropyGloveThrowPacket::toBytes).consumerMainThread(EntropyGloveThrowPacket::handle).add();
         net.messageBuilder(EntropyAmmoSlotClickPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyAmmoSlotClickPacket::new).encoder(EntropyAmmoSlotClickPacket::toBytes).consumerMainThread(EntropyAmmoSlotClickPacket::handle).add();

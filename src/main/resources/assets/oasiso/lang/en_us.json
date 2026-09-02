@@ -180,9 +180,11 @@
   "key.categories.oasiso": "Oasiso",
   "key.oasiso.dialogue_editor": "Open Dialogue Studio",
   "key.oasiso.azumalit_chain": "Azumalite Chain Attack",
+  "key.oasiso.glove_fill_mode": "Fill mode",
 
   "tooltip.oasiso.azumalit_chestplate.line1": "SHIFT + RMB create Waypoint",
   "tooltip.oasiso.azumalit_chestplate.line2": "Press H for chain attack",
+  "tooltip.oasiso.glove": "Press N for Fill mode",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

@@ -147,6 +147,8 @@ public final class ChaosPocketTransitionServer {
 
         PocketDimensionManager.keepDestinationReady(chaos, platform.marker(), player);
 
+        ChaosPortalEntity.discardOwnedReturnPortals(server, player.getUUID());
+
         PocketTravelData.saveSource(player, entrance);
         entrance.setKeepAlive(true);
 
@@ -206,80 +208,39 @@ public final class ChaosPocketTransitionServer {
 
         UUID sourcePortalId = target.sourcePortal();
 
+        returnPortal.discard();
+
         player.stopRiding();
-
         player.teleportTo(destination, target.x(), target.y(), target.z(), target.yaw(), target.pitch());
-
-        ModMessages.sendToPlayer(player, new PocketModeS2CPacket(false));
-        PocketTravelData.clear(player);
         player.setDeltaMovement(Vec3.ZERO);
+
         player.fallDistance = 0.0F;
         player.hurtMarked = true;
-
-
-        /*
-         * ========================================================
-         * RELEASE BOTH PORTALS
-         * ========================================================
-         */
 
         if (sourcePortalId != null) {
 
             Entity source = destination.getEntity(sourcePortalId);
-
-
             if (source instanceof ChaosPortalEntity entrance) {
-
+                entrance.setLinkedPortalId(null);
                 entrance.releaseAfterUse();
             }
         }
 
-
-        /*
-         * Return portal ещё 20 sec
-         * существует визуально,
-         * но больше никого не принимает.
-         */
-        returnPortal.releaseAfterUse();
-
-
         PocketTravelData.clear(player);
-
-
         return true;
     }
 
-
-    /*
-     * ============================================================
-     * UTILS
-     * ============================================================
-     */
-
     private static void freezePlayer(ServerPlayer player) {
         player.setDeltaMovement(Vec3.ZERO);
-
         player.fallDistance = 0.0F;
-
         player.hurtMarked = true;
     }
 
 
     private static void cancel(ServerPlayer player) {
         ACTIVE.remove(player.getUUID());
-
-
-        BossPortalTransitionNetwork.send(player,
-
-                BossPortalTransitionS2CPacket.Action.CANCEL);
+        BossPortalTransitionNetwork.send(player, BossPortalTransitionS2CPacket.Action.CANCEL);
     }
-
-
-    /*
-     * ============================================================
-     * CLEANUP
-     * ============================================================
-     */
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
@@ -295,27 +256,14 @@ public final class ChaosPocketTransitionServer {
         }
     }
 
-
-    /*
-     * ============================================================
-     * TRANSITION
-     * ============================================================
-     */
-
     private static final class Transition {
-
         private final UUID portalId;
-
         private final ChaosPortalEntity.PortalRole role;
-
         private int ticks;
-
         private boolean teleported;
-
 
         private Transition(UUID portalId, ChaosPortalEntity.PortalRole role) {
             this.portalId = portalId;
-
             this.role = role;
         }
     }

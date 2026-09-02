@@ -4,8 +4,10 @@ import com.benji.oasiso.client.renderer.EntropyChestplateGloveRenderer;
 import com.benji.oasiso.common.entity.EntropyPhysicsBlockEntity;
 import com.benji.oasiso.common.world.MeltedNephritisSavedData;
 import com.benji.oasiso.registry.ModEntities;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -16,8 +18,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -32,6 +36,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -40,6 +45,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -49,6 +55,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
     public static final float MAX_PICKUP_HARDNESS = 100.0F;
 
     private static final String TAG_HELD_BLOCK = "EntropyGravityHeldBlock";
+    private static final String TAG_FILL_MODE = "EntropyGravityFillMode";
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -81,6 +88,12 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         }
 
         ItemStack glove = context.getItemInHand();
+
+        if (isFillMode(glove)) {
+            return level.isClientSide
+                    ? InteractionResult.SUCCESS
+                    : InteractionResult.CONSUME;
+        }
 
         if (level.isClientSide) {
             BlockState clientState = level.getBlockState(context.getClickedPos());
@@ -155,6 +168,13 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack glove = player.getItemInHand(hand);
 
+        if (isFillMode(glove)) {
+            return InteractionResultHolder.sidedSuccess(
+                    glove,
+                    level.isClientSide
+            );
+        }
+
         if (level.isClientSide) {
             return hasHeldBlock(glove) ? InteractionResultHolder.success(glove) : InteractionResultHolder.pass(glove);
         }
@@ -197,6 +217,54 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         }
 
         return state.getRenderShape() == RenderShape.MODEL;
+    }
+
+    public static boolean isFillMode(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+
+        return tag != null && tag.getBoolean(TAG_FILL_MODE);
+    }
+
+
+    public static void setFillMode(ItemStack stack, boolean enabled) {
+        if (enabled) {
+            stack.getOrCreateTag().putBoolean(TAG_FILL_MODE, true);
+            return;
+        }
+
+        CompoundTag tag = stack.getTag();
+
+        if (tag != null) {
+            tag.remove(TAG_FILL_MODE);
+        }
+    }
+
+
+    public static ItemStack findGloveInHands(Player player) {
+        ItemStack main = player.getMainHandItem();
+
+        if (main.getItem() instanceof EntropyChestplateGloveItem) {
+            return main;
+        }
+
+        ItemStack off = player.getOffhandItem();
+        if (off.getItem() instanceof EntropyChestplateGloveItem) {
+            return off;
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+
+    public static InteractionHand findGloveHand(Player player) {
+        if (player.getMainHandItem().getItem() instanceof EntropyChestplateGloveItem) {
+            return InteractionHand.MAIN_HAND;
+        }
+        if (player.getOffhandItem().getItem() instanceof EntropyChestplateGloveItem) {
+            return InteractionHand.OFF_HAND;
+        }
+
+        return null;
     }
 
     public static boolean canAttachBlockState(Level level, BlockPos referencePos, BlockState state) {
@@ -281,12 +349,17 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
     public static ItemStack findActiveGlove(Player player) {
         ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof EntropyChestplateGloveItem && hasHeldBlock(main)) {
+
+        if (main.getItem() instanceof EntropyChestplateGloveItem
+                && !isFillMode(main)
+                && hasHeldBlock(main)) {
             return main;
         }
 
         ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof EntropyChestplateGloveItem && hasHeldBlock(off)) {
+        if (off.getItem() instanceof EntropyChestplateGloveItem
+                && !isFillMode(off)
+                && hasHeldBlock(off)) {
             return off;
         }
 
@@ -302,6 +375,13 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         }
 
         syncInventory(player);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        Component gloveb = Component.translatable("tooltip.oasiso.glove")
+                .withStyle(ChatFormatting.AQUA);
+        tooltipComponents.add(gloveb);
     }
 
     private static void syncInventory(ServerPlayer player) {

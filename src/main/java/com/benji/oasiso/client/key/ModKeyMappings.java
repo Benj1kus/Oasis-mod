@@ -14,11 +14,14 @@ public final class ModKeyMappings {
 
     public static final KeyMapping TURRET_MODE = new KeyMapping("key.oasiso.turret_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.oasiso");
 
+    public static final KeyMapping GLOVE_FILL_MODE = new KeyMapping("key.oasiso.glove_fill_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.categories.oasiso");
+
     private ModKeyMappings() {
     }
 
     @SubscribeEvent
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(TURRET_MODE);
+        event.register(GLOVE_FILL_MODE);
     }
 }
