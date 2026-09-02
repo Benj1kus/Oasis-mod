@@ -1,6 +1,8 @@
 package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.ModSounds;
+import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.dimension.PocketDimensionManager;
 import com.benji.oasiso.common.entity.ChaosPortalEntity;
 import com.benji.oasiso.registry.ModEntities;
 import net.minecraft.server.level.ServerLevel;
@@ -44,7 +46,7 @@ public class ChaosScissorsItem extends Item {
             return InteractionResultHolder.fail(stack);
         }
 
-        if (ChaosPortalEntity.hasOwnedPortal(serverLevel.getServer(), player.getUUID())) {
+        if (ChaosPortalEntity.hasOwnedEntrancePortal(serverLevel.getServer(), player.getUUID())) {
             return InteractionResultHolder.fail(stack);
         }
 
@@ -54,6 +56,15 @@ public class ChaosScissorsItem extends Item {
         if (forward.lengthSqr() < 0.0001D) {
             float yaw = player.getYRot() * Mth.DEG_TO_RAD;
             forward = new Vec3(-Mth.sin(yaw), 0.0D, Mth.cos(yaw));
+        }
+
+        PocketDimensionManager.PlatformTarget platform = PocketDimensionManager.preparePlatform(serverLevel.getServer(), player.getUUID());
+        if (platform == null) {
+            return InteractionResultHolder.fail(stack);
+        }
+
+        if (level.dimension().equals(Oasiso.CHAOS_DIMENSION)) {
+            return InteractionResultHolder.fail(stack);
         }
 
         forward = forward.normalize();

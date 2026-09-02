@@ -105,6 +105,8 @@ public final class ChaosPortalTeleporter {
 
         ChaosReturnData.save(player, portalPos, portalAxis);
 
+        PocketTravelData.clear(player);
+
         player.teleportTo(destinationLevel, destinationX, destinationY, destinationZ, player.getYRot(), player.getXRot());
         player.setDeltaMovement(Vec3.ZERO);
         player.fallDistance = 0.0F;

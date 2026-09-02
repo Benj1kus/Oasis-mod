@@ -54,27 +54,27 @@ public final class ChaosDimensionExitHandler {
             return;
         }
 
-        ExitSequence activeSequence = ACTIVE_SEQUENCES.get(player.getUUID());
+        if (player.level().dimension().equals(Oasiso.CHAOS_DIMENSION) && PocketTravelData.isActive(player)) {
+            suppressOutcomeForPocket(player);
+            return;
+        }
 
+        ExitSequence activeSequence = ACTIVE_SEQUENCES.get(player.getUUID());
         if (activeSequence != null) {
             tickActiveSequence(player, activeSequence);
             return;
         }
-
         if (!player.level().dimension().equals(Oasiso.CHAOS_DIMENSION)) {
             player.getPersistentData().remove(STAY_TICKS_TAG);
             return;
         }
-
         if (BossArenaEncounter.isArenaSession(player)) {
             player.getPersistentData().remove(STAY_TICKS_TAG);
             return;
         }
-
         if (hasNearbyGaster(player)) {
             return;
         }
-
         CompoundTag data = player.getPersistentData();
         int stayTicks = data.getInt(STAY_TICKS_TAG) + 1;
         data.putInt(STAY_TICKS_TAG, stayTicks);
@@ -83,6 +83,13 @@ public final class ChaosDimensionExitHandler {
         }
     }
 
+    private static void suppressOutcomeForPocket(ServerPlayer player) {
+        player.getPersistentData().remove(STAY_TICKS_TAG);
+        ExitSequence sequence = ACTIVE_SEQUENCES.remove(player.getUUID());
+        if (sequence != null) {
+            discardActor(player.serverLevel(), sequence.actorId);
+        }
+    }
     private static boolean hasNearbyGaster(ServerPlayer player) {
         AABB area = player.getBoundingBox().inflate(GASTER_PAUSE_RADIUS);
         return !player.serverLevel().getEntitiesOfClass(GasterEntity.class, area, GasterEntity::isAlive).isEmpty();

@@ -19,6 +19,7 @@ import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.client.sound.ChaosDimensionAmbientSound;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
+import com.benji.oasiso.client.dimension.PocketModeClient;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class ChaosDimensionClientEvents {
@@ -75,6 +76,17 @@ public final class ChaosDimensionClientEvents {
             bossArenaDefeated = false;
 
             stopAmbientSound();
+            return;
+        }
+
+        if (PocketModeClient.isActive()) {
+            dimensionTicks = 0;
+            nextEchoTimer = 0;
+            lastMoonStage = 1;
+            bossArenaPaused = false;
+            bossArenaDefeated = false;
+            ensureAmbientSound();
+            spawnAtmosphere(minecraft.level, minecraft.player);
             return;
         }
 

@@ -21,6 +21,7 @@ public class ModMessages {
         SimpleChannel net = NetworkRegistry.ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "messages")).networkProtocolVersion(() -> "1.0").clientAcceptedVersions(s -> true).serverAcceptedVersions(s -> true).simpleChannel();
 
         INSTANCE = net;
+        net.messageBuilder(PocketModeS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT).decoder(PocketModeS2CPacket::new).encoder(PocketModeS2CPacket::toBytes).consumerMainThread(PocketModeS2CPacket::handle).add();
         net.messageBuilder(EntropyGloveThrowPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyGloveThrowPacket::new).encoder(EntropyGloveThrowPacket::toBytes).consumerMainThread(EntropyGloveThrowPacket::handle).add();
         net.messageBuilder(EntropyAmmoSlotClickPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyAmmoSlotClickPacket::new).encoder(EntropyAmmoSlotClickPacket::toBytes).consumerMainThread(EntropyAmmoSlotClickPacket::handle).add();
         net.messageBuilder(EntropyAmmoInsertPacket.class, id(), NetworkDirection.PLAY_TO_SERVER).decoder(EntropyAmmoInsertPacket::new).encoder(EntropyAmmoInsertPacket::toBytes).consumerMainThread(EntropyAmmoInsertPacket::handle).add();
