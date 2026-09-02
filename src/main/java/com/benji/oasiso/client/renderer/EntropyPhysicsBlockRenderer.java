@@ -27,6 +27,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.GameRenderer;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBlockEntity> {
 
@@ -34,8 +41,6 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
     private final ItemRenderer itemRenderer;
 
     private final MultiBufferSource.BufferSource outlineBuffers = MultiBufferSource.immediate(new BufferBuilder(4096));
-
-    private final MultiBufferSource.BufferSource previewBuffers = MultiBufferSource.immediate(new BufferBuilder(4096));
 
     public EntropyPhysicsBlockRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -128,11 +133,12 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
 
     private void renderAttachmentPreview(EntropyPhysicsBlockEntity entity, float partialTick, PoseStack poseStack) {
         if (!entity.isNephritisCoated() || !entity.isSettledPhysical()) {
+
             return;
         }
 
-        Minecraft minecraft = Minecraft.getInstance();
 
+        Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
 
         if (player == null || player.isShiftKeyDown()) {
@@ -158,7 +164,6 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         }
 
         EntropyPhysicsBlockEntity.AttachmentPreview preview = entity.getAttachmentPreview(entity.level(), player);
-
         if (preview == null) {
             return;
         }
@@ -168,46 +173,27 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         int oz = preview.targetOffset().getZ();
 
         float time = entity.tickCount + partialTick;
-
         float pulse = 0.5F + 0.5F * net.minecraft.util.Mth.sin(time * 0.38F);
-        float fillAlpha = 0.055F + pulse * 0.135F;
-        float lineAlpha = 0.52F + pulse * 0.48F;
+        float fillAlpha = 0.035F + pulse * 0.065F;
+        float lineAlpha = 0.60F + pulse * 0.40F;
         float inset = 0.025F + (1.0F - pulse) * 0.018F;
+        float edgeThickness = 0.018F + pulse * 0.010F;
 
         poseStack.pushPose();
-
         poseStack.translate(ox, oy, oz);
 
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        RenderType fillType = RenderType.debugFilledBox();
-
-        VertexConsumer fill = this.previewBuffers.getBuffer(fillType);
-
-        LevelRenderer.addChainedFilledBoxVertices(poseStack, fill, -0.5F + inset, -0.5F + inset, -0.5F + inset, 0.5F - inset, 0.5F - inset, 0.5F - inset, 0.00F, 1.00F, 0.94F, fillAlpha);
-
-        this.previewBuffers.endBatch(fillType);
-
-        RenderType lineType = RenderType.lines();
-        VertexConsumer lines = this.outlineBuffers.getBuffer(lineType);
-        RenderSystem.lineWidth(4.2F + pulse * 2.0F);
-
-        LevelRenderer.renderLineBox(poseStack, lines, new AABB(-0.5D + inset, -0.5D + inset, -0.5D + inset, 0.5D - inset, 0.5D - inset, 0.5D - inset), 0.00F, 1.00F, 1.00F, lineAlpha);
-
-        this.outlineBuffers.endBatch(lineType);
-
-        RenderSystem.lineWidth(1.0F);
-        RenderSystem.disableBlend();
-
+        renderDepthTestedPreviewBox(poseStack, -0.5F + inset, -0.5F + inset, -0.5F + inset, 0.5F - inset, 0.5F - inset, 0.5F - inset, edgeThickness, 0.00F, 1.00F, 0.94F, fillAlpha, 0.00F, 1.00F, 1.00F, lineAlpha);
         poseStack.popPose();
     }
 
     private void renderDetachmentPreview(EntropyPhysicsBlockEntity entity, float partialTick, PoseStack poseStack) {
         if (!entity.isNephritisCoated() || !entity.isSettledPhysical()) {
+
             return;
         }
 
         Minecraft minecraft = Minecraft.getInstance();
+
         LocalPlayer player = minecraft.player;
 
         if (player == null || !player.isShiftKeyDown()) {
@@ -215,16 +201,19 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         }
 
         ItemStack glove = findFreeGlove(player);
+
         if (glove.isEmpty()) {
             return;
         }
 
         HitResult hitResult = minecraft.hitResult;
+
         if (!(hitResult instanceof EntityHitResult entityHit) || entityHit.getEntity() != entity) {
             return;
         }
 
         EntropyPhysicsBlockEntity.DetachmentPreview preview = entity.getDetachmentPreview(player);
+
         if (preview == null) {
             return;
         }
@@ -234,34 +223,18 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         int oz = preview.sourceOffset().getZ();
 
         float time = entity.tickCount + partialTick;
+
+
         float pulse = 0.5F + 0.5F * net.minecraft.util.Mth.sin(time * 0.42F);
-        float fillAlpha = 0.075F + pulse * 0.11F;
-        float lineAlpha = 0.64F + pulse * 0.36F;
+        float fillAlpha = 0.045F + pulse * 0.070F;
+        float lineAlpha = 0.66F + pulse * 0.34F;
         float inset = 0.020F + (1.0F - pulse) * 0.012F;
+        float edgeThickness = 0.020F + pulse * 0.011F;
 
         poseStack.pushPose();
         poseStack.translate(ox, oy, oz);
 
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-
-        RenderType fillType = RenderType.debugFilledBox();
-        VertexConsumer fill = this.previewBuffers.getBuffer(fillType);
-
-        LevelRenderer.addChainedFilledBoxVertices(poseStack, fill, -0.5F + inset, -0.5F + inset, -0.5F + inset, 0.5F - inset, 0.5F - inset, 0.5F - inset, 0.08F, 1.00F, 0.62F, fillAlpha);
-
-        this.previewBuffers.endBatch(fillType);
-
-        RenderType lineType = RenderType.lines();
-        VertexConsumer lines = this.outlineBuffers.getBuffer(lineType);
-        RenderSystem.lineWidth(4.8F + pulse * 2.2F);
-
-        LevelRenderer.renderLineBox(poseStack, lines, new AABB(-0.5D + inset, -0.5D + inset, -0.5D + inset, 0.5D - inset, 0.5D - inset, 0.5D - inset), 0.00F, 1.00F, 0.72F, lineAlpha);
-
-        this.outlineBuffers.endBatch(lineType);
-
-        RenderSystem.lineWidth(1.0F);
-        RenderSystem.disableBlend();
+        renderDepthTestedPreviewBox(poseStack, -0.5F + inset, -0.5F + inset, -0.5F + inset, 0.5F - inset, 0.5F - inset, 0.5F - inset, edgeThickness, 0.08F, 1.00F, 0.62F, fillAlpha, 0.00F, 1.00F, 0.72F, lineAlpha);
         poseStack.popPose();
     }
 
@@ -277,6 +250,68 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         }
 
         return ItemStack.EMPTY;
+    }
+
+
+    private static void renderDepthTestedPreviewBox(PoseStack poseStack, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float edgeThickness, float fillR, float fillG, float fillB, float fillA, float edgeR, float edgeG, float edgeB, float edgeA) {
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.depthMask(false);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+        Matrix4f matrix = poseStack.last().pose();
+
+        addSolidBox(builder, matrix, minX, minY, minZ, maxX, maxY, maxZ, fillR, fillG, fillB, fillA);
+        addBoxEdges(builder, matrix, minX, minY, minZ, maxX, maxY, maxZ, edgeThickness, edgeR, edgeG, edgeB, edgeA);
+
+
+        BufferUploader.drawWithShader(builder.end());
+
+        RenderSystem.enableCull();
+        RenderSystem.depthMask(true);
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.disableBlend();
+    }
+
+    private static void addBoxEdges(BufferBuilder builder, Matrix4f matrix, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float thickness, float r, float g, float b, float a) {
+        float half = thickness * 0.5F;
+
+        addSolidBox(builder, matrix, minX, minY - half, minZ - half, maxX, minY + half, minZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX, minY - half, maxZ - half, maxX, minY + half, maxZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX, maxY - half, minZ - half, maxX, maxY + half, minZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX, maxY - half, maxZ - half, maxX, maxY + half, maxZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX - half, minY, minZ - half, minX + half, maxY, minZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, maxX - half, minY, minZ - half, maxX + half, maxY, minZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX - half, minY, maxZ - half, minX + half, maxY, maxZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, maxX - half, minY, maxZ - half, maxX + half, maxY, maxZ + half, r, g, b, a);
+        addSolidBox(builder, matrix, minX - half, minY - half, minZ, minX + half, minY + half, maxZ, r, g, b, a);
+        addSolidBox(builder, matrix, maxX - half, minY - half, minZ, maxX + half, minY + half, maxZ, r, g, b, a);
+        addSolidBox(builder, matrix, minX - half, maxY - half, minZ, minX + half, maxY + half, maxZ, r, g, b, a);
+        addSolidBox(builder, matrix, maxX - half, maxY - half, minZ, maxX + half, maxY + half, maxZ, r, g, b, a);
+    }
+
+    private static void addSolidBox(BufferBuilder builder, Matrix4f matrix, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a) {
+
+        addQuad(builder, matrix, x1, y1, z1, x2, y1, z1, x2, y2, z1, x1, y2, z1, r, g, b, a);
+
+        addQuad(builder, matrix, x2, y1, z2, x1, y1, z2, x1, y2, z2, x2, y2, z2, r, g, b, a);
+        addQuad(builder, matrix, x1, y1, z2, x1, y1, z1, x1, y2, z1, x1, y2, z2, r, g, b, a);
+        addQuad(builder, matrix, x2, y1, z1, x2, y1, z2, x2, y2, z2, x2, y2, z1, r, g, b, a);
+        addQuad(builder, matrix, x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2, r, g, b, a);
+        addQuad(builder, matrix, x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1, r, g, b, a);
+    }
+
+    private static void addQuad(BufferBuilder builder, Matrix4f matrix, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, float r, float g, float b, float a) {
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).endVertex();
+        builder.vertex(matrix, x3, y3, z3).color(r, g, b, a).endVertex();
+        builder.vertex(matrix, x4, y4, z4).color(r, g, b, a).endVertex();
     }
 
     private static ItemStack findHeldPlaceableBlock(LocalPlayer player) {

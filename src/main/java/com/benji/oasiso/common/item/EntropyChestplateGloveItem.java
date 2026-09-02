@@ -385,6 +385,9 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
         tooltipComponents.add(Component.translatable("tooltip.oasiso.glove2", glove)
                 .withStyle(ChatFormatting.DARK_AQUA));
 
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove3", glove)
+                .withStyle(ChatFormatting.DARK_AQUA));
+
         tooltipComponents.add(glove);
     }
 
