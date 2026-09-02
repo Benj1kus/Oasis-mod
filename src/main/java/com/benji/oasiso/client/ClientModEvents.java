@@ -4,6 +4,7 @@ import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.client.particle.*;
 import com.benji.oasiso.client.renderer.*;
 import com.benji.oasiso.registry.ModBlockEntities;
+import com.benji.oasiso.registry.ModEntities;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import com.benji.oasiso.client.dimension.ChaosDimensionEffects;
 import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
@@ -206,6 +207,11 @@ public class ClientModEvents {
         event.registerEntityRenderer(
                 Oasiso.CRUSADER_ASSASIN.get(),
                 CrusaderAssasinRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.CHAOS_PORTAL_ENTITY.get(),
+                ChaosPortalEntityRenderer::new
         );
 
         event.registerEntityRenderer(

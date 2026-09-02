@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "RG#",
+    " R "
+  ],
+  "key": {
+    "#":{
+      "item": "oasiso:azumalit_shard"
+    },
+    "R":{
+      "item": "oasiso:karakolit_ingot"
+    },
+    "G":{
+      "item": "oasiso:nephritis_core"
+    }
+  },
+  "result": {
+    "item": "oasiso:chaos_scissors"
+  }
+}

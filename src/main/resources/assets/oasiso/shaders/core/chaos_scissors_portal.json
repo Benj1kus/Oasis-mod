@@ -1,0 +1,63 @@
+{
+  "vertex": "oasiso:chaos_scissors_portal",
+  "fragment": "oasiso:chaos_scissors_portal",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [],
+  "uniforms": [
+    {
+      "name": "ModelViewMat",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ]
+    },
+    {
+      "name": "ProjMat",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [0.0]
+    },
+    {
+      "name": "Reveal",
+      "type": "float",
+      "count": 1,
+      "values": [1.0]
+    },
+    {
+      "name": "Despawn",
+      "type": "float",
+      "count": 1,
+      "values": [0.0]
+    },
+    {
+      "name": "Seed",
+      "type": "float",
+      "count": 1,
+      "values": [0.0]
+    },
+    {
+      "name": "GlowOnly",
+      "type": "float",
+      "count": 1,
+      "values": [0.0]
+    }
+  ]
+}
