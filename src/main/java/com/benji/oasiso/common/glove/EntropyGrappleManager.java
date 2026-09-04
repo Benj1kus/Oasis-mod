@@ -16,16 +16,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,7 +40,15 @@ public final class EntropyGrappleManager {
     public static final double MAX_RANGE = 30.0D;
 
     private static final double STOP_DISTANCE = 1.70D;
-    private static final double HARD_BREAK_DISTANCE = 30.0D;
+    private static final double HARD_BREAK_DISTANCE = MAX_RANGE + 8.0D;
+
+    private static final int MAX_PIVOTS = 8;
+    private static final int PIVOT_MIN_LIFE_TICKS = 3;
+    private static final int PIVOT_UNWRAP_CONFIRM_TICKS = 2;
+
+    private static final double PIVOT_CLEARANCE = 0.075D;
+    private static final double PIVOT_ENDPOINT_TOLERANCE = 0.18D;
+    private static final double MIN_PIVOT_SPACING = 0.14D;
 
     private static final int MIN_LAUNCH_TICKS = 4;
     private static final int MAX_LAUNCH_TICKS = 11;
@@ -153,6 +166,8 @@ public final class EntropyGrappleManager {
         session.duration = 0;
         session.pullTicks = 0;
         session.attachDistance = player.getEyePosition().distanceTo(session.anchor);
+        session.pivots.clear();
+        session.unwrapClearTicks = 0;
 
         player.playNotifySound(ModSounds.GLOV_BOUNCE.get(), SoundSource.PLAYERS, 0.78F, 1.10F);
 
@@ -241,23 +256,28 @@ public final class EntropyGrappleManager {
 
     private static void tickAttached(ServerLevel level, ServerPlayer player, Session session) {
         Vec3 playerPoint = player.getEyePosition();
-        Vec3 towardAnchor = session.anchor.subtract(playerPoint);
 
-        double distance = towardAnchor.length();
+        updatePivots(level, playerPoint, session);
 
-        if (distance > HARD_BREAK_DISTANCE) {
+        Vec3 pullTarget = currentPullTarget(session);
+        Vec3 towardTarget = pullTarget.subtract(playerPoint);
+
+        double targetDistance = towardTarget.length();
+        double directAnchorDistance = playerPoint.distanceTo(session.anchor);
+
+        if (directAnchorDistance > HARD_BREAK_DISTANCE) {
             beginRetract(level, player, session, true);
             return;
         }
 
-        if (distance < 1.0E-5D) {
+        if (targetDistance < 1.0E-5D) {
             return;
         }
 
-        Vec3 direction = towardAnchor.scale(1.0D / distance);
+        Vec3 direction = towardTarget.scale(1.0D / targetDistance);
         Vec3 velocity = player.getDeltaMovement();
 
-        if (distance <= STOP_DISTANCE) {
+        if (targetDistance <= STOP_DISTANCE) {
             double radial = velocity.dot(direction);
 
             if (radial < -0.12D) {
@@ -266,6 +286,7 @@ public final class EntropyGrappleManager {
                 player.setDeltaMovement(velocity);
                 player.hurtMarked = true;
             }
+
             player.fallDistance = 0.0F;
             return;
         }
@@ -278,7 +299,8 @@ public final class EntropyGrappleManager {
         double ramp = Mth.clamp(session.pullTicks / (double) rampTicks, 0.0D, 1.0D);
         double acceleration = Mth.lerp(ramp, 0.065D, 0.285D);
 
-        double remainingFactor = Mth.clamp((distance - STOP_DISTANCE) / (MAX_RANGE - STOP_DISTANCE), 0.0D, 1.0D);
+        double ropePathDistance = currentRopePathDistance(playerPoint, session);
+        double remainingFactor = Mth.clamp((ropePathDistance - STOP_DISTANCE) / (MAX_RANGE - STOP_DISTANCE), 0.0D, 1.0D);
         double maxRadialSpeed = Mth.lerp(remainingFactor, 0.72D, 1.95D);
 
         velocity = velocity.scale(0.985D).add(direction.scale(acceleration));
@@ -292,6 +314,250 @@ public final class EntropyGrappleManager {
         player.setDeltaMovement(velocity);
         player.hurtMarked = true;
         player.fallDistance = 0.0F;
+    }
+
+    private static void updatePivots(ServerLevel level, Vec3 playerPoint, Session session) {
+        for (Pivot pivot : session.pivots) {
+            pivot.age++;
+        }
+
+        if (!session.pivots.isEmpty()) {
+            Pivot newest = session.pivots.get(session.pivots.size() - 1);
+
+            Vec3 previousTarget;
+            BlockPos previousTargetBlock;
+
+            if (session.pivots.size() >= 2) {
+                Pivot previous = session.pivots.get(session.pivots.size() - 2);
+
+                previousTarget = previous.position;
+                previousTargetBlock = previous.blockPos;
+            } else {
+                previousTarget = session.anchor;
+                previousTargetBlock = session.anchorBlock;
+            }
+
+            if (newest.age >= PIVOT_MIN_LIFE_TICKS && segmentIsClear(level, playerPoint, previousTarget, previousTargetBlock)) {
+
+                session.unwrapClearTicks++;
+
+                if (session.unwrapClearTicks >= PIVOT_UNWRAP_CONFIRM_TICKS) {
+                    session.pivots.remove(session.pivots.size() - 1);
+                    session.unwrapClearTicks = 0;
+                }
+
+            } else {
+                session.unwrapClearTicks = 0;
+            }
+        }
+        if (session.pivots.size() >= MAX_PIVOTS) {
+            return;
+        }
+
+        Vec3 currentTarget = currentPullTarget(session);
+        BlockPos currentTargetBlock = currentPullTargetBlock(session);
+
+        BlockHitResult obstruction = firstObstruction(level, playerPoint, currentTarget, currentTargetBlock);
+
+        if (obstruction == null) {
+            return;
+        }
+
+        if (obstruction.getLocation().distanceToSqr(playerPoint) < 0.20D * 0.20D) {
+
+            return;
+        }
+
+        Vec3 pivotPosition = findBestPivot(level, playerPoint, currentTarget, currentTargetBlock, obstruction);
+
+        if (pivotPosition == null) {
+            return;
+        }
+
+        if (!session.pivots.isEmpty()) {
+            Pivot newest = session.pivots.get(session.pivots.size() - 1);
+
+            if (newest.position.distanceToSqr(pivotPosition) < MIN_PIVOT_SPACING * MIN_PIVOT_SPACING) {
+
+                return;
+            }
+        }
+
+        session.pivots.add(new Pivot(pivotPosition, obstruction.getBlockPos().immutable()));
+
+        session.unwrapClearTicks = 0;
+    }
+
+    private static Vec3 currentPullTarget(Session session) {
+        if (session.pivots.isEmpty()) {
+            return session.anchor;
+        }
+
+        return session.pivots.get(session.pivots.size() - 1).position;
+    }
+
+    private static BlockPos currentPullTargetBlock(Session session) {
+        if (session.pivots.isEmpty()) {
+            return session.anchorBlock;
+        }
+
+        return session.pivots.get(session.pivots.size() - 1).blockPos;
+    }
+
+    private static double currentRopePathDistance(Vec3 playerPoint, Session session) {
+        double total = 0.0D;
+        Vec3 cursor = playerPoint;
+
+        for (int i = session.pivots.size() - 1; i >= 0; i--) {
+
+            Vec3 pivot = session.pivots.get(i).position;
+
+            total += cursor.distanceTo(pivot);
+            cursor = pivot;
+        }
+
+        total += cursor.distanceTo(session.anchor);
+
+        return total;
+    }
+
+    @Nullable
+    private static BlockHitResult firstObstruction(ServerLevel level, Vec3 from, Vec3 to, @Nullable BlockPos allowedEndBlock) {
+        Vec3 delta = to.subtract(from);
+        double length = delta.length();
+
+        if (length < 0.05D) {
+            return null;
+        }
+
+        Vec3 direction = delta.scale(1.0D / length);
+        Vec3 rayStart = from.add(direction.scale(0.02D));
+        Vec3 rayEnd = to.subtract(direction.scale(0.02D));
+
+        BlockHitResult hit = level.clip(new ClipContext(rayStart, rayEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+
+        if (hit.getType() != HitResult.Type.BLOCK) {
+            return null;
+        }
+
+        if (allowedEndBlock != null && hit.getBlockPos().equals(allowedEndBlock) && hit.getLocation().distanceToSqr(to) <= PIVOT_ENDPOINT_TOLERANCE * PIVOT_ENDPOINT_TOLERANCE) {
+
+            return null;
+        }
+
+        if (hit.getLocation().distanceToSqr(to) <= 0.08D * 0.08D) {
+
+            return null;
+        }
+
+        return hit;
+    }
+
+    private static boolean segmentIsClear(ServerLevel level, Vec3 from, Vec3 to, @Nullable BlockPos allowedEndBlock) {
+        return firstObstruction(level, from, to, allowedEndBlock) == null;
+    }
+
+    @Nullable
+    private static Vec3 findBestPivot(ServerLevel level, Vec3 from, Vec3 target, @Nullable BlockPos targetBlock, BlockHitResult obstruction) {
+        BlockPos blockPos = obstruction.getBlockPos();
+
+        VoxelShape shape = level.getBlockState(blockPos).getCollisionShape(level, blockPos);
+
+        if (shape.isEmpty()) {
+            return null;
+        }
+
+        Vec3 hit = obstruction.getLocation();
+
+        List<Vec3> candidates = new ArrayList<>();
+
+        for (AABB localBox : shape.toAabbs()) {
+            AABB worldBox = localBox.move(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+
+            if (distanceToAabbSqr(hit, worldBox) > 0.30D * 0.30D) {
+
+                continue;
+            }
+
+            AABB expanded = worldBox.inflate(PIVOT_CLEARANCE);
+            addEdgeCandidates(candidates, expanded, hit);
+        }
+
+        if (candidates.isEmpty()) {
+            for (AABB localBox : shape.toAabbs()) {
+                AABB expanded = localBox.move(blockPos.getX(), blockPos.getY(), blockPos.getZ()).inflate(PIVOT_CLEARANCE);
+
+                addEdgeCandidates(candidates, expanded, hit);
+            }
+        }
+
+        Vec3 best = null;
+        double bestScore = Double.POSITIVE_INFINITY;
+
+        for (Vec3 candidate : candidates) {
+            if (candidate.distanceToSqr(from) < 0.12D * 0.12D) {
+
+                continue;
+            }
+
+            if (!segmentIsClear(level, from, candidate, blockPos)) {
+
+                continue;
+            }
+
+            boolean clearToTarget = segmentIsClear(level, candidate, target, targetBlock);
+            double score = from.distanceTo(candidate) + candidate.distanceTo(target) + hit.distanceTo(candidate) * 0.18D;
+
+            if (!clearToTarget) {
+                score += 12.0D;
+            }
+
+            if (score < bestScore) {
+                bestScore = score;
+                best = candidate;
+            }
+        }
+
+        return best;
+    }
+
+    private static void addEdgeCandidates(List<Vec3> candidates, AABB box, Vec3 near) {
+        double x = Mth.clamp(near.x, box.minX, box.maxX);
+        double y = Mth.clamp(near.y, box.minY, box.maxY);
+        double z = Mth.clamp(near.z, box.minZ, box.maxZ);
+
+        candidates.add(new Vec3(x, box.minY, box.minZ));
+        candidates.add(new Vec3(x, box.minY, box.maxZ));
+        candidates.add(new Vec3(x, box.maxY, box.minZ));
+        candidates.add(new Vec3(x, box.maxY, box.maxZ));
+
+        candidates.add(new Vec3(box.minX, y, box.minZ));
+        candidates.add(new Vec3(box.minX, y, box.maxZ));
+        candidates.add(new Vec3(box.maxX, y, box.minZ));
+        candidates.add(new Vec3(box.maxX, y, box.maxZ));
+
+        candidates.add(new Vec3(box.minX, box.minY, z));
+        candidates.add(new Vec3(box.minX, box.maxY, z));
+        candidates.add(new Vec3(box.maxX, box.minY, z));
+        candidates.add(new Vec3(box.maxX, box.maxY, z));
+
+        candidates.add(new Vec3(box.minX, box.minY, box.minZ));
+        candidates.add(new Vec3(box.minX, box.minY, box.maxZ));
+        candidates.add(new Vec3(box.minX, box.maxY, box.minZ));
+        candidates.add(new Vec3(box.minX, box.maxY, box.maxZ));
+
+        candidates.add(new Vec3(box.maxX, box.minY, box.minZ));
+        candidates.add(new Vec3(box.maxX, box.minY, box.maxZ));
+        candidates.add(new Vec3(box.maxX, box.maxY, box.minZ));
+        candidates.add(new Vec3(box.maxX, box.maxY, box.maxZ));
+    }
+
+    private static double distanceToAabbSqr(Vec3 point, AABB box) {
+        double dx = Math.max(Math.max(box.minX - point.x, 0.0D), point.x - box.maxX);
+        double dy = Math.max(Math.max(box.minY - point.y, 0.0D), point.y - box.maxY);
+        double dz = Math.max(Math.max(box.minZ - point.z, 0.0D), point.z - box.maxZ);
+
+        return dx * dx + dy * dy + dz * dz;
     }
 
     private static boolean isAnchorStillValid(ServerLevel level, BlockPos anchorBlock) {
@@ -353,6 +619,17 @@ public final class EntropyGrappleManager {
         SESSIONS.remove(event.getEntity().getUUID());
     }
 
+    private static final class Pivot {
+        private final Vec3 position;
+        private final BlockPos blockPos;
+        private int age;
+
+        private Pivot(Vec3 position, BlockPos blockPos) {
+            this.position = position;
+            this.blockPos = blockPos;
+        }
+    }
+
     private static final class Session {
         private final UUID playerId;
         private final ResourceKey<Level> dimension;
@@ -366,6 +643,9 @@ public final class EntropyGrappleManager {
 
         private int pullTicks;
         private double attachDistance;
+
+        private final List<Pivot> pivots = new ArrayList<>();
+        private int unwrapClearTicks;
 
         private Session(UUID playerId, ResourceKey<Level> dimension, InteractionHand hand, Vec3 anchor, BlockPos anchorBlock, State state, int duration) {
             this.playerId = playerId;

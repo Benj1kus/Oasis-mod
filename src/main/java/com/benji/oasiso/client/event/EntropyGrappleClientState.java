@@ -7,7 +7,10 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,8 +25,12 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class EntropyGrappleClientState {
 
-    private static final int SEGMENTS = 24;
-    private static final int CONSTRAINT_ITERATIONS = 9;
+    private static final int SEGMENTS = 36;
+    private static final int CONSTRAINT_ITERATIONS = 10;
+
+    private static final double ROPE_COLLISION_RADIUS = 0.055D;
+    private static final double COLLISION_EPSILON = 0.0025D;
+    private static final double SURFACE_FRICTION = 0.82D;
 
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 
@@ -111,7 +118,7 @@ public final class EntropyGrappleClientState {
             Vec3 end = getVisualEnd(session, start, now);
 
             session.currentEnd = end;
-            session.rope.step(start, end, session.state, now);
+            session.rope.step(level, start, end, session.state, now);
 
             if (session.state == EntropyGrappleStateS2CPacket.VisualState.RETRACTING && now - session.phaseStartTick > session.duration + 2L) {
 
@@ -239,15 +246,19 @@ public final class EntropyGrappleClientState {
         public UUID playerId() {
             return playerId;
         }
+
         public InteractionHand hand() {
             return hand;
         }
+
         public EntropyGrappleStateS2CPacket.VisualState state() {
             return state;
         }
+
         public Vec3 currentEnd() {
             return currentEnd;
         }
+
         public Rope rope() {
             return rope;
         }
@@ -280,7 +291,7 @@ public final class EntropyGrappleClientState {
             initialized = true;
         }
 
-        private void step(Vec3 start, Vec3 end, EntropyGrappleStateS2CPacket.VisualState state, long gameTime) {
+        private void step(ClientLevel level, Vec3 start, Vec3 end, EntropyGrappleStateS2CPacket.VisualState state, long gameTime) {
             if (!initialized || points[0] == null || points[SEGMENTS] == null || points[0].distanceToSqr(start) > 256.0D || points[SEGMENTS].distanceToSqr(end) > 256.0D) {
 
                 seed(start, end);
@@ -306,6 +317,9 @@ public final class EntropyGrappleClientState {
 
                 points[i] = current.add(velocity).add(microWobble, -gravity, -microWobble * 0.55D);
             }
+
+
+            collideRopeWithWorld(level);
 
             double distance = Math.max(0.01D, start.distanceTo(end));
 
@@ -345,10 +359,172 @@ public final class EntropyGrappleClientState {
                         points[i + 1] = points[i + 1].subtract(correction);
                     }
                 }
+
+                if ((iteration & 1) == 1) {
+                    collideRopeWithWorld(level);
+                }
             }
+
+            collideRopeWithWorld(level);
 
             points[0] = start;
             points[SEGMENTS] = end;
+        }
+
+        private void collideRopeWithWorld(ClientLevel level) {
+            for (int i = 1; i < SEGMENTS; i++) {
+                Vec3 original = points[i];
+
+                CollisionResult collision = resolvePointCollision(level, original);
+
+                if (!collision.collided()) {
+                    continue;
+                }
+
+                Vec3 resolved = collision.point();
+                Vec3 normal = collision.normal();
+
+                Vec3 velocity = original.subtract(previous[i]);
+
+                double normalVelocity = velocity.dot(normal);
+
+                if (normalVelocity < 0.0D) {
+                    velocity = velocity.subtract(normal.scale(normalVelocity));
+                }
+
+                velocity = velocity.scale(SURFACE_FRICTION);
+
+                points[i] = resolved;
+                previous[i] = resolved.subtract(velocity);
+            }
+        }
+
+        private static CollisionResult resolvePointCollision(ClientLevel level, Vec3 source) {
+            Vec3 point = source;
+            Vec3 lastNormal = Vec3.ZERO;
+            boolean collided = false;
+
+            for (int pass = 0; pass < 3; pass++) {
+                CollisionResult best = findDeepestCollision(level, point);
+
+                if (!best.collided()) {
+                    break;
+                }
+
+                collided = true;
+                point = best.point();
+                lastNormal = best.normal();
+            }
+
+            return new CollisionResult(point, lastNormal, collided);
+        }
+
+        private static CollisionResult findDeepestCollision(ClientLevel level, Vec3 point) {
+            int minX = Mth.floor(point.x - ROPE_COLLISION_RADIUS);
+            int maxX = Mth.floor(point.x + ROPE_COLLISION_RADIUS);
+
+            int minY = Mth.floor(point.y - ROPE_COLLISION_RADIUS);
+            int maxY = Mth.floor(point.y + ROPE_COLLISION_RADIUS);
+
+            int minZ = Mth.floor(point.z - ROPE_COLLISION_RADIUS);
+            int maxZ = Mth.floor(point.z + ROPE_COLLISION_RADIUS);
+
+            net.minecraft.core.BlockPos.MutableBlockPos mutable = new net.minecraft.core.BlockPos.MutableBlockPos();
+
+            CollisionResult best = CollisionResult.NONE;
+            double bestDepth = Double.POSITIVE_INFINITY;
+
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+
+                        mutable.set(x, y, z);
+
+                        BlockState state = level.getBlockState(mutable);
+
+                        if (state.isAir()) {
+                            continue;
+                        }
+
+                        VoxelShape shape = state.getCollisionShape(level, mutable);
+
+                        if (shape.isEmpty()) {
+                            continue;
+                        }
+
+                        for (AABB localBox : shape.toAabbs()) {
+                            AABB box = localBox.move(x, y, z).inflate(ROPE_COLLISION_RADIUS);
+
+                            if (!box.contains(point)) {
+                                continue;
+                            }
+                            
+                            double toMinX = point.x - box.minX;
+                            double toMaxX = box.maxX - point.x;
+
+                            double toMinY = point.y - box.minY;
+                            double toMaxY = box.maxY - point.y;
+
+                            double toMinZ = point.z - box.minZ;
+                            double toMaxZ = box.maxZ - point.z;
+
+                            double depth = toMinX;
+
+                            Vec3 resolved = new Vec3(box.minX - COLLISION_EPSILON, point.y, point.z);
+
+                            Vec3 normal = new Vec3(-1.0D, 0.0D, 0.0D);
+
+                            if (toMaxX < depth) {
+                                depth = toMaxX;
+
+                                resolved = new Vec3(box.maxX + COLLISION_EPSILON, point.y, point.z);
+
+                                normal = new Vec3(1.0D, 0.0D, 0.0D);
+                            }
+
+                            if (toMinY < depth) {
+                                depth = toMinY;
+
+                                resolved = new Vec3(point.x, box.minY - COLLISION_EPSILON, point.z);
+
+                                normal = new Vec3(0.0D, -1.0D, 0.0D);
+                            }
+
+                            if (toMaxY < depth) {
+                                depth = toMaxY;
+
+                                resolved = new Vec3(point.x, box.maxY + COLLISION_EPSILON, point.z);
+
+                                normal = new Vec3(0.0D, 1.0D, 0.0D);
+                            }
+
+                            if (toMinZ < depth) {
+                                depth = toMinZ;
+
+                                resolved = new Vec3(point.x, point.y, box.minZ - COLLISION_EPSILON);
+
+                                normal = new Vec3(0.0D, 0.0D, -1.0D);
+                            }
+
+                            if (toMaxZ < depth) {
+                                depth = toMaxZ;
+
+                                resolved = new Vec3(point.x, point.y, box.maxZ + COLLISION_EPSILON);
+
+                                normal = new Vec3(0.0D, 0.0D, 1.0D);
+                            }
+
+                            if (depth < bestDepth) {
+                                bestDepth = depth;
+
+                                best = new CollisionResult(resolved, normal, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return best;
         }
 
         public Vec3 getPoint(int index, float partialTick) {
@@ -368,5 +544,10 @@ public final class EntropyGrappleClientState {
         public int size() {
             return SEGMENTS + 1;
         }
+
+        private record CollisionResult(Vec3 point, Vec3 normal, boolean collided) {
+            private static final CollisionResult NONE = new CollisionResult(Vec3.ZERO, Vec3.ZERO, false);
+        }
     }
+
 }
