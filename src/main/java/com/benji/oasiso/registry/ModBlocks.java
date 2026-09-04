@@ -38,6 +38,9 @@ public final class ModBlocks {
     public static final RegistryObject<Block> SCARLET_GRASS = BLOCKS.register("scarlet_grass", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SPONGE).strength(1.0F)));
     public static final RegistryObject<Block> SCARLET_LOG = BLOCKS.register("scarlet_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(4.0F).requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> MEMORY_PUZ = BLOCKS.register("memory_puz", () -> new MemoryPuzzleBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(250.0F).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> MEMORY_CORE = BLOCKS.register("memory_core", () -> new MemoryCoreBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(250.0F).requiresCorrectToolForDrops().noOcclusion()));
+
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_COMPRESSED = BLOCKS.register("nephritis_compressed", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(10.0F).requiresCorrectToolForDrops()));

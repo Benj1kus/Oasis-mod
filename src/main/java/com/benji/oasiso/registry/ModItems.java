@@ -37,6 +37,10 @@ public final class ModItems {
     public static final RegistryObject<Item> NEPHRITIS_LINE_ITEM = ITEMS.register("nephritis_line", () -> new BlockItem(ModBlocks.NEPHRITIS_LINE.get(), new Item.Properties()));
     public static final RegistryObject<Item> AZUMALIT_BLOCK_ITEM = ITEMS.register("azumalit_block", () -> new BlockItem(ModBlocks.AZUMALIT_BLOCK.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> MEMORY_PUZ_ITEM = ITEMS.register("memory_puz", () -> new BlockItem(ModBlocks.MEMORY_PUZ.get(), new Item.Properties()));
+    public static final RegistryObject<Item> MEMORY_CORE_ITEM = ITEMS.register("memory_core", () -> new BlockItem(ModBlocks.MEMORY_CORE.get(), new Item.Properties()));
+
+
     public static final RegistryObject<Item> SANDSTONE_COLORED_ITEM = ITEMS.register("sandstone_colored", () -> new BlockItem(ModBlocks.SANDSTONE_COLORED.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_STRIPE_ITEM = ITEMS.register("sandstone_stripe", () -> new BlockItem(ModBlocks.SANDSTONE_STRIPE.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_FLOORB_ITEM = ITEMS.register("sandstone_floorb", () -> new BlockItem(ModBlocks.SANDSTONE_FLOORB.get(), new Item.Properties()));

@@ -94,11 +94,18 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
-                Oasiso
-                        .STORM_TOTEM_BLOCK_ENTITY
-                        .get(),
-
+                Oasiso.STORM_TOTEM_BLOCK_ENTITY.get(),
                 StormTotemRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.MEMORY_PUZ_BE.get(),
+                MemoryPuzzleBlockRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.MEMORY_CORE_BE.get(),
+                MemoryCoreBlockRenderer::new
         );
 
         event.registerBlockEntityRenderer(
