@@ -18,7 +18,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -56,6 +55,7 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
     private static final String TAG_HELD_BLOCK = "EntropyGravityHeldBlock";
     private static final String TAG_FILL_MODE = "EntropyGravityFillMode";
+    private static final String TAG_GRAPPLE_MODE = "EntropyGravityGrappleMode";
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -89,10 +89,12 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
         ItemStack glove = context.getItemInHand();
 
+        if (isGrappleMode(glove)) {
+            return level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
+        }
+
         if (isFillMode(glove)) {
-            return level.isClientSide
-                    ? InteractionResult.SUCCESS
-                    : InteractionResult.CONSUME;
+            return level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
         }
 
         if (level.isClientSide) {
@@ -168,11 +170,12 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack glove = player.getItemInHand(hand);
 
+        if (isGrappleMode(glove)) {
+            return InteractionResultHolder.sidedSuccess(glove, level.isClientSide);
+        }
+
         if (isFillMode(glove)) {
-            return InteractionResultHolder.sidedSuccess(
-                    glove,
-                    level.isClientSide
-            );
+            return InteractionResultHolder.sidedSuccess(glove, level.isClientSide);
         }
 
         if (level.isClientSide) {
@@ -227,16 +230,43 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
 
     public static void setFillMode(ItemStack stack, boolean enabled) {
-        if (enabled) {
-            stack.getOrCreateTag().putBoolean(TAG_FILL_MODE, true);
+        CompoundTag tag = enabled ? stack.getOrCreateTag() : stack.getTag();
+
+        if (tag == null) {
             return;
         }
 
+        if (enabled) {
+            tag.remove(TAG_GRAPPLE_MODE);
+            tag.putBoolean(TAG_FILL_MODE, true);
+            return;
+        }
+
+        tag.remove(TAG_FILL_MODE);
+    }
+
+
+    public static boolean isGrappleMode(ItemStack stack) {
         CompoundTag tag = stack.getTag();
 
-        if (tag != null) {
-            tag.remove(TAG_FILL_MODE);
+        return tag != null && tag.getBoolean(TAG_GRAPPLE_MODE);
+    }
+
+
+    public static void setGrappleMode(ItemStack stack, boolean enabled) {
+        CompoundTag tag = enabled ? stack.getOrCreateTag() : stack.getTag();
+
+        if (tag == null) {
+            return;
         }
+
+        if (enabled) {
+            tag.remove(TAG_FILL_MODE);
+            tag.putBoolean(TAG_GRAPPLE_MODE, true);
+            return;
+        }
+
+        tag.remove(TAG_GRAPPLE_MODE);
     }
 
 
@@ -350,16 +380,12 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
     public static ItemStack findActiveGlove(Player player) {
         ItemStack main = player.getMainHandItem();
 
-        if (main.getItem() instanceof EntropyChestplateGloveItem
-                && !isFillMode(main)
-                && hasHeldBlock(main)) {
+        if (main.getItem() instanceof EntropyChestplateGloveItem && !isFillMode(main) && !isGrappleMode(main) && hasHeldBlock(main)) {
             return main;
         }
 
         ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof EntropyChestplateGloveItem
-                && !isFillMode(off)
-                && hasHeldBlock(off)) {
+        if (off.getItem() instanceof EntropyChestplateGloveItem && !isFillMode(off) && !isGrappleMode(off) && hasHeldBlock(off)) {
             return off;
         }
 
@@ -379,14 +405,13 @@ public class EntropyChestplateGloveItem extends Item implements GeoItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        Component glove = Component.translatable("tooltip.oasiso.glove")
-                .withStyle(ChatFormatting.AQUA);
+        Component glove = Component.translatable("tooltip.oasiso.glove").withStyle(ChatFormatting.AQUA);
 
-        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove2", glove)
-                .withStyle(ChatFormatting.DARK_AQUA));
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove2", glove).withStyle(ChatFormatting.DARK_AQUA));
 
-        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove3", glove)
-                .withStyle(ChatFormatting.DARK_AQUA));
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove3", glove).withStyle(ChatFormatting.DARK_AQUA));
+
+        tooltipComponents.add(Component.translatable("tooltip.oasiso.glove4", glove).withStyle(ChatFormatting.DARK_AQUA));
 
         tooltipComponents.add(glove);
     }

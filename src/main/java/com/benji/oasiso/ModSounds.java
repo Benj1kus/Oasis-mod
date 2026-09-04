@@ -16,6 +16,9 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
 
+    public static final RegistryObject<SoundEvent> GLOV_BOUNCE = registerSoundEvent("glov_bounce");
+
+
     public static final RegistryObject<SoundEvent> PALADIN_THEME = registerSoundEvent("paladin_theme");
     public static final RegistryObject<SoundEvent> PALADIN_IDLE1 = registerSoundEvent("paladin_idle1");
     public static final RegistryObject<SoundEvent> PALADIN_IDLE2 = registerSoundEvent("paladin_idle2");

@@ -25,6 +25,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.SoundType;
+import com.benji.oasiso.ModSounds;
 
 import java.util.*;
 
@@ -50,6 +51,10 @@ public final class EntropyGloveFillManager {
 
         boolean enabled = !EntropyChestplateGloveItem.isFillMode(glove);
 
+        if (enabled) {
+            EntropyGrappleManager.disableForOtherMode(player, hand);
+        }
+
         if (enabled && player.level() instanceof ServerLevel level) {
             EntropyPhysicsBlockEntity held = EntropyChestplateGloveItem.resolveHeldBlock(level, glove);
 
@@ -64,6 +69,7 @@ public final class EntropyGloveFillManager {
         SELECTIONS.remove(player.getUUID());
         syncInventory(player);
         syncSelection(player, hand);
+        player.playNotifySound(ModSounds.CASER_DEFAULT.get(), SoundSource.PLAYERS, 0.72F, enabled ? 1.08F : 0.92F);
     }
 
     public static void startSelection(ServerPlayer player, InteractionHand hand, BlockPos point, Direction.Axis axis) {
@@ -77,14 +83,28 @@ public final class EntropyGloveFillManager {
             return;
         }
 
-        Selection selection = new Selection(player.level().dimension(),
-                hand,
-                point.immutable(),
-                null,
-                axis,
-                player.getRandom().nextLong());
+        Selection selection = new Selection(player.level().dimension(), hand, point.immutable(), null, axis, player.getRandom().nextLong());
 
         SELECTIONS.put(player.getUUID(), selection);
+        syncSelection(player, hand);
+    }
+
+    public static void disableForOtherMode(ServerPlayer player, InteractionHand hand) {
+        ItemStack glove = player.getItemInHand(hand);
+
+        if (!(glove.getItem() instanceof EntropyChestplateGloveItem)) {
+            return;
+        }
+
+        if (!EntropyChestplateGloveItem.isFillMode(glove)) {
+            return;
+        }
+
+        EntropyChestplateGloveItem.setFillMode(glove, false);
+
+        SELECTIONS.remove(player.getUUID());
+
+        syncInventory(player);
         syncSelection(player, hand);
     }
 
@@ -92,9 +112,7 @@ public final class EntropyGloveFillManager {
         Selection current = SELECTIONS.get(player.getUUID());
 
 
-        if (current == null || current.second() != null
-                || current.dimension() != player.level().dimension()
-                || current.hand() != hand) {
+        if (current == null || current.second() != null || current.dimension() != player.level().dimension() || current.hand() != hand) {
 
             return;
         }
@@ -118,10 +136,7 @@ public final class EntropyGloveFillManager {
         }
 
 
-        Selection completed = new Selection(current.dimension(), current.hand(),
-                current.first(), point.immutable(),
-                current.axis(),
-                current.seed());
+        Selection completed = new Selection(current.dimension(), current.hand(), current.first(), point.immutable(), current.axis(), current.seed());
 
         SELECTIONS.put(player.getUUID(), completed);
         syncSelection(player, hand);
@@ -141,9 +156,7 @@ public final class EntropyGloveFillManager {
 
         Selection selection = SELECTIONS.get(player.getUUID());
 
-        if (selection == null || selection.second() == null
-                || selection.dimension() != level.dimension()
-                || selection.hand() != gloveHand) {
+        if (selection == null || selection.second() == null || selection.dimension() != level.dimension() || selection.hand() != gloveHand) {
             return;
         }
 
@@ -157,8 +170,7 @@ public final class EntropyGloveFillManager {
             return;
         }
 
-        InteractionHand materialHand = gloveHand == InteractionHand.MAIN_HAND
-                ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        InteractionHand materialHand = gloveHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
 
         ItemStack material = player.getItemInHand(materialHand);
 
@@ -179,8 +191,7 @@ public final class EntropyGloveFillManager {
             return;
         }
 
-        int available = player.getAbilities().instabuild
-                ? targets.size() : material.getCount();
+        int available = player.getAbilities().instabuild ? targets.size() : material.getCount();
 
         int amount = Math.min(available, targets.size());
 
@@ -207,23 +218,13 @@ public final class EntropyGloveFillManager {
 
             long animationStart = now + (long) i * START_INTERVAL_TICKS;
 
-            PENDING.add(new ScheduledPlacement(level.dimension(),
-                    player.getUUID(),
-                    pos,
-                    placementState,
-                    refund,
-                    !player.getAbilities().instabuild,
-                    animationStart,
-                    animationStart + INSERT_ANIMATION_TICKS,
-                    false));
+            PENDING.add(new ScheduledPlacement(level.dimension(), player.getUUID(), pos, placementState, refund, !player.getAbilities().instabuild, animationStart, animationStart + INSERT_ANIMATION_TICKS, false));
         }
     }
 
     @SubscribeEvent
     public static void onLevelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase != TickEvent.Phase.END
-                || event.level.isClientSide
-                || !(event.level instanceof ServerLevel level)) {
+        if (event.phase != TickEvent.Phase.END || event.level.isClientSide || !(event.level instanceof ServerLevel level)) {
             return;
         }
         long now = level.getGameTime();
@@ -252,13 +253,9 @@ public final class EntropyGloveFillManager {
 
             RESERVED.remove(reserved);
 
-            if (canFillTarget(level,
-                    placement.pos(),
-                    placement.state())) {
+            if (canFillTarget(level, placement.pos(), placement.state())) {
 
-                boolean placed = level.setBlock(placement.pos(),
-                        placement.state(),
-                        Block.UPDATE_ALL);
+                boolean placed = level.setBlock(placement.pos(), placement.state(), Block.UPDATE_ALL);
 
 
                 if (!placed) {
@@ -339,10 +336,7 @@ public final class EntropyGloveFillManager {
         int cornerA = highA ? maxA : minA;
         int cornerB = highB ? maxB : minB;
 
-        result.sort(Comparator.comparingDouble(pos -> getOrderDistance(pos,
-                selection.axis(),
-                cornerA, cornerB,
-                selection.seed())));
+        result.sort(Comparator.comparingDouble(pos -> getOrderDistance(pos, selection.axis(), cornerA, cornerB, selection.seed())));
 
         return result;
     }
@@ -385,8 +379,7 @@ public final class EntropyGloveFillManager {
     }
 
     private static boolean canFillTarget(ServerLevel level, BlockPos pos, BlockState state) {
-        if (pos.getY() < level.getMinBuildHeight()
-                || pos.getY() >= level.getMaxBuildHeight()) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() >= level.getMaxBuildHeight()) {
             return false;
         }
 
@@ -410,9 +403,7 @@ public final class EntropyGloveFillManager {
     private static void broadcastAnimation(ServerLevel level, ScheduledPlacement placement) {
         Vec3 center = Vec3.atCenterOf(placement.pos());
 
-        EntropyGloveFillAnimationPacket packet = new EntropyGloveFillAnimationPacket(placement.pos(),
-                Block.getId(placement.state()),
-                INSERT_ANIMATION_TICKS);
+        EntropyGloveFillAnimationPacket packet = new EntropyGloveFillAnimationPacket(placement.pos(), Block.getId(placement.state()), INSERT_ANIMATION_TICKS);
 
 
         for (ServerPlayer watcher : level.players()) {
@@ -424,8 +415,7 @@ public final class EntropyGloveFillManager {
         }
 
         SoundType soundType = placement.state().getSoundType();
-        float volume = Math.min(0.55F,
-                0.28F + soundType.getVolume() * 0.18F);
+        float volume = Math.min(0.55F, 0.28F + soundType.getVolume() * 0.18F);
 
         float pitch = soundType.getPitch() * (0.96F + level.random.nextFloat() * 0.10F);
 

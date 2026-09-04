@@ -16,6 +16,8 @@ public final class ModKeyMappings {
 
     public static final KeyMapping GLOVE_FILL_MODE = new KeyMapping("key.oasiso.glove_fill_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.categories.oasiso");
 
+    public static final KeyMapping GLOVE_GRAPPLE_MODE = new KeyMapping("key.oasiso.glove_grapple_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, "key.categories.oasiso");
+
     private ModKeyMappings() {
     }
 
@@ -23,5 +25,6 @@ public final class ModKeyMappings {
     public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(TURRET_MODE);
         event.register(GLOVE_FILL_MODE);
+        event.register(GLOVE_GRAPPLE_MODE);
     }
 }
