@@ -458,7 +458,7 @@ public final class EntropyGrappleClientState {
                             if (!box.contains(point)) {
                                 continue;
                             }
-                            
+
                             double toMinX = point.x - box.minX;
                             double toMaxX = box.maxX - point.x;
 

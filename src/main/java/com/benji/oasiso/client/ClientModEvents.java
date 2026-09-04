@@ -172,6 +172,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                Oasiso.SCARAB.get(),
+                ScarabRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.TITANA.get(),
                 TitanaRenderer::new
         );

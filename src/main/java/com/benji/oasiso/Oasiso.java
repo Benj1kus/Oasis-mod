@@ -276,6 +276,7 @@ public class Oasiso {
     public static final RegistryObject<BlockEntityType<com.benji.oasiso.common.block.entity.DoumPalmHangingSignBlockEntity>> DOUM_PALM_HANGING_SIGN_BE = ModBlockEntities.DOUM_PALM_HANGING_SIGN_BE;
 
     // Entities
+    public static final RegistryObject<EntityType<ScarabEntity>> SCARAB = ModEntities.SCARAB;
     public static final RegistryObject<EntityType<KrombulEntity>> KROMBUL = ModEntities.KROMBUL;
     public static final RegistryObject<EntityType<AzumaalEntity>> AZUMAAL = ModEntities.AZUMAAL;
     public static final RegistryObject<EntityType<ChaosBombEntity>> CHAOS_BOMB = ModEntities.CHAOS_BOMB;
@@ -411,6 +412,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.SCARAB.get(), ScarabEntity.createAttributes().build());
             event.put(ModEntities.MONKI.get(), MonkiEntity.createAttributes().build());
             event.put(ModEntities.GASTER.get(), GasterEntity.createAttributes().build());
             event.put(ModEntities.BOSS_PORTAL.get(), BossPortalEntity.createAttributes().build());

@@ -19,6 +19,7 @@ public final class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<EntityType<ScarabEntity>> SCARAB = ENTITIES.register("scarab", () -> EntityType.Builder.of(ScarabEntity::new, MobCategory.CREATURE).sized(2.875f, 1.75f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "scarab").toString()));
     public static final RegistryObject<EntityType<KrombulEntity>> KROMBUL = ENTITIES.register("krombul", () -> EntityType.Builder.of(KrombulEntity::new, MobCategory.CREATURE).sized(0.75F, 1.25F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "krombul").toString()));
     public static final RegistryObject<EntityType<AzumaalEntity>> AZUMAAL = ENTITIES.register("azumaal", () -> EntityType.Builder.of(AzumaalEntity::new, MobCategory.MONSTER).sized(1.375F, 6.25F).build(ResourceLocation.fromNamespaceAndPath(MODID, "azumaal").toString()));
     public static final RegistryObject<EntityType<ChaosBombEntity>> CHAOS_BOMB = ENTITIES.register("chaos_bomb", () -> EntityType.Builder.of(ChaosBombEntity::new, MobCategory.MONSTER).sized(0.75F, 0.875F).build(ResourceLocation.fromNamespaceAndPath(MODID, "chaos_bomb").toString()));
