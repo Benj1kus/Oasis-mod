@@ -35,6 +35,12 @@
   "tower_place": { "sounds": [ "oasiso:tower_place" ] },
   "cast": { "sounds": [ "oasiso:cast" ] },
 
+  "scarab_idle": { "sounds": [ "oasiso:scarab_idle" ] },
+  "scarab_idle2": { "sounds": [ "oasiso:scarab_idle2" ] },
+  "scarab_idle3": { "sounds": [ "oasiso:scarab_idle3" ] },
+  "scarab_death": { "sounds": [ "oasiso:scarab_death" ] },
+  "scarab_step": { "sounds": [ "oasiso:scarab_step" ] },
+
   "paladin_idle1": { "sounds": [ "oasiso:paladin_idle1" ] },
   "paladin_idle2": { "sounds": [ "oasiso:paladin_idle2" ] },
   "paladin_idle3": { "sounds": [ "oasiso:paladin_idle3" ] },

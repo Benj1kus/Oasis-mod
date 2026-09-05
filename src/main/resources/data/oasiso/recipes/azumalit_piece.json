@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:azumalit_shard"
+    }
+  ],
+  "result": {
+    "item": "oasiso:azumalit_piece",
+    "count": 9
+  }
+}

@@ -114,6 +114,8 @@ public final class ModItems {
 
     public static final RegistryObject<Item> ENTROPY_CHESTPLATE = ITEMS.register("entropy_chestplate", () -> new EntropyChestplateItem(new Item.Properties().stacksTo(1).fireResistant()));
 
+    public static final RegistryObject<Item> SCARAB_CORE = ITEMS.register("scarab_core", () -> new ScarabCoreItem(ModEntities.SCARAB, 0xFFFFFF, 0xFFFFFF, new Item.Properties().durability(5)));
+
     public static final RegistryObject<Item> CASSASIN_SPAWN_EGG = ITEMS.register("cassasin_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_ASSASIN, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CTANK_SPAWN_EGG = ITEMS.register("ctank_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_TANK, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CWARRIOR_SPAWN_EGG = ITEMS.register("cwarrior_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_WARRIOR, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));

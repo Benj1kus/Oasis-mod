@@ -116,6 +116,7 @@
   "item.oasiso.cwizard_spawn_egg": "Osiris' Crusader Wizard Spawn Egg",
   "item.oasiso.ctank_spawn_egg": "Osiris' Crusader Barbarian Spawn Egg",
   "item.oasiso.cpaladin_spawn_egg": "Osiris' Paladin Ramiel Spawn Egg",
+  "item.oasiso.scarab_core": "Osiris' Scarab core",
 
   "entity.oasiso.azumaal": "Osiris",
   "entity.oasiso.chaos_bomb": "Chaos bomb",
@@ -195,6 +196,8 @@
   "tooltip.oasiso.scis": "Press [RMB] to open portal",
   "tooltip.oasiso.scis2": "Be careful :P",
   "tooltip.oasiso.karak_chest": "[SHIFT] + [RMB] to use ability",
+  "tooltip.oasiso.scarab1": "Is that his pet?",
+  "tooltip.oasiso.scarab2": "Use Azumalit pieces to feed Scarab",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

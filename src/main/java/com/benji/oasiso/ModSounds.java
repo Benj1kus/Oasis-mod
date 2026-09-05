@@ -19,6 +19,12 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> GLOV_BOUNCE = registerSoundEvent("glov_bounce");
 
 
+    public static final RegistryObject<SoundEvent> SCARAB_IDLE = registerSoundEvent("scarab_idle");
+    public static final RegistryObject<SoundEvent> SCARAB_IDLE2 = registerSoundEvent("scarab_idle2");
+    public static final RegistryObject<SoundEvent> SCARAB_IDLE3 = registerSoundEvent("scarab_idle3");
+    public static final RegistryObject<SoundEvent> SCARAB_DEATH = registerSoundEvent("scarab_death");
+    public static final RegistryObject<SoundEvent> SCARAB_STEP = registerSoundEvent("scarab_step");
+
     public static final RegistryObject<SoundEvent> PALADIN_THEME = registerSoundEvent("paladin_theme");
     public static final RegistryObject<SoundEvent> PALADIN_IDLE1 = registerSoundEvent("paladin_idle1");
     public static final RegistryObject<SoundEvent> PALADIN_IDLE2 = registerSoundEvent("paladin_idle2");
