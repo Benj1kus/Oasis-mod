@@ -124,6 +124,7 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     implementation "com.benji.dialoguestudio:dlgstd:1.0.0"
+    implementation "com.benji.titlestudio:ttlstd:1.0.0"
 
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.9.1+1.20.1:api")
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.9.1+1.20.1")

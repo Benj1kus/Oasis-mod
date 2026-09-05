@@ -17,3 +17,11 @@ includeBuild('../dialoguestudio') {
         substitute module('com.benji.dialoguestudio:dlgstd') using project(':')
     }
 }
+
+includeBuild('../titlestudio') {
+    dependencySubstitution {
+        substitute module(
+                'com.benji.titlestudio:ttlstd'
+        ) using project(':')
+    }
+}
