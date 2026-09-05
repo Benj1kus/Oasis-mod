@@ -1,7 +1,7 @@
 {
   "format": 2,
 
-  "voice": "osiris",
+  "voice": "oasiso:osiris_voice",
   "voice_pitch": 1.0,
   "voice_volume": 0.55,
   "voice_every": 1,
@@ -13,8 +13,8 @@
   "text_color": "rainbow",
   "text_effect": "wave",
 
-  "frame": "oasiso:textures/gui/dialogue/frame_dialog.png",
-  "background": "oasiso:textures/gui/dialogue/dithering_gradient.png",
+  "frame": "dlgstd:textures/gui/dialogue/frame_dialog.png",
+  "background": "dlgstd:textures/gui/dialogue/dithering_gradient.png",
 
   "background_alpha": 0.62,
   "background_bob": 1.6,

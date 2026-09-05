@@ -1,7 +1,7 @@
 {
   "format": 2,
 
-  "voice": "paladin",
+  "voice": "oasiso:paladin_voice",
 
   "char_ticks": 2,
   "hold_ticks": 24,
@@ -14,8 +14,8 @@
   "text_color": "gold",
   "text_effect": "wave",
 
-  "frame": "oasiso:textures/gui/dialogue/frame_dialog.png",
-  "background": "oasiso:textures/gui/dialogue/dithering_gradient.png",
+  "frame": "dlgstd:textures/gui/dialogue/frame_dialog.png",
+  "background": "dlgstd:textures/gui/dialogue/dithering_gradient.png",
   "background_alpha": 0.62,
 
   "sprite_position": "center",

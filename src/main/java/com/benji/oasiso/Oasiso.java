@@ -12,7 +12,6 @@ import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 import com.benji.oasiso.config.OsirisRealmConfig;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
-import com.benji.oasiso.network.dialogueengine.DialogueNetwork;
 import com.benji.oasiso.registry.ModBlockEntities;
 import com.benji.oasiso.registry.ModBlocks;
 import com.benji.oasiso.registry.ModEffects;
@@ -343,7 +342,6 @@ public class Oasiso {
             ModMessages.register();
             BossPortalTransitionNetwork.register();
             BossDialogueNetwork.register();
-            DialogueNetwork.register();
 
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.FLOWERY.getId(), ModBlocks.POTTED_FLOWERY);
 

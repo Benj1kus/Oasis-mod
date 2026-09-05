@@ -8,7 +8,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import com.benji.oasiso.common.entity.PaladinEntity;
-import com.benji.oasiso.dialogue.DialogueApi;
+import com.benji.dialoguestudio.dialogue.DialogueApi;
 import net.minecraft.world.entity.Entity;
 
 import java.util.UUID;
