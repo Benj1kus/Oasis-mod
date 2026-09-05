@@ -20,6 +20,7 @@ public class ScarabRenderer extends GeoEntityRenderer<ScarabEntity> {
     public void render(ScarabEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.pushPose();
         try {
+            ScarabFlightRenderUtil.applySurfaceOffset(poseStack, entity);
             ScarabFlightRenderUtil.applyTilt(poseStack, entity, partialTick);
             super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 

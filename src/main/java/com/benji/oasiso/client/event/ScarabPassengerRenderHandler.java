@@ -29,6 +29,8 @@ public final class ScarabPassengerRenderHandler {
         }
 
         event.getPoseStack().pushPose();
+
+        ScarabFlightRenderUtil.applySurfaceOffset(event.getPoseStack(), scarab);
         ScarabFlightRenderUtil.applyTilt(event.getPoseStack(), scarab, event.getPartialTick());
     }
 
@@ -48,6 +50,10 @@ public final class ScarabPassengerRenderHandler {
         }
 
         if (!(player.getVehicle() instanceof ScarabEntity scarab)) {
+            return;
+        }
+
+        if (!scarab.isFlyingMode()) {
             return;
         }
 

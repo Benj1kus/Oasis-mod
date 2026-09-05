@@ -48,8 +48,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import com.benji.oasiso.common.item.ScarabCoreItem;
+
 import java.util.UUID;
+
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
 
 public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, PlayerRideableJumping {
 
@@ -68,6 +73,10 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
     private static final EntityDataAccessor<Integer> DATA_UPGRADE = SynchedEntityData.defineId(ScarabEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_POWERED = SynchedEntityData.defineId(ScarabEntity.class, EntityDataSerializers.BOOLEAN);
 
+    private static final EntityDataAccessor<Integer> DATA_SURFACE = SynchedEntityData.defineId(ScarabEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_WALL_FACING_DOWN = SynchedEntityData.defineId(ScarabEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_CEILING_ENTRY_DIRECTION = SynchedEntityData.defineId(ScarabEntity.class, EntityDataSerializers.INT);
+
     private static final int POWER_DURATION = 20 * 40;
     private static final double POWER_STAT_MULTIPLIER = 2.0D;
     private static final float POWER_TILT_ANGLE_MULTIPLIER = 1.08F;
@@ -77,10 +86,17 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
     private static final double SEAT_Y = 18.0D / 16.0D;
     private static final double SEAT_Z = 1.5D / 16.0D;
 
+    private static final double WALL_VISUAL_INSET = 1.5D;
+    private static final double CEILING_VISUAL_INSET = 1.8D;
+
+    private static final int CEILING_ENTRY_TICKS = 14;
+
     private static final int STEP_SOUND_INTERVAL = 3;
 
     private int stepSoundCooldown;
     private int stepSoundIndex;
+
+    private int ceilingEntryTicks;
 
     private double lastSoundX;
     private double lastSoundZ;
@@ -104,11 +120,23 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
 
     private static final double SCARAB_MOVE_SPEED = 0.205D;
 
+    private static final double SURFACE_SPEED_MULTIPLIER = 0.90D;
+    private static final double SURFACE_ADHESION = 0.075D;
+    private static final double SURFACE_PROBE_DEPTH = 0.12D;
+    private static final int WALL_REQUIRED_HEIGHT = 4;
+    private static final double AUTO_WALL_SPEED_MULTIPLIER = 0.72D;
+    private static final double AUTO_CEILING_SPEED_MULTIPLIER = 0.64D;
+    private static final float SURFACE_TILT_RESPONSE = 0.20F;
+    private static final int NORMAL_DROP_HEIGHT = 3;
+
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private float previousFlightPitch;
     private float previousFlightRoll;
     private int powerTicksRemaining;
     private int powerFxTicksRemaining;
+
+    private int autoWallDirection = 1;
+    private int autoSurfaceDecisionTicks;
 
     @Nullable
     private UUID summoningCoreId;
@@ -118,6 +146,7 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
 
     private boolean coreDeathHandled;
 
+    private double lastSoundY;
 
     public ScarabEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -157,10 +186,21 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
         this.entityData.define(DATA_FLYING, false);
         this.entityData.define(DATA_UPGRADE, ScarabUpgrade.NONE.id());
         this.entityData.define(DATA_POWERED, false);
+        this.entityData.define(DATA_SURFACE, ScarabSurface.FLOOR.id());
+        this.entityData.define(DATA_WALL_FACING_DOWN, false);
+        this.entityData.define(DATA_CEILING_ENTRY_DIRECTION, -1);
     }
 
     public boolean isFlyingMode() {
         return this.entityData.get(DATA_FLYING);
+    }
+
+    public boolean isWallFacingDown() {
+        return this.entityData.get(DATA_WALL_FACING_DOWN);
+    }
+
+    private void setWallFacingDown(boolean facingDown) {
+        this.entityData.set(DATA_WALL_FACING_DOWN, facingDown);
     }
 
     public ScarabUpgrade getUpgrade() {
@@ -212,23 +252,641 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
         this.setNoGravity(false);
     }
 
+    public ScarabSurface getSurface() {
+        return ScarabSurface.byId(this.entityData.get(DATA_SURFACE));
+    }
+
+    public boolean isSurfaceAttached() {
+        return this.getSurface() != ScarabSurface.FLOOR;
+    }
+
+    private void setSurface(ScarabSurface surface) {
+        this.entityData.set(DATA_SURFACE, surface.id());
+
+        if (surface != ScarabSurface.CEILING) {
+            clearCeilingEntry();
+        }
+
+        if (!surface.isWall()) {
+            this.setWallFacingDown(false);
+        }
+
+        if (surface != ScarabSurface.FLOOR) {
+
+            this.setNoGravity(true);
+            this.resetFallDistance();
+
+        } else if (!this.isFlyingMode()) {
+
+            this.setNoGravity(false);
+        }
+    }
+
+    private Direction getHorizontalDirection(float yaw) {
+        int index = Mth.floor(yaw / 90.0F + 0.5F) & 3;
+
+        return switch (index) {
+            case 0 -> Direction.SOUTH;
+            case 1 -> Direction.WEST;
+            case 2 -> Direction.NORTH;
+            default -> Direction.EAST;
+        };
+    }
+
+    private float getYawForDirection(Direction direction) {
+        return switch (direction) {
+            case SOUTH -> 0.0F;
+            case WEST -> 90.0F;
+            case NORTH -> 180.0F;
+            case EAST -> -90.0F;
+
+            default -> this.getYRot();
+        };
+    }
+
+    private void faceDirection(Direction direction) {
+        float yaw = getYawForDirection(direction);
+        this.setYRot(yaw);
+
+        this.yBodyRot = yaw;
+        this.yHeadRot = yaw;
+    }
+
+    private Vec3 directionVector(Direction direction) {
+        return new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
+    }
+
+    private boolean isTouchingSurface(Direction normal) {
+        return isTouchingSurfaceAt(this.getBoundingBox(), normal);
+    }
+
+    private boolean isTouchingSurfaceAt(AABB box, Direction normal) {
+        double depth = SURFACE_PROBE_DEPTH;
+
+        double horizontalInset = Math.min(0.12D, this.getBbWidth() * 0.08D);
+
+        double verticalInset = 0.10D;
+
+        AABB probe = switch (normal) {
+
+            case UP ->
+                    new AABB(box.minX + horizontalInset, box.minY - depth, box.minZ + horizontalInset, box.maxX - horizontalInset, box.minY + 0.02D, box.maxZ - horizontalInset);
+            case DOWN ->
+                    new AABB(box.minX + horizontalInset, box.maxY - 0.02D, box.minZ + horizontalInset, box.maxX - horizontalInset, box.maxY + depth, box.maxZ - horizontalInset);
+            case NORTH ->
+                    new AABB(box.minX + horizontalInset, box.minY + verticalInset, box.maxZ - 0.02D, box.maxX - horizontalInset, box.maxY - verticalInset, box.maxZ + depth);
+            case SOUTH ->
+                    new AABB(box.minX + horizontalInset, box.minY + verticalInset, box.minZ - depth, box.maxX - horizontalInset, box.maxY - verticalInset, box.minZ + 0.02D);
+            case WEST ->
+                    new AABB(box.maxX - 0.02D, box.minY + verticalInset, box.minZ + horizontalInset, box.maxX + depth, box.maxY - verticalInset, box.maxZ - horizontalInset);
+            case EAST ->
+                    new AABB(box.minX - depth, box.minY + verticalInset, box.minZ + horizontalInset, box.minX + 0.02D, box.maxY - verticalInset, box.maxZ - horizontalInset);
+        };
+
+        return !this.level().noCollision(this, probe);
+    }
+
+    @Nullable
+    private Vec3 findSurfaceStepOffset(Direction normal, Vec3 tangentMovement) {
+        if (tangentMovement.lengthSqr() < 0.000001D) {
+            return null;
+        }
+
+        Vec3 travel = tangentMovement.normalize().scale(Math.max(tangentMovement.length(), 0.24D));
+        Vec3 awayFromSurface = directionVector(normal);
+
+        for (int blocks = 1; blocks <= 2; blocks++) {
+
+            Vec3 offset = awayFromSurface.scale(blocks + 0.05D).add(travel);
+
+            AABB candidate = this.getBoundingBox().move(offset);
+
+            if (!this.level().noCollision(this, candidate)) {
+                continue;
+            }
+            if (!isTouchingSurfaceAt(candidate, normal)) {
+
+                continue;
+            }
+            return offset;
+        }
+        return null;
+    }
+
+    private boolean canSurfaceStep(Direction normal, Vec3 tangentMovement) {
+        return findSurfaceStepOffset(normal, tangentMovement) != null;
+    }
+
+    private boolean trySurfaceStep(Direction normal, Vec3 tangentMovement) {
+        Vec3 offset = findSurfaceStepOffset(normal, tangentMovement);
+
+        if (offset == null) {
+            return false;
+        }
+
+        this.setPos(this.getX() + offset.x, this.getY() + offset.y, this.getZ() + offset.z);
+        this.setDeltaMovement(tangentMovement);
+        this.resetFallDistance();
+
+        return true;
+    }
+
+    private boolean isTallWall(Direction travelDirection) {
+        if (travelDirection == Direction.UP || travelDirection == Direction.DOWN) {
+
+            return false;
+        }
+
+        double distance = this.getBbWidth() * 0.5D + 0.35D;
+        double checkX = this.getX() + travelDirection.getStepX() * distance;
+        double checkZ = this.getZ() + travelDirection.getStepZ() * distance;
+
+        int baseY = Mth.floor(this.getBoundingBox().minY + 0.15D);
+
+        for (int y = 0; y < WALL_REQUIRED_HEIGHT; y++) {
+
+            BlockPos pos = BlockPos.containing(checkX, baseY + y, checkZ);
+            BlockState state = this.level().getBlockState(pos);
+
+            if (state.getCollisionShape(this.level(), pos).isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void tryStartWallClimb(@Nullable Player rider) {
+        if (this.isFlyingMode() || this.isSurfaceAttached() || !this.onGround()) {
+
+            return;
+        }
+
+        boolean wantsWall;
+
+        if (rider != null) {
+            wantsWall = rider.zza > 0.05F;
+
+        } else {
+            wantsWall = this.horizontalCollision;
+        }
+
+
+        if (!wantsWall) {
+            return;
+        }
+
+        Direction travelDirection = getHorizontalDirection(this.getYRot());
+
+        if (!isTallWall(travelDirection)) {
+            return;
+        }
+
+        Direction wallNormal = travelDirection.getOpposite();
+        this.setWallFacingDown(false);
+        this.setSurface(ScarabSurface.fromWallNormal(wallNormal));
+
+        faceDirection(travelDirection);
+
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+
+        this.autoWallDirection = 1;
+        this.autoSurfaceDecisionTicks = 80 + this.random.nextInt(100);
+    }
+
+    private void travelOnAttachedSurface(Player player) {
+        if (!this.isControlledByLocalInstance()) {
+
+            this.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
+        ScarabSurface surface = this.getSurface();
+
+        double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * SURFACE_SPEED_MULTIPLIER;
+
+        float forward = player.zza;
+        float strafe = player.xxa;
+
+        Vec3 tangentMovement = Vec3.ZERO;
+
+        if (surface.isWall()) {
+
+            Direction normal = surface.normal();
+            updateWallBodyYaw(normal);
+
+            Vec3 normalVector = directionVector(normal);
+            Vec3 worldUp = new Vec3(0.0D, 1.0D, 0.0D);
+            Vec3 wallLeft = normalVector.cross(worldUp);
+
+            double verticalDirection = this.isWallFacingDown() ? -1.0D : 1.0D;
+            tangentMovement = worldUp.scale(forward * verticalDirection).add(wallLeft.scale(strafe));
+
+        } else if (surface == ScarabSurface.CEILING) {
+
+            Direction entryDirection = getCeilingEntryDirection();
+
+            if (entryDirection != null) {
+                faceDirection(entryDirection);
+
+                Vec3 forwardVector = directionVector(entryDirection);
+                Vec3 leftVector = new Vec3(forwardVector.z, 0.0D, -forwardVector.x);
+
+                tangentMovement = forwardVector.scale(forward).add(leftVector.scale(strafe));
+
+            } else {
+
+                this.setYRot(player.getYRot());
+
+                this.yBodyRot = this.getYRot();
+                this.yHeadRot = this.getYRot();
+
+                float radians = (float) Math.toRadians(this.getYRot());
+
+                Vec3 forwardVector = new Vec3(-Mth.sin(radians), 0.0D, Mth.cos(radians));
+                Vec3 leftVector = new Vec3(Mth.cos(radians), 0.0D, Mth.sin(radians));
+
+                tangentMovement = forwardVector.scale(forward).add(leftVector.scale(strafe));
+            }
+        }
+
+        if (tangentMovement.lengthSqr() > 1.0D) {
+            tangentMovement = tangentMovement.normalize();
+        }
+
+        tangentMovement = tangentMovement.scale(speed);
+        moveAlongSurface(tangentMovement, surface.normal());
+    }
+
+    private void moveAlongSurface(Vec3 tangentMovement, Direction normal) {
+        Vec3 normalVector = directionVector(normal);
+
+        if (tangentMovement.lengthSqr() > 0.000001D) {
+
+            AABB directCandidate = this.getBoundingBox().move(tangentMovement);
+
+            if (!this.level().noCollision(this, directCandidate)) {
+
+                if (trySurfaceStep(normal, tangentMovement)) {
+                    return;
+                }
+            }
+        }
+
+        Vec3 adhesion = normalVector.scale(-SURFACE_ADHESION);
+
+        this.setDeltaMovement(tangentMovement);
+        this.move(MoverType.SELF, tangentMovement.add(adhesion));
+        this.resetFallDistance();
+    }
+
+    private boolean tryReturnToBaseSurface(Direction normal) {
+        Vec3 towardSurface = directionVector(normal).scale(-1.0D);
+
+        for (int blocks = 1; blocks <= 2; blocks++) {
+
+            Vec3 offset = towardSurface.scale(blocks);
+            AABB candidate = this.getBoundingBox().move(offset);
+
+            if (!this.level().noCollision(this, candidate)) {
+                continue;
+            }
+
+            if (!isTouchingSurfaceAt(candidate, normal)) {
+                continue;
+            }
+
+            this.setPos(this.getX() + offset.x, this.getY() + offset.y, this.getZ() + offset.z);
+
+            this.setDeltaMovement(Vec3.ZERO);
+            return true;
+        }
+        return false;
+    }
+
+    private void moveAutonomousOnWall() {
+        double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * AUTO_WALL_SPEED_MULTIPLIER;
+
+        Vec3 movement = new Vec3(0.0D, speed * this.autoWallDirection, 0.0D);
+        moveAlongSurface(movement, this.getSurface().normal());
+    }
+
+    private void moveAutonomousOnCeiling() {
+        double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * AUTO_CEILING_SPEED_MULTIPLIER;
+
+        this.autoSurfaceDecisionTicks--;
+
+        if (this.autoSurfaceDecisionTicks <= 0) {
+
+            if (this.random.nextFloat() < 0.45F) {
+
+                float turn = this.random.nextBoolean() ? 90.0F : -90.0F;
+                this.setYRot(this.getYRot() + turn);
+
+                this.yBodyRot = this.getYRot();
+                this.yHeadRot = this.getYRot();
+            }
+
+            this.autoSurfaceDecisionTicks = 70 + this.random.nextInt(100);
+        }
+
+        float radians = (float) Math.toRadians(this.getYRot());
+
+        Vec3 forward = new Vec3(-Mth.sin(radians), 0.0D, Mth.cos(radians));
+
+        moveAlongSurface(forward.scale(speed), Direction.DOWN);
+    }
+
+    private void updateAutoWallDecision() {
+        this.autoSurfaceDecisionTicks--;
+
+        if (this.autoSurfaceDecisionTicks > 0) {
+            return;
+        }
+
+        if (this.random.nextFloat() < 0.30F) {
+            this.autoWallDirection *= -1;
+        }
+
+        this.autoSurfaceDecisionTicks = 80 + this.random.nextInt(120);
+    }
+
+    private boolean tryWrapWallOntoTop(Direction wallNormal) {
+        Vec3 inward = directionVector(wallNormal).scale(-1.0D);
+
+        double horizontalShift = this.getBbWidth() * 0.5D + 0.35D;
+        double verticalShift = 0.18D;
+
+        Vec3 offset = new Vec3(inward.x * horizontalShift, verticalShift, inward.z * horizontalShift);
+
+        AABB candidate = this.getBoundingBox().move(offset);
+
+        if (!this.level().noCollision(this, candidate)) {
+            return false;
+        }
+
+        AABB floorProbe = candidate.move(0.0D, -0.22D, 0.0D);
+
+        if (this.level().noCollision(this, floorProbe)) {
+            return false;
+        }
+
+        this.setPos(this.getX() + offset.x, this.getY() + offset.y, this.getZ() + offset.z);
+
+        this.setSurface(ScarabSurface.FLOOR);
+        this.setNoGravity(false);
+        this.setOnGround(true);
+        this.setDeltaMovement(Vec3.ZERO);
+
+        return true;
+    }
+
+    private void tickSurfaceState(@Nullable Player rider) {
+
+        if (this.isFlyingMode()) {
+            if (this.getSurface() != ScarabSurface.FLOOR) {
+                this.setSurface(ScarabSurface.FLOOR);
+            }
+
+            return;
+        }
+
+        ScarabSurface surface = this.getSurface();
+
+        if (surface == ScarabSurface.FLOOR) {
+
+            if (tryStartDownwardWall(rider)) {
+                return;
+            }
+
+            tryStartWallClimb(rider);
+            return;
+        }
+
+
+        this.getNavigation().stop();
+        this.setNoGravity(true);
+        this.resetFallDistance();
+
+        if (surface.isWall()) {
+
+            Direction normal = surface.normal();
+
+            boolean wantsUp;
+
+            boolean wantsDown;
+
+            if (rider != null) {
+
+                if (this.isWallFacingDown()) {
+
+                    wantsDown = rider.zza > 0.05F;
+                    wantsUp = rider.zza < -0.05F;
+
+                } else {
+                    wantsUp = rider.zza > 0.05F;
+                    wantsDown = rider.zza < -0.05F;
+                }
+
+            } else {
+
+                updateAutoWallDecision();
+                wantsUp = this.autoWallDirection > 0;
+                wantsDown = this.autoWallDirection < 0;
+                this.setWallFacingDown(wantsDown);
+            }
+
+            updateWallBodyYaw(normal);
+
+            if (wantsDown && isTouchingSurface(Direction.UP)) {
+
+                double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * SURFACE_SPEED_MULTIPLIER;
+                Vec3 downwardMovement = new Vec3(0.0D, -speed, 0.0D);
+
+                if (!canSurfaceStep(normal, downwardMovement)) {
+
+                    this.setSurface(ScarabSurface.FLOOR);
+                    this.setDeltaMovement(Vec3.ZERO);
+
+                    return;
+                }
+            }
+
+            if (wantsUp && isTouchingSurface(Direction.DOWN)) {
+
+                double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * SURFACE_SPEED_MULTIPLIER;
+                Vec3 upwardMovement = new Vec3(0.0D, speed, 0.0D);
+
+                if (!canSurfaceStep(normal, upwardMovement)) {
+
+                    this.setSurface(ScarabSurface.CEILING);
+                    faceDirection(normal);
+                    startCeilingEntry(normal);
+
+                    this.autoSurfaceDecisionTicks = 70 + this.random.nextInt(100);
+                    this.setDeltaMovement(Vec3.ZERO);
+                    return;
+                }
+            }
+
+            if (!isTouchingSurface(normal)) {
+
+                if (tryReturnToBaseSurface(normal)) {
+                    return;
+                }
+
+                if (wantsUp && tryWrapWallOntoTop(normal)) {
+                    return;
+                }
+                this.setSurface(ScarabSurface.FLOOR);
+                return;
+            }
+
+            if (rider == null) {
+                moveAutonomousOnWall();
+            }
+
+            return;
+        }
+
+        if (surface == ScarabSurface.CEILING) {
+
+            if (!isTouchingSurface(Direction.DOWN)) {
+
+                if (tryReturnToBaseSurface(Direction.DOWN)) {
+                    return;
+                }
+
+                this.setSurface(ScarabSurface.FLOOR);
+                return;
+            }
+
+            Direction ceilingEntryDirection = getCeilingEntryDirection();
+
+            if (ceilingEntryDirection != null) {
+
+                if (this.ceilingEntryTicks > 0) {
+                    this.ceilingEntryTicks--;
+                }
+
+                if (rider != null && rider.zza <= 0.05F) {
+                    clearCeilingEntry();
+                    ceilingEntryDirection = null;
+
+                } else if (this.ceilingEntryTicks <= 0) {
+                    clearCeilingEntry();
+                    ceilingEntryDirection = null;
+                }
+            }
+
+            if (ceilingEntryDirection == null) {
+
+                Direction travelDirection = getDesiredCeilingDirection(rider);
+
+                if (travelDirection != null) {
+                    Direction wallNormal = travelDirection.getOpposite();
+
+                    if (isTouchingSurface(wallNormal)) {
+
+                        double speed = this.getAttributeValue(Attributes.MOVEMENT_SPEED) * SURFACE_SPEED_MULTIPLIER;
+
+                        Vec3 desiredMovement = directionVector(travelDirection).scale(speed);
+
+                        if (!canSurfaceStep(Direction.DOWN, desiredMovement)) {
+                            this.setSurface(ScarabSurface.fromWallNormal(wallNormal));
+                            this.setWallFacingDown(true);
+
+                            updateWallBodyYaw(wallNormal);
+
+                            this.autoWallDirection = -1;
+                            this.autoSurfaceDecisionTicks = 80 + this.random.nextInt(100);
+
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (rider == null) {
+                moveAutonomousOnCeiling();
+            }
+        }
+    }
+
+    @Nullable
+    private Direction getDesiredCeilingDirection(@Nullable Player rider) {
+        double x;
+        double z;
+
+        if (rider != null) {
+
+            if (Math.abs(rider.zza) < 0.05F && Math.abs(rider.xxa) < 0.05F) {
+
+                return null;
+            }
+
+            float radians = (float) Math.toRadians(rider.getYRot());
+
+            Vec3 forward = new Vec3(-Mth.sin(radians), 0.0D, Mth.cos(radians));
+            Vec3 left = new Vec3(Mth.cos(radians), 0.0D, Mth.sin(radians));
+            Vec3 movement = forward.scale(rider.zza).add(left.scale(rider.xxa));
+
+            x = movement.x;
+            z = movement.z;
+
+        } else {
+
+            if (!this.horizontalCollision) {
+                return null;
+            }
+
+            float radians = (float) Math.toRadians(this.getYRot());
+
+            x = -Mth.sin(radians);
+            z = Mth.cos(radians);
+        }
+
+        if (Math.abs(x) > Math.abs(z)) {
+            return x > 0.0D ? Direction.EAST : Direction.WEST;
+        }
+        return z > 0.0D ? Direction.SOUTH : Direction.NORTH;
+    }
+
+    public Vec3 getSurfaceVisualOffset() {
+        ScarabSurface surface = this.getSurface();
+
+        if (surface == ScarabSurface.FLOOR) {
+            return Vec3.ZERO;
+        }
+
+        double inset = surface == ScarabSurface.CEILING ? CEILING_VISUAL_INSET : WALL_VISUAL_INSET;
+
+        Direction normal = surface.normal();
+
+        return new Vec3(-normal.getStepX() * inset, -normal.getStepY() * inset, -normal.getStepZ() * inset);
+    }
+
     private void tickScarabMovementSounds() {
 
         if (!this.soundPositionInitialized) {
             this.lastSoundX = this.getX();
+            this.lastSoundY = this.getY();
             this.lastSoundZ = this.getZ();
             this.soundPositionInitialized = true;
         }
 
         double dx = this.getX() - this.lastSoundX;
+        double dy = this.getY() - this.lastSoundY;
         double dz = this.getZ() - this.lastSoundZ;
 
-        double movedSq = dx * dx + dz * dz;
+        double movedSq = dx * dx + dy * dy + dz * dz;
 
         this.lastSoundX = this.getX();
+        this.lastSoundY = this.getY();
         this.lastSoundZ = this.getZ();
 
-        boolean walking = this.onGround() && !this.isFlyingMode() && movedSq > 0.0004D;
+        boolean walking = !this.isFlyingMode() && (this.onGround() || this.isSurfaceAttached()) && movedSq > 0.0004D;
 
         if (walking) {
             if (this.stepSoundCooldown <= 0) {
@@ -280,6 +938,38 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
         this.stepSoundIndex = (this.stepSoundIndex + 1) % 4;
     }
 
+    private void updateWallBodyYaw(Direction normal) {
+        Direction yawDirection = this.isWallFacingDown() ? normal : normal.getOpposite();
+        faceDirection(yawDirection);
+    }
+
+    @Nullable
+    private Direction getCeilingEntryDirection() {
+        int value = this.entityData.get(DATA_CEILING_ENTRY_DIRECTION);
+
+        if (value < 0) {
+            return null;
+        }
+
+        return Direction.from3DDataValue(value);
+    }
+
+    private void startCeilingEntry(Direction direction) {
+        if (direction == Direction.UP || direction == Direction.DOWN) {
+
+            return;
+        }
+
+        this.entityData.set(DATA_CEILING_ENTRY_DIRECTION, direction.get3DDataValue());
+
+        this.ceilingEntryTicks = CEILING_ENTRY_TICKS;
+    }
+
+    private void clearCeilingEntry() {
+        this.entityData.set(DATA_CEILING_ENTRY_DIRECTION, -1);
+
+        this.ceilingEntryTicks = 0;
+    }
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
@@ -344,11 +1034,7 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
         if (!this.level().isClientSide && !this.coreDeathHandled && this.summoningCoreId != null && this.summoningPlayerId != null) {
             this.coreDeathHandled = true;
             if (this.level().getServer() != null) {
-
-                ScarabCoreItem.onBoundScarabDeath(this.level().getServer(),
-                        this.summoningPlayerId,
-                        this.summoningCoreId,
-                        this.getUUID());
+                ScarabCoreItem.onBoundScarabDeath(this.level().getServer(), this.summoningPlayerId, this.summoningCoreId, this.getUUID());
             }
         }
 
@@ -559,21 +1245,39 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
     public void travel(Vec3 travelVector) {
         LivingEntity controller = this.getControllingPassenger();
 
-        if (!(controller instanceof Player player) || !this.isAlive()) {
+        if (!this.isAlive()) {
+
+            super.travel(travelVector);
+
+            return;
+        }
+
+        if (!this.isFlyingMode() && this.isSurfaceAttached()) {
+
+            if (controller instanceof Player player) {
+
+                travelOnAttachedSurface(player);
+
+            } else {
+                this.setDeltaMovement(Vec3.ZERO);
+            }
+            return;
+        }
+
+        if (!(controller instanceof Player player)) {
             super.travel(travelVector);
             return;
         }
 
+
         if (this.isFlyingMode()) {
 
             if (!this.isNoGravity()) {
-
                 super.travel(Vec3.ZERO);
                 return;
             }
 
             rotateTowardsFlightTarget(player);
-
             if (this.isControlledByLocalInstance()) {
 
                 Vec3 wantedVelocity = player.getLookAngle().normalize().scale(getCurrentFlightSpeed());
@@ -629,18 +1333,40 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
 
         ScarabUpgrade upgrade = this.getUpgrade();
 
-        float poweredAngle = this.isPowered() ? POWER_TILT_ANGLE_MULTIPLIER : 1.0F;
-        float pitchScale = upgrade.pitchMultiplier() * poweredAngle;
-        float rollScale = upgrade.rollMultiplier() * poweredAngle;
-        float response = FLIGHT_TILT_RESPONSE * upgrade.tiltResponseMultiplier() * (this.isPowered() ? POWER_TILT_RESPONSE_MULTIPLIER : 1.0F);
+        float response;
 
-        response = Mth.clamp(response, 0.035F, 0.65F);
+        if (!this.isFlyingMode() && this.isSurfaceAttached()) {
 
-        if (this.isFlyingMode() && this.isNoGravity() && player != null) {
-            targetPitch = Mth.clamp(-player.getXRot() * pitchScale, -MAX_FLIGHT_PITCH * pitchScale, MAX_FLIGHT_PITCH * pitchScale);
+            ScarabSurface surface = this.getSurface();
 
-            float yawDifference = Mth.wrapDegrees(player.getYRot() - this.getYRot());
-            targetRoll = Mth.clamp(-yawDifference * FLIGHT_ROLL_FACTOR * rollScale, -MAX_FLIGHT_ROLL * rollScale, MAX_FLIGHT_ROLL * rollScale);
+            if (surface.isWall()) {
+                targetPitch = this.isWallFacingDown() ? -90.0F : 90.0F;
+                targetRoll = 0.0F;
+
+            } else {
+                targetPitch = surface.pitch();
+                targetRoll = surface.roll();
+            }
+
+            response = SURFACE_TILT_RESPONSE * upgrade.tiltResponseMultiplier();
+            response = Mth.clamp(response, 0.06F, 0.45F);
+
+        } else {
+
+            float poweredAngle = this.isPowered() ? POWER_TILT_ANGLE_MULTIPLIER : 1.0F;
+            float pitchScale = upgrade.pitchMultiplier() * poweredAngle;
+            float rollScale = upgrade.rollMultiplier() * poweredAngle;
+
+            response = FLIGHT_TILT_RESPONSE * upgrade.tiltResponseMultiplier() * (this.isPowered() ? POWER_TILT_RESPONSE_MULTIPLIER : 1.0F);
+
+            response = Mth.clamp(response, 0.035F, 0.65F);
+
+            if (this.isFlyingMode() && this.isNoGravity() && player != null) {
+
+                targetPitch = Mth.clamp(-player.getXRot() * pitchScale, -MAX_FLIGHT_PITCH * pitchScale, MAX_FLIGHT_PITCH * pitchScale);
+                float yawDifference = Mth.wrapDegrees(player.getYRot() - this.getYRot());
+                targetRoll = Mth.clamp(-yawDifference * FLIGHT_ROLL_FACTOR * rollScale, -MAX_FLIGHT_ROLL * rollScale, MAX_FLIGHT_ROLL * rollScale);
+            }
         }
 
         float pitch = Mth.lerp(response, this.getFlightPitch(), targetPitch);
@@ -656,6 +1382,99 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
 
         this.entityData.set(DATA_FLIGHT_PITCH, pitch);
         this.entityData.set(DATA_FLIGHT_ROLL, roll);
+    }
+
+    private boolean hasFloorWithinDrop(Direction direction, int maxDrop) {
+        double distance = this.getBbWidth() * 0.5D + 0.18D;
+
+        double x = this.getX() + direction.getStepX() * distance;
+        double z = this.getZ() + direction.getStepZ() * distance;
+
+        int startY = Mth.floor(this.getBoundingBox().minY - 0.12D);
+        for (int drop = 0; drop <= maxDrop; drop++) {
+            BlockPos pos = BlockPos.containing(x, startY - drop, z);
+            BlockState state = this.level().getBlockState(pos);
+            if (!state.getCollisionShape(this.level(), pos).isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean tryStartDownwardWall(@Nullable Player rider) {
+        if (this.isFlyingMode() || this.isSurfaceAttached() || !this.onGround()) {
+
+            return false;
+        }
+
+        boolean wantsForward;
+
+        float yaw;
+
+        if (rider != null) {
+
+            wantsForward = rider.zza > 0.05F;
+            yaw = rider.getYRot();
+
+        } else {
+
+            Vec3 movement = this.getDeltaMovement();
+            wantsForward = movement.x * movement.x + movement.z * movement.z > 0.0020D;
+            yaw = this.getYRot();
+        }
+
+        if (!wantsForward) {
+            return false;
+        }
+
+        Direction travelDirection = getHorizontalDirection(yaw);
+
+        if (this.horizontalCollision) {
+            return false;
+        }
+
+        if (hasFloorWithinDrop(travelDirection, NORMAL_DROP_HEIGHT)) {
+            return false;
+        }
+
+        Vec3 forward = directionVector(travelDirection);
+
+        double maxForward = this.getBbWidth() + 0.75D;
+        double maxDown = Math.max(NORMAL_DROP_HEIGHT + 3.0D, this.getBbHeight() + 1.5D);
+
+        for (double down = 0.20D; down <= maxDown; down += 0.20D) {
+            for (double forwardDistance = 0.20D; forwardDistance <= maxForward; forwardDistance += 0.20D) {
+
+                Vec3 offset = forward.scale(forwardDistance).add(0.0D, -down, 0.0D);
+                AABB candidate = this.getBoundingBox().move(offset);
+
+                if (!this.level().noCollision(this, candidate)) {
+
+                    continue;
+                }
+
+                if (!isTouchingSurfaceAt(candidate, travelDirection)) {
+                    continue;
+                }
+
+                this.setPos(this.getX() + offset.x, this.getY() + offset.y, this.getZ() + offset.z);
+                this.setSurface(ScarabSurface.fromWallNormal(travelDirection));
+                this.setWallFacingDown(true);
+                updateWallBodyYaw(travelDirection);
+
+                this.setOnGround(false);
+                this.setNoGravity(true);
+                this.setDeltaMovement(Vec3.ZERO);
+                this.getNavigation().stop();
+                this.autoWallDirection = -1;
+                this.autoSurfaceDecisionTicks = 80 + this.random.nextInt(100);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -749,6 +1568,8 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
                 this.powerFxTicksRemaining--;
             }
             tickNetheriteProtection(passenger);
+            Player surfaceRider = passenger instanceof Player player ? player : null;
+            tickSurfaceState(surfaceRider);
             tickScarabMovementSounds();
         }
 
@@ -759,7 +1580,13 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
 
         if (!this.isFlyingMode()) {
 
-            if (this.isNoGravity()) {
+            if (this.isSurfaceAttached()) {
+
+                if (!this.isNoGravity()) {
+                    this.setNoGravity(true);
+                }
+
+            } else if (this.isNoGravity()) {
                 this.setNoGravity(false);
             }
 
@@ -889,6 +1716,14 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
                 return state.setAndContinue(FLY_FORWARD);
             }
 
+            if (this.isSurfaceAttached()) {
+
+                if (this.getDeltaMovement().lengthSqr() > 0.0004D) {
+                    return state.setAndContinue(WALK);
+                }
+                return state.setAndContinue(IDLE);
+            }
+
             if (!this.onGround()) {
 
                 if (this.getDeltaMovement().y > 0.05D) {
@@ -911,6 +1746,9 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
+        tag.putInt("ScarabSurface", this.getSurface().id());
+        tag.putBoolean("ScarabWallFacingDown", this.isWallFacingDown());
+
         if (this.summoningCoreId != null) {
             tag.putUUID("SummoningCoreId", this.summoningCoreId);
         }
@@ -925,6 +1763,9 @@ public class ScarabEntity extends Monster implements GeoEntity, GlowmaskEntity, 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+
+        this.setSurface(ScarabSurface.byId(tag.getInt("ScarabSurface")));
+        this.setWallFacingDown(tag.getBoolean("ScarabWallFacingDown"));
 
         this.setUpgrade(ScarabUpgrade.byId(tag.getInt("ScarabUpgrade")));
         this.powerTicksRemaining = Math.max(0, tag.getInt("ScarabPowerTicks"));
