@@ -11,11 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.io.IOException;
 
-@Mod.EventBusSubscriber(
-        modid = Oasiso.MODID,
-        value = Dist.CLIENT,
-        bus = Mod.EventBusSubscriber.Bus.MOD
-)
+@Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class EntropyPhysicsOutlineShaders {
 
     private static ShaderInstance compositeShader;
@@ -24,21 +20,8 @@ public final class EntropyPhysicsOutlineShaders {
     }
 
     @SubscribeEvent
-    public static void registerShaders(
-            RegisterShadersEvent event
-    ) throws IOException {
-        event.registerShader(
-                new ShaderInstance(
-                        event.getResourceProvider(),
-                        new ResourceLocation(
-                                Oasiso.MODID,
-                                "entropy_physics_outline"
-                        ),
-                        DefaultVertexFormat.POSITION_TEX
-                ),
-                shader ->
-                        compositeShader = shader
-        );
+    public static void registerShaders(RegisterShadersEvent event) throws IOException {
+        event.registerShader(new ShaderInstance(event.getResourceProvider(),  ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "entropy_physics_outline"), DefaultVertexFormat.POSITION_TEX), shader -> compositeShader = shader);
     }
 
     public static ShaderInstance getCompositeShader() {
