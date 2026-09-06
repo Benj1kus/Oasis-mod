@@ -28,9 +28,14 @@ public class SeamlessCurveBannerBlockEntity extends BlockEntity {
 
     private int validationTimer;
     private int incompleteTicks;
+    private long connectionGameTime = -1L;
 
     public SeamlessCurveBannerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SEEMLESS_CURVE_BANNER_BE.get(), pos, state);
+    }
+
+    public long getConnectionGameTime() {
+        return this.connectionGameTime;
     }
 
     public boolean isConnected() {
@@ -68,6 +73,8 @@ public class SeamlessCurveBannerBlockEntity extends BlockEntity {
         this.endSupportPos = supportPos.immutable();
 
         this.endFace = face;
+
+        this.connectionGameTime = this.level != null ? this.level.getGameTime() : 0L;
 
         this.incompleteTicks = 0;
 
@@ -132,6 +139,7 @@ public class SeamlessCurveBannerBlockEntity extends BlockEntity {
         super.saveAdditional(tag);
 
         if (this.endSupportPos != null && this.endFace != null) {
+            tag.putLong("ConnectionGameTime", this.connectionGameTime);
             tag.putLong("EndSupport", this.endSupportPos.asLong());
             tag.putInt("EndFace", this.endFace.get3DDataValue());
         }
@@ -147,6 +155,7 @@ public class SeamlessCurveBannerBlockEntity extends BlockEntity {
         if (tag.contains("EndSupport") && tag.contains("EndFace")) {
             this.endSupportPos = BlockPos.of(tag.getLong("EndSupport"));
             this.endFace = Direction.from3DDataValue(tag.getInt("EndFace"));
+            this.connectionGameTime = tag.contains("ConnectionGameTime") ? tag.getLong("ConnectionGameTime") : -1L;
         }
     }
 

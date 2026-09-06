@@ -21,22 +21,59 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 
 public class SeamlessCurveBannerItem extends Item {
 
-    /*
-     * Максимальная длина одной ткани.
-     *
-     * Можно спокойно увеличить позже.
-     */
-    private static final double MAX_CONNECTION_DISTANCE = 48.0D;
 
-    private static final double MIN_CONNECTION_DISTANCE = 1.0D;
+    public static final double MAX_CONNECTION_DISTANCE = 48.0D;
+    public static final double MIN_CONNECTION_DISTANCE = 1.0D;
 
     private static final String TAG_ANCHOR = "SeamlessCurveBannerAnchor";
 
     public SeamlessCurveBannerItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
+        if (!level.isClientSide || !(livingEntity instanceof Player player)) {
+            return;
+        }
+
+        CompoundTag tag = stack.getTag();
+
+        if (tag == null || !tag.contains(TAG_ANCHOR)) {
+            return;
+        }
+
+        int usedTicks = this.getUseDuration(stack) - remainingUseDuration;
+
+        if (usedTicks <= 0 || usedTicks % 4 != 0) {
+            return;
+        }
+
+        BlockPos anchorPos = BlockPos.of(tag.getLong(TAG_ANCHOR));
+
+        if (!(level.getBlockEntity(anchorPos) instanceof SeamlessCurveBannerBlockEntity banner)) {
+            return;
+        }
+
+        BlockHitResult hit = rayTraceDestination(level, player);
+        Vec3 target = hit.getLocation();
+
+        double distance = banner.getStartPoint().distanceTo(target);
+
+        float normalized = Mth.clamp((float) (distance / MAX_CONNECTION_DISTANCE), 0.0F, 1.0F);
+        float pitch = 0.78F + normalized * 0.52F;
+        float volume = 0.12F + normalized * 0.07F;
+
+        level.playLocalSound(player.getX(), player.getY(), player.getZ(), ((usedTicks / 4) & 1) == 0 ? SoundEvents.STONE_BUTTON_CLICK_ON : SoundEvents.STONE_BUTTON_CLICK_OFF, SoundSource.PLAYERS, volume, pitch, false);
     }
 
     @Override
@@ -51,31 +88,19 @@ public class SeamlessCurveBannerItem extends Item {
 
         ItemStack stack = context.getItemInHand();
 
-        /*
-         * Если предыдущая попытка почему-то
-         * не закончилась корректно, убираем
-         * старый временный anchor.
-         */
         if (!level.isClientSide) {
             cleanupPreviousAnchor(level, stack);
         }
 
         BlockPos supportPos = context.getClickedPos();
-
         Direction face = context.getClickedFace();
-
         BlockState supportState = level.getBlockState(supportPos);
 
         if (!supportState.isFaceSturdy(level, supportPos, face)) {
             return InteractionResult.FAIL;
         }
 
-        /*
-         * Anchor ставится в воздухе
-         * непосредственно перед выбранной стеной.
-         */
         BlockPos anchorPos = supportPos.relative(face);
-
         if (!level.isEmptyBlock(anchorPos)) {
             return InteractionResult.FAIL;
         }
@@ -90,13 +115,11 @@ public class SeamlessCurveBannerItem extends Item {
                 return InteractionResult.FAIL;
             }
 
+            level.playSound(null, anchorPos, SoundEvents.STONE_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.45F, 0.86F);
+
             player.displayClientMessage(Component.literal("Hold RMB and release on the second surface"), true);
         }
 
-        /*
-         * NBT нужен только пока игрок
-         * держит ПКМ.
-         */
         stack.getOrCreateTag().putLong(TAG_ANCHOR, anchorPos.asLong());
 
         player.startUsingItem(context.getHand());
@@ -124,24 +147,17 @@ public class SeamlessCurveBannerItem extends Item {
 
         BlockPos anchorPos = BlockPos.of(tag.getLong(TAG_ANCHOR));
 
-        /*
-         * Клиенту ничего решать не разрешаем.
-         * Финальная связь создаётся только сервером.
-         */
         if (level.isClientSide) {
             clearAnchorTag(stack);
             return;
         }
 
         if (!(livingEntity instanceof Player player)) {
-
             cancelConnection(level, anchorPos, stack);
-
             return;
         }
 
         if (!(level.getBlockEntity(anchorPos) instanceof SeamlessCurveBannerBlockEntity banner)) {
-
             clearAnchorTag(stack);
             return;
         }
@@ -149,29 +165,22 @@ public class SeamlessCurveBannerItem extends Item {
         BlockHitResult hit = rayTraceDestination(level, player);
 
         if (hit.getType() != HitResult.Type.BLOCK) {
-
             cancelConnection(level, anchorPos, stack);
-
             player.displayClientMessage(Component.literal("Banner connection cancelled"), true);
 
             return;
         }
 
         BlockPos endSupport = hit.getBlockPos();
-
         Direction endFace = hit.getDirection();
-
         BlockState endState = level.getBlockState(endSupport);
 
         if (!endState.isFaceSturdy(level, endSupport, endFace)) {
-
             cancelConnection(level, anchorPos, stack);
-
             return;
         }
 
         Vec3 startPoint = banner.getStartPoint();
-
         Vec3 endPoint = attachmentPoint(endSupport, endFace);
 
         double distance = startPoint.distanceTo(endPoint);
@@ -179,7 +188,6 @@ public class SeamlessCurveBannerItem extends Item {
         if (distance < MIN_CONNECTION_DISTANCE || distance > MAX_CONNECTION_DISTANCE) {
 
             cancelConnection(level, anchorPos, stack);
-
             player.displayClientMessage(Component.literal("Banner distance must be between 1 and 48 blocks"), true);
 
             return;
@@ -187,14 +195,12 @@ public class SeamlessCurveBannerItem extends Item {
 
         banner.setConnection(endSupport, endFace);
 
-        /*
-         * Только теперь предмет реально тратится.
-         *
-         * Поэтому неудачная попытка ничего
-         * у игрока не забирает.
-         */
-        clearAnchorTag(stack);
+        if (level instanceof ServerLevel serverLevel) {
 
+            spawnConnectionParticles(serverLevel, banner, endSupport);
+            serverLevel.playSound(null, endSupport, SoundEvents.LEASH_KNOT_PLACE, SoundSource.BLOCKS, 0.85F, 1.08F);
+        }
+        clearAnchorTag(stack);
         if (!player.getAbilities().instabuild) {
             stack.shrink(1);
         }
@@ -202,28 +208,42 @@ public class SeamlessCurveBannerItem extends Item {
         player.displayClientMessage(Component.literal("Banner connected"), true);
     }
 
+    private static void spawnConnectionParticles(ServerLevel level, SeamlessCurveBannerBlockEntity banner, BlockPos endSupport) {
+        Direction startFace = banner.getBlockState().getValue(SeamlessCurveBannerBlock.FACING);
+
+        BlockPos startSupport = banner.getBlockPos().relative(startFace.getOpposite());
+        BlockState startState = level.getBlockState(startSupport);
+        BlockState endState = level.getBlockState(endSupport);
+
+        spawnEndpointParticles(level, banner.getStartPoint(), startState);
+        Vec3 end = banner.getEndPoint();
+
+        if (end != null) {
+
+            spawnEndpointParticles(level, end, endState);
+        }
+    }
+
+    private static void spawnEndpointParticles(ServerLevel level, Vec3 position, BlockState state) {
+        if (state.isAir()) {
+            return;
+        }
+        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), position.x, position.y, position.z, 14, 0.16D, 0.16D, 0.16D, 0.055D);
+    }
+
     private static BlockHitResult rayTraceDestination(Level level, Player player) {
         Vec3 eye = player.getEyePosition();
-
         Vec3 end = eye.add(player.getLookAngle().scale(MAX_CONNECTION_DISTANCE));
-
         return level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
     }
 
     private static Vec3 attachmentPoint(BlockPos supportPos, Direction face) {
         Vec3 center = Vec3.atCenterOf(supportPos);
-
         return center.add(face.getStepX() * 0.501D, face.getStepY() * 0.501D, face.getStepZ() * 0.501D);
     }
 
     private static void cancelConnection(Level level, BlockPos anchorPos, ItemStack stack) {
         if (level.getBlockState(anchorPos).is(ModBlocks.SEEMLESS_CURVE_BANNER.get())) {
-
-            /*
-             * false:
-             * незаконченный anchor ничего не дропает,
-             * потому что предмет ещё находится в руке.
-             */
             level.removeBlock(anchorPos, false);
         }
 
