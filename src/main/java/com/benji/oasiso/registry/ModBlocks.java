@@ -57,6 +57,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> KARAKOLIT_BLOCK = BLOCKS.register("karakolit_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK).strength(5.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BLOCK = BLOCKS.register("nephritis_block", () -> new NephritisBlock(BlockBehaviour.Properties.copy(Blocks.RAW_GOLD_BLOCK).strength(5.0F).requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> SEEMLESS_CURVE_BANNER = BLOCKS.register("seemless_curve_banner", () -> new SeamlessCurveBannerBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).sound(SoundType.WOOL).strength(0.5F).noOcclusion().noCollission()));
+
     public static final RegistryObject<Block> WIZARD_EYE = BLOCKS.register("wizard_eye", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(5.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> WIZARD_COLUMN = BLOCKS.register("wizard_column", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(5.0F).requiresCorrectToolForDrops()));
 

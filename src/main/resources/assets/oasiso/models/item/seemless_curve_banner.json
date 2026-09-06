@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "oasiso:item/seemless_curve_banner_item"
+  }
+}

@@ -13,6 +13,7 @@ public final class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Oasiso.MODID);
 
     public static final RegistryObject<BlockEntityType<NephritisLampBlockEntity>> NEPHRITIS_LAMP_BE = BLOCK_ENTITIES.register("nephritis_lamp", () -> BlockEntityType.Builder.of(NephritisLampBlockEntity::new, ModBlocks.NEPHRITIS_LAMP.get()).build(null));
+    public static final RegistryObject<BlockEntityType<SeamlessCurveBannerBlockEntity>> SEEMLESS_CURVE_BANNER_BE = BLOCK_ENTITIES.register("seemless_curve_banner", () -> BlockEntityType.Builder.of(SeamlessCurveBannerBlockEntity::new, ModBlocks.SEEMLESS_CURVE_BANNER.get()).build(null));
     public static final RegistryObject<BlockEntityType<StormTotemBlockEntity>> STORM_TOTEM_BLOCK_ENTITY = BLOCK_ENTITIES.register("storm_totem", () -> BlockEntityType.Builder.of(StormTotemBlockEntity::new, ModBlocks.STORM_TOTEM.get()).build(null));
     public static final RegistryObject<BlockEntityType<StatBlockEntity>> STAT_BE = BLOCK_ENTITIES.register("stat", () -> BlockEntityType.Builder.of(StatBlockEntity::new, ModBlocks.STAT.get()).build(null));
     public static final RegistryObject<BlockEntityType<StatueBlockEntity>> STATUE_BE = BLOCK_ENTITIES.register("statue", () -> BlockEntityType.Builder.of(StatueBlockEntity::new, ModBlocks.MONKI_STATUE.get(), ModBlocks.DASHER_STATUE.get(), ModBlocks.TITANA_STATUE.get()).build(null));

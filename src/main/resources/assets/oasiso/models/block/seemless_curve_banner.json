@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "oasiso:block/seemless_curve_banner"
+  }
+}
