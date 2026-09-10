@@ -16,6 +16,9 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import com.benji.oasiso.network.ModMessages;
+import com.benji.oasiso.network.SandScreenHitPacket;
+import net.minecraft.server.level.ServerPlayer;
 
 public class DesertBallEntity extends ThrowableProjectile implements GeoEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -44,9 +47,15 @@ public class DesertBallEntity extends ThrowableProjectile implements GeoEntity {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide) {
-            // damage
-            result.getEntity().hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), 5.0F);
+
+        if (this.level().isClientSide) {
+            return;
+        }
+        if (result.getEntity() instanceof ServerPlayer player) {
+            ModMessages.sendToPlayer(player, new SandScreenHitPacket());
+        }
+        if (this.getOwner() instanceof LivingEntity owner) {
+            result.getEntity().hurt(this.damageSources().mobProjectile(this, owner), 5.0F);
         }
     }
 
