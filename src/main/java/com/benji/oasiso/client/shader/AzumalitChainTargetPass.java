@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -31,6 +32,8 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.opengl.GL11;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,9 +43,9 @@ public final class AzumalitChainTargetPass {
 
     private static final int MASK_BUFFER_SIZE = 1024 * 1024;
 
-    private static final MultiBufferSource.BufferSource OUTLINE_BUFFERS = MultiBufferSource.immediate(new BufferBuilder(MASK_BUFFER_SIZE));
+    private static final MultiBufferSource.BufferSource OUTLINE_BUFFERS = createMaskBuffers();
 
-    private static final MultiBufferSource.BufferSource PULSE_BUFFERS = MultiBufferSource.immediate(new BufferBuilder(MASK_BUFFER_SIZE));
+    private static final MultiBufferSource.BufferSource PULSE_BUFFERS = createMaskBuffers();
 
     private static TextureTarget outlineMask;
     private static TextureTarget pulseMask;
@@ -50,6 +53,20 @@ public final class AzumalitChainTargetPass {
     private static boolean renderingMaskPass;
 
     private AzumalitChainTargetPass() {
+    }
+
+    private static MultiBufferSource.BufferSource createMaskBuffers() {
+        Map<RenderType, BufferBuilder> fixedBuffers = new LinkedHashMap<>();
+
+        fixedBuffers.put(RenderType.glint(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.glintDirect(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.glintTranslucent(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.entityGlint(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.entityGlintDirect(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.armorGlint(), new BufferBuilder(MASK_BUFFER_SIZE));
+        fixedBuffers.put(RenderType.armorEntityGlint(), new BufferBuilder(MASK_BUFFER_SIZE));
+
+        return MultiBufferSource.immediateWithBuffers(fixedBuffers, new BufferBuilder(MASK_BUFFER_SIZE));
     }
 
     @SubscribeEvent
