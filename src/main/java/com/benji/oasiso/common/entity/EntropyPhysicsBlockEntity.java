@@ -49,6 +49,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
+import com.benji.oasiso.common.block.entity.EntropyConnectorBlockEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +68,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     public static final int MODE_DROPPED = 2;
     public static final int MODE_THROWN = 3;
     public static final int MODE_SETTLED = 4;
+    public static final int MODE_CONNECTOR_PULL = 5;
 
     private static final EntityDataAccessor<Integer> MODE = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CARRIED_BLOCK_STATE = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.INT);
@@ -80,11 +82,13 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private static final double HOLD_DOWN = 0.55D;
     private static final double HOLD_FOLLOW_FACTOR = 0.38D;
 
-    /*
-     * One glove contributes this much lifting power. Mass is derived from the
-     * hardness of EVERY block in the structure, so helpers genuinely add
-     * together instead of merely changing an animation speed.
-     */
+    private static final double CONNECTOR_PULL_GRAVITY = 0.045D;
+    private static final double CONNECTOR_PULL_DRAG = 0.88D;
+    private static final double CONNECTOR_PULL_MIN_ACCEL = 0.055D;
+    private static final double CONNECTOR_PULL_MAX_ACCEL = 0.165D;
+    private static final double CONNECTOR_PULL_ACCEL_PER_BLOCK = 0.018D;
+    private static final double CONNECTOR_PULL_MAX_SPEED = 0.42D;
+
     private static final double LIFT_POWER_PER_PLAYER = 18.0D;
     private static final double MIN_HOLD_FOLLOW_FACTOR = 0.035D;
     private static final double MAX_HEAVY_SAG = 2.35D;
@@ -118,6 +122,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private static final int THROW_PLAYER_IMMUNITY_TICKS = 8;
 
     private static final int MAX_ATTACHED_BLOCKS = 64;
+    private static final int MAX_SERIALIZED_STRUCTURE_PARTS = 256;
+    private static final double MAX_STRUCTURE_CULL_RADIUS = 32.0D;
+
     private static final int MAX_STRUCTURE_RADIUS = 5;
     private static final double STRUCTURE_RAYCAST_REACH = 7.0D;
     private static final Set<Block> FRAGILE_GLASS_BLOCKS = Set.of(Blocks.GLASS, Blocks.GLASS_PANE, Blocks.WHITE_STAINED_GLASS, Blocks.WHITE_STAINED_GLASS_PANE, Blocks.ORANGE_STAINED_GLASS, Blocks.ORANGE_STAINED_GLASS_PANE, Blocks.MAGENTA_STAINED_GLASS, Blocks.MAGENTA_STAINED_GLASS_PANE, Blocks.LIGHT_BLUE_STAINED_GLASS, Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, Blocks.YELLOW_STAINED_GLASS, Blocks.YELLOW_STAINED_GLASS_PANE, Blocks.LIME_STAINED_GLASS, Blocks.LIME_STAINED_GLASS_PANE, Blocks.PINK_STAINED_GLASS, Blocks.PINK_STAINED_GLASS_PANE, Blocks.GRAY_STAINED_GLASS, Blocks.GRAY_STAINED_GLASS_PANE, Blocks.LIGHT_GRAY_STAINED_GLASS, Blocks.LIGHT_GRAY_STAINED_GLASS_PANE, Blocks.CYAN_STAINED_GLASS, Blocks.CYAN_STAINED_GLASS_PANE, Blocks.PURPLE_STAINED_GLASS, Blocks.PURPLE_STAINED_GLASS_PANE, Blocks.BLUE_STAINED_GLASS, Blocks.BLUE_STAINED_GLASS_PANE, Blocks.BROWN_STAINED_GLASS, Blocks.BROWN_STAINED_GLASS_PANE, Blocks.GREEN_STAINED_GLASS, Blocks.GREEN_STAINED_GLASS_PANE, Blocks.RED_STAINED_GLASS, Blocks.RED_STAINED_GLASS_PANE, Blocks.BLACK_STAINED_GLASS, Blocks.BLACK_STAINED_GLASS_PANE);
@@ -131,11 +138,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private StructurePhysicsProfile cachedPhysicsProfile;
     private boolean physicsProfileDirty = true;
 
-    /*
-     * ownerId/heldHand are retained as a primary-holder compatibility mirror.
-     * Actual control is multi-player and lives in holderHands.
-     */
     private UUID ownerId;
+    private BlockPos connectorPullTarget;
+    private Direction connectorPullSide;
     private int heldHand = 0;
     private final Map<UUID, Integer> holderHands = new LinkedHashMap<>();
     private int pullTicks = PULL_SHAKE_TICKS;
@@ -183,6 +188,71 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     public void initializeFromBlock(BlockState state, float hardness, CompoundTag blockEntityData, ServerPlayer owner, InteractionHand hand, BlockPos sourcePos) {
         initializeFromBlock(state, hardness, blockEntityData, owner, hand, sourcePos, false);
+    }
+
+    public void initializeForConnectorPull(BlockState state, float hardness, CompoundTag blockEntityData, BlockPos sourcePos, BlockPos connectorPos, Direction connectorSide) {
+        initializeForConnectorPull(state, hardness, blockEntityData, sourcePos, connectorPos, connectorSide, List.of());
+    }
+
+    public void initializeForConnectorPull(BlockState state, float hardness, CompoundTag blockEntityData, BlockPos sourcePos, BlockPos connectorPos, Direction connectorSide, List<ConnectorStructurePart> structureParts) {
+        setCarriedBlockState(state);
+
+        this.sourceHardness = Math.max(0.0F, hardness);
+        this.blockEntityData = blockEntityData == null ? null : blockEntityData.copy();
+
+        this.ownerId = null;
+        this.heldHand = 0;
+        this.holderHands.clear();
+
+        this.pullTicks = 0;
+        this.settleTicks = 0;
+        this.freeTicks = 0;
+
+        this.shatterOnImpact = false;
+
+        setNephritisCoated(false);
+
+        this.attachedParts.clear();
+        if (structureParts != null) {
+            for (ConnectorStructurePart part : structureParts) {
+                if (part == null || part.offset() == null || part.offset().equals(BlockPos.ZERO) || part.state() == null || part.state().isAir()) {
+                    continue;
+                }
+                this.attachedParts.add(new StructurePart(part.offset().immutable(), part.state(), part.blockEntityData() == null ? null : part.blockEntityData().copy(), true));
+                if (this.attachedParts.size() >= MAX_SERIALIZED_STRUCTURE_PARTS) {
+                    break;
+                }
+            }
+        }
+
+        syncStructureData();
+
+        this.connectorPullTarget = connectorPos.immutable();
+        this.connectorPullSide = connectorSide;
+        this.setMode(MODE_CONNECTOR_PULL);
+        this.setPos(sourcePos.getX() + 0.5D, sourcePos.getY(), sourcePos.getZ() + 0.5D);
+        this.setDeltaMovement(Vec3.ZERO);
+
+        this.noPhysics = false;
+        this.setNoGravity(true);
+
+        this.visualYaw = this.visualYawO = 0.0F;
+        this.visualPitch = this.visualPitchO = 0.0F;
+        this.visualRoll = this.visualRollO = 0.0F;
+
+        BlockPos dockPos = connectorPos.relative(connectorSide);
+
+        Vec3 target = new Vec3(dockPos.getX() + 0.5D, dockPos.getY(), dockPos.getZ() + 0.5D);
+        Vec3 direction = target.subtract(this.position());
+
+        if (direction.lengthSqr() > 1.0E-6D) {
+            direction = direction.normalize().scale(0.055D);
+
+        } else {
+            direction = Vec3.ZERO;
+        }
+
+        this.setDeltaMovement(direction.add(0.0D, 0.035D, 0.0D));
     }
 
     private void initializeLooseFragment(BlockState state, CompoundTag data, Vec3 position, Vec3 velocity) {
@@ -258,6 +328,82 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         return getMode() == MODE_SETTLED;
     }
 
+    public boolean isConnectorPullMode() {
+        return getMode() == MODE_CONNECTOR_PULL;
+    }
+
+    public void abortConnectorPull() {
+        if (getMode() != MODE_CONNECTOR_PULL) {
+            return;
+        }
+        this.connectorPullTarget = null;
+        this.connectorPullSide = null;
+        this.setMode(MODE_DROPPED);
+        this.noPhysics = false;
+        this.setNoGravity(true);
+        this.settleTicks = 0;
+        this.freeTicks = 0;
+    }
+
+    public boolean finishConnectorDock(ServerLevel level, BlockPos dockPos) {
+        if (getMode() != MODE_CONNECTOR_PULL) {
+
+            return false;
+        }
+        if (!canMaterializeConnectorStructureAt(level, dockPos)) {
+            return false;
+        }
+        BlockState rootState = prepareStateForFluid(level, dockPos, this.blockState);
+        level.setBlock(dockPos, rootState, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+
+        for (StructurePart part : this.attachedParts) {
+            BlockPos partPos = dockPos.offset(part.offset);
+            BlockState partState = prepareStateForFluid(level, partPos, part.state);
+            level.setBlock(partPos, partState, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+        }
+
+        restoreBlockEntityData(level, dockPos, rootState, this.blockEntityData);
+        for (StructurePart part : this.attachedParts) {
+            BlockPos partPos = dockPos.offset(part.offset);
+            BlockState partState = level.getBlockState(partPos);
+            restoreBlockEntityData(level, partPos, partState, part.blockEntityData);
+        }
+
+        this.connectorPullTarget = null;
+        this.connectorPullSide = null;
+        this.setDeltaMovement(Vec3.ZERO);
+        this.discard();
+
+        return true;
+    }
+
+    private boolean canMaterializeConnectorStructureAt(ServerLevel level, BlockPos rootPos) {
+        BlockState rootState = prepareStateForFluid(level, rootPos, this.blockState);
+        if (!canPlaceConnectorPart(level, rootPos, rootState)) {
+            return false;
+        }
+        for (StructurePart part : this.attachedParts) {
+            BlockPos partPos = rootPos.offset(part.offset);
+            BlockState partState = prepareStateForFluid(level, partPos, part.state);
+            if (!canPlaceConnectorPart(level, partPos, partState)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean canPlaceConnectorPart(ServerLevel level, BlockPos pos, BlockState state) {
+        BlockState replaced = level.getBlockState(pos);
+        if (!replaced.canBeReplaced()) {
+            return false;
+        }
+        if (!state.canSurvive(level, pos)) {
+            return false;
+        }
+        AABB box = new AABB(pos).deflate(0.035D);
+        return level.noCollision(this, box);
+    }
+
     public List<StructurePart> getAttachedParts() {
         return Collections.unmodifiableList(this.attachedParts);
     }
@@ -313,6 +459,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             case MODE_HELD -> tickHeld(level);
             case MODE_DROPPED, MODE_THROWN -> tickFreePhysics(level);
             case MODE_SETTLED -> tickSettled();
+            case MODE_CONNECTOR_PULL -> tickConnectorPull(level);
             default -> {
             }
         }
@@ -320,6 +467,74 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (isNephritisCoated() && this.random.nextInt(68) == 0) {
             MeltedNephritisEffects.spawnIdle(level, getRandomStructureSurfacePosition());
         }
+    }
+
+    private void tickConnectorPull(ServerLevel level) {
+        if (this.connectorPullTarget == null || this.connectorPullSide == null) {
+            abortConnectorPull();
+            return;
+        }
+
+        if (!(level.getBlockEntity(this.connectorPullTarget) instanceof EntropyConnectorBlockEntity)) {
+            abortConnectorPull();
+            return;
+        }
+
+        this.noPhysics = false;
+        this.setNoGravity(true);
+        this.freeTicks++;
+
+        BlockPos dockPos = this.connectorPullTarget.relative(this.connectorPullSide);
+        Vec3 target = new Vec3(dockPos.getX() + 0.5D, dockPos.getY(), dockPos.getZ() + 0.5D);
+        Vec3 difference = target.subtract(this.position());
+
+        double distance = difference.length();
+
+        if (distance < 1.0E-5D) {
+            this.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
+        double acceleration = Mth.clamp(CONNECTOR_PULL_MIN_ACCEL + distance * CONNECTOR_PULL_ACCEL_PER_BLOCK, CONNECTOR_PULL_MIN_ACCEL, CONNECTOR_PULL_MAX_ACCEL);
+
+        Vec3 pullForce = difference.normalize().scale(acceleration);
+        Vec3 velocity = this.getDeltaMovement().scale(CONNECTOR_PULL_DRAG).add(pullForce);
+        velocity = velocity.add(0.0D, -CONNECTOR_PULL_GRAVITY, 0.0D);
+
+        double speed = velocity.length();
+        if (speed > CONNECTOR_PULL_MAX_SPEED) {
+            velocity = velocity.scale(CONNECTOR_PULL_MAX_SPEED / speed);
+        }
+        Vec3 start = this.position();
+
+        boolean hitX = Math.abs(velocity.x) > 1.0E-6D && !canStructureMove(level, new Vec3(velocity.x, 0.0D, 0.0D));
+        boolean hitY = Math.abs(velocity.y) > 1.0E-6D && !canStructureMove(level, new Vec3(0.0D, velocity.y, 0.0D));
+        boolean hitZ = Math.abs(velocity.z) > 1.0E-6D && !canStructureMove(level, new Vec3(0.0D, 0.0D, velocity.z));
+        Vec3 movement = new Vec3(hitX ? 0.0D : velocity.x, hitY ? 0.0D : velocity.y, hitZ ? 0.0D : velocity.z);
+        this.setDeltaMovement(movement);
+        this.move(MoverType.SELF, movement);
+
+        Vec3 actualMovement = this.position().subtract(start);
+
+        boolean collidedX = hitX || Math.abs(actualMovement.x - movement.x) > 1.0E-4D;
+        boolean collidedY = hitY || Math.abs(actualMovement.y - movement.y) > 1.0E-4D;
+        boolean collidedZ = hitZ || Math.abs(actualMovement.z - movement.z) > 1.0E-4D;
+
+        double nextX = collidedX ? 0.0D : velocity.x;
+        double nextY = collidedY ? 0.0D : velocity.y;
+        double nextZ = collidedZ ? 0.0D : velocity.z;
+
+        if (this.onGround()) {
+
+            nextX *= 0.92D;
+            nextZ *= 0.92D;
+
+            if (nextY < 0.0D) {
+                nextY = 0.0D;
+            }
+        }
+
+        this.setDeltaMovement(nextX, nextY, nextZ);
     }
 
     private void tickSettled() {
@@ -1031,6 +1246,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     }
 
     public boolean canBeGrabbedWithGlove() {
+        if (getMode() == MODE_CONNECTOR_PULL) {
+            return false;
+        }
         if (this.isRemoved()) {
             return false;
         }
@@ -1905,6 +2123,14 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return;
         }
 
+        if (mode == MODE_CONNECTOR_PULL) {
+            this.settledPoseChosen = false;
+            this.visualYaw = 0.0F;
+            this.visualPitch = 0.0F;
+            this.visualRoll = 0.0F;
+            return;
+        }
+
         if (mode == MODE_SETTLED) {
             if (!this.settledPoseChosen) {
                 this.settledYaw = snapToQuarterTurn(this.visualYaw);
@@ -1973,7 +2199,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         this.attachedParts.clear();
         ListTag list = root.getList("Parts", Tag.TAG_COMPOUND);
 
-        for (int i = 0; i < list.size() && this.attachedParts.size() < MAX_ATTACHED_BLOCKS; i++) {
+        for (int i = 0; i < list.size() && this.attachedParts.size() < MAX_SERIALIZED_STRUCTURE_PARTS; i++) {
             CompoundTag tag = list.getCompound(i);
             BlockState state = Block.stateById(tag.getInt("State"));
 
@@ -2041,6 +2267,10 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (this.ownerId != null) {
             tag.putUUID("GravityOwner", this.ownerId);
         }
+        if (this.connectorPullTarget != null && this.connectorPullSide != null) {
+            tag.putLong("ConnectorPullTarget", this.connectorPullTarget.asLong());
+            tag.putInt("ConnectorPullSide", this.connectorPullSide.get3DDataValue());
+        }
     }
 
     @Override
@@ -2082,6 +2312,12 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             readStructureTag(tag.getCompound("AttachedStructure"));
         } else {
             this.attachedParts.clear();
+        }
+
+        this.connectorPullTarget = tag.contains("ConnectorPullTarget") ? BlockPos.of(tag.getLong("ConnectorPullTarget")) : null;
+        this.connectorPullSide = tag.contains("ConnectorPullSide") ? Direction.from3DDataValue(tag.getInt("ConnectorPullSide")) : null;
+        if (getMode() == MODE_CONNECTOR_PULL && (this.connectorPullTarget == null || this.connectorPullSide == null)) {
+            this.setMode(MODE_DROPPED);
         }
 
         syncStructureData();
@@ -2147,7 +2383,6 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (!isPickable()) {
             return 0.0F;
         }
-
         return Math.min(MAX_STRUCTURE_RADIUS + 0.5F, getStructureRadiusCells() + 0.65F);
     }
 
@@ -2157,7 +2392,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return super.getBoundingBoxForCulling();
         }
 
-        double radius = Math.min(MAX_STRUCTURE_RADIUS + 1.5D, getStructureRadiusCells() + 1.25D);
+        double radius = Math.min(MAX_STRUCTURE_CULL_RADIUS, getStructureRadiusCells() + 1.75D);
 
         return this.getBoundingBox().inflate(radius);
     }
@@ -2226,6 +2461,9 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     }
 
     public record DetachmentPreview(BlockPos sourceOffset) {
+    }
+
+    public record ConnectorStructurePart(BlockPos offset, BlockState state, CompoundTag blockEntityData) {
     }
 
     private record StructureRayHit(BlockPos offset, Direction face, double distanceSqr) {

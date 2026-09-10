@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "particle": "oasiso:block/entropy_connector_side",
+    "end": "oasiso:block/entropy_connector_top",
+    "side": "oasiso:block/entropy_connector_side"
+  }
+}

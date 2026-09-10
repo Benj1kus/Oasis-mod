@@ -12,6 +12,7 @@ public final class ModBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<BlockEntityType<EntropyConnectorBlockEntity>> ENTROPY_CONNECTOR_BE = BLOCK_ENTITIES.register("entropy_connector", () -> BlockEntityType.Builder.of(EntropyConnectorBlockEntity::new, ModBlocks.ENTROPY_CONNECTOR.get()).build(null));
     public static final RegistryObject<BlockEntityType<NephritisLampBlockEntity>> NEPHRITIS_LAMP_BE = BLOCK_ENTITIES.register("nephritis_lamp", () -> BlockEntityType.Builder.of(NephritisLampBlockEntity::new, ModBlocks.NEPHRITIS_LAMP.get()).build(null));
     public static final RegistryObject<BlockEntityType<SeamlessCurveBannerBlockEntity>> SEEMLESS_CURVE_BANNER_BE = BLOCK_ENTITIES.register("seemless_curve_banner", () -> BlockEntityType.Builder.of(SeamlessCurveBannerBlockEntity::new, ModBlocks.SEEMLESS_CURVE_BANNER.get()).build(null));
     public static final RegistryObject<BlockEntityType<StormTotemBlockEntity>> STORM_TOTEM_BLOCK_ENTITY = BLOCK_ENTITIES.register("storm_totem", () -> BlockEntityType.Builder.of(StormTotemBlockEntity::new, ModBlocks.STORM_TOTEM.get()).build(null));

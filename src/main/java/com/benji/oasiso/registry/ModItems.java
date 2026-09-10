@@ -55,6 +55,8 @@ public final class ModItems {
     public static final RegistryObject<Item> SANDSTONE_BRICKED_ITEM = ITEMS.register("sandstone_bricked", () -> new BlockItem(ModBlocks.SANDSTONE_BRICKED.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_AZAZEL_ITEM = ITEMS.register("sandstone_azazel", () -> new BlockItem(ModBlocks.SANDSTONE_AZAZEL.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> ENTROPY_CONNECTOR_ITEM = ITEMS.register("entropy_connector", () -> new BlockItem(ModBlocks.ENTROPY_CONNECTOR.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block", () -> new BlockItem(ModBlocks.ENTROPY_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein", () -> new BlockItem(ModBlocks.ENTROPY_VEIN.get(), new Item.Properties()));
     public static final RegistryObject<Item> CHAOS_SPAWNER_ITEM = ITEMS.register("chaos_spawner", () -> new BlockItem(ModBlocks.CHAOS_SPAWNER.get(), new Item.Properties()));

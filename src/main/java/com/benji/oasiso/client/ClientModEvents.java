@@ -123,6 +123,11 @@ public class ClientModEvents {
                 net.minecraft.client.renderer.blockentity.HangingSignRenderer::new
         );
 
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.ENTROPY_CONNECTOR_BE.get(),
+                EntropyConnectorRenderer::new
+        );
+
         event.registerEntityRenderer(
                 Oasiso.SAND_GOLEM.get(),
                 SandGolemRenderer::new
