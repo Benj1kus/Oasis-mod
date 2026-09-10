@@ -25,6 +25,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.*;
 
@@ -42,10 +44,13 @@ public class EntropyConnectorBlockEntity extends BlockEntity {
     private static final int MAX_CONNECTED_STRUCTURE_BLOCKS = 256;
 
     private static final int CONNECTION_VALIDATION_INTERVAL = 20;
+    private static final int PLATFORM_HINT_TICKS = 60;
+
     private final EnumMap<Direction, PullState> activePulls = new EnumMap<>(Direction.class);
     private final EnumSet<Direction> connectedSides = EnumSet.noneOf(Direction.class);
 
     private int connectionValidationTicks;
+    private long platformHintUntil;
 
     public EntropyConnectorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ENTROPY_CONNECTOR_BE.get(), pos, state);
@@ -136,9 +141,81 @@ public class EntropyConnectorBlockEntity extends BlockEntity {
         }
     }
 
+    public void showPlatformHint() {
+        if (this.level == null || this.level.isClientSide) {
+            return;
+        }
+
+        this.platformHintUntil = this.level.getGameTime() + PLATFORM_HINT_TICKS;
+
+        sync();
+    }
+
+    public float getPlatformHintAlpha(float partialTick) {
+        if (this.level == null) {
+            return 0.0F;
+        }
+
+        double now = this.level.getGameTime() + partialTick;
+        double remaining = this.platformHintUntil - now;
+
+        if (remaining <= 0.0D) {
+            return 0.0F;
+        }
+
+        double age = PLATFORM_HINT_TICKS - remaining;
+        float fadeIn = Mth.clamp((float) age / 5.0F, 0.0F, 1.0F);
+        float fadeOut = Mth.clamp((float) remaining / 10.0F, 0.0F, 1.0F);
+        return Math.min(fadeIn, fadeOut);
+    }
+
+    public boolean activatePlatform(ServerPlayer player) {
+        if (!(this.level instanceof ServerLevel serverLevel)) {
+
+            return false;
+        }
+        if (!this.activePulls.isEmpty()) {
+            return false;
+        }
+
+        CapturedStructure structure = captureConnectedStructure(serverLevel, this.worldPosition);
+        if (structure == null || structure.blocks().isEmpty()) {
+
+            return false;
+        }
+
+        CapturedBlock root = structure.root();
+        List<EntropyPhysicsBlockEntity.ConnectorStructurePart> structureParts = new ArrayList<>();
+
+        for (CapturedBlock block : structure.blocks()) {
+
+            if (block.pos().equals(structure.rootPos())) {
+                continue;
+            }
+
+            BlockPos offset = block.pos().subtract(structure.rootPos());
+            structureParts.add(new EntropyPhysicsBlockEntity.ConnectorStructurePart(offset, block.state(), block.blockEntityData()));
+        }
+
+        float hardness = root.state().getDestroySpeed(serverLevel, root.pos());
+        EntropyPhysicsBlockEntity platform = new EntropyPhysicsBlockEntity(ModEntities.ENTROPY_PHYSICS_BLOCK.get(), serverLevel);
+        platform.initializeAsMovingPlatform(root.state(), hardness, root.blockEntityData(), structure.rootPos(), structureParts);
+        removeCapturedStructure(serverLevel, structure);
+
+        if (!serverLevel.addFreshEntity(platform)) {
+            restoreCapturedStructure(serverLevel, structure);
+            return false;
+        }
+
+        Vec3 center = Vec3.atCenterOf(this.worldPosition);
+        serverLevel.sendParticles(Oasiso.WIZARD_PIXELS.get(), center.x, center.y, center.z, 22, 0.38D, 0.38D, 0.38D, 0.025D);
+        serverLevel.playSound(null, this.worldPosition, ModSounds.AZUMAAL_IDLE1.get(), SoundSource.BLOCKS, 0.85F, 1.10F);
+
+        return true;
+    }
+
     private boolean tickConnectionValidation(ServerLevel level) {
         this.connectionValidationTicks++;
-
         if (this.connectionValidationTicks < CONNECTION_VALIDATION_INTERVAL) {
             return false;
         }
@@ -280,7 +357,7 @@ public class EntropyConnectorBlockEntity extends BlockEntity {
             if (!visitedConnectors.add(connectorPos)) {
                 continue;
             }
-            if (connectorPos.equals(this.worldPosition)) {
+            if (!rootPos.equals(this.worldPosition) && connectorPos.equals(this.worldPosition)) {
                 return null;
             }
 
@@ -703,6 +780,8 @@ public class EntropyConnectorBlockEntity extends BlockEntity {
             }
         }
 
+        tag.putLong("PlatformHintUntil", this.platformHintUntil);
+
         tag.putInt("ConnectedSides", connectionMask);
 
         tag.put("ActivePulls", pulls);
@@ -721,6 +800,7 @@ public class EntropyConnectorBlockEntity extends BlockEntity {
             }
         }
 
+        this.platformHintUntil = tag.getLong("PlatformHintUntil");
         this.activePulls.clear();
 
         if (!tag.contains("ActivePulls", Tag.TAG_LIST)) {

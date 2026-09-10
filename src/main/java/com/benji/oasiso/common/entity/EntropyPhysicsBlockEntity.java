@@ -50,6 +50,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
 import com.benji.oasiso.common.block.entity.EntropyConnectorBlockEntity;
+import com.benji.oasiso.registry.ModItems;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,11 +70,13 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     public static final int MODE_THROWN = 3;
     public static final int MODE_SETTLED = 4;
     public static final int MODE_CONNECTOR_PULL = 5;
+    public static final int MODE_PLATFORM = 6;
 
     private static final EntityDataAccessor<Integer> MODE = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CARRIED_BLOCK_STATE = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> NEPHRITIS_COATED = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<CompoundTag> STRUCTURE_DATA = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.COMPOUND_TAG);
+    private static final EntityDataAccessor<Integer> PLATFORM_DIRECTION = SynchedEntityData.defineId(EntropyPhysicsBlockEntity.class, EntityDataSerializers.INT);
 
     private static final int PULL_SHAKE_TICKS = 8;
 
@@ -88,6 +91,15 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private static final double CONNECTOR_PULL_MAX_ACCEL = 0.165D;
     private static final double CONNECTOR_PULL_ACCEL_PER_BLOCK = 0.018D;
     private static final double CONNECTOR_PULL_MAX_SPEED = 0.42D;
+
+    private static final int PLATFORM_START_TICKS = 20;
+    private static final int PLATFORM_RIDER_GRACE_TICKS = 30;
+    private static final int PLATFORM_DIRECTION_PAUSE_TICKS = 20;
+    private static final double PLATFORM_MAX_SPEED = 0.085D;
+    private static final double PLATFORM_ACCELERATION = 0.0045D;
+    private static final double PLATFORM_DECELERATION = 0.0065D;
+    private static final double PLATFORM_GRID_ALIGN_SPEED = 0.075D;
+    private static final int PLATFORM_PARTICLE_INTERVAL = 7;
 
     private static final double LIFT_POWER_PER_PLAYER = 18.0D;
     private static final double MIN_HOLD_FOLLOW_FACTOR = 0.035D;
@@ -141,6 +153,17 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     private UUID ownerId;
     private BlockPos connectorPullTarget;
     private Direction connectorPullSide;
+
+    private double platformSpeed;
+    private int platformStandTicks;
+    private int platformNoRiderTicks;
+    private int platformDirectionPauseTicks;
+
+    private boolean platformMovementArmed;
+    private boolean platformDisableRequested;
+
+    private Direction platformMotionDirection = Direction.NORTH;
+
     private int heldHand = 0;
     private final Map<UUID, Integer> holderHands = new LinkedHashMap<>();
     private int pullTicks = PULL_SHAKE_TICKS;
@@ -294,12 +317,90 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         this.setNoGravity(true);
     }
 
+    public void initializeAsMovingPlatform(BlockState state, float hardness, CompoundTag blockEntityData, BlockPos sourcePos, List<ConnectorStructurePart> structureParts) {
+        setCarriedBlockState(state);
+
+        this.sourceHardness = Math.max(0.0F, hardness);
+        this.blockEntityData = blockEntityData == null ? null : blockEntityData.copy();
+
+        this.ownerId = null;
+        this.holderHands.clear();
+        this.heldHand = 0;
+
+        this.pullTicks = 0;
+        this.settleTicks = 0;
+        this.freeTicks = 0;
+
+        this.shatterOnImpact = false;
+
+        setNephritisCoated(false);
+
+        this.attachedParts.clear();
+
+        if (structureParts != null) {
+            for (ConnectorStructurePart part : structureParts) {
+                if (part == null || part.offset() == null || part.offset().equals(BlockPos.ZERO) || part.state() == null || part.state().isAir()) {
+                    continue;
+                }
+                this.attachedParts.add(new StructurePart(part.offset().immutable(), part.state(), part.blockEntityData() == null ? null : part.blockEntityData().copy(), true));
+            }
+        }
+
+        syncStructureData();
+        this.setMode(MODE_PLATFORM);
+        setPlatformDirection(Direction.NORTH);
+        this.platformMotionDirection = Direction.NORTH;
+        this.platformSpeed = 0.0D;
+        this.platformStandTicks = 0;
+        this.platformNoRiderTicks = 0;
+        this.platformDirectionPauseTicks = 0;
+
+        this.platformMovementArmed = false;
+        this.platformDisableRequested = false;
+
+        this.setPos(sourcePos.getX() + 0.5D, sourcePos.getY(), sourcePos.getZ() + 0.5D);
+        this.setDeltaMovement(Vec3.ZERO);
+        this.noPhysics = false;
+        this.setNoGravity(true);
+
+        this.visualYaw = this.visualYawO = 0.0F;
+        this.visualPitch = this.visualPitchO = 0.0F;
+        this.visualRoll = this.visualRollO = 0.0F;
+    }
+
+    @Override
+    public InteractionResult interactAt(Player player, Vec3 location, InteractionHand hand) {
+        if (!isPlatformMode()) {
+
+            return super.interactAt(player, location, hand);
+        }
+
+        if (this.level().isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        if (!(player instanceof ServerPlayer serverPlayer) || !(this.level() instanceof ServerLevel serverLevel)) {
+            return InteractionResult.PASS;
+        }
+
+        ItemStack stack = serverPlayer.getItemInHand(hand);
+        if (stack.is(ModItems.NEPHRITIS.get())) {
+            requestPlatformDisable();
+
+        } else {
+            cyclePlatformDirection(serverLevel);
+        }
+        serverPlayer.swing(hand, true);
+        return InteractionResult.CONSUME;
+    }
+
     @Override
     protected void defineSynchedData() {
         this.entityData.define(MODE, MODE_PULLING);
         this.entityData.define(CARRIED_BLOCK_STATE, Block.getId(Blocks.STONE.defaultBlockState()));
         this.entityData.define(NEPHRITIS_COATED, false);
         this.entityData.define(STRUCTURE_DATA, new CompoundTag());
+        this.entityData.define(PLATFORM_DIRECTION, 0);
     }
 
     private void setCarriedBlockState(BlockState state) {
@@ -332,6 +433,10 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         return getMode() == MODE_CONNECTOR_PULL;
     }
 
+    public boolean isPlatformMode() {
+        return getMode() == MODE_PLATFORM;
+    }
+
     public void abortConnectorPull() {
         if (getMode() != MODE_CONNECTOR_PULL) {
             return;
@@ -345,34 +450,82 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         this.freeTicks = 0;
     }
 
+
+    public Direction getPlatformDirection() {
+        return switch (this.entityData.get(PLATFORM_DIRECTION)) {
+            case 1 -> Direction.EAST;
+            case 2 -> Direction.SOUTH;
+            case 3 -> Direction.WEST;
+            default -> Direction.NORTH;
+        };
+    }
+
+    private void setPlatformDirection(Direction direction) {
+        int id = switch (direction) {
+            case EAST -> 1;
+            case SOUTH -> 2;
+            case WEST -> 3;
+            default -> 0;
+        };
+
+        this.entityData.set(PLATFORM_DIRECTION, id);
+    }
+
+    private void cyclePlatformDirection(ServerLevel level) {
+        Direction oldDirection = getPlatformDirection();
+
+        Direction newDirection = switch (oldDirection) {
+            case NORTH -> Direction.EAST;
+            case EAST -> Direction.SOUTH;
+            case SOUTH -> Direction.WEST;
+            default -> Direction.NORTH;
+        };
+
+        setPlatformDirection(newDirection);
+        this.platformDirectionPauseTicks = PLATFORM_DIRECTION_PAUSE_TICKS;
+
+        level.playSound(null, this.getX(), this.getY() + 1.0D, this.getZ(), SoundEvents.STONE_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.55F, 1.35F);
+        level.sendParticles(Oasiso.WIZARD_PIXELS.get(), this.getX(), this.getY() + 1.0D, this.getZ(), 7, 0.22D, 0.18D, 0.22D, 0.015D);
+    }
+
     public boolean finishConnectorDock(ServerLevel level, BlockPos dockPos) {
         if (getMode() != MODE_CONNECTOR_PULL) {
 
             return false;
         }
-        if (!canMaterializeConnectorStructureAt(level, dockPos)) {
+
+        if (!materializeStoredStructureAt(level, dockPos)) {
             return false;
-        }
-        BlockState rootState = prepareStateForFluid(level, dockPos, this.blockState);
-        level.setBlock(dockPos, rootState, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
-
-        for (StructurePart part : this.attachedParts) {
-            BlockPos partPos = dockPos.offset(part.offset);
-            BlockState partState = prepareStateForFluid(level, partPos, part.state);
-            level.setBlock(partPos, partState, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
-        }
-
-        restoreBlockEntityData(level, dockPos, rootState, this.blockEntityData);
-        for (StructurePart part : this.attachedParts) {
-            BlockPos partPos = dockPos.offset(part.offset);
-            BlockState partState = level.getBlockState(partPos);
-            restoreBlockEntityData(level, partPos, partState, part.blockEntityData);
         }
 
         this.connectorPullTarget = null;
         this.connectorPullSide = null;
+
         this.setDeltaMovement(Vec3.ZERO);
+
         this.discard();
+
+        return true;
+    }
+
+    private boolean materializeStoredStructureAt(ServerLevel level, BlockPos rootPos) {
+        if (!canMaterializeConnectorStructureAt(level, rootPos)) {
+            return false;
+        }
+
+        BlockState rootState = prepareStateForFluid(level, rootPos, this.blockState);
+        level.setBlock(rootPos, rootState, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+
+        for (StructurePart part : this.attachedParts) {
+            BlockPos pos = rootPos.offset(part.offset);
+            BlockState state = prepareStateForFluid(level, pos, part.state);
+            level.setBlock(pos, state, Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+        }
+        restoreBlockEntityData(level, rootPos, rootState, this.blockEntityData);
+        for (StructurePart part : this.attachedParts) {
+            BlockPos pos = rootPos.offset(part.offset);
+            restoreBlockEntityData(level, pos, level.getBlockState(pos), part.blockEntityData);
+        }
 
         return true;
     }
@@ -460,6 +613,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             case MODE_DROPPED, MODE_THROWN -> tickFreePhysics(level);
             case MODE_SETTLED -> tickSettled();
             case MODE_CONNECTOR_PULL -> tickConnectorPull(level);
+            case MODE_PLATFORM -> tickMovingPlatform(level);
             default -> {
             }
         }
@@ -467,6 +621,289 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         if (isNephritisCoated() && this.random.nextInt(68) == 0) {
             MeltedNephritisEffects.spawnIdle(level, getRandomStructureSurfacePosition());
         }
+    }
+
+    private void tickMovingPlatform(ServerLevel level) {
+        this.noPhysics = false;
+        this.setNoGravity(true);
+
+        if (this.tickCount % PLATFORM_PARTICLE_INTERVAL == 0) {
+
+            level.sendParticles(Oasiso.WIZARD_PIXELS.get(), this.getX(), this.getY() + 0.85D, this.getZ(), 2, 0.18D, 0.20D, 0.18D, 0.012D);
+        }
+
+        List<ServerPlayer> riders = collectPlatformRiders(level);
+
+        if (this.platformDisableRequested) {
+            tickPlatformDisable(level, riders);
+            return;
+        }
+
+        boolean riderPresent = !riders.isEmpty();
+
+        if (riderPresent) {
+
+            this.platformStandTicks = Math.min(PLATFORM_START_TICKS, this.platformStandTicks + 1);
+            this.platformNoRiderTicks = 0;
+
+            if (this.platformStandTicks >= PLATFORM_START_TICKS) {
+                this.platformMovementArmed = true;
+            }
+
+        } else {
+
+            this.platformStandTicks = 0;
+            if (this.platformMovementArmed) {
+                this.platformNoRiderTicks++;
+                if (this.platformNoRiderTicks > PLATFORM_RIDER_GRACE_TICKS) {
+                    this.platformMovementArmed = false;
+                }
+            }
+        }
+
+        boolean choosingDirection = this.platformDirectionPauseTicks > 0;
+
+        if (choosingDirection) {
+
+            this.platformDirectionPauseTicks--;
+            this.platformSpeed = approachDouble(this.platformSpeed, 0.0D, PLATFORM_DECELERATION);
+
+            if (this.platformSpeed <= 0.002D && this.platformDirectionPauseTicks <= 0) {
+                this.platformMotionDirection = getPlatformDirection();
+            }
+
+        } else {
+
+            this.platformMotionDirection = getPlatformDirection();
+            boolean shouldMove = this.platformMovementArmed && (riderPresent || this.platformNoRiderTicks <= PLATFORM_RIDER_GRACE_TICKS);
+            double targetSpeed = shouldMove ? PLATFORM_MAX_SPEED : 0.0D;
+            this.platformSpeed = approachDouble(this.platformSpeed, targetSpeed, targetSpeed > this.platformSpeed ? PLATFORM_ACCELERATION : PLATFORM_DECELERATION);
+        }
+
+        Vec3 direction = new Vec3(this.platformMotionDirection.getStepX(), 0.0D, this.platformMotionDirection.getStepZ());
+        Vec3 desiredMovement = direction.scale(this.platformSpeed);
+
+        if (desiredMovement.lengthSqr() > 1.0E-8D && !canPlatformMove(level, desiredMovement)) {
+            this.platformSpeed = approachDouble(this.platformSpeed, 0.0D, PLATFORM_DECELERATION);
+            desiredMovement = direction.scale(this.platformSpeed);
+            if (!canPlatformMove(level, desiredMovement)) {
+                desiredMovement = Vec3.ZERO;
+            }
+        }
+        movePlatformAndRiders(level, riders, desiredMovement);
+    }
+
+    private boolean canPlatformMove(ServerLevel level, Vec3 delta) {
+        if (delta.lengthSqr() < 1.0E-10D) {
+            return true;
+        }
+
+        Vec3 rootCenter = this.position().add(0.0D, 0.5D, 0.0D);
+
+        if (!isPlatformCubeFree(level, rootCenter.add(delta))) {
+            return false;
+        }
+
+        for (StructurePart part : this.attachedParts) {
+            Vec3 center = rootCenter.add(part.offset.getX(), part.offset.getY(), part.offset.getZ()).add(delta);
+            if (!isPlatformCubeFree(level, center)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isPlatformCubeFree(ServerLevel level, Vec3 center) {
+        AABB box = new AABB(center.x - 0.49D, center.y - 0.49D, center.z - 0.49D, center.x + 0.49D, center.y + 0.49D, center.z + 0.49D);
+        return level.noCollision(this, box);
+    }
+
+    private void movePlatformAndRiders(ServerLevel level, List<ServerPlayer> riders, Vec3 requestedMovement) {
+        if (requestedMovement.lengthSqr() < 1.0E-10D) {
+            for (ServerPlayer player : riders) {
+                stabilizePlatformRider(level, player);
+            }
+            this.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+
+        Vec3 oldPosition = this.position();
+        this.setDeltaMovement(requestedMovement);
+        this.move(MoverType.SELF, requestedMovement);
+        Vec3 actualMovement = this.position().subtract(oldPosition);
+
+        for (ServerPlayer player : riders) {
+            player.move(MoverType.PISTON, actualMovement);
+            stabilizePlatformRider(level, player);
+        }
+        this.setDeltaMovement(actualMovement);
+    }
+
+    private List<ServerPlayer> collectPlatformRiders(ServerLevel level) {
+        List<ServerPlayer> result = new ArrayList<>();
+
+        double radius = Math.min(MAX_STRUCTURE_CULL_RADIUS, getStructureRadiusCells() + 2.5D);
+        AABB searchBox = this.getBoundingBox().inflate(radius, 2.5D, radius);
+        for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, searchBox)) {
+
+            if (!player.isAlive() || player.isSpectator()) {
+                continue;
+            }
+
+            if (player.getDeltaMovement().y > 0.12D) {
+                continue;
+            }
+
+            if (!Double.isNaN(getPlatformTopUnderPlayer(player))) {
+                result.add(player);
+            }
+        }
+
+        return result;
+    }
+
+    public double getPlatformTopUnderPlayer(Player player) {
+        if (!isPlatformMode() || player == null || this.level() == null) {
+
+            return Double.NaN;
+        }
+
+        Level level = this.level();
+
+        double bestTop = Double.NaN;
+        double rootMinX = this.getX() - 0.5D;
+        double rootMinY = this.getY();
+        double rootMinZ = this.getZ() - 0.5D;
+        double rootTop = getPartTopIfUnderPlayer(level, player, this.blockState, rootMinX, rootMinY, rootMinZ);
+        if (!Double.isNaN(rootTop)) {
+            bestTop = rootTop;
+        }
+
+        for (StructurePart part : this.attachedParts) {
+
+            double top = getPartTopIfUnderPlayer(level, player, part.state,
+                    rootMinX + part.offset.getX(),
+                    rootMinY + part.offset.getY(),
+                    rootMinZ + part.offset.getZ());
+
+            if (!Double.isNaN(top) && (Double.isNaN(bestTop) || top > bestTop)) {
+                bestTop = top;
+            }
+        }
+
+        return bestTop;
+    }
+
+    private double getPartTopIfUnderPlayer(Level level, Player player, BlockState state, double blockX, double blockY, double blockZ) {
+        var shape = state.getCollisionShape(level, BlockPos.containing(blockX, blockY, blockZ));
+
+        if (shape.isEmpty()) {
+            return Double.NaN;
+        }
+        AABB bounds = shape.bounds();
+
+        double minX = blockX + bounds.minX;
+        double maxX = blockX + bounds.maxX;
+        double minZ = blockZ + bounds.minZ;
+        double maxZ = blockZ + bounds.maxZ;
+        double topY = blockY + bounds.maxY;
+
+        AABB playerBox = player.getBoundingBox();
+
+        double horizontalInset = 0.025D;
+        boolean overlapsX = playerBox.maxX > minX + horizontalInset && playerBox.minX < maxX - horizontalInset;
+        boolean overlapsZ = playerBox.maxZ > minZ + horizontalInset && playerBox.minZ < maxZ - horizontalInset;
+
+        if (!overlapsX || !overlapsZ) {
+            return Double.NaN;
+        }
+
+        double feetY = player.getY();
+        if (feetY < topY - 0.42D || feetY > topY + 0.52D) {
+
+            return Double.NaN;
+        }
+
+        return topY;
+    }
+
+    private void stabilizePlatformRider(ServerLevel level, ServerPlayer player) {
+        double top = getPlatformTopUnderPlayer(player);
+
+        if (Double.isNaN(top)) {
+            return;
+        }
+
+        if (player.getY() < top) {
+            player.setPos(player.getX(), top, player.getZ());
+        }
+
+        Vec3 velocity = player.getDeltaMovement();
+
+        if (velocity.y < 0.0D) {
+            player.setDeltaMovement(velocity.x, 0.0D, velocity.z);
+        }
+
+        player.setOnGround(true);
+        player.fallDistance = 0.0F;
+        player.hurtMarked = true;
+    }
+
+    private void requestPlatformDisable() {
+        if (!isPlatformMode()) {
+            return;
+        }
+
+        this.platformDisableRequested = true;
+
+        this.platformMovementArmed = false;
+
+        this.platformStandTicks = 0;
+        this.platformNoRiderTicks = 0;
+        this.platformDirectionPauseTicks = 0;
+    }
+
+    private void tickPlatformDisable(ServerLevel level, List<ServerPlayer> riders) {
+
+        if (this.platformSpeed > 0.001D) {
+            this.platformSpeed = approachDouble(this.platformSpeed, 0.0D, PLATFORM_DECELERATION);
+
+            Vec3 direction = new Vec3(this.platformMotionDirection.getStepX(), 0.0D, this.platformMotionDirection.getStepZ());
+            Vec3 movement = direction.scale(this.platformSpeed);
+
+            if (!canPlatformMove(level, movement)) {
+                movement = Vec3.ZERO;
+                this.platformSpeed = 0.0D;
+            }
+
+            movePlatformAndRiders(level, riders, movement);
+
+            return;
+        }
+
+        BlockPos gridPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getY() + 0.5D), Mth.floor(this.getZ()));
+        Vec3 target = new Vec3(gridPos.getX() + 0.5D, gridPos.getY(), gridPos.getZ() + 0.5D);
+        Vec3 difference = target.subtract(this.position());
+
+        if (difference.lengthSqr() > 0.0004D) {
+
+            double distance = difference.length();
+            Vec3 movement = distance <= PLATFORM_GRID_ALIGN_SPEED ? difference : difference.scale(PLATFORM_GRID_ALIGN_SPEED / distance);
+
+            if (!canPlatformMove(level, movement)) {
+                this.platformDisableRequested = false;
+                return;
+            }
+            movePlatformAndRiders(level, riders, movement);
+            return;
+        }
+        this.setPos(target.x, target.y, target.z);
+        if (!materializeStoredStructureAt(level, gridPos)) {
+            this.platformDisableRequested = false;
+            return;
+        }
+
+        this.discard();
     }
 
     private void tickConnectorPull(ServerLevel level) {
@@ -1246,9 +1683,10 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
     }
 
     public boolean canBeGrabbedWithGlove() {
-        if (getMode() == MODE_CONNECTOR_PULL) {
+        if (getMode() == MODE_CONNECTOR_PULL || getMode() == MODE_PLATFORM) {
             return false;
         }
+
         if (this.isRemoved()) {
             return false;
         }
@@ -2131,6 +2569,14 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
             return;
         }
 
+        if (mode == MODE_PLATFORM) {
+            this.settledPoseChosen = false;
+            this.visualYaw = 0.0F;
+            this.visualPitch = 0.0F;
+            this.visualRoll = 0.0F;
+            return;
+        }
+
         if (mode == MODE_SETTLED) {
             if (!this.settledPoseChosen) {
                 this.settledYaw = snapToQuarterTurn(this.visualYaw);
@@ -2154,6 +2600,16 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
         this.visualYaw += spin * 0.74F;
         this.visualPitch += spin;
         this.visualRoll += spin * 0.61F;
+    }
+
+    private static double approachDouble(double current, double target, double maxStep) {
+        if (current < target) {
+            return Math.min(current + maxStep, target);
+        }
+        if (current > target) {
+            return Math.max(current - maxStep, target);
+        }
+        return target;
     }
 
     private static float snapToQuarterTurn(float angle) {
@@ -2236,6 +2692,20 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        tag.putInt("PlatformDirection", switch (getPlatformDirection()) {
+            case EAST -> 1;
+            case SOUTH -> 2;
+            case WEST -> 3;
+            default -> 0;
+        });
+
+        tag.putDouble("PlatformSpeed", this.platformSpeed);
+        tag.putInt("PlatformStandTicks", this.platformStandTicks);
+        tag.putInt("PlatformNoRiderTicks", this.platformNoRiderTicks);
+        tag.putInt("PlatformDirectionPause", this.platformDirectionPauseTicks);
+        tag.putBoolean("PlatformMovementArmed", this.platformMovementArmed);
+        tag.putBoolean("PlatformDisableRequested", this.platformDisableRequested);
+
         tag.putInt("CarriedBlockState", Block.getId(this.blockState));
         tag.putFloat("SourceHardness", this.sourceHardness);
         tag.putInt("GravityMode", getMode());
@@ -2275,6 +2745,22 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+
+        setPlatformDirection(switch (tag.getInt("PlatformDirection")) {
+            case 1 -> Direction.EAST;
+            case 2 -> Direction.SOUTH;
+            case 3 -> Direction.WEST;
+            default -> Direction.NORTH;
+        });
+
+        this.platformMotionDirection = getPlatformDirection();
+        this.platformSpeed = tag.getDouble("PlatformSpeed");
+        this.platformStandTicks = tag.getInt("PlatformStandTicks");
+        this.platformNoRiderTicks = tag.getInt("PlatformNoRiderTicks");
+        this.platformDirectionPauseTicks = tag.getInt("PlatformDirectionPause");
+        this.platformMovementArmed = tag.getBoolean("PlatformMovementArmed");
+        this.platformDisableRequested = tag.getBoolean("PlatformDisableRequested");
+
         BlockState loaded = Block.stateById(tag.getInt("CarriedBlockState"));
         setCarriedBlockState(loaded == null ? Blocks.STONE.defaultBlockState() : loaded);
         this.sourceHardness = tag.getFloat("SourceHardness");
@@ -2365,7 +2851,7 @@ public class EntropyPhysicsBlockEntity extends Entity implements IEntityAddition
 
     @Override
     public boolean isPickable() {
-        return canBeGrabbedWithGlove();
+        return isPlatformMode() || canBeGrabbedWithGlove();
     }
 
     private int getStructureRadiusCells() {

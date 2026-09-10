@@ -18,6 +18,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.GameRenderer;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +34,7 @@ import java.util.UUID;
 public class EntropyConnectorRenderer implements BlockEntityRenderer<EntropyConnectorBlockEntity> {
 
     private static final ResourceLocation ARROW_TEXTURE = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/block/connector_arrow.png");
+    private static final ResourceLocation HINT_TEXTURE = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/block/connector_hint.png");
 
     private static final float ARROW_SIZE = 0.62F;
     private static final double ARROW_DISTANCE = 0.82D;
@@ -87,6 +96,52 @@ public class EntropyConnectorRenderer implements BlockEntityRenderer<EntropyConn
 
             EntropyRopeRenderUtil.renderCyanHook(poseStack, end, renderOrigin, 0.085F);
         }
+        renderPlatformHint(connector, partialTick, time, poseStack, bufferSource);
+    }
+
+    private static void renderPlatformHint(EntropyConnectorBlockEntity connector, float partialTick, float time, PoseStack poseStack, MultiBufferSource bufferSource) {
+        float alpha = connector.getPlatformHintAlpha(partialTick);
+
+        if (alpha <= 0.001F) {
+            return;
+        }
+
+        float bob = Mth.sin(time * 0.16F) * 0.055F;
+
+        poseStack.pushPose();
+        poseStack.translate(0.5D, 1.72D + bob, 0.5D);
+        poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
+
+        float halfWidth = 0.46F;
+        float halfHeight = halfWidth * 26.0F / 28.0F;
+
+        int a = Mth.clamp((int) (alpha * 255.0F), 0, 255);
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableCull();
+        RenderSystem.depthMask(false);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderTexture(0, HINT_TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        Matrix4f matrix = poseStack.last().pose();
+
+        builder.vertex(matrix, -halfWidth, -halfHeight, 0.0F).uv(0.0F, 1.0F).color(255, 255, 255, a).endVertex();
+        builder.vertex(matrix, halfWidth, -halfHeight, 0.0F).uv(1.0F, 1.0F).color(255, 255, 255, a).endVertex();
+        builder.vertex(matrix, halfWidth, halfHeight, 0.0F).uv(1.0F, 0.0F).color(255, 255, 255, a).endVertex();
+        builder.vertex(matrix, -halfWidth, halfHeight, 0.0F).uv(0.0F, 0.0F).color(255, 255, 255, a).endVertex();
+
+        BufferUploader.drawWithShader(builder.end());
+
+        RenderSystem.depthMask(true);
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        poseStack.popPose();
     }
 
     private static void renderArrow(Direction side, float time, PoseStack poseStack, MultiBufferSource bufferSource) {

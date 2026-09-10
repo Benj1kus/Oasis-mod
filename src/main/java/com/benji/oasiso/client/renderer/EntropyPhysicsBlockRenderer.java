@@ -26,12 +26,17 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
+import com.benji.oasiso.Oasiso;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.HitResult;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -48,6 +53,9 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
         this.shadowRadius = 0.0F;
     }
+
+    private static final ResourceLocation PLATFORM_ARROW_TEXTURE = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/block/connector_arrow.png");
+    private static final float PLATFORM_ARROW_SIZE = 0.72F;
 
     @Override
     public void render(EntropyPhysicsBlockEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
@@ -66,6 +74,8 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
             renderPart(entity, part.state(), part.offset().getX(), part.offset().getY(), part.offset().getZ(), poseStack, bufferSource, packedLight);
         }
 
+        renderPlatformArrow(entity, partialTick, poseStack, bufferSource);
+
         if (entity.getCarriedBlockState().getRenderShape() != RenderShape.MODEL) {
             renderShapeFallback(entity, entity.getCarriedBlockState(), 0, 0, 0, poseStack, partialTick);
         }
@@ -76,6 +86,42 @@ public class EntropyPhysicsBlockRenderer extends EntityRenderer<EntropyPhysicsBl
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+    }
+
+    private static void renderPlatformArrow(EntropyPhysicsBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
+        if (!entity.isPlatformMode()) {
+            return;
+        }
+
+        Direction direction = entity.getPlatformDirection();
+
+        float time = entity.tickCount + partialTick;
+        float bob = Mth.sin(time * 0.16F) * 0.055F;
+        float pulse = 0.95F + 0.05F * Mth.sin(time * 0.21F);
+
+        Vec3 forward = new Vec3(direction.getStepX(), 0.0D, direction.getStepZ());
+        Vec3 right = new Vec3(forward.z, 0.0D, -forward.x);
+        Vec3 center = new Vec3(0.0D, 0.68D + bob, 0.0D);
+
+        double half = PLATFORM_ARROW_SIZE * pulse * 0.5D;
+
+        Vec3 topLeft = center.add(forward.scale(half)).subtract(right.scale(half));
+        Vec3 topRight = center.add(forward.scale(half)).add(right.scale(half));
+        Vec3 bottomRight = center.subtract(forward.scale(half)).add(right.scale(half));
+        Vec3 bottomLeft = center.subtract(forward.scale(half)).subtract(right.scale(half));
+
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucent(PLATFORM_ARROW_TEXTURE));
+
+        PoseStack.Pose pose = poseStack.last();
+
+        platformArrowVertex(consumer, pose, topLeft, 0.0F, 0.0F);
+        platformArrowVertex(consumer, pose, topRight, 1.0F, 0.0F);
+        platformArrowVertex(consumer, pose, bottomRight, 1.0F, 1.0F);
+        platformArrowVertex(consumer, pose, bottomLeft, 0.0F, 1.0F);
+    }
+
+    private static void platformArrowVertex(VertexConsumer consumer, PoseStack.Pose pose, Vec3 position, float u, float v) {
+        consumer.vertex(pose.pose(), (float) position.x, (float) position.y, (float) position.z).color(255, 255, 255, 230).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(pose.normal(), 0.0F, 1.0F, 0.0F).endVertex();
     }
 
     private void renderPart(EntropyPhysicsBlockEntity entity, BlockState state, int offsetX, int offsetY, int offsetZ, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
