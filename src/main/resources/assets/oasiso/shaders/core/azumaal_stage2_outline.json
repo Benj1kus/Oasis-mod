@@ -1,0 +1,38 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha"
+  },
+  "vertex": "oasiso:azumaal_stage2_outline",
+  "fragment": "oasiso:azumaal_stage2_outline",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Mask"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "TexelSize",
+      "type": "float",
+      "count": 2,
+      "values": [ 1.0, 1.0 ]
+    },
+    {
+      "name": "Pulse",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [ 0.0 ]
+    }
+  ]
+}

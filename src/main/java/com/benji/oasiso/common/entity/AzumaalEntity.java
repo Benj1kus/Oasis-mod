@@ -388,6 +388,30 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     }
 
 
+    private void tickStageTwoEntropyFlames() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        if (this.tickCount % 2 != 0) {
+            return;
+        }
+
+        int particles = 1 + this.random.nextInt(2);
+
+        for (int i = 0; i < particles; i++) {
+            double x = this.getX() + (this.random.nextDouble() - 0.5D) * this.getBbWidth() * 1.55D;
+            double y = this.getY() + 0.35D + this.random.nextDouble() * (this.getBbHeight() * 0.82D);
+            double z = this.getZ() + (this.random.nextDouble() - 0.5D) * this.getBbWidth() * 1.55D;
+
+            double vx = (this.random.nextDouble() - 0.5D) * 0.030D;
+            double vy = 0.006D + this.random.nextDouble() * 0.018D;
+            double vz = (this.random.nextDouble() - 0.5D) * 0.030D;
+
+            serverLevel.sendParticles(Oasiso.ENTROPY_FLAME.get(), x, y, z, 1, vx, vy, vz, 0.0D);
+        }
+    }
+
+
     @Override
     public void tick() {
         super.tick();
@@ -479,7 +503,9 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
                     this.setAnimState(STATE_IDLE);
                 }
             }
-
+            if (!this.level().isClientSide) {
+                tickStageTwoEntropyFlames();
+            }
             return;
         }
 

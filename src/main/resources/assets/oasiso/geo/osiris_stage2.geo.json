@@ -78,11 +78,27 @@
 					]
 				},
 				{
+					"name": "flame_tent_big_left2",
+					"parent": "ttb_left3",
+					"pivot": [59, 45.25, 3],
+					"cubes": [
+						{"origin": [59, 45.25, 3], "size": [0, 0, 0], "uv": [168, 239]}
+					]
+				},
+				{
 					"name": "tttb_left3",
 					"parent": "ttb_left3",
 					"pivot": [64, 38.75, 3],
 					"cubes": [
 						{"origin": [64, 34.25, -1], "size": [12, 9, 8], "uv": [148, 231]}
+					]
+				},
+				{
+					"name": "flame_tent_big_left",
+					"parent": "tttb_left3",
+					"pivot": [70, 43.25, 3],
+					"cubes": [
+						{"origin": [70, 43.25, 3], "size": [0, 0, 0], "uv": [168, 239]}
 					]
 				},
 				{
@@ -102,11 +118,27 @@
 					]
 				},
 				{
+					"name": "flame_tent_right2",
+					"parent": "ttb_right2",
+					"pivot": [-61, 45.25, 3],
+					"cubes": [
+						{"origin": [-61, 45.25, 3], "size": [0, 0, 0], "uv": [168, 239]}
+					]
+				},
+				{
 					"name": "tttb_right2",
 					"parent": "ttb_right2",
 					"pivot": [-64, 38.75, 3],
 					"cubes": [
 						{"origin": [-76, 34.25, -1], "size": [12, 9, 8], "uv": [148, 231], "mirror": true}
+					]
+				},
+				{
+					"name": "flame_tent_right",
+					"parent": "tttb_right2",
+					"pivot": [-73, 43.25, 3],
+					"cubes": [
+						{"origin": [-73, 43.25, 3], "size": [0, 0, 0], "uv": [168, 239]}
 					]
 				},
 				{
@@ -336,6 +368,30 @@
 					"pivot": [-20.5, 55.17334, -7.2346],
 					"cubes": [
 						{"origin": [-25, 50.67334, -15.7346], "size": [9, 9, 9], "uv": [36, 232]}
+					]
+				},
+				{
+					"name": "flame_head_top",
+					"parent": "mouth",
+					"pivot": [0, 56.25, 18],
+					"cubes": [
+						{"origin": [0, 56.25, 18], "size": [0, 0, 0], "uv": [75, 86]}
+					]
+				},
+				{
+					"name": "flame_head_left",
+					"parent": "mouth",
+					"pivot": [22, 57.25, 2],
+					"cubes": [
+						{"origin": [22, 57.25, 2], "size": [0, 0, 0], "uv": [75, 86]}
+					]
+				},
+				{
+					"name": "flame_head_right",
+					"parent": "mouth",
+					"pivot": [-22, 57.25, 2],
+					"cubes": [
+						{"origin": [-22, 57.25, 2], "size": [0, 0, 0], "uv": [75, 86]}
 					]
 				},
 				{

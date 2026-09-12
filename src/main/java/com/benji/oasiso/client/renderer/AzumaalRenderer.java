@@ -1,14 +1,11 @@
 package com.benji.oasiso.client.renderer;
 
-import com.benji.oasiso.client.layer.GlowmaskLayer;
+import com.benji.oasiso.client.layer.*;
 import com.benji.oasiso.client.model.AzumaalModel;
 import com.benji.oasiso.common.entity.AzumaalEntity;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
-import com.benji.oasiso.client.layer.AzumaalHologramTrailLayer;
-import com.benji.oasiso.client.layer.AzumaalBladeSlashLayer;
-import com.benji.oasiso.client.layer.AzumaalShockwaveLayer;
 import com.benji.oasiso.client.renderer.effect.AzumaalDeathRayRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,6 +18,7 @@ public class AzumaalRenderer extends GeoEntityRenderer<AzumaalEntity> {
         addRenderLayer(new AzumaalHologramTrailLayer(this));
         addRenderLayer(new AzumaalBladeSlashLayer(this));
         addRenderLayer(new AzumaalShockwaveLayer(this));
+        addRenderLayer(new AzumaalStageTwoMouthSmokeLayer(this));
     }
 
     @Override

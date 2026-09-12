@@ -82,6 +82,8 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> MELTED_SPLASH = PARTICLES.register("melted_splash", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ARM_SMOKE = PARTICLES.register("arm_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> MOUTH_SMOKE = PARTICLES.register("mouth_smoke", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENTROPY_FLAME = PARTICLES.register("entropy_flame", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> AZUMAAL_MOUTH_SMOKE = PARTICLES.register("azumaal_mouth_smoke", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {

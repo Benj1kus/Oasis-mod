@@ -61,6 +61,16 @@ public class ClientModEvents {
         );
 
         event.registerSpriteSet(
+                Oasiso.ENTROPY_FLAME.get(),
+                EntropyFlameParticle.Provider::new
+        );
+
+        event.registerSpriteSet(
+                Oasiso.AZUMAAL_MOUTH_SMOKE.get(),
+                AzumaalMouthSmokeParticleProvider::new
+        );
+
+        event.registerSpriteSet(
                 Oasiso.CHAOS_BOMB_SPARKS.get(),
                 ChaosBombSparksParticle.Provider::new
         );
