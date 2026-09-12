@@ -48,6 +48,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 @Mod(Oasiso.MODID)
 public class Oasiso {
@@ -338,6 +341,9 @@ public class Oasiso {
 
     private void setup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
+
+            ObfuscationReflectionHelper.setPrivateValue(RangedAttribute.class, (RangedAttribute) Attributes.MAX_HEALTH, 1_000_000.0D, "f_22308_");
+
             ModDispenserBehaviors.register();
             ModMessages.register();
             BossPortalTransitionNetwork.register();

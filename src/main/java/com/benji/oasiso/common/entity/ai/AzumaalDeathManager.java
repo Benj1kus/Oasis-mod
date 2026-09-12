@@ -37,9 +37,11 @@ public final class AzumaalDeathManager {
 
     private boolean active;
     private int deathTicks;
+    private boolean stageTransition;
 
     private UUID killerId;
     private UUID portalId;
+
 
     public AzumaalDeathManager(AzumaalEntity boss) {
         this.boss = boss;
@@ -50,23 +52,40 @@ public final class AzumaalDeathManager {
     }
 
     public void begin(ServerLevel level, DamageSource source) {
+        beginInternal(level, source, false);
+    }
+
+    public void beginStageTransition(ServerLevel level, DamageSource source) {
+        beginInternal(level, source, true);
+    }
+
+    private void beginInternal(ServerLevel level, DamageSource source, boolean stageTransition) {
         if (this.active) {
             return;
         }
+
         this.active = true;
+        this.stageTransition = stageTransition;
         this.deathTicks = 0;
+
         boss.setDeathVisualTicks(0);
 
         level.playSound(null, boss.getX(), boss.getY() + boss.getBbHeight() * 0.5D, boss.getZ(), ModSounds.AZUMAAL_DEATH.get(), SoundSource.HOSTILE, 2.0F, 1.0F);
 
         Entity attacker = source.getEntity();
-        if (attacker instanceof Player player) {
+
+        if (!stageTransition && attacker instanceof Player player) {
             this.killerId = player.getUUID();
-        } else {
+        } else if (!stageTransition) {
             this.killerId = null;
         }
 
-        boss.setHealth(0.01F);
+        if (stageTransition) {
+            boss.setHealth(boss.getStageTwoTriggerHealth());
+        } else {
+            boss.setHealth(0.01F);
+        }
+
         boss.setAnimState(AzumaalEntity.STATE_DEATH);
         boss.setDeltaMovement(Vec3.ZERO);
         boss.fallDistance = 0.0F;
@@ -91,12 +110,21 @@ public final class AzumaalDeathManager {
         }
 
         spawnDeathExplosion(level);
+        if (this.stageTransition) {
+            this.active = false;
+            this.stageTransition = false;
+            return true;
+        }
         spawnRewardBarrel(level);
         startPortalDespawning(level);
         spawnChaosReturnPortal(level);
 
         this.active = false;
         return true;
+    }
+
+    public boolean isStageTransition() {
+        return this.stageTransition;
     }
 
     private void spawnChaosReturnPortal(ServerLevel level) {
@@ -299,7 +327,7 @@ public final class AzumaalDeathManager {
         CompoundTag tag = new CompoundTag();
 
         tag.putBoolean("Active", this.active);
-
+        tag.putBoolean("StageTransition", this.stageTransition);
         tag.putInt("DeathTicks", this.deathTicks);
 
         if (this.killerId != null) {
@@ -319,6 +347,7 @@ public final class AzumaalDeathManager {
         CompoundTag tag = parent.getCompound(DATA_TAG);
 
         this.active = tag.getBoolean("Active");
+        this.stageTransition = tag.getBoolean("StageTransition");
         this.deathTicks = tag.getInt("DeathTicks");
 
         boss.setDeathVisualTicks(this.deathTicks);

@@ -26,6 +26,8 @@ import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -59,6 +61,9 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int STATE_SUMMON_2 = 8;
     public static final int STATE_SUMMON_1 = 7;
     public static final int STATE_ATTACK_DOUBLE = 6;
+
+    private static final float STAGE_TWO_HITBOX_SIZE = 88.0F / 16.0F;
+    public static final String BOSS_BAR_STAGE_TWO_KEY = "bossbar.oasiso.azumaal_stage2";
 
     public static final int SPLASH_NONE = 0;
     public static final int SPLASH_BOTH = 1;
@@ -115,11 +120,11 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final EntityDataAccessor<Boolean> DEFENDING = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> CLONE_MODE = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CLONE_INDEX = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.INT);
-
+    private static final EntityDataAccessor<Boolean> STAGE_TWO = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final RawAnimation EYES_ANIMATION = RawAnimation.begin().thenPlay("eyes");
     private static final RawAnimation DEATH_ANIMATION = RawAnimation.begin().thenPlay("death");
-    private static final RawAnimation SUMMON_1_ANIMATION = RawAnimation.begin().thenPlay("summon_1");
+    private static final RawAnimation SUMMON_1_ANIMATION = RawAnimation.begin().thenPlay("summon_1").thenLoop("idle");
     private static final RawAnimation SUMMON_2_ANIMATION = RawAnimation.begin().thenPlay("summon_2");
     private static final RawAnimation ATTACK_DOUBLE_ANIMATION = RawAnimation.begin().thenPlay("attack_double");
     private static final RawAnimation ATTACK_THROW_ANIMATION = RawAnimation.begin().thenPlay("attack_throw");
@@ -155,13 +160,6 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private boolean introLocked;
     private int introDialogueTicks;
 
-    /*
-     * Multiplayer intro state is per player.
-     *
-     * Previously one mutable introPlayerId was overwritten by whichever client
-     * finished the spawn panel last. That made only one client receive dialogue
-     * and could leave the boss locked until the 45 second failsafe.
-     */
     private final Set<UUID> introParticipants = new HashSet<>();
     private final Set<UUID> introPanelFinishedPlayers = new HashSet<>();
     private final Set<UUID> introDialogueStartedPlayers = new HashSet<>();
@@ -232,6 +230,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     protected void defineSynchedData() {
         super.defineSynchedData();
 
+        this.entityData.define(STAGE_TWO, false);
         this.entityData.define(DEATH_VISUAL_TICKS, 0);
         this.entityData.define(PARKOUR_ACTIVE, false);
         this.entityData.define(DEFENDING, false);
@@ -239,6 +238,59 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.entityData.define(CLONE_MODE, false);
         this.entityData.define(CLONE_INDEX, 0);
         this.entityData.define(HOVER_BASE_Y, 0.0F);
+    }
+
+    public boolean isStageTwo() {
+        return this.entityData.get(STAGE_TWO);
+    }
+
+    public float getStageTwoTriggerHealth() {
+        return (float) Math.min(this.getMaxHealth(), Math.max(1.0D, OsirisRealmConfig.AZUMAAL_STAGE_TWO_TRIGGER_HEALTH.get()));
+    }
+
+    private void setStageTwo(boolean stageTwo) {
+        this.entityData.set(STAGE_TWO, stageTwo);
+
+        this.refreshDimensions();
+
+        if (!this.level().isClientSide) {
+            this.bossEvent.setName(Component.translatable(stageTwo ? BOSS_BAR_STAGE_TWO_KEY : "entity.oasiso.azumaal"));
+        }
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        if (isStageTwo()) {
+            return EntityDimensions.scalable(STAGE_TWO_HITBOX_SIZE, STAGE_TWO_HITBOX_SIZE);
+        }
+        return super.getDimensions(pose);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
+        super.onSyncedDataUpdated(accessor);
+        if (STAGE_TWO.equals(accessor)) {
+            this.refreshDimensions();
+        }
+    }
+
+    private void beginStageTwoTransition(ServerLevel level, DamageSource source) {
+        if (this.isStageTwo() || this.deathManager.isActive()) {
+
+            return;
+        }
+        this.setHealth(getStageTwoTriggerHealth());
+        this.attackController.prepareForDeath(level);
+
+        this.pressureHitTicks.clear();
+        this.pressureDamageSamples.clear();
+        this.pressureDefenseCooldownUntil = 0L;
+
+        this.setDefending(false);
+        this.setParkourActive(false);
+        this.setDeltaMovement(Vec3.ZERO);
+
+        this.deathManager.beginStageTransition(level, source);
     }
 
     public boolean isDefending() {
@@ -342,25 +394,48 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
 
         if (!this.level().isClientSide && !this.isClone()) {
-            float progress = this.isDeathSequenceActive() || this.getMaxHealth() <= 0.0F ? 0.0F : this.getHealth() / this.getMaxHealth();
+            float progress;
+
+            if (this.getMaxHealth() <= 0.0F) {
+                progress = 0.0F;
+            } else if (this.isDeathSequenceActive() && !this.deathManager.isStageTransition()) {
+                progress = 0.0F;
+            } else {
+                progress = this.getHealth() / this.getMaxHealth();
+            }
+
             this.bossEvent.setProgress(Mth.clamp(progress, 0.0F, 1.0F));
         }
         if (!this.level().isClientSide && !this.isClone() && this.level() instanceof ServerLevel serverLevel && this.tickCount % 10 == 0) {
             ChaosChamberManager.captureNearbyPlayers(serverLevel, this);
         }
-        this.setNoGravity(true);
-        this.fallDistance = 0.0F;
+
+        if (!this.isStageTwo()) {
+            this.setNoGravity(true);
+            this.fallDistance = 0.0F;
+        } else {
+            this.setNoGravity(false);
+        }
+
         if (this.isClone()) {
             tickClone();
             return;
         }
+
         if (this.isDeathSequenceActive()) {
             this.setDeltaMovement(Vec3.ZERO);
+
             this.fallDistance = 0.0F;
+
             if (!this.level().isClientSide && this.level() instanceof ServerLevel level) {
+                boolean stageTransition = this.deathManager.isStageTransition();
                 boolean finished = this.deathManager.tick(level);
                 if (finished) {
-                    finishCustomDeath(level);
+                    if (stageTransition) {
+                        finishStageTwoTransition(level);
+                    } else {
+                        finishCustomDeath(level);
+                    }
                 }
             }
             return;
@@ -388,8 +463,22 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         }
 
         if (!this.level().isClientSide && this.introLocked && this.level() instanceof ServerLevel serverLevel) {
-
             tickIntroDialogue(serverLevel);
+            return;
+        }
+
+        if (this.isStageTwo()) {
+            this.setNoGravity(false);
+            Vec3 movement = this.getDeltaMovement();
+
+            this.setDeltaMovement(0.0D, movement.y, 0.0D);
+
+            if (!this.level().isClientSide) {
+                this.setInvulnerable(false);
+                if (this.getAnimState() != STATE_IDLE) {
+                    this.setAnimState(STATE_IDLE);
+                }
+            }
 
             return;
         }
@@ -832,6 +921,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         tag.putBoolean("AzumaalParkourActive", this.isParkourActive());
         tag.putBoolean("AzumaalDefending", this.isDefending());
         tag.putBoolean("AzumaalIsClone", this.isClone());
+        tag.putBoolean("AzumaalStageTwo", this.isStageTwo());
 
         tag.putInt("AzumaalCloneIndex", this.getCloneIndex());
         if (this.cloneOwnerId != null) {
@@ -895,8 +985,16 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
         this.introDialogueTicks = tag.getInt("AzumaalIntroTicks");
 
-        this.setNoGravity(true);
-        this.setInvulnerable(this.getAnimState() == STATE_SPAWN || this.introLocked);
+        this.entityData.set(STAGE_TWO, tag.getBoolean("AzumaalStageTwo"));
+
+        this.refreshDimensions();
+        if (!this.level().isClientSide) {
+            this.bossEvent.setName(Component.translatable(this.isStageTwo() ? BOSS_BAR_STAGE_TWO_KEY : "entity.oasiso.azumaal"));
+        }
+
+        this.setNoGravity(!this.isStageTwo());
+
+        this.setInvulnerable(this.getAnimState() == STATE_SPAWN || this.introLocked || this.isDeathSequenceActive());
 
         this.deathManager.load(tag);
         if (!this.isClone()) {
@@ -970,15 +1068,26 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
                 this.attackController.onParkourMeleeHit(parkourMeleePlayer);
             }
 
+            float stageTwoTriggerHealth = getStageTwoTriggerHealth();
+
+            boolean shouldStartStageTwo = !this.level().isClientSide && damaged && !this.isStageTwo() && !this.deathManager.isActive() && this.getHealth() <= stageTwoTriggerHealth;
+
+            if (shouldStartStageTwo && this.getHealth() < stageTwoTriggerHealth) {
+                this.setHealth(stageTwoTriggerHealth);
+            }
+
             if (!this.level().isClientSide && damaged && this.level() instanceof ServerLevel level) {
                 float actualDamage = healthBefore - this.getHealth();
                 if (actualDamage > 0.0F) {
                     DamageNumberSpawner.spawn(level, this, actualDamage);
 
-                    if (!this.isDeathSequenceActive() && source.getEntity() instanceof Player attackingPlayer && !attackingPlayer.isCreative() && !attackingPlayer.isSpectator()) {
+                    if (!this.isStageTwo() && !this.isDeathSequenceActive() && source.getEntity() instanceof Player attackingPlayer && !attackingPlayer.isCreative() && !attackingPlayer.isSpectator()) {
                         registerPressureDefenseHit(level, actualDamage);
                     }
                 }
+            }
+            if (shouldStartStageTwo && this.level() instanceof ServerLevel level) {
+                beginStageTwoTransition(level, source);
             }
             return damaged;
         }
@@ -1088,6 +1197,24 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private record PressureDamageSample(long tick, float damage) {
     }
 
+    private void finishStageTwoTransition(ServerLevel level) {
+        this.setStageTwo(true);
+
+        this.setHealth(getStageTwoTriggerHealth());
+
+        this.setDeathVisualTicks(0);
+        this.setDefending(false);
+        this.setParkourActive(false);
+        this.setAnimState(STATE_IDLE);
+        this.setNoGravity(false);
+        this.setInvulnerable(false);
+        this.setDeltaMovement(Vec3.ZERO);
+        this.hoverFallSpeed = 0.0D;
+        this.refreshDimensions();
+
+        level.sendParticles(Oasiso.MELTED_SPLASH.get(), this.getX(), this.getY() + this.getBbHeight() * 0.48D, this.getZ(), 180, 2.35D, 2.35D, 2.35D, 0.16D);
+    }
+
     private void finishCustomDeath(ServerLevel level) {
         ChaosChamberManager.releasePlayers(level.getServer(), this.getUUID());
         // credit player
@@ -1115,10 +1242,18 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
             super.die(source);
             return;
         }
+
         if (this.isDeathSequenceActive()) {
             return;
         }
+
         if (!(this.level() instanceof ServerLevel level)) {
+
+            return;
+        }
+        if (!this.isStageTwo()) {
+            beginStageTwoTransition(level, source);
+
             return;
         }
         this.attackController.prepareForDeath(level);
@@ -1149,11 +1284,17 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     }
 
     public ResourceLocation getMainTexture() {
+        if (this.isStageTwo()) {
+            return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/osiris_stage2.png");
+        }
         String baseName = this.isDefending() ? "azumaal_defend" : "azumaal";
         return buildAnimatedTexture("textures/entity/", baseName);
     }
 
     public ResourceLocation getAnimatedEmissiveTexture() {
+        if (this.isStageTwo()) {
+            return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/emissive/osiris_stage2_emissive.png");
+        }
         return buildAnimatedTexture("textures/entity/emissive/", "azumaal_emissive");
     }
 

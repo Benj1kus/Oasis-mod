@@ -40,6 +40,11 @@ public class AzumaalHologramTrailLayer extends GeoRenderLayer<AzumaalEntity> {
     public void render(PoseStack poseStack, AzumaalEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
         TrailHistory history = histories.computeIfAbsent(animatable, entity -> new TrailHistory());
 
+        if (animatable.isStageTwo()) {
+            history.clear();
+            return;
+        }
+
         if (animatable.getAnimState() == AzumaalEntity.STATE_SPAWN) {
             history.clear();
             return;
