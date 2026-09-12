@@ -20,7 +20,9 @@ import java.util.WeakHashMap;
 
 public class AzumaalStageTwoMouthSmokeLayer extends GeoRenderLayer<AzumaalEntity> {
 
-    private static final int SMOKE_INTERVAL = 40;
+    private static final int NORMAL_SMOKE_INTERVAL = 40;
+    private static final int CHARGE_SMOKE_INTERVAL = 20;
+
     private final Map<AzumaalEntity, Integer> lastEmissionTick = new WeakHashMap<>();
 
     public AzumaalStageTwoMouthSmokeLayer(GeoRenderer<AzumaalEntity> renderer) {
@@ -37,7 +39,9 @@ public class AzumaalStageTwoMouthSmokeLayer extends GeoRenderLayer<AzumaalEntity
             return;
         }
 
-        if ((animatable.tickCount + animatable.getId() * 11) % SMOKE_INTERVAL != 0) {
+        int smokeInterval = animatable.getAnimState() == AzumaalEntity.STATE_STAGE_TWO_RUN ? CHARGE_SMOKE_INTERVAL : NORMAL_SMOKE_INTERVAL;
+        if ((animatable.tickCount + animatable.getId() * 11) % smokeInterval != 0) {
+
             return;
         }
 

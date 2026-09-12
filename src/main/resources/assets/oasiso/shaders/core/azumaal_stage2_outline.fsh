@@ -107,17 +107,17 @@ void main() {
 
     outerMask = max(
         outerMask,
-        sample8(4.05 + outerJitter * 0.26 + pulseWidth * 0.20)
+        sample8(2.05 + outerJitter * 0.26 + pulseWidth * 0.20)
     );
 
     outerMask = max(
         outerMask,
-        sample8(5.50 + outerJitter * 0.55 + pulseWidth * 0.55)
+        sample8(3.50 + outerJitter * 0.55 + pulseWidth * 0.55)
     );
 
     outerMask = max(
         outerMask,
-        sample8(6.30 + outerJitter * 0.92 + pulseWidth)
+        sample8(4.30 + outerJitter * 0.92 + pulseWidth)
     );
 
     float innerEdge =

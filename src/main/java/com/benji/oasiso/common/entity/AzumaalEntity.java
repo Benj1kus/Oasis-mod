@@ -28,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import com.benji.oasiso.common.entity.ai.AzumaalStageTwoAI;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -80,6 +81,12 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     public static final int STATE_ATTACK_2 = 3;
     public static final int STATE_EYES = 9;
 
+    public static final int STATE_STAGE_TWO_BITE = 11;
+    public static final int STATE_STAGE_TWO_DIG = 12;
+    public static final int STATE_STAGE_TWO_JUMP = 13;
+    public static final int STATE_STAGE_TWO_RUN = 14;
+    public static final int STATE_STAGE_TWO_TENTACLE = 15;
+
     private static final int SPAWN_ANIMATION_TIME = 200;
 
     private static final double HOVER_AMPLITUDE = 0.18D;
@@ -122,6 +129,12 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final EntityDataAccessor<Integer> CLONE_INDEX = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> STAGE_TWO = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.BOOLEAN);
 
+    private static final RawAnimation STAGE_TWO_BITE_ANIMATION = RawAnimation.begin().thenPlay("bite");
+    private static final RawAnimation STAGE_TWO_DIG_ANIMATION = RawAnimation.begin().thenPlay("diggin");
+    private static final RawAnimation STAGE_TWO_JUMP_ANIMATION = RawAnimation.begin().thenPlay("jump");
+    private static final RawAnimation STAGE_TWO_RUN_ANIMATION = RawAnimation.begin().thenLoop("run");
+    private static final RawAnimation STAGE_TWO_TENTACLE_ANIMATION = RawAnimation.begin().thenPlay("tentacle");
+
     private static final RawAnimation EYES_ANIMATION = RawAnimation.begin().thenPlay("eyes");
     private static final RawAnimation DEATH_ANIMATION = RawAnimation.begin().thenPlay("death");
     private static final RawAnimation SUMMON_1_ANIMATION = RawAnimation.begin().thenPlay("summon_1").thenLoop("idle");
@@ -150,6 +163,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
     private final AzumaalAttackController attackController;
     private final AzumaalDeathManager deathManager;
+    private final AzumaalStageTwoAI stageTwoAI;
 
     private int bladeSplashMode = SPLASH_NONE;
     private int spawnTicks;
@@ -171,6 +185,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         super(type, level);
         this.deathManager = new AzumaalDeathManager(this);
         this.attackController = new AzumaalAttackController(this);
+        this.stageTwoAI = new AzumaalStageTwoAI(this);
         this.setNoGravity(true);
 
         if (!level.isClientSide) {
@@ -493,19 +508,16 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
         if (this.isStageTwo()) {
             this.setNoGravity(false);
-            Vec3 movement = this.getDeltaMovement();
 
+            Vec3 movement = this.getDeltaMovement();
             this.setDeltaMovement(0.0D, movement.y, 0.0D);
 
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
                 this.setInvulnerable(false);
-                if (this.getAnimState() != STATE_IDLE) {
-                    this.setAnimState(STATE_IDLE);
-                }
-            }
-            if (!this.level().isClientSide) {
+                this.stageTwoAI.tick(serverLevel);
                 tickStageTwoEntropyFlames();
             }
+
             return;
         }
 
@@ -976,6 +988,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
         if (!this.isClone()) {
             this.attackController.save(tag);
+            this.stageTwoAI.save(tag);
         }
     }
 
@@ -1023,8 +1036,10 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.setInvulnerable(this.getAnimState() == STATE_SPAWN || this.introLocked || this.isDeathSequenceActive());
 
         this.deathManager.load(tag);
+
         if (!this.isClone()) {
             this.attackController.load(tag);
+            this.stageTwoAI.load(tag);
         }
     }
 
@@ -1040,6 +1055,11 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
                 state -> {
                     return switch (this.getAnimState()) {
+                        case STATE_STAGE_TWO_BITE -> state.setAndContinue(STAGE_TWO_BITE_ANIMATION);
+                        case STATE_STAGE_TWO_DIG -> state.setAndContinue(STAGE_TWO_DIG_ANIMATION);
+                        case STATE_STAGE_TWO_JUMP -> state.setAndContinue(STAGE_TWO_JUMP_ANIMATION);
+                        case STATE_STAGE_TWO_RUN -> state.setAndContinue(STAGE_TWO_RUN_ANIMATION);
+                        case STATE_STAGE_TWO_TENTACLE -> state.setAndContinue(STAGE_TWO_TENTACLE_ANIMATION);
                         case STATE_DEATH -> state.setAndContinue(DEATH_ANIMATION);
                         case STATE_EYES -> state.setAndContinue(EYES_ANIMATION);
                         case STATE_SUMMON_2 -> state.setAndContinue(SUMMON_2_ANIMATION);
@@ -1237,6 +1257,7 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         this.setDeltaMovement(Vec3.ZERO);
         this.hoverFallSpeed = 0.0D;
         this.refreshDimensions();
+        this.stageTwoAI.beginStageTwo();
 
         level.sendParticles(Oasiso.MELTED_SPLASH.get(), this.getX(), this.getY() + this.getBbHeight() * 0.48D, this.getZ(), 180, 2.35D, 2.35D, 2.35D, 0.16D);
     }
@@ -1279,9 +1300,10 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
         }
         if (!this.isStageTwo()) {
             beginStageTwoTransition(level, source);
-
             return;
         }
+
+        this.stageTwoAI.reset();
         this.attackController.prepareForDeath(level);
         this.deathManager.begin(level, source);
     }

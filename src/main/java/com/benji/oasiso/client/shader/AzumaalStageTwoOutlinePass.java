@@ -86,10 +86,12 @@ public final class AzumaalStageTwoOutlinePass {
         main.bindWrite(false);
 
         float time = level.getGameTime() + event.getPartialTick();
+        boolean charging = targets.stream().anyMatch(azumaal -> azumaal.getAnimState() == AzumaalEntity.STATE_STAGE_TWO_RUN);
+        float visualSpeed = charging ? 2.0F : 1.0F;
+        float effectTime = time * visualSpeed;
+        float pulse = 0.5F + 0.5F * Mth.sin(effectTime * 0.222F);
 
-        float pulse = 0.5F + 0.5F * Mth.sin(time * 0.222F);
-
-        composite(main, pulse, time);
+        composite(main, pulse, effectTime);
     }
 
     @SubscribeEvent
