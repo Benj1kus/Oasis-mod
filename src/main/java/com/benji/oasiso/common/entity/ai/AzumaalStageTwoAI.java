@@ -14,7 +14,15 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import com.benji.oasiso.config.OsirisRealmConfig;
+import com.benji.oasiso.common.entity.OsirisTentacleEntity;
+import com.benji.oasiso.registry.ModEntities;
+import net.minecraft.core.BlockPos;
+import com.benji.oasiso.common.entity.OsirisSplitEntity;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -51,6 +59,37 @@ public final class AzumaalStageTwoAI {
     private static final int CHARGE_IMPACT_ANIMATION_TICKS = 25;
     private static final double CHARGE_PUSH_SPEED = 0.65D;
 
+
+    private static final int TENTACLE_CAST_TICKS = 25;
+    private static final int TENTACLE_WAVE_INTERVAL = 30;
+    private static final int TENTACLE_WAVE_COUNT = 3;
+    private static final float TENTACLE_SQUARE_PATTERN_CHANCE = 0.30F;
+    private static final double[] TENTACLE_SQUARE_HALF_SIZES = {2.50D, 1.75D, 1.00D};
+
+    private static final double TENTACLE_HIT_HALF_WIDTH = 1.05D;
+    private static final double TENTACLE_HIT_HEIGHT = 2.40D;
+
+    private static final int SPIT_ANIMATION_TICKS = 10;
+    private static final int SPIT_SHOOT_TICK = 5;
+    private static final int SPIT_RESTART_GAP_TICKS = 2;
+    private static final float SPIT_TRIPLE_CHANCE = 0.50F;
+
+    private static final double BEAM_ANCHOR_SIDE = 0.75D / 16.0D;
+    private static final double BEAM_ANCHOR_HEIGHT = 43.75D / 16.0D;
+    private static final double BEAM_ANCHOR_FORWARD = 8.75D / 16.0D;
+
+    private static final int MEGA_BEAM_OPEN_TICKS = 15;
+
+    private static final int MEGA_BEAM_CHARGE_TICKS = 20 * 5;
+    private static final int MEGA_BEAM_ACTIVE_TICKS = 20 * 20;
+    private static final int MEGA_BEAM_CLOSE_TICKS = 15;
+    private static final int MEGA_BEAM_BUILD_TICKS = 24;
+    private static final double MEGA_BEAM_RANGE = 40.0D;
+    private static final double MEGA_BEAM_HIT_RADIUS = 1.80D;
+    private static final int MEGA_BEAM_DAMAGE_INTERVAL = 20;
+    private static final int MEGA_BEAM_FIRE_SECONDS = 3;
+    private static final float MEGA_BEAM_ROTATION_SPEED = 2.00F;
+
     private final AzumaalEntity boss;
 
     private Phase phase = Phase.NONE;
@@ -65,8 +104,14 @@ public final class AzumaalStageTwoAI {
     private boolean damagingEmerge;
     private boolean emergeDamageDone;
     private double digGroundY;
-    private final Map<UUID, Long> chargeHitTimes = new HashMap<>();
+    private boolean tentacleSquarePattern;
+    private int tentacleWaveIndex;
+    private Vec3 tentaclePatternCenter = Vec3.ZERO;
+    private int spitShotsRemaining;
+    private boolean spitShotFired;
 
+    private final Map<UUID, Long> chargeHitTimes = new HashMap<>();
+    private final Map<UUID, Long> megaBeamHitTimes = new HashMap<>();
 
     public AzumaalStageTwoAI(AzumaalEntity boss) {
         this.boss = boss;
@@ -94,6 +139,14 @@ public final class AzumaalStageTwoAI {
         this.damagingEmerge = false;
         this.emergeDamageDone = false;
 
+        this.tentacleSquarePattern = false;
+        this.tentacleWaveIndex = 0;
+        this.tentaclePatternCenter = Vec3.ZERO;
+
+        this.spitShotsRemaining = 0;
+        this.spitShotFired = false;
+
+        this.megaBeamHitTimes.clear();
         this.chargeHitTimes.clear();
 
         boss.setDeltaMovement(Vec3.ZERO);
@@ -120,6 +173,14 @@ public final class AzumaalStageTwoAI {
             case EMERGE -> tickEmerge(level);
             case CHARGE -> tickCharge(level);
             case CHARGE_IMPACT -> tickChargeImpact();
+            case TENTACLE_CAST -> tickTentacleCast(level);
+            case TENTACLE_WAVES -> tickTentacleWaves(level);
+            case SPIT_CAST -> tickSpitCast(level);
+            case MEGA_BEAM_OPEN -> tickMegaBeamOpen(level);
+            case MEGA_BEAM_CHARGE -> tickMegaBeamCharge(level);
+            case MEGA_BEAM_ACTIVE -> tickMegaBeamActive(level);
+            case MEGA_BEAM_CLOSE -> tickMegaBeamClose();
+            case SPIT_GAP -> tickSpitGap(level);
         }
     }
 
@@ -154,10 +215,14 @@ public final class AzumaalStageTwoAI {
             return;
         }
 
-        if (boss.getRandom().nextBoolean()) {
-            startDig(target);
-        } else {
-            startCharge(target);
+        int attack = boss.getRandom().nextInt(5);
+
+        switch (attack) {
+            case 0 -> startDig(target);
+            case 1 -> startCharge(target);
+            case 2 -> startTentacleAttack(target);
+            case 3 -> startSpitAttack(target);
+            default -> startMegaBeam(target);
         }
     }
 
@@ -321,6 +386,484 @@ public final class AzumaalStageTwoAI {
 
             level.sendParticles(particle, x, groundY + 0.08D, z, 1, 0.04D, 0.15D, 0.04D, 0.09D);
         }
+    }
+//beam
+
+    private void startMegaBeam(ServerPlayer target) {
+        this.phase = Phase.MEGA_BEAM_OPEN;
+        this.attackTick = 0;
+        this.targetId = target.getUUID();
+        this.megaBeamHitTimes.clear();
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        boss.lookAtPlayer(target, 180.0F);
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_MOUTH_OPEN);
+    }
+
+
+    private void tickMegaBeamOpen(ServerLevel level) {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        boss.lookAtPlayer(target, 10.0F);
+        if (this.attackTick < MEGA_BEAM_OPEN_TICKS) {
+
+            return;
+        }
+
+        this.phase = Phase.MEGA_BEAM_CHARGE;
+        this.attackTick = 0;
+        this.targetId = target.getUUID();
+
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BEAM_CHARGE);
+    }
+
+
+    private void tickMegaBeamCharge(ServerLevel level) {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        boss.lookAtPlayer(target, 5.0F);
+
+        if (this.attackTick < MEGA_BEAM_CHARGE_TICKS) {
+
+            return;
+        }
+
+        this.phase = Phase.MEGA_BEAM_ACTIVE;
+        this.attackTick = 0;
+        this.megaBeamHitTimes.clear();
+
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BEAM_ACTIVE);
+    }
+
+
+    private void tickMegaBeamActive(ServerLevel level) {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        damageMegaBeamTargets(level);
+        rotateMegaBeamBoss();
+
+        if (this.attackTick < MEGA_BEAM_ACTIVE_TICKS) {
+
+            return;
+        }
+
+        this.phase = Phase.MEGA_BEAM_CLOSE;
+        this.attackTick = 0;
+        this.megaBeamHitTimes.clear();
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_MOUTH_CLOSE);
+    }
+
+
+    private void tickMegaBeamClose() {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        if (this.attackTick >= MEGA_BEAM_CLOSE_TICKS) {
+            finishAttack();
+        }
+    }
+
+
+    private void rotateMegaBeamBoss() {
+        float previousYaw = boss.getYRot();
+
+        float nextYaw = Mth.wrapDegrees(previousYaw + MEGA_BEAM_ROTATION_SPEED);
+        boss.yRotO = previousYaw;
+        boss.yBodyRotO = previousYaw;
+        boss.yHeadRotO = previousYaw;
+        boss.setYRot(nextYaw);
+        boss.yBodyRot = nextYaw;
+        boss.setYHeadRot(nextYaw);
+    }
+
+
+    private void damageMegaBeamTargets(ServerLevel level) {
+
+        float build = Mth.clamp(this.attackTick / (float) MEGA_BEAM_BUILD_TICKS,
+                0.0F, 1.0F);
+
+        build = build * build * (3.0F - 2.0F * build);
+        double currentRange = MEGA_BEAM_RANGE * build;
+
+        if (currentRange <= 0.05D) {
+            return;
+        }
+
+        Vec3 start = getBeamAnchorWorldPosition();
+        Vec3 direction = getMegaBeamDirection();
+        Vec3 end = start.add(direction.scale(currentRange));
+        long now = level.getGameTime();
+
+        for (ServerPlayer player : level.players()) {
+
+            if (!isValidTarget(player)) {
+                continue;
+            }
+
+            AABB targetBox = player.getBoundingBox().inflate(MEGA_BEAM_HIT_RADIUS);
+            if (targetBox.clip(start, end).isEmpty()) {
+
+                continue;
+            }
+
+            player.setSecondsOnFire(MEGA_BEAM_FIRE_SECONDS);
+            Long lastDamage = this.megaBeamHitTimes.get(player.getUUID());
+
+            if (lastDamage != null && now - lastDamage < MEGA_BEAM_DAMAGE_INTERVAL) {
+                continue;
+            }
+
+            this.megaBeamHitTimes.put(player.getUUID(), now);
+            damagePlayer(player, OsirisRealmConfig.AZUMAAL_STAGE_TWO_EMERGE_DAMAGE.get().floatValue());
+        }
+    }
+
+
+    private Vec3 getMegaBeamDirection() {
+        float yaw = boss.getYRot() * Mth.DEG_TO_RAD;
+        return new Vec3(-Mth.sin(yaw), 0.0D, Mth.cos(yaw)).normalize();
+    }
+
+    //split
+
+    private void startSpitAttack(ServerPlayer target) {
+        this.phase = Phase.SPIT_CAST;
+        this.attackTick = 0;
+        this.targetId = target.getUUID();
+        this.spitShotFired = false;
+
+        this.spitShotsRemaining = boss.getRandom().nextFloat() < SPIT_TRIPLE_CHANCE ? 3 : 1;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        boss.lookAtPlayer(target, 180.0F);
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BITE);
+    }
+
+
+    private void tickSpitCast(ServerLevel level) {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        boss.lookAtPlayer(target, 14.0F);
+
+        if (!this.spitShotFired && this.attackTick >= SPIT_SHOOT_TICK) {
+            this.spitShotFired = true;
+            fireOsirisSplit(level, target);
+        }
+
+        if (this.attackTick < SPIT_ANIMATION_TICKS) {
+
+            return;
+        }
+
+        this.spitShotsRemaining--;
+
+        if (this.spitShotsRemaining <= 0) {
+
+            finishAttack();
+            return;
+        }
+
+        boss.setAnimState(AzumaalEntity.STATE_IDLE);
+        this.phase = Phase.SPIT_GAP;
+        this.attackTick = 0;
+    }
+
+
+    private void tickSpitGap(ServerLevel level) {
+        this.attackTick++;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+
+        if (this.attackTick < SPIT_RESTART_GAP_TICKS) {
+
+            return;
+        }
+
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        this.targetId = target.getUUID();
+        this.spitShotFired = false;
+        this.attackTick = 0;
+        this.phase = Phase.SPIT_CAST;
+
+        boss.lookAtPlayer(target, 180.0F);
+
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BITE);
+    }
+
+
+    private void fireOsirisSplit(ServerLevel level, ServerPlayer target) {
+        Vec3 origin = getBeamAnchorWorldPosition();
+        Vec3 targetPoint = new Vec3(target.getX(), target.getY() + target.getBbHeight() * 0.55D, target.getZ());
+
+        OsirisSplitEntity split = ModEntities.OSIRIS_SPLIT.get().create(level);
+
+        if (split == null) {
+            return;
+        }
+
+        split.moveTo(origin.x, origin.y, origin.z,
+
+                boss.getYRot(), 0.0F);
+
+        split.setAzumaalOwner(boss);
+        split.launchTowards(targetPoint);
+
+        level.addFreshEntity(split);
+        OsirisSplitEntity.spawnLaunchParticles(level, origin);
+
+        float pitch = 0.60F + boss.getRandom().nextFloat() * 0.08F;
+
+        level.playSound(null, origin.x, origin.y, origin.z, SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 1.55F, pitch);
+    }
+
+    private Vec3 getBeamAnchorWorldPosition() {
+        float yawRadians = boss.getYRot() * Mth.DEG_TO_RAD;
+
+        Vec3 forward = new Vec3(-Mth.sin(yawRadians), 0.0D, Mth.cos(yawRadians));
+        Vec3 right = new Vec3(Mth.cos(yawRadians), 0.0D, Mth.sin(yawRadians));
+
+        return new Vec3(boss.getX(), boss.getY() + BEAM_ANCHOR_HEIGHT, boss.getZ()).add(forward.scale(BEAM_ANCHOR_FORWARD)).add(right.scale(BEAM_ANCHOR_SIDE));
+    }
+
+    //tentacles
+
+    private void startTentacleAttack(ServerPlayer target) {
+        this.phase = Phase.TENTACLE_CAST;
+        this.attackTick = 0;
+        this.targetId = target.getUUID();
+        this.tentacleWaveIndex = 0;
+
+        this.tentacleSquarePattern = boss.getRandom().nextFloat() < TENTACLE_SQUARE_PATTERN_CHANCE;
+        this.tentaclePatternCenter = Vec3.ZERO;
+
+        boss.setDeltaMovement(Vec3.ZERO);
+        boss.lookAtPlayer(target, 8.0F);
+        boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_TENTACLE);
+    }
+
+    private void tickTentacleCast(ServerLevel level) {
+        this.attackTick++;
+        boss.setDeltaMovement(Vec3.ZERO);
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+
+        if (target != null) {
+            boss.lookAtPlayer(target, 8.0F);
+        }
+
+        if (this.attackTick < TENTACLE_CAST_TICKS) {
+            return;
+        }
+
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        boss.setAnimState(AzumaalEntity.STATE_IDLE);
+        this.phase = Phase.TENTACLE_WAVES;
+
+        this.attackTick = 0;
+        this.tentacleWaveIndex = 0;
+        double centerGroundY = findTentacleGroundY(level, target.getX(), target.getY(), target.getZ());
+        this.tentaclePatternCenter = new Vec3(target.getX(), centerGroundY, target.getZ());
+        spawnTentacleWave(level, target);
+
+        this.tentacleWaveIndex++;
+    }
+
+    private void tickTentacleWaves(ServerLevel level) {
+        this.attackTick++;
+        boss.setDeltaMovement(Vec3.ZERO);
+
+        if (this.attackTick < TENTACLE_WAVE_INTERVAL) {
+            return;
+        }
+
+        this.attackTick = 0;
+
+        if (this.tentacleWaveIndex >= TENTACLE_WAVE_COUNT) {
+
+            finishAttack();
+            return;
+        }
+        ServerPlayer target = resolveTarget(level);
+
+        if (target == null) {
+            target = findNearestTarget(level);
+        }
+        if (target == null) {
+            finishAttack();
+            return;
+        }
+
+        spawnTentacleWave(level, target);
+
+        this.tentacleWaveIndex++;
+        if (this.tentacleWaveIndex >= TENTACLE_WAVE_COUNT) {
+            finishAttack();
+        }
+    }
+
+    private void spawnTentacleWave(ServerLevel level, ServerPlayer target) {
+        List<Vec3> positions;
+
+        if (this.tentacleSquarePattern) {
+            positions = createTentacleSquarePositions(level, this.tentacleWaveIndex);
+
+        } else {
+
+            double groundY = findTentacleGroundY(level, target.getX(), target.getY(), target.getZ());
+            positions = List.of(new Vec3(target.getX(), groundY, target.getZ()));
+        }
+
+        for (Vec3 position : positions) {
+            spawnTentacleEntity(level, position);
+        }
+        damagePlayersInTentacleWave(level, positions);
+    }
+
+    private List<Vec3> createTentacleSquarePositions(ServerLevel level, int wave) {
+        int safeWave = Mth.clamp(wave, 0, TENTACLE_SQUARE_HALF_SIZES.length - 1);
+
+        double half = TENTACLE_SQUARE_HALF_SIZES[safeWave];
+        double centerX = this.tentaclePatternCenter.x;
+        double centerZ = this.tentaclePatternCenter.z;
+        double referenceY = this.tentaclePatternCenter.y;
+
+        double[][] offsets = {
+                {-half, -half},
+                { half, -half},
+                { half,  half},
+                {-half,  half}
+        };
+
+        List<Vec3> result = new ArrayList<>(offsets.length);
+
+        for (double[] offset : offsets) {
+            double x = centerX + offset[0];
+            double z = centerZ + offset[1];
+            double y = findTentacleGroundY(level, x, referenceY, z);
+
+            result.add(new Vec3(x, y, z));
+        }
+
+        return result;
+    }
+
+    private void spawnTentacleEntity(ServerLevel level, Vec3 position) {
+        OsirisTentacleEntity tentacle = ModEntities.OSIRIS_TENTACLE.get().create(level);
+
+        if (tentacle == null) {
+            return;
+        }
+
+        float yaw = boss.getRandom().nextFloat() * 360.0F;
+
+        tentacle.moveTo(position.x, position.y, position.z, yaw, 0.0F);
+
+        tentacle.setYRot(yaw);
+        tentacle.setYHeadRot(yaw);
+        tentacle.yBodyRot = yaw;
+
+        level.addFreshEntity(tentacle);
+    }
+
+    private void damagePlayersInTentacleWave(ServerLevel level, List<Vec3> positions) {
+        float damage = OsirisRealmConfig.AZUMAAL_STAGE_TWO_CHARGE_DAMAGE.get().floatValue();
+
+        for (ServerPlayer player : level.players()) {
+            if (!isValidTarget(player)) {
+                continue;
+            }
+
+            boolean hit = false;
+
+            for (Vec3 position : positions) {
+
+                AABB hitBox = new AABB(position.x - TENTACLE_HIT_HALF_WIDTH, position.y, position.z - TENTACLE_HIT_HALF_WIDTH,
+                        position.x + TENTACLE_HIT_HALF_WIDTH, position.y + TENTACLE_HIT_HEIGHT, position.z + TENTACLE_HIT_HALF_WIDTH);
+
+                if (hitBox.intersects(player.getBoundingBox())) {
+                    hit = true;
+                    break;
+                }
+            }
+
+            if (!hit) {
+                continue;
+            }
+            damagePlayer(player, damage);
+        }
+    }
+
+    private double findTentacleGroundY(ServerLevel level, double x, double referenceY, double z) {
+        int blockX = Mth.floor(x);
+        int blockZ = Mth.floor(z);
+        int startY = Mth.floor(referenceY) + 2;
+
+        int minimumY = Math.max(level.getMinBuildHeight(), startY - 10);
+
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+        for (int y = startY; y >= minimumY; y--) {
+            pos.set(blockX, y, blockZ);
+            if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+
+                return y + 1.0D;
+            }
+        }
+        return referenceY;
     }
 
     private void startCharge(ServerPlayer target) {
@@ -519,6 +1062,12 @@ public final class AzumaalStageTwoAI {
         this.chargeDirection = Vec3.ZERO;
         this.damagingEmerge = false;
         this.emergeDamageDone = false;
+        this.tentacleSquarePattern = false;
+        this.tentacleWaveIndex = 0;
+        this.tentaclePatternCenter = Vec3.ZERO;
+        this.spitShotsRemaining = 0;
+        this.spitShotFired = false;
+        this.megaBeamHitTimes.clear();
         this.chargeHitTimes.clear();
 
         boss.setDeltaMovement(Vec3.ZERO);
@@ -551,6 +1100,15 @@ public final class AzumaalStageTwoAI {
         tag.putBoolean("EmergeDamageDone", this.emergeDamageDone);
         tag.putDouble("DigGroundY", this.digGroundY);
 
+        tag.putBoolean("TentacleSquarePattern", this.tentacleSquarePattern);
+        tag.putInt("TentacleWaveIndex", this.tentacleWaveIndex);
+        tag.putDouble("TentacleCenterX", this.tentaclePatternCenter.x);
+        tag.putDouble("TentacleCenterY", this.tentaclePatternCenter.y);
+        tag.putDouble("TentacleCenterZ", this.tentaclePatternCenter.z);
+
+        tag.putInt("SpitShotsRemaining", this.spitShotsRemaining);
+        tag.putBoolean("SpitShotFired", this.spitShotFired);
+
         parent.put(DATA_TAG, tag);
     }
 
@@ -576,9 +1134,27 @@ public final class AzumaalStageTwoAI {
         this.damagingEmerge = tag.getBoolean("DamagingEmerge");
         this.emergeDamageDone = tag.getBoolean("EmergeDamageDone");
         this.digGroundY = tag.getDouble("DigGroundY");
+
+        this.spitShotsRemaining = tag.getInt("SpitShotsRemaining");
+        this.spitShotFired = tag.getBoolean("SpitShotFired");
+
+        this.tentacleSquarePattern = tag.getBoolean("TentacleSquarePattern");
+        this.tentacleWaveIndex = tag.getInt("TentacleWaveIndex");
+        this.tentaclePatternCenter = new Vec3(tag.getDouble("TentacleCenterX"), tag.getDouble("TentacleCenterY"), tag.getDouble("TentacleCenterZ"));
     }
 
     private enum Phase {
-        NONE, BITE, DIG_ANIMATION, DIG_WAIT, EMERGE, CHARGE, CHARGE_IMPACT
+        NONE,
+        BITE,
+
+        DIG_ANIMATION, DIG_WAIT, EMERGE,
+
+        CHARGE, CHARGE_IMPACT,
+
+        TENTACLE_CAST, TENTACLE_WAVES,
+
+        SPIT_CAST, SPIT_GAP,
+
+        MEGA_BEAM_OPEN, MEGA_BEAM_CHARGE, MEGA_BEAM_ACTIVE, MEGA_BEAM_CLOSE
     }
 }

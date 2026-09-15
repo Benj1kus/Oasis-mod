@@ -19,6 +19,8 @@ public final class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<EntityType<OsirisSplitEntity>> OSIRIS_SPLIT = ENTITIES.register("osiris_split", () -> EntityType.Builder.of(OsirisSplitEntity::new, MobCategory.MONSTER).sized(0.625f, 2.625f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "osiris_split").toString()));
+    public static final RegistryObject<EntityType<OsirisTentacleEntity>> OSIRIS_TENTACLE = ENTITIES.register("osiris_tentacle", () -> EntityType.Builder.of(OsirisTentacleEntity::new, MobCategory.MONSTER).sized(2.00f, 2.00f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "osiris_tentacle").toString()));
     public static final RegistryObject<EntityType<ScarabEntity>> SCARAB = ENTITIES.register("scarab", () -> EntityType.Builder.of(ScarabEntity::new, MobCategory.CREATURE).sized(2.875f, 1.75f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "scarab").toString()));
     public static final RegistryObject<EntityType<KrombulEntity>> KROMBUL = ENTITIES.register("krombul", () -> EntityType.Builder.of(KrombulEntity::new, MobCategory.CREATURE).sized(0.75F, 1.25F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "krombul").toString()));
     public static final RegistryObject<EntityType<AzumaalEntity>> AZUMAAL = ENTITIES.register("azumaal", () -> EntityType.Builder.of(AzumaalEntity::new, MobCategory.MONSTER).sized(1.375F, 6.25F).build(ResourceLocation.fromNamespaceAndPath(MODID, "azumaal").toString()));

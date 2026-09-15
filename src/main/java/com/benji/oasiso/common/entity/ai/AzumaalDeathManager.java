@@ -25,7 +25,10 @@ import java.util.UUID;
 
 public final class AzumaalDeathManager {
 
-    public static final int DEATH_DURATION = 20 * 14;
+    public static final int STAGE_ONE_DEATH_DURATION = 20 * 14;
+
+    public static final int STAGE_TWO_DEATH_DURATION = 20 * 6;
+    public static final int STAGE_TWO_PUDDLE_TICK = 20;
 
     private static final int BODY_PARTICLE_INTERVAL = 2;
 
@@ -91,6 +94,11 @@ public final class AzumaalDeathManager {
         boss.fallDistance = 0.0F;
     }
 
+    private boolean isStageTwoFinalDeath() {
+        return !this.stageTransition
+                && boss.isStageTwo();
+    }
+
     public boolean tick(ServerLevel level) {
         if (!this.active) {
             return false;
@@ -99,27 +107,33 @@ public final class AzumaalDeathManager {
         this.deathTicks++;
 
         boss.setDeathVisualTicks(this.deathTicks);
+        boolean stageTwoFinalDeath = isStageTwoFinalDeath();
 
-        if (this.deathTicks % BODY_PARTICLE_INTERVAL == 0) {
-
+        if (!stageTwoFinalDeath && this.deathTicks % BODY_PARTICLE_INTERVAL == 0) {
             spawnBodyParticles(level);
         }
 
-        if (this.deathTicks < DEATH_DURATION) {
+        int deathDuration = stageTwoFinalDeath ? STAGE_TWO_DEATH_DURATION : STAGE_ONE_DEATH_DURATION;
+        if (this.deathTicks < deathDuration) {
             return false;
         }
 
-        spawnDeathExplosion(level);
+        if (!stageTwoFinalDeath) {
+            spawnDeathExplosion(level);
+        }
+
         if (this.stageTransition) {
             this.active = false;
             this.stageTransition = false;
+
             return true;
         }
+
         spawnRewardBarrel(level);
         startPortalDespawning(level);
         spawnChaosReturnPortal(level);
-
         this.active = false;
+
         return true;
     }
 
@@ -245,7 +259,7 @@ public final class AzumaalDeathManager {
 
     private void spawnBodyParticles(ServerLevel level) {
 
-        double progress = Mth.clamp(this.deathTicks / (double) DEATH_DURATION, 0.0D, 1.0D);
+        double progress = Mth.clamp(this.deathTicks / (double) STAGE_ONE_DEATH_DURATION, 0.0D, 1.0D);
 
         int count = 7 + Mth.floor(progress * 10.0D);
 
@@ -255,15 +269,27 @@ public final class AzumaalDeathManager {
         level.sendParticles(Oasiso.PURPLE_STARS.get(), boss.getX(), boss.getY() + boss.getBbHeight() * 0.5D, boss.getZ(), count, width, height, width, 0.035D);
     }
 
+    private void spawnRewardBarrelExplosion(ServerLevel level, BlockPos barrelPos) {
+        double x = barrelPos.getX() + 0.5D;
+
+        double y = barrelPos.getY() + 0.65D;
+
+        double z = barrelPos.getZ() + 0.5D;
+
+        level.sendParticles(Oasiso.CHAOS_BOMB_CENTER_SMOKE.get(), x, y, z, 10, 0.45D, 0.65D, 0.45D, 0.04D);
+        level.sendParticles(Oasiso.CHAOS_BOMB_FIRE_SMOKE.get(), x, y, z, 38, 1.35D, 1.45D, 1.35D, 0.13D);
+        level.sendParticles(Oasiso.CHAOS_BOMB_SPARKS.get(), x, y, z, 80, 1.15D, 1.35D, 1.15D, 0.27D);
+
+        level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 2.0F, 0.72F);
+    }
+
     private void spawnDeathExplosion(ServerLevel level) {
         double x = boss.getX();
         double y = boss.getY() + boss.getBbHeight() * 0.48D;
         double z = boss.getZ();
 
         level.sendParticles(Oasiso.CHAOS_BOMB_CENTER_SMOKE.get(), x, y, z, 10, 0.45D, 0.65D, 0.45D, 0.04D);
-
         level.sendParticles(Oasiso.CHAOS_BOMB_FIRE_SMOKE.get(), x, y, z, 38, 1.35D, 1.75D, 1.35D, 0.13D);
-
         level.sendParticles(Oasiso.CHAOS_BOMB_SPARKS.get(), x, y, z, 80, 1.15D, 1.55D, 1.15D, 0.27D);
 
         level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 2.0F, 0.72F);
@@ -278,6 +304,8 @@ public final class AzumaalDeathManager {
         BlockPos barrelPos = new BlockPos(x, y, z);
 
         level.setBlock(barrelPos, Blocks.BARREL.defaultBlockState(), 3);
+
+        spawnRewardBarrelExplosion(level, barrelPos);
 
         if (!(level.getBlockEntity(barrelPos) instanceof BarrelBlockEntity barrel)) {
 

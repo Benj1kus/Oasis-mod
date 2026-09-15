@@ -122,7 +122,7 @@ public final class OsirisRealmConfig {
         BUILDER.push("Osiris Boss");
         AZUMAAL_MAX_HEALTH = BUILDER.comment("Maximum health of Osiris. Requires restart to affect newly created bosses.").defineInRange("maxHealth", 2000.0D, 1.0D, 1000000.0D);
         AZUMAAL_STAGE_TWO_TRIGGER_HEALTH = BUILDER.comment("Health threshold at which Osiris starts the transition into Stage 2.", "If this value is higher than maxHealth, it is automatically clamped to maxHealth.").defineInRange("stageTwoTriggerHealth", 800.0D, 1.0D, 1000000.0D);
-        AZUMAAL_STAGE_TWO_CHARGE_DAMAGE = BUILDER.comment("Base damage dealt by each hit of Osiris Stage 2 charge attack.", "Damage Scaler is applied on top of this value.").defineInRange("stageTwoChargeDamage", 10.0D, 0.0D, 100000.0D);
+        AZUMAAL_STAGE_TWO_CHARGE_DAMAGE = BUILDER.comment("Base damage dealt by each hit of Osiris Stage 2 charge attack and tentacles.", "Damage Scaler is applied on top of this value.").defineInRange("stageTwoChargeDamage", 10.0D, 0.0D, 100000.0D);
         AZUMAAL_STAGE_TWO_EMERGE_DAMAGE = BUILDER.comment("Base damage dealt when Osiris Stage 2 emerges directly beneath a player.", "Damage Scaler is applied on top of this value.").defineInRange("stageTwoEmergeDamage", 16.0D, 0.0D, 100000.0D);
         AZUMAAL_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Osiris. Attack multipliers below are applied to this value.").defineInRange("attackDamage", 22.0D, 0.0D, 100000.0D);
         BUILDER.pop();

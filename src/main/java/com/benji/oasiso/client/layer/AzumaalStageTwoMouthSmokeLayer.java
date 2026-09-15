@@ -14,6 +14,7 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
+import com.benji.oasiso.common.entity.ai.AzumaalDeathManager;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -32,6 +33,10 @@ public class AzumaalStageTwoMouthSmokeLayer extends GeoRenderLayer<AzumaalEntity
     @Override
     public void render(PoseStack poseStack, AzumaalEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
         if (!animatable.isStageTwo()) {
+            return;
+        }
+
+        if (animatable.isDeathSequenceActive() && animatable.getDeathVisualTicks() >= AzumaalDeathManager.STAGE_TWO_PUDDLE_TICK) {
             return;
         }
 

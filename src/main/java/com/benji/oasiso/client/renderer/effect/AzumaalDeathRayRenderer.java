@@ -35,7 +35,7 @@ public final class AzumaalDeathRayRenderer {
         }
 
         float deathTime = boss.getDeathVisualTicks() + partialTick;
-        float progress = Mth.clamp(deathTime / AzumaalDeathManager.DEATH_DURATION, 0.0F, 1.0F);
+        float progress = Mth.clamp(deathTime / AzumaalDeathManager.STAGE_ONE_DEATH_DURATION, 0.0F, 1.0F);
 
         float appear = smoothstep(0.02F, 0.20F, progress);
         float finale = smoothstep(0.62F, 1.0F, progress);

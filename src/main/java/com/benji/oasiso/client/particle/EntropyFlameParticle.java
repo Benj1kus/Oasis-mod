@@ -8,6 +8,9 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
+import com.benji.oasiso.common.entity.AzumaalEntity;
+import com.benji.oasiso.common.entity.ai.AzumaalDeathManager;
+import net.minecraft.world.phys.AABB;
 
 public class EntropyFlameParticle extends TextureSheetParticle {
 
@@ -56,6 +59,17 @@ public class EntropyFlameParticle extends TextureSheetParticle {
 
     @Override
     public void tick() {
+
+        boolean puddleDeathNearby = !this.level.getEntitiesOfClass(AzumaalEntity.class,
+                new AABB(this.x - 8.0D, this.y - 8.0D, this.z - 8.0D,
+                        this.x + 8.0D, this.y + 8.0D, this.z + 8.0D),
+                boss -> boss.isStageTwo() && boss.isDeathSequenceActive() && boss.getDeathVisualTicks() >= AzumaalDeathManager.STAGE_TWO_PUDDLE_TICK).isEmpty();
+
+        if (puddleDeathNearby) {
+            this.remove();
+            return;
+        }
+
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;

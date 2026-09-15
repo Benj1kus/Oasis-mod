@@ -2,6 +2,7 @@ package com.benji.oasiso.client.shader;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.AzumaalEntity;
+import com.benji.oasiso.common.entity.ai.AzumaalDeathManager;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.shaders.Uniform;
@@ -72,8 +73,14 @@ public final class AzumaalStageTwoOutlinePass {
             }
 
             if (!azumaal.isAlive() || azumaal.isRemoved() || azumaal.isClone() || !azumaal.isStageTwo()) {
+
                 continue;
             }
+
+            if (azumaal.isDeathSequenceActive() && azumaal.getDeathVisualTicks() >= AzumaalDeathManager.STAGE_TWO_PUDDLE_TICK) {
+                continue;
+            }
+
             targets.add(azumaal);
         }
         if (targets.isEmpty()) {

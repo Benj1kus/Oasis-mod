@@ -12,7 +12,9 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
+import com.benji.oasiso.client.event.AzumaalMegaBeamCameraShake;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(
         modid = Oasiso.MODID,
@@ -21,6 +23,10 @@ import net.minecraftforge.fml.common.Mod;
 )
 public class ClientModEvents {
 
+    @SubscribeEvent
+    public static void clientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> MinecraftForge.EVENT_BUS.register(AzumaalMegaBeamCameraShake.class));
+    }
 
     @SubscribeEvent
     public static void registerDimensionEffects(
@@ -142,6 +148,17 @@ public class ClientModEvents {
                 Oasiso.SAND_GOLEM.get(),
                 SandGolemRenderer::new
         );
+
+        event.registerEntityRenderer(
+                Oasiso.OSIRIS_TENTACLE.get(),
+                OsirisTentacleRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                Oasiso.OSIRIS_SPLIT.get(),
+                OsirisSplitRenderer::new
+        );
+
 
         event.registerEntityRenderer(
                 Oasiso.DAMAGE_NUMBER.get(),

@@ -111,6 +111,11 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final double PRESSURE_PUSH_MAX = 8.5D;
     private static final byte PRESSURE_SHOCKWAVE_EVENT = 67;
 
+    public static final int STATE_STAGE_TWO_MOUTH_OPEN = 16;
+    public static final int STATE_STAGE_TWO_BEAM_CHARGE = 17;
+    public static final int STATE_STAGE_TWO_BEAM_ACTIVE = 18;
+    public static final int STATE_STAGE_TWO_MOUTH_CLOSE = 19;
+
     private static final EntityDataAccessor<Integer> ANIM_STATE = SynchedEntityData.defineId(AzumaalEntity.class, EntityDataSerializers.INT);
 
     private UUID cloneOwnerId;
@@ -134,6 +139,9 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
     private static final RawAnimation STAGE_TWO_JUMP_ANIMATION = RawAnimation.begin().thenPlay("jump");
     private static final RawAnimation STAGE_TWO_RUN_ANIMATION = RawAnimation.begin().thenLoop("run");
     private static final RawAnimation STAGE_TWO_TENTACLE_ANIMATION = RawAnimation.begin().thenPlay("tentacle");
+    private static final RawAnimation STAGE_TWO_MOUTH_OPEN_ANIMATION = RawAnimation.begin().thenPlay("mouth_open");
+    private static final RawAnimation STAGE_TWO_MOUTH_ATTACK_ANIMATION = RawAnimation.begin().thenLoop("mouth_attack");
+    private static final RawAnimation STAGE_TWO_MOUTH_CLOSE_ANIMATION = RawAnimation.begin().thenPlay("mouth_close");
 
     private static final RawAnimation EYES_ANIMATION = RawAnimation.begin().thenPlay("eyes");
     private static final RawAnimation DEATH_ANIMATION = RawAnimation.begin().thenPlay("death");
@@ -1056,6 +1064,10 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
                 state -> {
                     return switch (this.getAnimState()) {
                         case STATE_STAGE_TWO_BITE -> state.setAndContinue(STAGE_TWO_BITE_ANIMATION);
+                        case STATE_STAGE_TWO_MOUTH_OPEN -> state.setAndContinue(STAGE_TWO_MOUTH_OPEN_ANIMATION);
+                        case STATE_STAGE_TWO_BEAM_CHARGE, STATE_STAGE_TWO_BEAM_ACTIVE ->
+                                state.setAndContinue(STAGE_TWO_MOUTH_ATTACK_ANIMATION);
+                        case STATE_STAGE_TWO_MOUTH_CLOSE -> state.setAndContinue(STAGE_TWO_MOUTH_CLOSE_ANIMATION);
                         case STATE_STAGE_TWO_DIG -> state.setAndContinue(STAGE_TWO_DIG_ANIMATION);
                         case STATE_STAGE_TWO_JUMP -> state.setAndContinue(STAGE_TWO_JUMP_ANIMATION);
                         case STATE_STAGE_TWO_RUN -> state.setAndContinue(STAGE_TWO_RUN_ANIMATION);
