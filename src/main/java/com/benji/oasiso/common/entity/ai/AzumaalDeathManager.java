@@ -130,10 +130,12 @@ public final class AzumaalDeathManager {
         }
 
         spawnRewardBarrel(level);
-        startPortalDespawning(level);
-        spawnChaosReturnPortal(level);
-        this.active = false;
 
+        startPortalDespawning(level);
+        startChaosEntryPortalDespawning(level);
+        spawnChaosReturnPortal(level);
+
+        this.active = false;
         return true;
     }
 
@@ -164,6 +166,33 @@ public final class AzumaalDeathManager {
         );
 
         level.playSound(null, portal.getX(), portal.getY(), portal.getZ(), ModSounds.PORTAL_OPEN.get(), SoundSource.BLOCKS, 1.25F, 1.0F);
+    }
+
+    private void startChaosEntryPortalDespawning(ServerLevel currentLevel) {
+        UUID sessionId = boss.getArenaSessionId();
+
+        if (sessionId == null) {
+            return;
+        }
+
+        for (ServerLevel level : currentLevel.getServer().getAllLevels()) {
+
+            for (Entity entity : level.getAllEntities()) {
+
+                if (!(entity instanceof BossPortalEntity portal)) {
+                    continue;
+                }
+
+                if (!portal.isChaosEntryPortal()) {
+                    continue;
+                }
+                UUID portalSessionId = portal.getArenaSessionId();
+                if (portalSessionId == null || !portalSessionId.equals(sessionId)) {
+                    continue;
+                }
+                portal.startDespawning();
+            }
+        }
     }
 
     private ServerPlayer findArenaPlayer(ServerLevel level) {
