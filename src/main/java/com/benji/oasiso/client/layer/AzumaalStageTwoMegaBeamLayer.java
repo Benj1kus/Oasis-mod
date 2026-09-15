@@ -16,6 +16,8 @@ import com.mojang.math.Axis;
 import org.joml.Vector3d;
 import software.bernie.geckolib.cache.object.GeoBone;
 import com.benji.oasiso.client.event.AzumaalMegaBeamCameraShake;
+import com.benji.oasiso.client.sound.AzumaalMegaBeamLoopSound;
+import net.minecraft.client.Minecraft;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -35,6 +37,7 @@ public class AzumaalStageTwoMegaBeamLayer extends GeoRenderLayer<AzumaalEntity> 
     private static final Vec3 BEAM_ANCHOR = new Vec3(0.75D / 16.0D, 43.75D / 16.0D, -8.75D / 16.0D);
 
     private final Map<AzumaalEntity, VisualClock> clocks = new WeakHashMap<>();
+    private final Map<AzumaalEntity, AzumaalMegaBeamLoopSound> beamSounds = new WeakHashMap<>();
 
     public AzumaalStageTwoMegaBeamLayer(GeoRenderer<AzumaalEntity> renderer) {
         super(renderer);
@@ -56,6 +59,8 @@ public class AzumaalStageTwoMegaBeamLayer extends GeoRenderLayer<AzumaalEntity> 
         boolean charging = state == AzumaalEntity.STATE_STAGE_TWO_BEAM_CHARGE;
         boolean active = state == AzumaalEntity.STATE_STAGE_TWO_BEAM_ACTIVE;
         boolean closing = state == AzumaalEntity.STATE_STAGE_TWO_MOUTH_CLOSE;
+
+        updateBeamSound(entity, active);
 
         if (!charging && !active && !closing) {
 
@@ -139,8 +144,23 @@ public class AzumaalStageTwoMegaBeamLayer extends GeoRenderLayer<AzumaalEntity> 
             }
 
             drawRing(consumer, matrix, BEAM_ANCHOR.x, BEAM_ANCHOR.y, z, radius, 0.11D, 18, 122, 115, Mth.clamp(Math.round(alpha * 170.0F), 0, 255));
-
             drawRing(consumer, matrix, BEAM_ANCHOR.x, BEAM_ANCHOR.y, z - 0.015D, radius * 0.96D, 0.045D, 90, 245, 255, Mth.clamp(Math.round(alpha * 235.0F), 0, 255));
+        }
+    }
+
+    private void updateBeamSound(AzumaalEntity entity, boolean active) {
+        AzumaalMegaBeamLoopSound sound = this.beamSounds.get(entity);
+        if (active) {
+            if (sound == null || sound.isStopped()) {
+                sound = new AzumaalMegaBeamLoopSound(entity);
+                this.beamSounds.put(entity, sound);
+                Minecraft.getInstance().getSoundManager().play(sound);
+            }
+            return;
+        }
+        if (sound != null) {
+            sound.forceStop();
+            this.beamSounds.remove(entity);
         }
     }
 

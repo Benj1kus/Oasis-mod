@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class AzumaalBossMusic {
 
-    // 61 = 61 sec  = 1:01 minutes
     private static final int INTRO_TICKS = 358 * 20;
     private static MusicStage stage = MusicStage.NONE;
     private static int stageTicks;

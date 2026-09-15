@@ -18,6 +18,7 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> GLOV_BOUNCE = registerSoundEvent("glov_bounce");
 
+    public static final RegistryObject<SoundEvent> BEAM_LOOP = registerSoundEvent("beam_loop");
 
     public static final RegistryObject<SoundEvent> SCARAB_IDLE = registerSoundEvent("scarab_idle");
     public static final RegistryObject<SoundEvent> SCARAB_IDLE2 = registerSoundEvent("scarab_idle2");

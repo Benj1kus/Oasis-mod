@@ -18,6 +18,7 @@
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
 
   "glov_bounce": { "sounds": [ "oasiso:glov_bounce" ] },
+  "beam_loop": { "sounds": [ "oasiso:beam_loop" ] },
 
   "osiris_voice": { "sounds": [ "oasiso:osiris_voice" ] },
   "paladin_voice": { "sounds": [ "oasiso:paladin_voice" ] },
