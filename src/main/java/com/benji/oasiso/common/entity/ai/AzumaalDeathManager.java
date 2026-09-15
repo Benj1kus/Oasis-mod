@@ -27,8 +27,8 @@ public final class AzumaalDeathManager {
 
     public static final int STAGE_ONE_DEATH_DURATION = 20 * 14;
 
-    public static final int STAGE_TWO_DEATH_DURATION = 20 * 6;
-    public static final int STAGE_TWO_PUDDLE_TICK = 20;
+    public static final int STAGE_TWO_DEATH_DURATION = Mth.ceil(8.9552F * 20.0F);
+    public static final int STAGE_TWO_PUDDLE_TICK = Mth.ceil(8.3333F * 20.0F);
 
     private static final int BODY_PARTICLE_INTERVAL = 2;
 
@@ -41,6 +41,7 @@ public final class AzumaalDeathManager {
     private boolean active;
     private int deathTicks;
     private boolean stageTransition;
+    private boolean puddleBurstTriggered;
 
     private UUID killerId;
     private UUID portalId;
@@ -70,6 +71,7 @@ public final class AzumaalDeathManager {
         this.active = true;
         this.stageTransition = stageTransition;
         this.deathTicks = 0;
+        this.puddleBurstTriggered = false;
 
         boss.setDeathVisualTicks(0);
 
@@ -109,6 +111,11 @@ public final class AzumaalDeathManager {
         boss.setDeathVisualTicks(this.deathTicks);
         boolean stageTwoFinalDeath = isStageTwoFinalDeath();
 
+        if (stageTwoFinalDeath && !this.puddleBurstTriggered && this.deathTicks >= STAGE_TWO_PUDDLE_TICK) {
+            spawnPuddleBurst(level);
+            this.puddleBurstTriggered = true;
+        }
+
         if (!stageTwoFinalDeath && this.deathTicks % BODY_PARTICLE_INTERVAL == 0) {
             spawnBodyParticles(level);
         }
@@ -137,6 +144,22 @@ public final class AzumaalDeathManager {
 
         this.active = false;
         return true;
+    }
+
+    private void spawnPuddleBurst(ServerLevel level) {
+        double x = boss.getX();
+        double y = boss.getY() + boss.getBbHeight() * 0.45D;
+        double z = boss.getZ();
+
+        double width = Math.max(1.8D, boss.getBbWidth() * 0.95D);
+        double height = Math.max(1.2D, boss.getBbHeight() * 0.55D);
+
+        level.sendParticles(Oasiso.CHAOS_BOMB_CENTER_SMOKE.get(), x, y, z, 26, width * 0.35D, height * 0.35D, width * 0.35D, 0.05D);
+        level.sendParticles(Oasiso.CHAOS_BOMB_FIRE_SMOKE.get(), x, y, z, 90, width, height * 0.55D, width, 0.15D);
+        level.sendParticles(Oasiso.CHAOS_BOMB_SPARKS.get(), x, y, z, 160, width * 0.9D, height * 0.65D, width * 0.9D, 0.32D);
+
+        level.playSound(null, x, y, z, SoundEvents.SLIME_SQUISH, SoundSource.HOSTILE, 4.0F, 0.72F + level.random.nextFloat() * 0.08F);
+        level.playSound(null, x, y, z, SoundEvents.SLIME_ATTACK, SoundSource.HOSTILE, 3.0F, 0.55F + level.random.nextFloat() * 0.07F);
     }
 
     public boolean isStageTransition() {
@@ -383,6 +406,7 @@ public final class AzumaalDeathManager {
     public void save(CompoundTag parent) {
         CompoundTag tag = new CompoundTag();
 
+        tag.putBoolean("PuddleBurstTriggered", this.puddleBurstTriggered);
         tag.putBoolean("Active", this.active);
         tag.putBoolean("StageTransition", this.stageTransition);
         tag.putInt("DeathTicks", this.deathTicks);
@@ -403,6 +427,7 @@ public final class AzumaalDeathManager {
 
         CompoundTag tag = parent.getCompound(DATA_TAG);
 
+        this.puddleBurstTriggered = tag.getBoolean("PuddleBurstTriggered");
         this.active = tag.getBoolean("Active");
         this.stageTransition = tag.getBoolean("StageTransition");
         this.deathTicks = tag.getInt("DeathTicks");

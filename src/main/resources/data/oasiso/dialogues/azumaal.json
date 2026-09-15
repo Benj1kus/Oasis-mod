@@ -1,75 +1,172 @@
 {
-  "format": 2,
-
+  "format": 5,
   "voice": "oasiso:osiris_voice",
+  "voice_source": "master",
   "voice_pitch": 1.0,
   "voice_volume": 0.55,
   "voice_every": 1,
-
   "char_ticks": 2,
   "hold_ticks": 20,
   "fade_ticks": 14,
-
   "text_color": "rainbow",
   "text_effect": "wave",
-
-  "frame": "dlgstd:textures/gui/dialogue/frame_dialog.png",
-  "background": "dlgstd:textures/gui/dialogue/dithering_gradient.png",
-
+  "text_effects": [
+    "wave"
+  ],
+  "markdown": false,
+  "text_font": "oasiso:grapesoda",
+  "text_outline_color": "#0E3F75",
+  "text_outline_thickness": 1.0,
+  "frame": "oasiso:textures/gui/dialogue/frame_osiris.png",
   "background_alpha": 0.62,
   "background_bob": 1.6,
   "background_speed": 1.1,
-
-  "sprite_position": "center",
+  "sprite_position": "right",
   "sprite_transition": "bounce",
   "sprite_move_ticks": 10,
   "sprite_transition_ticks": 8,
-
   "freeze_source": true,
   "source_invulnerable": true,
   "cancel_if_source_missing": true,
   "exclusive_source": true,
-
   "once": "never",
-
   "layout": {
     "canvas_width": 192,
     "canvas_height": 108,
-
     "frame_x": 0,
     "frame_y": 63,
     "frame_width": 192,
     "frame_height": 45,
-
-    "text_x": 23,
-    "text_y": 75,
+    "text_x": 69,
+    "text_y": 79,
     "text_width": 146,
-    "text_scale": 0.72,
+    "text_scale": 0.71671236,
     "line_height": 10,
-
     "sprite_width": 126,
     "sprite_height": 78,
     "sprite_y": 0,
-
-    "sprite_left_x": 0,
-    "sprite_center_x": 33,
-    "sprite_right_x": 66
+    "sprite_left_x": 0.0,
+    "sprite_center_x": 33.0,
+    "sprite_right_x": 66.0,
+    "choice_x": 23,
+    "choice_y": 86,
+    "choice_width": 146,
+    "choice_scale": 0.62,
+    "choice_line_height": 9,
+    "choice_color": "white",
+    "choice_selected_color": "gold",
+    "choice_disabled_color": "#777777"
   },
-
   "triggers": [
     {
-      "type": "manual"
+      "type": "manual",
+      "radius": 5.0,
+      "look_angle": 12.0,
+      "check_interval": 5,
+      "cooldown_ticks": 40,
+      "consume": false,
+      "shape": "cylinder",
+      "height": 2.0,
+      "size_x": 6.0,
+      "size_y": 2.0,
+      "size_z": 6.0,
+      "visual": {
+        "enabled": true,
+        "style": "auto",
+        "show_default_zone": true,
+        "color": "cyan",
+        "alpha": 0.55,
+        "y_offset": 0.03,
+        "size": 0.0,
+        "visual_height": 0.0,
+        "preview_distance": 16.0,
+        "texture_mode": "plane",
+        "texture_fit": "stretch",
+        "texture_repeat_x": 1.0,
+        "texture_repeat_y": 1.0,
+        "texture_scroll_u": 0.0,
+        "texture_scroll_v": 0.0,
+        "texture_offset_x": 0.0,
+        "texture_offset_y": 0.0,
+        "texture_offset_z": 0.0,
+        "texture_scale_x": 1.0,
+        "texture_scale_y": 1.0,
+        "texture_rotation_x": 0.0,
+        "texture_rotation": 0.0,
+        "texture_rotation_z": 0.0,
+        "fill_enabled": false,
+        "fill_mode": "gradient",
+        "fill_color_bottom": "cyan",
+        "fill_color_top": "cyan",
+        "fill_alpha_bottom": 0.35,
+        "fill_alpha_top": 0.0,
+        "pulse": true,
+        "pulse_amplitude": 0.035,
+        "pulse_speed": 1.0,
+        "bob": false,
+        "bob_amplitude": 0.2,
+        "bob_speed": 0.75,
+        "rotate": false,
+        "rotate_speed": 30.0,
+        "alpha_breathe": false,
+        "alpha_breathe_amount": 0.18,
+        "alpha_breathe_speed": 0.7,
+        "preset": "custom"
+      },
+      "interactive_marker": {
+        "enabled": false,
+        "texture": "dlgstd:textures/gui/dialogue/interactive_arrow.png",
+        "size": 0.85,
+        "anchor": "auto",
+        "pick": "nearest",
+        "y_offset": 0.35,
+        "preview_distance": 20.0,
+        "animated": true,
+        "bob": true,
+        "bob_amplitude": 0.18,
+        "bob_speed": 1.15,
+        "pulse": true,
+        "pulse_amount": 0.08,
+        "pulse_speed": 1.4,
+        "sway": false,
+        "sway_degrees": 6.0,
+        "sway_speed": 0.9
+      },
+      "marker_text": {
+        "enabled": false,
+        "text": "Talk",
+        "color": "white",
+        "scale": 1.0,
+        "shadow": true,
+        "background": true,
+        "background_alpha": 0.25,
+        "anchor": "auto",
+        "pick": "nearest",
+        "y_offset": 1.2,
+        "preview_distance": 20.0,
+        "animated": true,
+        "bob": true,
+        "bob_amplitude": 0.1,
+        "bob_speed": 1.15,
+        "pulse": true,
+        "pulse_amount": 0.04,
+        "pulse_speed": 1.4,
+        "sway": false,
+        "sway_degrees": 6.0,
+        "sway_speed": 0.9
+      }
     }
   ],
-
   "lines": [
     {
       "text": "dialogue.oasiso.azumaal.1",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_speak.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_idle.png"
     },
     {
       "text": "dialogue.oasiso.azumaal.2",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png",
+      "rich_regions": [],
+      "sprite_position": "center"
     },
     {
       "text": "dialogue.oasiso.azumaal.3",
@@ -77,7 +174,8 @@
     },
     {
       "text": "dialogue.oasiso.azumaal.4",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_think.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png",
+      "sprite_position": "center"
     },
     {
       "text": "dialogue.oasiso.azumaal.5",
@@ -85,12 +183,14 @@
     },
     {
       "text": "dialogue.oasiso.azumaal.6",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_laugh.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_speak.png"
     },
     {
       "text": "dialogue.oasiso.azumaal.7",
       "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_scary.png",
-      "hold_ticks": 24
+      "sprite_position": "center"
     }
-  ]
+  ],
+  "graph_enabled": false,
+  "nodes": {}
 }

@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "text": "OSIRIS\u0027 ARENA",
+  "font": "minecraft:default",
+  "position": {
+    "x": 0.17938931,
+    "y": 0.16961837,
+    "scale": 1.54375,
+    "rotation": -1.6875,
+    "anchor": "top_center",
+    "align": "center"
+  },
+  "style": {
+    "color": "#D7AB01",
+    "gradient": [
+      "#05FFD0",
+      "#19E779"
+    ],
+    "outline": {
+      "enabled": true,
+      "color": "#2A3A46",
+      "width": 1.2875
+    }
+  },
+  "effects": {
+    "enabled": [
+      "wave",
+      "pulse"
+    ],
+    "wave_amplitude": 0.575,
+    "wave_speed": 2.6484375,
+    "wave_frequency": 1.3789062,
+    "shake_strength": 0.175,
+    "pulse_amount": 0.0765625,
+    "pulse_speed": 2.875
+  },
+  "enter": {
+    "preset": "typewriter",
+    "easing": "out_back",
+    "duration": 35,
+    "distance": 32.727272,
+    "scale": 0.84338844
+  },
+  "hold_ticks": 129,
+  "exit": {
+    "preset": "slide_left",
+    "easing": "in_cubic",
+    "duration": 29,
+    "distance": 29.752066,
+    "scale": 1.3491735
+  },
+  "trigger": {
+    "type": "structure",
+    "target": "oasiso:arena_boss",
+    "minimum_stay_ticks": 8,
+    "once_per_visit": true,
+    "cooldown_ticks": 100
+  },
+  "sound": {
+    "event": "oasiso:boss_spawn",
+    "source": "master",
+    "volume": 1.153125,
+    "pitch": 0.85429686
+  }
+}

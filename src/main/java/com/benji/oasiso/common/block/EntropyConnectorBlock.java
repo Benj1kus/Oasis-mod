@@ -47,7 +47,7 @@ public class EntropyConnectorBlock extends BaseEntityBlock {
 
             if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
                 connector.activatePlatform(serverPlayer);
-                
+
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }

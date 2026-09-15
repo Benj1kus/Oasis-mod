@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "text": "EGG MAN?",
+  "font": "minecraft:default",
+  "position": {
+    "x": 0.14122137,
+    "y": 0.14054668,
+    "scale": 1.615625,
+    "rotation": 0.0,
+    "anchor": "top_center",
+    "align": "center"
+  },
+  "style": {
+    "color": "#D1D1D1",
+    "gradient": [
+      "#D1D1D1",
+      "#8C8282"
+    ],
+    "outline": {
+      "enabled": true,
+      "color": "#691628",
+      "width": 1.0
+    }
+  },
+  "effects": {
+    "enabled": [
+      "shake",
+      "pulse"
+    ],
+    "wave_amplitude": 0.85,
+    "wave_speed": 5.0,
+    "wave_frequency": 0.55,
+    "shake_strength": 0.65,
+    "pulse_amount": 0.14328125,
+    "pulse_speed": 2.0
+  },
+  "enter": {
+    "preset": "explode",
+    "easing": "out_back",
+    "duration": 14,
+    "distance": 18.0,
+    "scale": 0.72
+  },
+  "hold_ticks": 60,
+  "exit": {
+    "preset": "fade_up",
+    "easing": "in_cubic",
+    "duration": 18,
+    "distance": 14.0,
+    "scale": 0.92
+  },
+  "trigger": {
+    "type": "structure",
+    "target": "oasiso:scarlet_tree",
+    "minimum_stay_ticks": 8,
+    "once_per_visit": true,
+    "cooldown_ticks": 100
+  },
+  "sound": {
+    "event": "oasiso:gaster",
+    "source": "master",
+    "volume": 0.60625,
+    "pitch": 0.25
+  }
+}

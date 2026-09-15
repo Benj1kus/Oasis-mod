@@ -21,7 +21,6 @@ public class AzumaalRenderer extends GeoEntityRenderer<AzumaalEntity> {
         addRenderLayer(new AzumaalShockwaveLayer(this));
         addRenderLayer(new AzumaalStageTwoMouthSmokeLayer(this));
         addRenderLayer(new AzumaalStageTwoMegaBeamLayer(this));
-        addRenderLayer(new AzumaalStageTwoDeathBubbleLayer(this));
     }
 
     @Override
