@@ -52,6 +52,18 @@ public class ModSounds {
 
     //AZUMAAL
 
+    public static final RegistryObject<SoundEvent> STAGE2_IDLE1 = registerSoundEvent("stage2_idle1");
+    public static final RegistryObject<SoundEvent> STAGE2_IDLE2 = registerSoundEvent("stage2_idle2");
+    public static final RegistryObject<SoundEvent> STAGE2_IDLE3 = registerSoundEvent("stage2_idle3");
+    public static final RegistryObject<SoundEvent> STAGE2_HURT1 = registerSoundEvent("stage2_hurt1");
+    public static final RegistryObject<SoundEvent> STAGE2_HURT2 = registerSoundEvent("stage2_hurt2");
+    public static final RegistryObject<SoundEvent> STAGE2_HURT3 = registerSoundEvent("stage2_hurt3");
+
+    public static final RegistryObject<SoundEvent> STAGE2_RUN = registerSoundEvent("stage2_run");
+    public static final RegistryObject<SoundEvent> STAGE2_POP = registerSoundEvent("stage2_pop");
+    public static final RegistryObject<SoundEvent> STAGE2_SCREAM = registerSoundEvent("stage2_scream");
+    public static final RegistryObject<SoundEvent> STAGE2_BITE = registerSoundEvent("stage2_bite");
+
     public static final RegistryObject<SoundEvent> AZUMAAL_IDLE1 = registerSoundEvent("azumaal_idle1");
     public static final RegistryObject<SoundEvent> AZUMAAL_IDLE2 = registerSoundEvent("azumaal_idle2");
     public static final RegistryObject<SoundEvent> AZUMAAL_IDLE3 = registerSoundEvent("azumaal_idle3");

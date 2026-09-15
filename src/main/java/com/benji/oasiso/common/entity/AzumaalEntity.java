@@ -1330,12 +1330,37 @@ public class AzumaalEntity extends Monster implements GeoEntity, GlowmaskEntity 
 
     @Override
     protected SoundEvent getAmbientSound() {
-        SoundEvent[] sounds = {ModSounds.AZUMAAL_IDLE1.get(), ModSounds.AZUMAAL_IDLE2.get(), ModSounds.AZUMAAL_IDLE3.get()};
+        if (this.isStageTwo()) {
+            SoundEvent[] sounds = {
+                    ModSounds.STAGE2_IDLE1.get(),
+                    ModSounds.STAGE2_IDLE2.get(),
+                    ModSounds.STAGE2_IDLE3.get()
+            };
+
+            return sounds[this.random.nextInt(sounds.length)];
+        }
+
+        SoundEvent[] sounds = {
+                ModSounds.AZUMAAL_IDLE1.get(),
+                ModSounds.AZUMAAL_IDLE2.get(),
+                ModSounds.AZUMAAL_IDLE3.get()
+        };
+
         return sounds[this.random.nextInt(sounds.length)];
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        if (this.isStageTwo()) {
+            SoundEvent[] sounds = {
+                    ModSounds.STAGE2_HURT1.get(),
+                    ModSounds.STAGE2_HURT2.get(),
+                    ModSounds.STAGE2_HURT3.get()
+            };
+
+            return sounds[this.random.nextInt(sounds.length)];
+        }
+
         return ModSounds.AZUMAAL_HIT.get();
     }
 

@@ -42,6 +42,19 @@
   "scarab_death": { "sounds": [ "oasiso:scarab_death" ] },
   "scarab_step": { "sounds": [ "oasiso:scarab_step" ] },
 
+  "stage2_idle1": { "sounds": [ "oasiso:stage2_idle1" ] },
+  "stage2_idle2": { "sounds": [ "oasiso:stage2_idle2" ] },
+  "stage2_idle3": { "sounds": [ "oasiso:stage2_idle3" ] },
+
+  "stage2_hurt1": { "sounds": [ "oasiso:stage2_hurt1" ] },
+  "stage2_hurt2": { "sounds": [ "oasiso:stage2_hurt2" ] },
+  "stage2_hurt3": { "sounds": [ "oasiso:stage2_idle3" ] },
+
+  "stage2_scream": { "sounds": [ "oasiso:stage2_scream" ] },
+  "stage2_pop": { "sounds": [ "oasiso:stage2_pop" ] },
+  "stage2_run": { "sounds": [ "oasiso:stage2_run" ] },
+  "stage2_bite": { "sounds": [ "oasiso:stage2_bite" ] },
+
   "paladin_idle1": { "sounds": [ "oasiso:paladin_idle1" ] },
   "paladin_idle2": { "sounds": [ "oasiso:paladin_idle2" ] },
   "paladin_idle3": { "sounds": [ "oasiso:paladin_idle3" ] },

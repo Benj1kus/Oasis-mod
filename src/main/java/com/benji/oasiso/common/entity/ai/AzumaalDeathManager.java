@@ -75,7 +75,8 @@ public final class AzumaalDeathManager {
 
         boss.setDeathVisualTicks(0);
 
-        level.playSound(null, boss.getX(), boss.getY() + boss.getBbHeight() * 0.5D, boss.getZ(), ModSounds.AZUMAAL_DEATH.get(), SoundSource.HOSTILE, 2.0F, 1.0F);
+        boolean stageTwoFinalDeath = !stageTransition && boss.isStageTwo();
+        level.playSound(null, boss.getX(), boss.getY() + boss.getBbHeight() * 0.5D, boss.getZ(), stageTwoFinalDeath ? ModSounds.STAGE2_SCREAM.get() : ModSounds.AZUMAAL_DEATH.get(), SoundSource.HOSTILE, stageTwoFinalDeath ? 3.5F : 2.0F, 1.0F);
 
         Entity attacker = source.getEntity();
 
@@ -158,8 +159,7 @@ public final class AzumaalDeathManager {
         level.sendParticles(Oasiso.CHAOS_BOMB_FIRE_SMOKE.get(), x, y, z, 90, width, height * 0.55D, width, 0.15D);
         level.sendParticles(Oasiso.CHAOS_BOMB_SPARKS.get(), x, y, z, 160, width * 0.9D, height * 0.65D, width * 0.9D, 0.32D);
 
-        level.playSound(null, x, y, z, SoundEvents.SLIME_SQUISH, SoundSource.HOSTILE, 4.0F, 0.72F + level.random.nextFloat() * 0.08F);
-        level.playSound(null, x, y, z, SoundEvents.SLIME_ATTACK, SoundSource.HOSTILE, 3.0F, 0.55F + level.random.nextFloat() * 0.07F);
+        level.playSound(null, x, y, z, ModSounds.STAGE2_POP.get(), SoundSource.HOSTILE, 4.0F, 1.0F);
     }
 
     public boolean isStageTransition() {

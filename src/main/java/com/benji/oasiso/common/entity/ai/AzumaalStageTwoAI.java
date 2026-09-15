@@ -20,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import com.benji.oasiso.common.entity.OsirisSplitEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import com.benji.oasiso.ModSounds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public final class AzumaalStageTwoAI {
     private static final String DATA_TAG = "AzumaalStageTwoAI";
 
     private static final int INITIAL_ATTACK_COOLDOWN = 30;
+    private static final int MEGA_BEAM_MIN_OTHER_ATTACKS = 5;
 
     private static final int ATTACK_COOLDOWN_MIN = 20;
     private static final int ATTACK_COOLDOWN_MAX = 35;
@@ -97,6 +99,7 @@ public final class AzumaalStageTwoAI {
     private int attackTick;
     private int attackCooldown = INITIAL_ATTACK_COOLDOWN;
     private int biteCooldown;
+    private int attacksSinceMegaBeam = MEGA_BEAM_MIN_OTHER_ATTACKS;
 
     private UUID targetId;
     private Vec3 chargeDirection = Vec3.ZERO;
@@ -131,6 +134,7 @@ public final class AzumaalStageTwoAI {
         this.attackTick = 0;
         this.attackCooldown = INITIAL_ATTACK_COOLDOWN;
         this.biteCooldown = 0;
+        this.attacksSinceMegaBeam = MEGA_BEAM_MIN_OTHER_ATTACKS;
 
         this.targetId = null;
 
@@ -211,17 +215,33 @@ public final class AzumaalStageTwoAI {
         boolean canBite = this.biteCooldown <= 0 && isInBiteRange(target);
 
         if (canBite && boss.getRandom().nextFloat() < BITE_SELECTION_CHANCE) {
+            this.attacksSinceMegaBeam++;
+
             startBite(target);
             return;
         }
 
-        int attack = boss.getRandom().nextInt(5);
+        boolean beamAvailable = this.attacksSinceMegaBeam >= MEGA_BEAM_MIN_OTHER_ATTACKS;
+
+        int attack = boss.getRandom().nextInt(beamAvailable ? 5 : 4);
 
         switch (attack) {
-            case 0 -> startDig(target);
-            case 1 -> startCharge(target);
-            case 2 -> startTentacleAttack(target);
-            case 3 -> startSpitAttack(target);
+            case 0 -> {
+                this.attacksSinceMegaBeam++;
+                startDig(target);
+            }
+            case 1 -> {
+                this.attacksSinceMegaBeam++;
+                startCharge(target);
+            }
+            case 2 -> {
+                this.attacksSinceMegaBeam++;
+                startTentacleAttack(target);
+            }
+            case 3 -> {
+                this.attacksSinceMegaBeam++;
+                startSpitAttack(target);
+            }
             default -> startMegaBeam(target);
         }
     }
@@ -234,6 +254,7 @@ public final class AzumaalStageTwoAI {
 
         boss.setDeltaMovement(Vec3.ZERO);
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BITE);
+        boss.playSound(ModSounds.STAGE2_BITE.get(), 2.75F, 1.0F);
     }
 
     private void tickBite(ServerLevel level) {
@@ -455,6 +476,7 @@ public final class AzumaalStageTwoAI {
         this.phase = Phase.MEGA_BEAM_ACTIVE;
         this.attackTick = 0;
         this.megaBeamHitTimes.clear();
+        this.attacksSinceMegaBeam = 0;
 
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BEAM_ACTIVE);
     }
@@ -562,6 +584,7 @@ public final class AzumaalStageTwoAI {
         boss.setDeltaMovement(Vec3.ZERO);
         boss.lookAtPlayer(target, 180.0F);
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BITE);
+        boss.playSound(ModSounds.STAGE2_BITE.get(), 2.75F, 1.0F);
     }
 
 
@@ -635,6 +658,7 @@ public final class AzumaalStageTwoAI {
         boss.lookAtPlayer(target, 180.0F);
 
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_BITE);
+        boss.playSound(ModSounds.STAGE2_BITE.get(), 2.75F, 1.0F);
     }
 
 
@@ -887,6 +911,7 @@ public final class AzumaalStageTwoAI {
         faceChargeDirection();
 
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_RUN);
+        boss.playSound(ModSounds.STAGE2_RUN.get(), 3.0F, 1.0F);
         boss.setDeltaMovement(Vec3.ZERO);
     }
 
@@ -963,6 +988,7 @@ public final class AzumaalStageTwoAI {
 
         boss.setDeltaMovement(Vec3.ZERO);
         boss.setAnimState(AzumaalEntity.STATE_STAGE_TWO_TENTACLE);
+        boss.playSound(ModSounds.STAGE2_HURT1.get(), 3.25F, 0.9F);
         spawnChargeImpactSmoke(level);
     }
 
@@ -1089,6 +1115,8 @@ public final class AzumaalStageTwoAI {
         tag.putInt("AttackTick", this.attackTick);
         tag.putInt("AttackCooldown", this.attackCooldown);
         tag.putInt("BiteCooldown", this.biteCooldown);
+        tag.putInt("AttacksSinceMegaBeam", this.attacksSinceMegaBeam);
+
 
         if (this.targetId != null) {
             tag.putUUID("Target", this.targetId);
@@ -1126,6 +1154,7 @@ public final class AzumaalStageTwoAI {
             this.phase = Phase.NONE;
         }
 
+        this.attacksSinceMegaBeam = tag.contains("AttacksSinceMegaBeam") ? tag.getInt("AttacksSinceMegaBeam") : MEGA_BEAM_MIN_OTHER_ATTACKS;
         this.attackTick = tag.getInt("AttackTick");
         this.attackCooldown = tag.getInt("AttackCooldown");
         this.biteCooldown = tag.getInt("BiteCooldown");
