@@ -41,7 +41,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> MEMORY_PUZ = BLOCKS.register("memory_puz", () -> new MemoryPuzzleBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(250.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> MEMORY_CORE = BLOCKS.register("memory_core", () -> new MemoryCoreBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(250.0F).requiresCorrectToolForDrops().noOcclusion()));
 
-    public static final RegistryObject<Block> ENTROPY_CONNECTOR = BLOCKS.register("entropy_connector", () -> new EntropyConnectorBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).lightLevel(state -> 10).strength(6.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_CONNECTOR = BLOCKS.register("entropy_connector", () -> new EntropyConnectorBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.HONEY_BLOCK).lightLevel(state -> 10).strength(6.0F).noOcclusion().requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));
