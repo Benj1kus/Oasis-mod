@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class OsirisSplitEntity extends Monster implements GeoEntity, GlowmaskEntity {
 
-    private static final float EXPLOSION_POWER = 4.0F;
+    private static final float EXPLOSION_POWER = 2.5F;
     private static final double GRAVITY = 0.045D;
     private static final double HORIZONTAL_SPEED = 0.70D;
     private static final int MAX_LIFETIME = 120;

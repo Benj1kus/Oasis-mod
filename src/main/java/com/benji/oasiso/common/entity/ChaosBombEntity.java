@@ -56,7 +56,7 @@ public class ChaosBombEntity extends Monster implements GeoEntity, GlowmaskEntit
     private static final int MIN_EXPLOSION_TIME = 80;
     private static final int MAX_EXPLOSION_TIME = 160;
 
-    private static final float EXPLOSION_POWER = 4.0F;
+    private static final float EXPLOSION_POWER = 2.0F;
     private static final byte EXPLOSION_VISUAL_EVENT = 67;
 
     private static final String EXPLOSION_TICKS_TAG = "ChaosBombExplosionTicks";

@@ -4,6 +4,7 @@ import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.item.AzumalitArmorItem;
 import com.benji.oasiso.common.chain.AzumalitChainManager;
 import com.benji.oasiso.common.waypoint.AzumalitWaypointManager;
+import com.benji.oasiso.config.OsirisRealmConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -62,7 +63,6 @@ public final class AzumalitArmorHandler {
     private static final double MELEE_ATTACK_RADIUS = 3.0D;
     private static final double STRONG_ATTACK_RADIUS = 8.0D;
 
-    private static final float ARM_ATTACK_DAMAGE = 20.0F;
     private static final int ARM_ATTACK_COOLDOWN_TICKS = 3 * 20;
     private static final int ARM_ATTACK_DAMAGE_TICK = AzumalitArmorItem.ATTACK_DAMAGE_KEY_TICK;
     private static final int ARM_ATTACK_DURATION_TICKS = AzumalitArmorItem.ATTACK_ANIMATION_TICKS;
@@ -398,7 +398,7 @@ public final class AzumalitArmorHandler {
                 continue;
             }
 
-            if (damageWithLivingArms(level, player, monster)) {
+            if (damageWithLivingArms(level, player, monster, OsirisRealmConfig.AZUMALIT_SINGLE_ARM_ATTACK_DAMAGE.get().floatValue())) {
                 alreadyHit.add(monster.getUUID());
             }
         }
@@ -415,7 +415,7 @@ public final class AzumalitArmorHandler {
             return;
         }
 
-        damageWithLivingArms(level, player, target);
+        damageWithLivingArms(level, player, target, OsirisRealmConfig.AZUMALIT_SINGLE_ARM_ATTACK_DAMAGE.get().floatValue());
     }
 
     private static void performStrongArmAttack(ServerLevel level, ServerPlayer player) {
@@ -428,7 +428,7 @@ public final class AzumalitArmorHandler {
                 continue;
             }
 
-            damageWithLivingArms(level, player, entity);
+            damageWithLivingArms(level, player, entity, OsirisRealmConfig.AZUMALIT_BOTH_ARMS_ATTACK_DAMAGE.get().floatValue());
             Vec3 movement = entity.getDeltaMovement();
             double requiredPush = Math.max(0.0D, STRONG_ATTACK_VERTICAL_SPEED - movement.y);
 
@@ -438,8 +438,8 @@ public final class AzumalitArmorHandler {
         }
     }
 
-    private static boolean damageWithLivingArms(ServerLevel level, ServerPlayer player, LivingEntity target) {
-        return target.hurt(level.damageSources().playerAttack(player), ARM_ATTACK_DAMAGE);
+    private static boolean damageWithLivingArms(ServerLevel level, ServerPlayer player, LivingEntity target, float damage) {
+        return target.hurt(level.damageSources().playerAttack(player), damage);
     }
 
     private static Monster findNearestAutomaticMonster(ServerLevel level, ServerPlayer player) {

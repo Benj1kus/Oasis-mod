@@ -9,6 +9,22 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
+    // Super Gold armor
+    public static final ForgeConfigSpec.IntValue SUPER_GOLD_HELMET_DEFENSE;
+    public static final ForgeConfigSpec.IntValue SUPER_GOLD_CHESTPLATE_DEFENSE;
+    public static final ForgeConfigSpec.IntValue SUPER_GOLD_LEGGINGS_DEFENSE;
+    public static final ForgeConfigSpec.IntValue SUPER_GOLD_BOOTS_DEFENSE;
+    public static final ForgeConfigSpec.DoubleValue SUPER_GOLD_TOUGHNESS_PER_PIECE;
+
+    // Azumalit armor
+    public static final ForgeConfigSpec.IntValue AZUMALIT_HELMET_DEFENSE;
+    public static final ForgeConfigSpec.IntValue AZUMALIT_CHESTPLATE_DEFENSE;
+    public static final ForgeConfigSpec.IntValue AZUMALIT_LEGGINGS_DEFENSE;
+    public static final ForgeConfigSpec.IntValue AZUMALIT_BOOTS_DEFENSE;
+    public static final ForgeConfigSpec.DoubleValue AZUMALIT_TOUGHNESS_PER_PIECE;
+    public static final ForgeConfigSpec.DoubleValue AZUMALIT_SINGLE_ARM_ATTACK_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue AZUMALIT_BOTH_ARMS_ATTACK_DAMAGE;
+
     // Osiris - base stats
     public static final ForgeConfigSpec.DoubleValue AZUMAAL_MAX_HEALTH;
     public static final ForgeConfigSpec.DoubleValue AZUMAAL_ATTACK_DAMAGE;
@@ -119,9 +135,27 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CHAOS_SPAWNER_GOLEMS_MOBS;
 
     static {
+        BUILDER.push("Super Gold Armor");
+        SUPER_GOLD_HELMET_DEFENSE = armorDefense("helmetDefense", "Protection points granted by the Karakolum helmet.", 3);
+        SUPER_GOLD_CHESTPLATE_DEFENSE = armorDefense("chestplateDefense", "Protection points granted by the Karakolum chestplate.", 8);
+        SUPER_GOLD_LEGGINGS_DEFENSE = armorDefense("leggingsDefense", "Protection points granted by the Karakolum leggings.", 6);
+        SUPER_GOLD_BOOTS_DEFENSE = armorDefense("bootsDefense", "Protection points granted by the Karakolum boots.", 3);
+        SUPER_GOLD_TOUGHNESS_PER_PIECE = armorToughness("toughnessPerPiece", "Armor toughness granted by EACH equipped Karakolum armor piece.", 2.5D);
+        BUILDER.pop();
+
+        BUILDER.push("Azumalit Armor");
+        AZUMALIT_HELMET_DEFENSE = armorDefense("helmetDefense", "Protection points granted by the Azumalit helmet.", 5);
+        AZUMALIT_CHESTPLATE_DEFENSE = armorDefense("chestplateDefense", "Protection points granted by the Azumalit chestplate.", 12);
+        AZUMALIT_LEGGINGS_DEFENSE = armorDefense("leggingsDefense", "Protection points granted by the Azumalit leggings.", 9);
+        AZUMALIT_BOOTS_DEFENSE = armorDefense("bootsDefense", "Protection points granted by the Azumalit boots.", 5);
+        AZUMALIT_TOUGHNESS_PER_PIECE = armorToughness("toughnessPerPiece", "Armor toughness granted by EACH equipped Azumalit armor piece.", 3.75D);
+        AZUMALIT_SINGLE_ARM_ATTACK_DAMAGE = doubleValue("singleArmAttackDamage", "Raw damage dealt by a normal living-arm attack before the target's armor and effects are applied.", 20.0D, 0.0D, 100000.0D);
+        AZUMALIT_BOTH_ARMS_ATTACK_DAMAGE = doubleValue("bothArmsAttackDamage", "Raw damage dealt to each target by the two-arm area attack before the target's armor and effects are applied.", 20.0D, 0.0D, 100000.0D);
+        BUILDER.pop();
+
         BUILDER.push("Osiris Boss");
-        AZUMAAL_MAX_HEALTH = BUILDER.comment("Maximum health of Osiris. Requires restart to affect newly created bosses.").defineInRange("maxHealth", 2000.0D, 1.0D, 1000000.0D);
-        AZUMAAL_STAGE_TWO_TRIGGER_HEALTH = BUILDER.comment("Health threshold at which Osiris starts the transition into Stage 2.", "If this value is higher than maxHealth, it is automatically clamped to maxHealth.").defineInRange("stageTwoTriggerHealth", 800.0D, 1.0D, 1000000.0D);
+        AZUMAAL_MAX_HEALTH = BUILDER.comment("Maximum health of Osiris. Requires restart to affect newly created bosses.").defineInRange("maxHealth", 1300.0D, 1.0D, 1000000.0D);
+        AZUMAAL_STAGE_TWO_TRIGGER_HEALTH = BUILDER.comment("Health threshold at which Osiris starts the transition into Stage 2.", "If this value is higher than maxHealth, it is automatically clamped to maxHealth.").defineInRange("stageTwoTriggerHealth", 600.0D, 1.0D, 1000000.0D);
         AZUMAAL_STAGE_TWO_CHARGE_DAMAGE = BUILDER.comment("Base damage dealt by each hit of Osiris Stage 2 charge attack and tentacles.", "Damage Scaler is applied on top of this value.").defineInRange("stageTwoChargeDamage", 10.0D, 0.0D, 100000.0D);
         AZUMAAL_STAGE_TWO_EMERGE_DAMAGE = BUILDER.comment("Base damage dealt when Osiris Stage 2 emerges directly beneath a player.", "Damage Scaler is applied on top of this value.").defineInRange("stageTwoEmergeDamage", 16.0D, 0.0D, 100000.0D);
         AZUMAAL_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Osiris. Attack multipliers below are applied to this value.").defineInRange("attackDamage", 22.0D, 0.0D, 100000.0D);
@@ -225,7 +259,7 @@ public final class OsirisRealmConfig {
         BUILDER.pop();
 
         BUILDER.push("Paladin Mini Boss");
-        PALADIN_MAX_HEALTH = BUILDER.comment("Maximum health of Paladin.").defineInRange("maxHealth", 800.0D, 1.0D, 1000000.0D);
+        PALADIN_MAX_HEALTH = BUILDER.comment("Maximum health of Paladin.").defineInRange("maxHealth", 700.0D, 1.0D, 1000000.0D);
         PALADIN_ATTACK_DAMAGE = BUILDER.comment("Base ATTACK_DAMAGE attribute of Paladin.").defineInRange("attackDamage", 24.0D, 0.0D, 100000.0D);
         BUILDER.pop();
 
@@ -296,6 +330,14 @@ public final class OsirisRealmConfig {
 
     private static ForgeConfigSpec.DoubleValue doubleValue(String name, String comment, double defaultValue, double min, double max) {
         return BUILDER.comment(comment).defineInRange(name, defaultValue, min, max);
+    }
+
+    private static ForgeConfigSpec.IntValue armorDefense(String name, String comment, int defaultValue) {
+        return BUILDER.comment(comment, "Minecraft normally caps the combined ARMOR attribute at 30.").defineInRange(name, defaultValue, 0, 30);
+    }
+
+    private static ForgeConfigSpec.DoubleValue armorToughness(String name, String comment, double defaultValue) {
+        return BUILDER.comment(comment, "Minecraft normally caps the combined ARMOR_TOUGHNESS attribute at 20.").defineInRange(name, defaultValue, 0.0D, 20.0D);
     }
 
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> spawnList(String name, List<String> defaults) {

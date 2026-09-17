@@ -1,6 +1,8 @@
 package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.config.OsirisRealmConfig;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.network.chat.Component;
@@ -8,6 +10,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -42,6 +46,35 @@ public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
     }
 
     @Override
+    public int getDefense() {
+        return switch (this.getType()) {
+            case HELMET -> OsirisRealmConfig.SUPER_GOLD_HELMET_DEFENSE.get();
+            case CHESTPLATE -> OsirisRealmConfig.SUPER_GOLD_CHESTPLATE_DEFENSE.get();
+            case LEGGINGS -> OsirisRealmConfig.SUPER_GOLD_LEGGINGS_DEFENSE.get();
+            case BOOTS -> OsirisRealmConfig.SUPER_GOLD_BOOTS_DEFENSE.get();
+        };
+    }
+
+    @Override
+    public float getToughness() {
+        return OsirisRealmConfig.SUPER_GOLD_TOUGHNESS_PER_PIECE.get().floatValue();
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        if (slot != this.getType().getSlot()) {
+            return super.getDefaultAttributeModifiers(slot);
+        }
+
+        return ConfigurableArmorAttributes.create(
+                this.getType(),
+                this.getDefense(),
+                this.getToughness(),
+                SuperGoldArmorMaterial.INSTANCE.getKnockbackResistance()
+        );
+    }
+
+    @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(Oasiso.KARAKOLIT_INGOT.get()) || super.isValidRepairItem(toRepair, repair);
     }
@@ -70,7 +103,7 @@ public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
 
-        ArmorItem.Type type = this.getType();
+        Type type = this.getType();
 
         switch (type) {
             case CHESTPLATE -> {

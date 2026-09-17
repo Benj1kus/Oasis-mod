@@ -1,7 +1,9 @@
 package com.benji.oasiso.common.item;
 
 import com.benji.oasiso.client.renderer.AzumalitArmorRenderer;
+import com.benji.oasiso.config.OsirisRealmConfig;
 import com.benji.oasiso.registry.ModItems;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -77,6 +81,35 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
 
     public AzumalitArmorItem(Type type, Properties properties) {
         super(AzumalitArmorMaterial.INSTANCE, type, properties.fireResistant());
+    }
+
+    @Override
+    public int getDefense() {
+        return switch (this.getType()) {
+            case HELMET -> OsirisRealmConfig.AZUMALIT_HELMET_DEFENSE.get();
+            case CHESTPLATE -> OsirisRealmConfig.AZUMALIT_CHESTPLATE_DEFENSE.get();
+            case LEGGINGS -> OsirisRealmConfig.AZUMALIT_LEGGINGS_DEFENSE.get();
+            case BOOTS -> OsirisRealmConfig.AZUMALIT_BOOTS_DEFENSE.get();
+        };
+    }
+
+    @Override
+    public float getToughness() {
+        return OsirisRealmConfig.AZUMALIT_TOUGHNESS_PER_PIECE.get().floatValue();
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        if (slot != this.getType().getSlot()) {
+            return super.getDefaultAttributeModifiers(slot);
+        }
+
+        return ConfigurableArmorAttributes.create(
+                this.getType(),
+                this.getDefense(),
+                this.getToughness(),
+                AzumalitArmorMaterial.INSTANCE.getKnockbackResistance()
+        );
     }
 
     @Override
@@ -183,7 +216,7 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
 
-        ArmorItem.Type type = this.getType();
+        Type type = this.getType();
 
         switch (type) {
             case CHESTPLATE -> {
