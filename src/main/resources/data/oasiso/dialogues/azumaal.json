@@ -2,7 +2,7 @@
   "format": 5,
   "voice": "oasiso:osiris_voice",
   "voice_source": "master",
-  "voice_pitch": 1.0,
+  "voice_pitch": 0.7,
   "voice_volume": 0.55,
   "voice_every": 1,
   "char_ticks": 2,
@@ -10,18 +10,15 @@
   "fade_ticks": 14,
   "text_color": "rainbow",
   "text_effect": "wave",
-  "text_effects": [
-    "wave"
-  ],
   "markdown": false,
   "text_font": "oasiso:grapesoda",
-  "text_outline_color": "#0E3F75",
+  "text_outline_color": "#0C345E",
   "text_outline_thickness": 1.0,
   "frame": "oasiso:textures/gui/dialogue/frame_osiris.png",
   "background_alpha": 0.62,
   "background_bob": 1.6,
   "background_speed": 1.1,
-  "sprite_position": "right",
+  "sprite_position": "center",
   "sprite_transition": "bounce",
   "sprite_move_ticks": 10,
   "sprite_transition_ticks": 8,
@@ -37,14 +34,14 @@
     "frame_y": 63,
     "frame_width": 192,
     "frame_height": 45,
-    "text_x": 69,
-    "text_y": 79,
+    "text_x": 71,
+    "text_y": 77,
     "text_width": 146,
-    "text_scale": 0.71671236,
+    "text_scale": 0.72,
     "line_height": 10,
-    "sprite_width": 126,
+    "sprite_width": 127,
     "sprite_height": 78,
-    "sprite_y": 0,
+    "sprite_y": -6,
     "sprite_left_x": 0.0,
     "sprite_center_x": 33.0,
     "sprite_right_x": 66.0,
@@ -160,35 +157,35 @@
   "lines": [
     {
       "text": "dialogue.oasiso.azumaal.1",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_idle.png"
+      "sprite": "oasiso:textures/gui/dialogue/azum.gif",
+      "sprite_position": "right"
     },
     {
       "text": "dialogue.oasiso.azumaal.2",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png",
-      "rich_regions": [],
-      "sprite_position": "center"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_question.gif",
+      "sprite_position": "left"
     },
     {
       "text": "dialogue.oasiso.azumaal.3",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_laugh.png"
+      "sprite": "oasiso:textures/gui/dialogue/azum.gif"
     },
     {
-      "text": "dialogue.oasiso.azumaal.4",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_question.png",
-      "sprite_position": "center"
+      "literal": "[player], do you know[br]sunmask guy?",
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_question.gif",
+      "sprite_position": "right"
     },
     {
       "text": "dialogue.oasiso.azumaal.5",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_kill.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_cut.gif"
     },
     {
       "text": "dialogue.oasiso.azumaal.6",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_speak.png"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_laugh.gif",
+      "sprite_position": "right"
     },
     {
       "text": "dialogue.oasiso.azumaal.7",
-      "sprite": "oasiso:textures/gui/dialogue/azumaal_sprite_scary.png",
-      "sprite_position": "center"
+      "sprite": "oasiso:textures/gui/dialogue/azumaal_laugh.gif"
     }
   ],
   "graph_enabled": false,

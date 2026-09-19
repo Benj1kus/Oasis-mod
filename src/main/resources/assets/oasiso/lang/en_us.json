@@ -74,6 +74,9 @@
   "item.oasiso.seemless_curve_banner": "Hanging Order Banner",
   "block.oasiso.seemless_curve_banner": "Hanging Order Banner",
 
+  "item.oasiso.seemless_curve_chain": "Hanging Golden Chain",
+  "block.oasiso.seemless_curve_chain": "Hanging Golden Chain",
+
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
 
@@ -121,6 +124,7 @@
   "item.oasiso.ctank_spawn_egg": "Osiris' Crusader Barbarian Spawn Egg",
   "item.oasiso.cpaladin_spawn_egg": "Osiris' Paladin Ramiel Spawn Egg",
   "item.oasiso.scarab_core": "Osiris' Scarab core",
+  "item.oasiso.config_scroll": "Config Scroll",
 
   "entity.oasiso.azumaal": "Osiris",
   "entity.oasiso.chaos_bomb": "Chaos bomb",
@@ -147,12 +151,11 @@
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
   "enchantment.oasiso.hammer_power": "Sand Hand",
 
-  "dialogue.oasiso.azumaal.1": "Wow, so overworld still exist?",
+  "dialogue.oasiso.azumaal.1": "Wow, so overworld...[br] ...still exist?",
   "dialogue.oasiso.azumaal.2": "Who are you?",
-  "dialogue.oasiso.azumaal.3": "You want to kill me, hah?",
-  "dialogue.oasiso.azumaal.4": "Do you know sunmask guy?",
-  "dialogue.oasiso.azumaal.5": "I chopped his head off, hah!",
-  "dialogue.oasiso.azumaal.6": "That was fun...",
+  "dialogue.oasiso.azumaal.3": "You want to kill me, hah?[br]That\u0027s cute",
+  "dialogue.oasiso.azumaal.5": "I chopped his head off[br]hah!",
+  "dialogue.oasiso.azumaal.6": "That was fun!",
   "dialogue.oasiso.azumaal.7": "Ok, time to kill you \u003c3",
 
   "dialogue.oasiso.paladin.1": "Who are you?",
@@ -202,6 +205,7 @@
   "tooltip.oasiso.karak_chest": "[SHIFT] + [RMB] to use ability",
   "tooltip.oasiso.scarab1": "Is that his pet?",
   "tooltip.oasiso.scarab2": "Use Azumalit pieces to feed Scarab",
+  "tooltip.oasiso.scroll": "Mod's §eConfig§r",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

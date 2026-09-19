@@ -125,6 +125,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.SEEMLESS_CURVE_CHAIN_BE.get(),
+                SeamlessCurveChainRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.MEMORY_CORE_BE.get(),
                 MemoryCoreBlockRenderer::new
         );

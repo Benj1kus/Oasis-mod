@@ -1,0 +1,9 @@
+{
+  "targets":["swap"],
+  "passes":[
+    {"name":"oasiso:config_scroll_blur","intarget":"minecraft:main","outtarget":"swap","uniforms":[{"name":"BlurDir","values":[1,0]},{"name":"Spread","values":[3]}]},
+    {"name":"oasiso:config_scroll_blur","intarget":"swap","outtarget":"minecraft:main","uniforms":[{"name":"BlurDir","values":[0,1]},{"name":"Spread","values":[3]}]},
+    {"name":"oasiso:config_scroll_blur","intarget":"minecraft:main","outtarget":"swap","uniforms":[{"name":"BlurDir","values":[1,0]},{"name":"Spread","values":[6]}]},
+    {"name":"oasiso:config_scroll_blur","intarget":"swap","outtarget":"minecraft:main","uniforms":[{"name":"BlurDir","values":[0,1]},{"name":"Spread","values":[6]}]}
+  ]
+}

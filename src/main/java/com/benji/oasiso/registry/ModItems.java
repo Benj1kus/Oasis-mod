@@ -67,6 +67,7 @@ public final class ModItems {
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
 
+
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase", () -> new BlockItem(ModBlocks.GEN_VASE.get(), new Item.Properties()));
     public static final RegistryObject<Item> BALL_CACTUS_ITEM = ITEMS.register("ball_cactus", () -> new BlockItem(ModBlocks.BALL_CACTUS.get(), new Item.Properties()));
     public static final RegistryObject<Item> STORM_TOTEM_ITEM = ITEMS.register("storm_totem", () -> new BlockItem(ModBlocks.STORM_TOTEM.get(), new Item.Properties()));
@@ -92,6 +93,7 @@ public final class ModItems {
     public static final RegistryObject<Item> AZUMALIT_UPGRADE = ITEMS.register("azumalit_upgrade", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> AZUMALIT_PIECE = ITEMS.register("azumalit_piece", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> CHAOS_SCISSORS = ITEMS.register("chaos_scissors", () -> new ChaosScissorsItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> CONFIG_SCROLL = ITEMS.register("config_scroll", () -> new ConfigScrollItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new Item(new Item.Properties().stacksTo(1)));
@@ -119,6 +121,7 @@ public final class ModItems {
     public static final RegistryObject<Item> SCARAB_CORE = ITEMS.register("scarab_core", () -> new ScarabCoreItem(ModEntities.SCARAB, 0xFFFFFF, 0xFFFFFF, new Item.Properties().durability(5)));
 
     public static final RegistryObject<Item> SEEMLESS_CURVE_BANNER_ITEM = ITEMS.register("seemless_curve_banner", () -> new SeamlessCurveBannerItem(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> SEEMLESS_CURVE_CHAIN_ITEM = ITEMS.register("seemless_curve_chain", () -> new SeamlessCurveChainItem(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<Item> CASSASIN_SPAWN_EGG = ITEMS.register("cassasin_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_ASSASIN, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CTANK_SPAWN_EGG = ITEMS.register("ctank_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_TANK, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
