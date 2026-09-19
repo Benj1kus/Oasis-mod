@@ -194,15 +194,6 @@ public class ScarabCoreItem extends ForgeSpawnEggItem {
         }
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        Component glove = Component.translatable("tooltip.oasiso.scarab1").withStyle(ChatFormatting.DARK_AQUA);
-
-        tooltipComponents.add(Component.translatable("tooltip.oasiso.scarab2", glove).withStyle(ChatFormatting.AQUA));
-
-        tooltipComponents.add(glove);
-    }
-
     private static boolean damageMatchingCore(ServerPlayer player, UUID coreId, UUID scarabId) {
         for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
 

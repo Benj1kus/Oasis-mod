@@ -1,6 +1,6 @@
 package com.benji.oasiso.common.item;
 
-import net.minecraft.ChatFormatting; // (убедись, что правильный импорт net.minecraft...)
+import net.minecraft.ChatFormatting;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;

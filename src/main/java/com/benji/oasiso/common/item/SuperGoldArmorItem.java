@@ -100,19 +100,6 @@ public class SuperGoldArmorItem extends ArmorItem implements GeoItem {
         });
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-
-        Type type = this.getType();
-
-        switch (type) {
-            case CHESTPLATE -> {
-                tooltipComponents.add(Component.translatable("tooltip.oasiso.karak_chest").withStyle(ChatFormatting.GOLD));
-            }
-        }
-
-        tooltipComponents.add(Component.empty());
-    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {

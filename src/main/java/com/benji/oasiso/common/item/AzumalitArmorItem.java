@@ -213,21 +213,6 @@ public class AzumalitArmorItem extends ArmorItem implements GeoItem {
         return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_WAYPOINT;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-
-        Type type = this.getType();
-
-        switch (type) {
-            case CHESTPLATE -> {
-                tooltipComponents.add(Component.translatable("tooltip.oasiso.azumalit_chestplate.line1").withStyle(ChatFormatting.BLUE));
-                tooltipComponents.add(Component.translatable("tooltip.oasiso.azumalit_chestplate.line2").withStyle(ChatFormatting.AQUA));
-            }
-        }
-
-        tooltipComponents.add(Component.empty());
-    }
-
     public static boolean isChainAnimationActive(LivingEntity wearer) {
         return getActiveArmorAnimation(wearer) == ARMOR_ANIMATION_CHAIN;
     }
