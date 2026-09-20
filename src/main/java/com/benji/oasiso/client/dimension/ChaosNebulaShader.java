@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ChaosNebulaShader {
-    public static final float NEBULA_BRIGHTNESS = 0.6F;
+    public static final float NEBULA_BRIGHTNESS = 0.15F;
     private static ShaderInstance shader;
 
     private ChaosNebulaShader() {}
