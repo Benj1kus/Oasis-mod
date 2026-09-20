@@ -36,7 +36,12 @@ import com.benji.oasiso.common.effect.SmellOfSinManager;
 
 import java.util.UUID;
 
-public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity {
+public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
+//show healthbar
+    @Override
+    public boolean showMiniBossHealthBar() {
+        return !this.isDeathSequenceActive();
+    }
 
     public static final int STATE_IDLE = 0;
     public static final int STATE_ATTACK_1 = 1;

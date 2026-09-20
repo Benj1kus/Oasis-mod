@@ -1,0 +1,13 @@
+{
+  "blend": {"func":"add", "srcrgb":"srcalpha", "dstrgb":"1-srcalpha"},
+  "vertex": "oasiso:mini_boss_health_bar",
+  "fragment": "oasiso:mini_boss_health_bar",
+  "attributes": ["Position", "UV0"],
+  "samplers": [{"name":"Sampler0"}],
+  "uniforms": [
+    {"name":"ModelViewMat","type":"matrix4x4","count":16,"values":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]},
+    {"name":"ProjMat","type":"matrix4x4","count":16,"values":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]},
+    {"name":"ColorModulator","type":"float","count":4,"values":[1,1,1,1]},
+    {"name":"Flash","type":"float","count":1,"values":[0]}
+  ]
+}

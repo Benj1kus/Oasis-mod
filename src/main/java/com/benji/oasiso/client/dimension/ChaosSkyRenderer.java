@@ -180,11 +180,9 @@ public final class ChaosSkyRenderer {
         Matrix4f voidMatrix = skyPoseStack.last().pose();
 
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
         RenderSystem.defaultBlendFunc();
 
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
-
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         addColorQuad(builder, voidMatrix, -size, -size, size, size, -size, size, size, -size, -size, -size, -size, -size, 0.0F, 0.0F, 0.0F, 0.82F);
