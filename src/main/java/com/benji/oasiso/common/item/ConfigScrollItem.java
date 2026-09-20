@@ -16,11 +16,4 @@ public class ConfigScrollItem extends Item {
     public ConfigScrollItem(Properties properties) {
         super(properties);
     }
-
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.oasiso.scroll").withStyle(ChatFormatting.AQUA));
-
-        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
-    }
 }

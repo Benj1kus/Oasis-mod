@@ -87,23 +87,23 @@ public final class ModItems {
 
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
-    public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> MELTED_NEPHRITIS = ITEMS.register("melted_nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> NEPHRITIS_CORE = ITEMS.register("nephritis_core", () -> new CoreItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MELTED_NEPHRITIS = ITEMS.register("melted_nephritis", () -> new MeltedNephritisItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> AZUMALIT_SHARD = ITEMS.register("azumalit_shard", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> AZUMALIT_UPGRADE = ITEMS.register("azumalit_upgrade", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> AZUMALIT_PIECE = ITEMS.register("azumalit_piece", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> CHAOS_SCISSORS = ITEMS.register("chaos_scissors", () -> new ChaosScissorsItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CONFIG_SCROLL = ITEMS.register("config_scroll", () -> new ConfigScrollItem(new Item.Properties().stacksTo(1)));
 
-    public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> KARAKOLIT_KEY = ITEMS.register("karakolit_key", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> CHAOS_BOMB_ITEM = ITEMS.register("chaos_bomb_item", () -> new Item(new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<Item> CACTUS_SPIKE = ITEMS.register("cactus_spike", () -> new Item(new Item.Properties().stacksTo(64)));
+    public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new ChaosItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new DominanceItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> KARAKOLIT_KEY = ITEMS.register("karakolit_key", () -> new KkeyItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> CHAOS_BOMB_ITEM = ITEMS.register("chaos_bomb_item", () -> new LoadItem(new Item.Properties().stacksTo(64)));
+    public static final RegistryObject<Item> CACTUS_SPIKE = ITEMS.register("cactus_spike", () -> new LoadItem(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> ENTROPY_CHESTPLATE_GLOVE = ITEMS.register("entropy_chestplate_glove", () -> new EntropyChestplateGloveItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENCHANTED_BOOK_HAMMER = ITEMS.register("enchanted_book_hammer", () -> new HammerEnchantmentBookItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final RegistryObject<Item> BOMBUL_BOTTLE = ITEMS.register("bombul_bottle", () -> new BombulBottleItem(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY = ITEMS.register("bombul_bottle_empty", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY = ITEMS.register("bombul_bottle_empty", () -> new EmptyBotItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> TITANA_HAMMER = ITEMS.register("titana_hammer", () -> new TitanaHammerItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> SUPER_GOLD_HELMET = ITEMS.register("super_gold_helmet", () -> new SuperGoldArmorItem(ArmorItem.Type.HELMET, new Item.Properties().stacksTo(1)));
