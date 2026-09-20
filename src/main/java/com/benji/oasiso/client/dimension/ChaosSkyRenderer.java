@@ -43,11 +43,14 @@ public final class ChaosSkyRenderer {
 
     private static final float SKY_SIZE = 100.0F;
 
+    private static final float LEGACY_THREADS_ALPHA = 0.10F;
+
     private ChaosSkyRenderer() {
     }
 
     public static void render(PoseStack skyPoseStack, int ticks, float partialTick) {
-        float time = ticks + partialTick;
+        float seconds = ChaosSkyLife.seconds(partialTick);
+        float time = seconds * 20.0F;
 
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
@@ -59,16 +62,20 @@ public final class ChaosSkyRenderer {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
 
-        drawSkyLayer(skyPoseStack, SKY_BACK, 0.0F, 1.0F);
-        drawSkyLayer(skyPoseStack, SKY_LAYER_2, -time * 0.006F, 0.9F);
-        drawSkyLayer(skyPoseStack, SKY_FRONT, time * 0.01F, 0.95F);
+        if (ChaosNebulaShader.render(skyPoseStack.last().pose(), SKY_SIZE, seconds)) {
+            drawSkyLayer(skyPoseStack, SKY_LAYER_2, -time * 0.002F, LEGACY_THREADS_ALPHA);
+            drawSkyLayer(skyPoseStack, SKY_FRONT, time * 0.003F, LEGACY_THREADS_ALPHA * 0.65F);
+        } else {
+            drawSkyLayer(skyPoseStack, SKY_BACK, 0.0F, 1.0F);
+            drawSkyLayer(skyPoseStack, SKY_LAYER_2, -time * 0.006F, 0.9F);
+            drawSkyLayer(skyPoseStack, SKY_FRONT, time * 0.01F, 0.95F);
+        }
+
+        ChaosSkyLife.render(skyPoseStack.last().pose(), seconds);
 
         drawChaosFlash(skyPoseStack, partialTick);
-
         drawVoidBottom(skyPoseStack, SKY_SIZE);
-
         drawMoon(skyPoseStack);
-
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderSystem.defaultBlendFunc();
@@ -232,11 +239,8 @@ public final class ChaosSkyRenderer {
 
                                 float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
         builder.vertex(matrix, x1, y1, z1).uv(0.0F, 0.0F).endVertex();
-
         builder.vertex(matrix, x2, y2, z2).uv(1.0F, 0.0F).endVertex();
-
         builder.vertex(matrix, x3, y3, z3).uv(1.0F, 1.0F).endVertex();
-
         builder.vertex(matrix, x4, y4, z4).uv(0.0F, 1.0F).endVertex();
     }
 
