@@ -53,13 +53,15 @@ public final class KarakLiquidRender {
             BufferBuilder b = Tesselator.getInstance().getBuilder();
             b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
             for (KarakLiquidVfx.Surface s : KarakLiquidVfx.SURFACES) {
-                if (s.mask == 0 || !KarakLiquidVfx.isJade(mc.level.getFluidState(s.pos)) || !mc.level.getBlockState(s.pos.above()).isAir())
+                if (!KarakLiquidVfx.isJade(mc.level.getFluidState(s.pos)) || !mc.level.getBlockState(s.pos.above()).isAir())
                     continue;
                 double x = s.pos.getX() - eye.x, y = s.pos.getY() - eye.y + .0025, z = s.pos.getZ() - eye.z;
-                vertex(b, view, x, y + s.nw, z, 0, 0, s.mask);
-                vertex(b, view, x, y + s.sw, z + 1, 0, 1, s.mask);
-                vertex(b, view, x + 1, y + s.se, z + 1, 1, 1, s.mask);
-                vertex(b, view, x + 1, y + s.ne, z, 1, 0, s.mask);
+                float u = Math.floorMod(s.pos.getX(), 256);
+                float v = Math.floorMod(s.pos.getZ(), 256);
+                vertex(b, view, x, y + s.nw, z, u, v, s.mask, s.depthNw);
+                vertex(b, view, x, y + s.sw, z + 1, u, v + 1, s.mask, s.depthSw);
+                vertex(b, view, x + 1, y + s.se, z + 1, u + 1, v + 1, s.mask, s.depthSe);
+                vertex(b, view, x + 1, y + s.ne, z, u + 1, v, s.mask, s.depthNe);
             }
             BufferUploader.drawWithShader(b.end());
         } finally {
@@ -72,8 +74,9 @@ public final class KarakLiquidRender {
         }
     }
 
-    private static void vertex(BufferBuilder b, Matrix4f m, double x, double y, double z, float u, float v, int mask) {
-        b.vertex(m, (float) x, (float) y, (float) z).uv(u, v).color((mask & 1) != 0 ? 255 : 0, (mask & 2) != 0 ? 255 : 0, (mask & 4) != 0 ? 255 : 0, (mask & 8) != 0 ? 255 : 0).endVertex();
+    private static void vertex(BufferBuilder b, Matrix4f m, double x, double y, double z, float u, float v, int mask, float shoreDistance) {
+        int distance = Math.round(Mth.clamp(shoreDistance / 8.0F, 0.0F, 1.0F) * 255.0F);
+        b.vertex(m, (float) x, (float) y, (float) z).uv(u, v).color(mask, distance, 0, 255).endVertex();
     }
 
     @SubscribeEvent

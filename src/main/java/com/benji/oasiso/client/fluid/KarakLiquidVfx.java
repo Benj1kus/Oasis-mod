@@ -14,21 +14,31 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class KarakLiquidVfx {
-    public static final int RANGE = 14; // Радиус поиска поверхностей около камеры.
+    public static final int RANGE = 14;
     private static final int Y_RANGE = 8;
     private static final int MAX_SURFACES = 1024;
+    private static final float MAX_SHORE_DISTANCE = 6.0F;
+    private static final int SHORE_PADDING = 7;
+    private static final Direction[] HORIZONTAL = {Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
     static final List<Surface> SURFACES = new ArrayList<>();
     static ClientLevel world;
     static int ticks;
     static float immersion, previousImmersion;
 
-    static boolean isJade(FluidState fluid) { return fluid.getType().isSame(ModKarakFluids.KR_WATER.get()); }
+    static boolean isJade(FluidState fluid) {
+        return fluid.getType().isSame(ModKarakFluids.KR_WATER.get());
+    }
+
     static boolean contains(ClientLevel level, double x, double y, double z) {
         BlockPos p = BlockPos.containing(x, y, z);
         FluidState f = level.getFluidState(p);
@@ -40,7 +50,9 @@ public final class KarakLiquidVfx {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (world != mc.level) {
-            world = mc.level; SURFACES.clear(); ticks = 0;
+            world = mc.level;
+            SURFACES.clear();
+            ticks = 0;
             immersion = previousImmersion = 0;
             KarakLiquidParticle.resetBudget(world);
         }
@@ -56,11 +68,11 @@ public final class KarakLiquidVfx {
         if (under) {
             for (int i = 0; i < underwaterCount; i++) {
                 for (int attempt = 0; attempt < 8; attempt++) {
-                    double x = camera.x + (world.random.nextDouble()-.5)*5;
-                    double y = camera.y + (world.random.nextDouble()-.5)*4;
-                    double z = camera.z + (world.random.nextDouble()-.5)*5;
-                    if (contains(world, x, y, z) && world.getBlockState(BlockPos.containing(x,y,z)).getCollisionShape(world, BlockPos.containing(x,y,z)).isEmpty()) {
-                        world.addParticle(Oasiso.KARAK_BUBBLES.get(), x,y,z,0,0,0);
+                    double x = camera.x + (world.random.nextDouble() - .5) * 5;
+                    double y = camera.y + (world.random.nextDouble() - .5) * 4;
+                    double z = camera.z + (world.random.nextDouble() - .5) * 5;
+                    if (contains(world, x, y, z) && world.getBlockState(BlockPos.containing(x, y, z)).getCollisionShape(world, BlockPos.containing(x, y, z)).isEmpty()) {
+                        world.addParticle(Oasiso.KARAK_BUBBLES.get(), x, y, z, 0, 0, 0);
                         break;
                     }
                 }
@@ -74,35 +86,88 @@ public final class KarakLiquidVfx {
     private static void spawnSurface(boolean steam) {
         Surface s = SURFACES.get(world.random.nextInt(SURFACES.size()));
         if (!isJade(world.getFluidState(s.pos)) || !world.getBlockState(s.pos.above()).isAir()) return;
-        double u = .15 + world.random.nextDouble()*.7, v = .15 + world.random.nextDouble()*.7;
-        double h = s.height((float)u, (float)v);
-        world.addParticle(steam ? Oasiso.KARAK_STEAM.get() : Oasiso.KARAK_BUBBLES.get(),
-                s.pos.getX()+u, s.pos.getY()+h+.025, s.pos.getZ()+v,
-                0, steam ? 0 : .15+world.random.nextDouble()*.45, 0);
+        double u = .15 + world.random.nextDouble() * .7, v = .15 + world.random.nextDouble() * .7;
+        double h = s.height((float) u, (float) v);
+        world.addParticle(steam ? Oasiso.KARAK_STEAM.get() : Oasiso.KARAK_BUBBLES.get(), s.pos.getX() + u, s.pos.getY() + h + .025, s.pos.getZ() + v, 0, steam ? 0 : .15 + world.random.nextDouble() * .45, 0);
     }
 
     private static void scan(Vec3 eye) {
         SURFACES.clear();
         BlockPos center = BlockPos.containing(eye);
         BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
-        for (int z=-RANGE; z<=RANGE; z++) for (int x=-RANGE; x<=RANGE; x++) {
-            if (x*x+z*z > RANGE*RANGE) continue;
-            for (int y=-Y_RANGE; y<=Y_RANGE; y++) {
-                p.set(center.getX()+x, center.getY()+y, center.getZ()+z);
-                if (!world.hasChunkAt(p)) continue;
-                if (!isJade(world.getFluidState(p)) || !world.getBlockState(p.above()).isAir()) continue;
-                BlockPos pos = p.immutable();
-                int mask = 0;
-                Direction[] dirs = {Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
-                for (int i=0;i<4;i++) {
-                    BlockPos n = pos.relative(dirs[i]);
-                    if (world.getBlockState(n).isFaceSturdy(world,n,dirs[i].getOpposite())) mask |= 1<<i;
+        Map<BlockPos, Float> shoreDistances = new HashMap<>();
+        int scanRange = RANGE + SHORE_PADDING;
+        for (int z = -scanRange; z <= scanRange; z++)
+            for (int x = -scanRange; x <= scanRange; x++) {
+                if (x * x + z * z > scanRange * scanRange) continue;
+                for (int y = -Y_RANGE; y <= Y_RANGE; y++) {
+                    p.set(center.getX() + x, center.getY() + y, center.getZ() + z);
+                    if (!world.hasChunkAt(p)) continue;
+                    if (!isJade(world.getFluidState(p)) || !world.getBlockState(p.above()).isAir()) continue;
+                    BlockPos pos = p.immutable();
+                    shoreDistances.put(pos, MAX_SHORE_DISTANCE);
+                    if (x * x + z * z > RANGE * RANGE) continue;
+                    int mask = 0;
+                    for (int i = 0; i < 4; i++) {
+                        BlockPos n = pos.relative(HORIZONTAL[i]);
+                        if (world.hasChunkAt(n) && world.getBlockState(n).isFaceSturdy(world, n, HORIZONTAL[i].getOpposite()))
+                            mask |= 1 << i;
+                    }
+                    SURFACES.add(new Surface(pos, mask, corner(pos, -1, -1), corner(pos, 1, -1), corner(pos, 1, 1), corner(pos, -1, 1)));
                 }
-                SURFACES.add(new Surface(pos, mask, corner(pos,-1,-1), corner(pos,1,-1), corner(pos,1,1), corner(pos,-1,1)));
+            }
+        SURFACES.sort(Comparator.comparingDouble(s -> s.pos.distToCenterSqr(eye.x, eye.y, eye.z)));
+        if (SURFACES.size() > MAX_SURFACES) SURFACES.subList(MAX_SURFACES, SURFACES.size()).clear();
+        if (!SURFACES.isEmpty()) {
+            measureShoreDistances(shoreDistances);
+            for (Surface s : SURFACES) {
+                s.depthNw = vertexDistance(shoreDistances, s.pos, -1, -1);
+                s.depthNe = vertexDistance(shoreDistances, s.pos, 1, -1);
+                s.depthSe = vertexDistance(shoreDistances, s.pos, 1, 1);
+                s.depthSw = vertexDistance(shoreDistances, s.pos, -1, 1);
             }
         }
-        SURFACES.sort(Comparator.comparingDouble(s -> s.pos.distToCenterSqr(eye.x,eye.y,eye.z)));
-        if (SURFACES.size()>MAX_SURFACES) SURFACES.subList(MAX_SURFACES,SURFACES.size()).clear();
+    }
+
+
+    private static void measureShoreDistances(Map<BlockPos, Float> distances) {
+        PriorityQueue<ShoreStep> queue = new PriorityQueue<>(Comparator.comparingDouble(ShoreStep::distance));
+        for (Map.Entry<BlockPos, Float> entry : distances.entrySet()) {
+            BlockPos pos = entry.getKey();
+            for (Direction dir : HORIZONTAL) {
+                BlockPos neighbor = pos.relative(dir);
+                if (!world.hasChunkAt(neighbor) || !isJade(world.getFluidState(neighbor))) {
+                    entry.setValue(0.5F);
+                    queue.add(new ShoreStep(pos, 0.5F));
+                    break;
+                }
+            }
+        }
+        while (!queue.isEmpty()) {
+            ShoreStep step = queue.poll();
+            if (step.distance() > distances.get(step.pos())) continue;
+            for (int dz = -1; dz <= 1; dz++)
+                for (int dx = -1; dx <= 1; dx++) {
+                    if (dx == 0 && dz == 0) continue;
+                    BlockPos next = step.pos().offset(dx, 0, dz);
+                    Float previous = distances.get(next);
+                    if (previous == null) continue;
+                    boolean diagonal = dx != 0 && dz != 0;
+                    if (diagonal && (!distances.containsKey(step.pos().offset(dx, 0, 0)) || !distances.containsKey(step.pos().offset(0, 0, dz))))
+                        continue;
+                    float distance = step.distance() + (diagonal ? 1.41421356F : 1.0F);
+                    if (distance >= previous) continue;
+                    distances.put(next, distance);
+                    queue.add(new ShoreStep(next, distance));
+                }
+        }
+    }
+
+    private static float vertexDistance(Map<BlockPos, Float> distances, BlockPos pos, int dx, int dz) {
+        return (distances.getOrDefault(pos, 0.0F) + distances.getOrDefault(pos.offset(dx, 0, 0), 0.0F) + distances.getOrDefault(pos.offset(0, 0, dz), 0.0F) + distances.getOrDefault(pos.offset(dx, 0, dz), 0.0F)) * 0.25F;
+    }
+
+    private record ShoreStep(BlockPos pos, float distance) {
     }
 
     private static float ownHeight(BlockPos p) {
@@ -112,25 +177,40 @@ public final class KarakLiquidVfx {
     }
 
     private static float corner(BlockPos p, int dx, int dz) {
-        float a=ownHeight(p), b=ownHeight(p.offset(dx,0,0)), c=ownHeight(p.offset(0,0,dz));
-        if (a>=1 || b>=1 || c>=1) return 1;
-        float d=(b>0 || c>0) ? ownHeight(p.offset(dx,0,dz)) : -1;
-        if (d>=1) return 1;
-        float total=0, weight=0;
-        for (float h : new float[]{a,b,c,d}) if (h>=0) {
-            float w=h>=.8F ? 10 : 1; total+=h*w; weight+=w;
-        }
-        return weight==0 ? 0 : total/weight;
+        float a = ownHeight(p), b = ownHeight(p.offset(dx, 0, 0)), c = ownHeight(p.offset(0, 0, dz));
+        if (a >= 1 || b >= 1 || c >= 1) return 1;
+        float d = (b > 0 || c > 0) ? ownHeight(p.offset(dx, 0, dz)) : -1;
+        if (d >= 1) return 1;
+        float total = 0, weight = 0;
+        for (float h : new float[]{a, b, c, d})
+            if (h >= 0) {
+                float w = h >= .8F ? 10 : 1;
+                total += h * w;
+                weight += w;
+            }
+        return weight == 0 ? 0 : total / weight;
     }
 
     static final class Surface {
         final BlockPos pos;
         final int mask;
-        final float nw,ne,se,sw;
-        Surface(BlockPos pos,int mask,float nw,float ne,float se,float sw) {
-            this.pos=pos;this.mask=mask;this.nw=nw;this.ne=ne;this.se=se;this.sw=sw;
+        final float nw, ne, se, sw;
+        float depthNw, depthNe, depthSe, depthSw;
+
+        Surface(BlockPos pos, int mask, float nw, float ne, float se, float sw) {
+            this.pos = pos;
+            this.mask = mask;
+            this.nw = nw;
+            this.ne = ne;
+            this.se = se;
+            this.sw = sw;
         }
-        float height(float u,float v) { return Mth.lerp(v,Mth.lerp(u,nw,ne),Mth.lerp(u,sw,se)); }
+
+        float height(float u, float v) {
+            return Mth.lerp(v, Mth.lerp(u, nw, ne), Mth.lerp(u, sw, se));
+        }
     }
-    private KarakLiquidVfx() {}
+
+    private KarakLiquidVfx() {
+    }
 }
