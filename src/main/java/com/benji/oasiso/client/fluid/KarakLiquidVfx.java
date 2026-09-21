@@ -119,24 +119,32 @@ public final class KarakLiquidVfx {
         SURFACES.sort(Comparator.comparingDouble(s -> s.pos.distToCenterSqr(eye.x, eye.y, eye.z)));
         if (SURFACES.size() > MAX_SURFACES) SURFACES.subList(MAX_SURFACES, SURFACES.size()).clear();
         if (!SURFACES.isEmpty()) {
-            measureShoreDistances(shoreDistances);
+            Map<BlockPos, Float> bankDistances = new HashMap<>(shoreDistances);
+            measureShoreDistances(shoreDistances, false);
+            measureShoreDistances(bankDistances, true);
             for (Surface s : SURFACES) {
                 s.depthNw = vertexDistance(shoreDistances, s.pos, -1, -1);
                 s.depthNe = vertexDistance(shoreDistances, s.pos, 1, -1);
                 s.depthSe = vertexDistance(shoreDistances, s.pos, 1, 1);
                 s.depthSw = vertexDistance(shoreDistances, s.pos, -1, 1);
+                s.bankNw = bankVertexDistance(bankDistances, s.pos, -1, -1);
+                s.bankNe = bankVertexDistance(bankDistances, s.pos, 1, -1);
+                s.bankSe = bankVertexDistance(bankDistances, s.pos, 1, 1);
+                s.bankSw = bankVertexDistance(bankDistances, s.pos, -1, 1);
             }
         }
     }
 
 
-    private static void measureShoreDistances(Map<BlockPos, Float> distances) {
+    private static void measureShoreDistances(Map<BlockPos, Float> distances, boolean solidBanksOnly) {
         PriorityQueue<ShoreStep> queue = new PriorityQueue<>(Comparator.comparingDouble(ShoreStep::distance));
         for (Map.Entry<BlockPos, Float> entry : distances.entrySet()) {
             BlockPos pos = entry.getKey();
             for (Direction dir : HORIZONTAL) {
                 BlockPos neighbor = pos.relative(dir);
-                if (!world.hasChunkAt(neighbor) || !isJade(world.getFluidState(neighbor))) {
+                boolean loaded = world.hasChunkAt(neighbor);
+                boolean boundary = solidBanksOnly ? loaded && world.getBlockState(neighbor).isFaceSturdy(world, neighbor, dir.getOpposite()) : !loaded || !isJade(world.getFluidState(neighbor));
+                if (boundary) {
                     entry.setValue(0.5F);
                     queue.add(new ShoreStep(pos, 0.5F));
                     break;
@@ -165,6 +173,26 @@ public final class KarakLiquidVfx {
 
     private static float vertexDistance(Map<BlockPos, Float> distances, BlockPos pos, int dx, int dz) {
         return (distances.getOrDefault(pos, 0.0F) + distances.getOrDefault(pos.offset(dx, 0, 0), 0.0F) + distances.getOrDefault(pos.offset(0, 0, dz), 0.0F) + distances.getOrDefault(pos.offset(dx, 0, dz), 0.0F)) * 0.25F;
+    }
+
+    private static float bankVertexDistance(Map<BlockPos, Float> distances, BlockPos pos, int dx, int dz) {
+        float sum = 0.0F;
+        int count = 0;
+        for (BlockPos p : new BlockPos[]{pos, pos.offset(dx, 0, 0), pos.offset(0, 0, dz), pos.offset(dx, 0, dz)}) {
+            Float value = distances.get(p);
+            if (value != null) {
+                sum += value;
+                count++;
+            } else if (world.hasChunkAt(p)) {
+                for (Direction direction : HORIZONTAL) {
+                    if (world.getBlockState(p).isFaceSturdy(world, p, direction)) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        return count == 0 ? MAX_SHORE_DISTANCE : sum / count;
     }
 
     private record ShoreStep(BlockPos pos, float distance) {
@@ -196,6 +224,7 @@ public final class KarakLiquidVfx {
         final int mask;
         final float nw, ne, se, sw;
         float depthNw, depthNe, depthSe, depthSw;
+        float bankNw, bankNe, bankSe, bankSw;
 
         Surface(BlockPos pos, int mask, float nw, float ne, float se, float sw) {
             this.pos = pos;

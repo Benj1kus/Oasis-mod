@@ -3,8 +3,10 @@ package com.benji.oasiso.common.fluid;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.registry.ModKarakFluids;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -15,20 +17,23 @@ public final class KarakFluidDamage {
     private static final float DAMAGE = 4.0F;
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) return;
-        Player player = event.player;
-        CompoundTag data = player.getPersistentData();
+    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (entity.level().isClientSide) return;
 
-        if (!player.isAlive() || player.isCreative() || player.isSpectator() || player.getFluidTypeHeight(ModKarakFluids.KR_WATER_TYPE.get()) <= 0.0D) {
-            data.remove(TIMER);
+        if (!entity.isAlive() || entity.isInvulnerable() || (entity instanceof Player player && (player.isCreative() || player.isSpectator()))) {
+            entity.getPersistentData().remove(TIMER);
             return;
         }
-
+        if (entity.getFluidTypeHeight(ModKarakFluids.KR_WATER_TYPE.get()) <= 0.0D) {
+            entity.getPersistentData().remove(TIMER);
+            return;
+        }
+        CompoundTag data = entity.getPersistentData();
         int ticks = data.getInt(TIMER) + 1;
         if (ticks >= DAMAGE_INTERVAL) {
             ticks = 0;
-            player.hurt(player.damageSources().magic(), DAMAGE);
+            entity.hurt(entity.damageSources().magic(), DAMAGE);
         }
         data.putInt(TIMER, ticks);
     }

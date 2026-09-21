@@ -2,15 +2,16 @@
 in vec2 uv;
 in vec4 edges;
 in float shoreDistance;
+in float bankDistance;
 in float distanceToCamera;
 uniform float Time;
 uniform float Range;
 out vec4 fragColor;
 
 //brightness
-const float CENTER_DARKNESS = 0.80;
+const float CENTER_DARKNESS = 0.60;
 //distance to center
-const float CENTER_START = 1.50;
+const float CENTER_START = 0.30;
 //anchor
 const float CENTER_CORE = 2.85;
 //waving stenght
@@ -24,7 +25,15 @@ const float CEL_EDGE_WIDTH = 0.100;
 //colors
 const vec3 CENTER_OUTER = vec3(0.045, 0.290, 0.335);
 const vec3 CENTER_MIDDLE = vec3(0.035, 0.205, 0.295);
-const vec3 CENTER_DEEP = vec3(0.025, 0.115, 0.225) * 1.5;
+const vec3 CENTER_DEEP = vec3(0.028, 0.200, 0.260);
+
+const float SHORE_WIDTH = 0.52;
+const float SHORE_WAVE = 1.28;
+const float SHORE_SPEED = 1.0;
+const float FRAGMENT_PERIOD = 8.5;
+const float FRAGMENT_TRAVEL = 1.70;
+const float FRAGMENT_AMOUNT = 0.78;
+
 const float TAU = 6.28318530718;
 
 float bayer2(vec2 p) {
@@ -61,10 +70,72 @@ float celStep(float border, float depth, float threshold) {
     return step(threshold,smoothstep(border-width,border+width,depth));
 }
 
+
+float pixelBankDistance(vec2 pixelCenter) {
+    vec2 dx=dFdx(uv),dy=dFdy(uv);
+    float sx=dFdx(bankDistance),sy=dFdy(bankDistance);
+    float determinant=dx.x*dy.y-dx.y*dy.x;
+    if(abs(determinant)<1e-10) return bankDistance;
+    vec2 gradient=vec2(sx*dy.y-sy*dx.y,dx.x*sy-dy.x*sx)/determinant;
+    return max(0.0,bankDistance+dot(gradient,pixelCenter-uv));
+}
+
+float shoreWave(vec2 p,float t) {
+    vec2 phase=mod(p,16.0)*TAU/16.0;
+    return 0.64*sin(phase.x*4.0+phase.y*2.0-t*1.12+0.6*sin(phase.y+t*.47))
+         + 0.36*sin(phase.y*4.0-phase.x*2.0+t*.86);
+}
+
+vec4 livingShore(vec2 p,float depth,float threshold) {
+    float t=Time*SHORE_SPEED;
+    float width=max(0.16,SHORE_WIDTH+SHORE_WAVE*shoreWave(p,t));
+    float band=1.0-smoothstep(0.0,width,depth);
+    band=floor(band*5.0+threshold)/5.0;
+    float bright=1.0-smoothstep(0.0,0.16,depth);
+    float pulse=.90+.10*sin(Time*1.8);
+    vec3 color=mix(vec3(.08,.65,.48),vec3(.153,.961,.706),band);
+    color=mix(color,vec3(.70,1.0,.90),bright*.7);
+    float alpha=band*band*.82*pulse;
+    vec4 result=vec4(color*alpha,alpha);
+
+    float limit=SHORE_WIDTH+abs(SHORE_WAVE)+max(FRAGMENT_TRAVEL,0.0)+0.45;
+    if(FRAGMENT_AMOUNT<=0.0 || depth>limit) return result;
+    float pixel=1.0/CENTER_PIXELS;
+
+    for(int i=0;i<3;i++) {
+        float clock=t/max(FRAGMENT_PERIOD,0.5)+float(i)*0.37;
+        float age=fract(clock);
+        float growth=smoothstep(0.0,0.17,age);
+        float dissolve=1.0-smoothstep(0.52,0.96,age);
+        if(growth*dissolve<0.015) continue;
+        float travel=smoothstep(0.08,0.82,age)*max(FRAGMENT_TRAVEL,0.0);
+        float separation=depth-(width*.60+travel);
+        if(abs(separation)>0.34+pixel) continue;
+
+        float seed=mod(floor(clock)+float(i)*13.0,64.0);
+        vec2 source=p+vec2(travel*.18,-travel*.13);
+        float shape=.72*noise(source*2.0+vec2(seed*3.0,seed*7.0),512.0)
+                   +.28*noise(source*4.0+vec2(seed*11.0,seed*5.0),1024.0);
+        float thickness=.12+.08*shape;
+        float strip=1.0-smoothstep(thickness,thickness+pixel*.85,abs(separation));
+        float pieces=smoothstep(.48,.69,shape);
+        float coverage=strip*pieces*growth*dissolve;
+
+        if(coverage<=threshold) continue;
+        float core=1.0-smoothstep(.02,.18,abs(separation));
+        vec3 pieceColor=mix(vec3(.07,.72,.61),vec3(.27,.99,.82),core*.70);
+        pieceColor=mix(pieceColor,vec3(.70,1.0,.90),core*growth*.18);
+        float pieceAlpha=clamp(FRAGMENT_AMOUNT,0.0,1.0)*(.50+.22*core);
+        result=vec4(pieceColor*pieceAlpha,pieceAlpha)+result*(1.0-pieceAlpha);
+    }
+    return result;
+}
+
 void main() {
     vec2 grid=floor(uv*CENTER_PIXELS+0.002);
     vec2 p=(grid+0.5)/CENTER_PIXELS;
     float pixelDepth=pixelShoreDistance(p);
+    float bankDepth=pixelBankDistance(p);
     vec2 local=fract(uv);
     float d=2.0;
     if(edges.r>.5) d=min(d,local.x);
@@ -72,19 +143,22 @@ void main() {
     if(edges.b>.5) d=min(d,local.y);
     if(edges.a>.5) d=min(d,1.0-local.y);
 
-    float band=1.0-smoothstep(0.0,0.50,d);
-    float bright=1.0-smoothstep(0.0,0.12,d);
-    float pulse=.90+.10*sin(Time*1.8);
     float fade=1.0-smoothstep(Range-3.0,Range,distanceToCamera);
     if(fade<=0.0) discard;
-    vec3 shoreColor=mix(vec3(0.08,0.65,0.48),vec3(0.153,0.961,0.706),band);
-    shoreColor=mix(shoreColor,vec3(0.70,1.0,0.90),bright*.7);
-    float shoreAlpha=band*band*.82*pulse;
+    float threshold=bayer4(grid);
+
+    vec2 pixelLocal=fract(p);
+    if(edges.r>.5) bankDepth=min(bankDepth,pixelLocal.x);
+    if(edges.g>.5) bankDepth=min(bankDepth,1.0-pixelLocal.x);
+    if(edges.b>.5) bankDepth=min(bankDepth,pixelLocal.y);
+    if(edges.a>.5) bankDepth=min(bankDepth,1.0-pixelLocal.y);
+    vec4 shore=livingShore(p,bankDepth,threshold);
+    float shoreAlpha=shore.a;
+    vec3 shoreColor=shoreAlpha>0.0?shore.rgb/shoreAlpha:vec3(0.0);
 
     float centerAlpha=0.0;
     vec3 centerColor=CENTER_OUTER;
     if(CENTER_DARKNESS>0.0 && pixelDepth>0.65 && d>0.50) {
-        float threshold=bayer4(grid);
         float t=Time*CENTER_SPEED;
         float first=max(CENTER_START,0.95);
         float core=max(CENTER_CORE,first+0.30);

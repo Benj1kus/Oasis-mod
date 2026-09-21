@@ -58,10 +58,10 @@ public final class KarakLiquidRender {
                 double x = s.pos.getX() - eye.x, y = s.pos.getY() - eye.y + .0025, z = s.pos.getZ() - eye.z;
                 float u = Math.floorMod(s.pos.getX(), 256);
                 float v = Math.floorMod(s.pos.getZ(), 256);
-                vertex(b, view, x, y + s.nw, z, u, v, s.mask, s.depthNw);
-                vertex(b, view, x, y + s.sw, z + 1, u, v + 1, s.mask, s.depthSw);
-                vertex(b, view, x + 1, y + s.se, z + 1, u + 1, v + 1, s.mask, s.depthSe);
-                vertex(b, view, x + 1, y + s.ne, z, u + 1, v, s.mask, s.depthNe);
+                vertex(b, view, x, y + s.nw, z, u, v, s.mask, s.depthNw, s.bankNw);
+                vertex(b, view, x, y + s.sw, z + 1, u, v + 1, s.mask, s.depthSw, s.bankSw);
+                vertex(b, view, x + 1, y + s.se, z + 1, u + 1, v + 1, s.mask, s.depthSe, s.bankSe);
+                vertex(b, view, x + 1, y + s.ne, z, u + 1, v, s.mask, s.depthNe, s.bankNe);
             }
             BufferUploader.drawWithShader(b.end());
         } finally {
@@ -74,9 +74,10 @@ public final class KarakLiquidRender {
         }
     }
 
-    private static void vertex(BufferBuilder b, Matrix4f m, double x, double y, double z, float u, float v, int mask, float shoreDistance) {
+    private static void vertex(BufferBuilder b, Matrix4f m, double x, double y, double z, float u, float v, int mask, float shoreDistance, float bankDistance) {
         int distance = Math.round(Mth.clamp(shoreDistance / 8.0F, 0.0F, 1.0F) * 255.0F);
-        b.vertex(m, (float) x, (float) y, (float) z).uv(u, v).color(mask, distance, 0, 255).endVertex();
+        int bank = Math.round(Mth.clamp(bankDistance / 8.0F, 0.0F, 1.0F) * 255.0F);
+        b.vertex(m, (float) x, (float) y, (float) z).uv(u, v).color(mask, distance, bank, 255).endVertex();
     }
 
     @SubscribeEvent
