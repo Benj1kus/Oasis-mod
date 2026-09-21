@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "oasiso:block/kr_stone",
+    "bottom": "oasiso:block/kr_stone",
+    "side": "oasiso:block/kr_stone_partsand"
+  }
+}

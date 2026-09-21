@@ -71,6 +71,16 @@
   "block.oasiso.azumalit_block": "Azumalite Block",
   "block.oasiso.entropy_connector": "Entropy Connector",
 
+
+  "block.oasiso.kr_grass": "Karak Grass ",
+  "block.oasiso.kr_biggrass": "Karak Big Grass ",
+  "block.oasiso.kr_smallgrass": "Karak Small Grass ",
+  "block.oasiso.kr_sand": "Karak Sand ",
+  "block.oasiso.kr_stone": "Karak Stone ",
+  "block.oasiso.kr_sandgrass": "Karak Bush ",
+
+  "item.oasiso.kr_water_bucket": "Melted Nephritis Bucket",
+
   "item.oasiso.seemless_curve_banner": "Hanging Order Banner",
   "block.oasiso.seemless_curve_banner": "Hanging Order Banner",
 

@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/grass_block",
+  "render_type": "minecraft:cutout_mipped",
+  "textures": {
+    "particle": "oasiso:block/kr_grass",
+    "bottom": "oasiso:block/kr_sand",
+    "top": "oasiso:block/kr_grass_top",
+    "side": "oasiso:block/kr_grass",
+    "overlay": "oasiso:block/kr_grass_overlay"
+  }
+}

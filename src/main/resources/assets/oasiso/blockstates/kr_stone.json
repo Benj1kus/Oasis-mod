@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "sand_layer=0": {
+      "model": "oasiso:block/kr_stone"
+    },
+    "sand_layer=1": {
+      "model": "oasiso:block/kr_stone_fullsand"
+    },
+    "sand_layer=2": {
+      "model": "oasiso:block/kr_stone_partsand"
+    }
+  }
+}

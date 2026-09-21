@@ -43,6 +43,14 @@ public final class ModBlocks {
 
     public static final RegistryObject<Block> ENTROPY_CONNECTOR = BLOCKS.register("entropy_connector", () -> new EntropyConnectorBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.HONEY_BLOCK).lightLevel(state -> 10).strength(6.0F).noOcclusion().requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> KR_SAND = BLOCKS.register("kr_sand", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.SAND).strength(0.5F)));
+    public static final RegistryObject<Block> KR_STONE = BLOCKS.register("kr_stone", () -> new KarakStoneBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KR_SANDGRASS = BLOCKS.register("kr_sandgrass", () -> new KarakSandGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> KR_GRASS = BLOCKS.register("kr_grass", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).sound(SoundType.SAND).strength(0.5F)));
+    public static final RegistryObject<LiquidBlock> KR_WATER = BLOCKS.register("kr_water", () -> new LiquidBlock(ModKarakFluids.KR_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).lightLevel(state -> 10).noLootTable()));
+    public static final RegistryObject<Block> KR_BIGGRASS = BLOCKS.register("kr_biggrass", () -> new KarakBigGrassBlock(BlockBehaviour.Properties.copy(Blocks.TALL_GRASS).noCollission().instabreak().noOcclusion()));
+    public static final RegistryObject<Block> KR_SMALLGRASS = BLOCKS.register("kr_smallgrass", () -> new KarakSmallGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).instabreak().noOcclusion()));
+
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_COMPRESSED = BLOCKS.register("nephritis_compressed", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).strength(10.0F).requiresCorrectToolForDrops()));

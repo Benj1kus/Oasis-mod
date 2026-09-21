@@ -37,6 +37,15 @@ public final class ModItems {
     public static final RegistryObject<Item> NEPHRITIS_LINE_ITEM = ITEMS.register("nephritis_line", () -> new BlockItem(ModBlocks.NEPHRITIS_LINE.get(), new Item.Properties()));
     public static final RegistryObject<Item> AZUMALIT_BLOCK_ITEM = ITEMS.register("azumalit_block", () -> new BlockItem(ModBlocks.AZUMALIT_BLOCK.get(), new Item.Properties()));
 
+
+    public static final RegistryObject<Item> KR_SAND_ITEM = ITEMS.register("kr_sand", () -> new BlockItem(ModBlocks.KR_SAND.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_GRASS_ITEM = ITEMS.register("kr_grass", () -> new BlockItem(ModBlocks.KR_GRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_STONE_ITEM = ITEMS.register("kr_stone", () -> new BlockItem(ModBlocks.KR_STONE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_SANDGRASS_ITEM = ITEMS.register("kr_sandgrass", () -> new BlockItem(ModBlocks.KR_SANDGRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_WATER_BUCKET = ITEMS.register("kr_water_bucket", () -> new BucketItem(ModKarakFluids.KR_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final RegistryObject<Item> KR_BIGGRASS_ITEM = ITEMS.register("kr_biggrass", () -> new BlockItem(ModBlocks.KR_BIGGRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_SMALLGRASS_ITEM = ITEMS.register("kr_smallgrass", () -> new BlockItem(ModBlocks.KR_SMALLGRASS.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> MEMORY_PUZ_ITEM = ITEMS.register("memory_puz", () -> new BlockItem(ModBlocks.MEMORY_PUZ.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEMORY_CORE_ITEM = ITEMS.register("memory_core", () -> new BlockItem(ModBlocks.MEMORY_CORE.get(), new Item.Properties()));
 

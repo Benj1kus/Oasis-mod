@@ -1,6 +1,7 @@
 package com.benji.oasiso.common.block;
 
 import com.benji.oasiso.ModSounds;
+import com.benji.oasiso.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
@@ -36,9 +37,13 @@ public class OasisoFlowerBlock extends FlowerBlock {
         super(effect, duration, properties);
     }
 
+    private static boolean maybePlaced (BlockState state) {
+        return state.is(Blocks.GRASS_BLOCK) || state.is(ModBlocks.KR_GRASS.get());
+    }
+
     @Override
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.is(Blocks.GRASS_BLOCK);
+        return maybePlaced(state);
     }
 
     @Override

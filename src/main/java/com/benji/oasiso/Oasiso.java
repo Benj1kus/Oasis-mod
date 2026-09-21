@@ -10,13 +10,9 @@ import com.benji.oasiso.network.BossPortalTransitionNetwork;
 import com.benji.oasiso.network.ModMessages;
 import com.benji.oasiso.network.dialogue.BossDialogueNetwork;
 import com.benji.oasiso.config.OsirisRealmConfig;
+import com.benji.oasiso.registry.*;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
-import com.benji.oasiso.registry.ModBlockEntities;
-import com.benji.oasiso.registry.ModBlocks;
-import com.benji.oasiso.registry.ModEffects;
-import com.benji.oasiso.registry.ModEntities;
-import com.benji.oasiso.registry.ModItems;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -84,6 +80,10 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> MOUTH_SMOKE = PARTICLES.register("mouth_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ENTROPY_FLAME = PARTICLES.register("entropy_flame", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> AZUMAAL_MOUTH_SMOKE = PARTICLES.register("azumaal_mouth_smoke", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> KARAK_BUBBLES = PARTICLES.register("karak_bubbles", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> KARAK_STEAM = PARTICLES.register("karak_steam", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> KR_SAND_DUST = PARTICLES.register("kr_sand_dust", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
@@ -332,6 +332,7 @@ public class Oasiso {
         ModItems.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);
+        ModKarakFluids.register(modEventBus);
         ModSounds.SOUNDS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         STRUCTURE_TYPES.register(modEventBus);

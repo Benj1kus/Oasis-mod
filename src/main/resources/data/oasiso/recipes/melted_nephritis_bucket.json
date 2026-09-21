@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "experience": 5,
+  "cookingtime": 100,
+  "ingredient":{
+    "item":"oasiso:kr_water_bucket"
+  },
+  "result": "oasiso:melted_nephritis"
+}
