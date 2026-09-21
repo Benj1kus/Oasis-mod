@@ -20,6 +20,9 @@
   "glov_bounce": { "sounds": [ "oasiso:glov_bounce" ] },
   "beam_loop": { "sounds": [ "oasiso:beam_loop" ] },
 
+  "kr_water_loop": { "sounds": [ "oasiso:kr_water_loop" ] },
+  "kr_water_loop_under": { "sounds": [ "oasiso:kr_water_loop_under" ] },
+
   "osiris_voice": { "sounds": [ "oasiso:osiris_voice" ] },
   "paladin_voice": { "sounds": [ "oasiso:paladin_voice" ] },
 

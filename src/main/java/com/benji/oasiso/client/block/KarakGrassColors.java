@@ -47,11 +47,6 @@ public final class KarakGrassColors {
         }, ModBlocks.KR_GRASS.get(), ModBlocks.KR_BIGGRASS.get(), ModBlocks.KR_SMALLGRASS.get());
     }
 
-    @SubscribeEvent
-    public static void registerItems(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tint) -> tint == 0 ? DRY : 0xFFFFFF, ModBlocks.KR_GRASS.get(), ModBlocks.KR_BIGGRASS.get(), ModBlocks.KR_SMALLGRASS.get());
-    }
-
     private static int color(BlockAndTintGetter level, BlockPos pos) {
         synchronized (LOCK) {
             Integer value = COLORS.get(pos);
@@ -69,6 +64,10 @@ public final class KarakGrassColors {
         }
     }
 
+    @SubscribeEvent
+    public static void registerItems(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tint) -> tint == 0 ? DRY : 0xFFFFFF, ModBlocks.KR_GRASS.get());
+    }
     private static int sample(BlockAndTintGetter level, BlockPos center) {
         double nearestSand = RADIUS, nearestWater = RADIUS;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
