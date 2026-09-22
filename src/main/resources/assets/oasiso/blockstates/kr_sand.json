@@ -1,22 +1,10 @@
 {
   "variants": {
     "": [
-      {
-        "model": "oasiso:block/kr_sand",
-        "y": 0
-      },
-      {
-        "model": "oasiso:block/kr_sand",
-        "y": 90
-      },
-      {
-        "model": "oasiso:block/kr_sand",
-        "y": 180
-      },
-      {
-        "model": "oasiso:block/kr_sand",
-        "y": 270
-      }
+      { "model": "oasiso:block/kr_sand", "y": 0 },
+      { "model": "oasiso:block/kr_sand", "y": 90 },
+      { "model": "oasiso:block/kr_sand", "y": 180 },
+      { "model": "oasiso:block/kr_sand", "y": 270 }
     ]
   }
 }

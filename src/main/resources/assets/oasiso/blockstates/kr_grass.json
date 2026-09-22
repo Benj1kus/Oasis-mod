@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
-      "model": "oasiso:block/kr_grass"
-    }
+    "": [
+      { "model": "oasiso:block/kr_grass", "y": 0 },
+      { "model": "oasiso:block/kr_grass", "y": 90 },
+      { "model": "oasiso:block/kr_grass", "y": 180 },
+      { "model": "oasiso:block/kr_grass", "y": 270 }
+    ]
   }
 }

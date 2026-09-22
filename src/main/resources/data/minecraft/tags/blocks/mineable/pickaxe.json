@@ -41,6 +41,7 @@
     "oasiso:entropy_connector",
     "oasiso:kr_stone",
     "oasiso:entropy_magma",
+    "oasiso:entropy_magma_little",
     "oasiso:entropy_soil"
   ]
 }

@@ -41,7 +41,6 @@ public final class KarakStoneBlock extends Block {
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
             LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        // Изменение верхнего камня передаст обновление следующему камню вниз.
         return direction == Direction.UP ? state.setValue(SAND_LAYER, layer(level, pos))
                 : super.updateShape(state, direction, neighbor, level, pos, neighborPos);
     }

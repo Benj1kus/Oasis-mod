@@ -49,6 +49,7 @@
   "block.oasiso.entropy_block": "Block of Entropy",
   "block.oasiso.entropy_soil": "Entropy Soil",
   "block.oasiso.entropy_magma": "Entropy Magma",
+  "block.oasiso.entropy_magma_little": "Entropy Low-Viscosity Magma",
   "block.oasiso.entropy_vein": "Entropy vein",
   "block.oasiso.chaos_altar": "Altar of Entropy",
   "block.oasiso.chaos_eye": "Eye of Chaos",

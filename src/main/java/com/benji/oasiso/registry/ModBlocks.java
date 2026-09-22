@@ -77,8 +77,9 @@ public final class ModBlocks {
     public static final RegistryObject<Block> SANDSTONE_BRICKED = BLOCKS.register("sandstone_bricked", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_AZAZEL = BLOCKS.register("sandstone_azazel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
 
-    public static final RegistryObject<Block> ENTROPY_SOIL = BLOCKS.register("entropy_soil", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
-    public static final RegistryObject<Block> ENTROPY_MAGMA = BLOCKS.register("entropy_magma", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).lightLevel(state -> 5).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_SOIL = BLOCKS.register("entropy_soil", () -> new EntropySoilBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_MAGMA = BLOCKS.register("entropy_magma", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).lightLevel(state -> 5).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_MAGMA_LITTLE = BLOCKS.register("entropy_magma_little", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).lightLevel(state -> 5).strength(5.0F).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));
