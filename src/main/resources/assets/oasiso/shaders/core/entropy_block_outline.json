@@ -1,0 +1,40 @@
+{
+  "vertex": "oasiso:entropy_block_screen",
+  "fragment": "oasiso:entropy_block_outline",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "FieldSize",
+      "type": "float",
+      "count": 2,
+      "values": [
+        960,
+        540
+      ]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "WidthScale",
+      "type": "float",
+      "count": 1,
+      "values": [
+        1
+      ]
+    }
+  ]
+}

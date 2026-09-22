@@ -1,0 +1,24 @@
+{
+  "vertex": "oasiso:entropy_block_screen",
+  "fragment": "oasiso:entropy_block_distance",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "FieldSize",
+      "type": "float",
+      "count": 2,
+      "values": [
+        960,
+        540
+      ]
+    }
+  ]
+}

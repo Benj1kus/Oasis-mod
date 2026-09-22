@@ -84,6 +84,7 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> KARAK_BUBBLES = PARTICLES.register("karak_bubbles", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> KARAK_STEAM = PARTICLES.register("karak_steam", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> KR_SAND_DUST = PARTICLES.register("kr_sand_dust", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENTROPY_LIGHTNING = PARTICLES.register("entropy_lightning", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {

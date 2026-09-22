@@ -16,6 +16,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> KR_WATER_LOOP = registerSoundEvent("kr_water_loop");
     public static final RegistryObject<SoundEvent> KR_WATER_LOOP_UNDER = registerSoundEvent("kr_water_loop_under");
 
+
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
 
@@ -112,6 +113,9 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY1 = registerSoundEvent("entropy1");
     public static final RegistryObject<SoundEvent> ENTROPY2 = registerSoundEvent("entropy2");
     public static final RegistryObject<SoundEvent> ENTROPY3 = registerSoundEvent("entropy3");
+    public static final RegistryObject<SoundEvent> ENTROPY_PULSE = registerSoundEvent("entropy_pulse");
+    public static final RegistryObject<SoundEvent> ENTROPY_LIGHTNING = registerSoundEvent("entropy_lightning");
+
 
     //caser
     public static final RegistryObject<SoundEvent> CASER1 = registerSoundEvent("caser1");

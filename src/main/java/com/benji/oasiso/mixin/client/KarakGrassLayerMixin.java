@@ -12,10 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
 public abstract class KarakGrassLayerMixin {
-    @Inject(method="renderChunkLayer", at=@At(value="INVOKE",
-            target="Lnet/minecraft/client/renderer/RenderType;setupRenderState()V",shift=At.Shift.AFTER),require=0)
-    private void oasiso$grassSway(RenderType layer,PoseStack pose,double cameraX,double cameraY,double cameraZ,
-                                 Matrix4f projection,CallbackInfo ci) {
-        KarakGrassSway.useShader(layer,cameraX,cameraY,cameraZ);
+    @Inject(method = "renderChunkLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;setupRenderState()V", shift = At.Shift.AFTER), require = 0)
+    private void oasiso$grassSway(RenderType layer, PoseStack pose, double cameraX, double cameraY, double cameraZ, Matrix4f projection, CallbackInfo ci) {
+        KarakGrassSway.useShader(layer, cameraX, cameraY, cameraZ);
     }
 }

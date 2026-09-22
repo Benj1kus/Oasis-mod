@@ -16,6 +16,8 @@
   "entropy1": { "sounds": [ "oasiso:entropy1" ] },
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
+  "entropy_pulse": { "sounds": [ "oasiso:entropy_pulse" ] },
+  "entropy_lightning": { "sounds": [ "oasiso:entropy_lightning" ] },
 
   "glov_bounce": { "sounds": [ "oasiso:glov_bounce" ] },
   "beam_loop": { "sounds": [ "oasiso:beam_loop" ] },

@@ -42,7 +42,6 @@ public class EntropyBlock extends Block {
         super.onPlace(state, level, pos, oldState, movedByPiston);
 
         if (!level.isClientSide && !state.is(oldState.getBlock())) {
-
             level.scheduleTick(pos, this, 2);
 
             if (level instanceof ServerLevel serverLevel) {
@@ -119,11 +118,8 @@ public class EntropyBlock extends Block {
     }
 
     private void playRandomEntropySound(ServerLevel level, BlockPos pos, RandomSource random) {
-        SoundEvent[] sounds = {ModSounds.ENTROPY1.get(), ModSounds.ENTROPY2.get(), ModSounds.ENTROPY3.get()};
-
-        SoundEvent selectedSound = sounds[random.nextInt(sounds.length)];
-
-        level.playSound(null, pos, selectedSound, SoundSource.BLOCKS, 0.8F, 0.9F + random.nextFloat() * 0.2F);
+        float pitch = 0.85F + random.nextFloat() * 0.3F;
+        level.playSound(null, pos, ModSounds.ENTROPY1.get(), SoundSource.BLOCKS, 0.8F, pitch);
     }
 
     private void applyEntropyAura(ServerLevel level, BlockPos sourcePos) {
@@ -167,11 +163,8 @@ public class EntropyBlock extends Block {
 
     private static boolean hasFullSuperGoldArmor(Player player) {
         return player.getItemBySlot(EquipmentSlot.HEAD).is(Oasiso.SUPER_GOLD_HELMET.get())
-
                 && player.getItemBySlot(EquipmentSlot.CHEST).is(Oasiso.SUPER_GOLD_CHESTPLATE.get())
-
                 && player.getItemBySlot(EquipmentSlot.LEGS).is(Oasiso.SUPER_GOLD_LEGGINGS.get())
-
                 && player.getItemBySlot(EquipmentSlot.FEET).is(Oasiso.SUPER_GOLD_BOOTS.get());
     }
 
