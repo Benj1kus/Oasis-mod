@@ -17,6 +17,8 @@
     "oasiso:nephritis_spiral",
     "oasiso:storm_totem",
     "oasiso:nephritis_lamp",
-    "oasiso:entropy_connector"
+    "oasiso:entropy_connector",
+    "oasiso:entropy_magma",
+    "oasiso:entropy_soil"
   ]
 }
