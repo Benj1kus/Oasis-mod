@@ -118,6 +118,7 @@ public class EntropyBlock extends Block {
     }
 
     private void playRandomEntropySound(ServerLevel level, BlockPos pos, RandomSource random) {
+        if (random.nextFloat() > 0.05F) return;
         float pitch = 0.85F + random.nextFloat() * 0.3F;
         level.playSound(null, pos, ModSounds.ENTROPY1.get(), SoundSource.BLOCKS, 0.8F, pitch);
     }
