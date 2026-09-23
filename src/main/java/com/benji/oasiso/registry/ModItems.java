@@ -45,6 +45,7 @@ public final class ModItems {
     public static final RegistryObject<Item> KR_WATER_BUCKET = ITEMS.register("kr_water_bucket", () -> new BucketItem(ModKarakFluids.KR_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
     public static final RegistryObject<Item> KR_BIGGRASS_ITEM = ITEMS.register("kr_biggrass", () -> new BlockItem(ModBlocks.KR_BIGGRASS.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_SMALLGRASS_ITEM = ITEMS.register("kr_smallgrass", () -> new BlockItem(ModBlocks.KR_SMALLGRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_WATER_BUCKET = ITEMS.register("entropy_water_bucket", () -> new BucketItem(ModKarakFluids.ENTROPY_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
     public static final RegistryObject<Item> MEMORY_PUZ_ITEM = ITEMS.register("memory_puz", () -> new BlockItem(ModBlocks.MEMORY_PUZ.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEMORY_CORE_ITEM = ITEMS.register("memory_core", () -> new BlockItem(ModBlocks.MEMORY_CORE.get(), new Item.Properties()));

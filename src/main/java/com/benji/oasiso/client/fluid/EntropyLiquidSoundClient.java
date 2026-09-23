@@ -6,7 +6,6 @@ import com.benji.oasiso.registry.ModKarakFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -23,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public final class KarakLiquidSoundClient {
+public final class EntropyLiquidSoundClient {
     private static final int MAX_SURFACE_SOUNDS = 3;
     private static final int SEARCH_RADIUS = 12;
     private static final int VERTICAL_RADIUS = 6;
@@ -39,11 +38,11 @@ public final class KarakLiquidSoundClient {
     private static long clock;
     private static int scanCountdown;
 
-    private KarakLiquidSoundClient() {
+    private EntropyLiquidSoundClient() {
     }
 
     private static boolean isJade(FluidState fluid) {
-        return fluid.getType().isSame(ModKarakFluids.KR_WATER.get());
+        return fluid.getType().isSame(ModKarakFluids.ENTROPY_WATER.get());
     }
 
     private static Vec3 listener(Minecraft mc) {
@@ -194,14 +193,14 @@ public final class KarakLiquidSoundClient {
         private final long startedAt;
 
         private JadeLoop(BlockPos anchor) {
-            super(anchor == null ? ModSounds.KR_WATER_LOOP_UNDER.get() : ModSounds.KR_WATER_LOOP.get(), anchor == null ? SoundSource.AMBIENT : SoundSource.BLOCKS, RandomSource.create());
+            super(anchor == null ? ModSounds.ENTROPY_WATER_LOOP_UNDER.get() : ModSounds.ENTROPY_WATER_LOOP.get(), anchor == null ? SoundSource.AMBIENT : SoundSource.BLOCKS, RandomSource.create());
             this.anchor = anchor;
             this.owner = world;
             this.startedAt = clock;
             this.looping = true;
             this.delay = 0;
             this.relative = anchor == null;
-            this.attenuation = anchor == null ? SoundInstance.Attenuation.NONE : SoundInstance.Attenuation.LINEAR;
+            this.attenuation = anchor == null ? Attenuation.NONE : Attenuation.LINEAR;
             this.volume = 0.0F;
             this.pitch = 1.0F;
             if (anchor != null) {

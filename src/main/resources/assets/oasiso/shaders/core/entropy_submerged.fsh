@@ -8,11 +8,11 @@ out vec4 fragColor;
 
 const float PIXEL_HEIGHT = 270.0;
 const float WAVE_SPEED = 2.0;
-const float WAVE_WIDTH = 1.5;
+const float WAVE_WIDTH = 3.5;
 const float FOAM_AMOUNT = 2.0;
 const float OPACITY = 0.88;
 const float BUBBLE_PERIOD = 6.5;
-const float BUBBLE_SIZE = 1.0;
+const float BUBBLE_SIZE = 3.0;
 const float BUBBLE_TRAVEL = 0.18;
 
 const float TAU = 6.2831853;
@@ -32,12 +32,12 @@ float bayer4(vec2 p) {
 vec3 waterPalette(float light, float threshold) {
     float ramp = clamp(light, 0.0, 0.999) * 5.0;
     float band = floor(ramp) + step(threshold, smoothstep(0.22, 0.78, fract(ramp)));
-    if (band < 1.0) return vec3(0.016, 0.150, 0.219);
-    if (band < 2.0) return vec3(0.016, 0.290, 0.321);
-    if (band < 3.0) return vec3(0.016, 0.455, 0.424);
-    if (band < 4.0) return vec3(0.035, 0.620, 0.530);
-    if (band < 5.0) return vec3(0.170, 0.735, 0.670);
-    return vec3(0.420, 0.840, 0.775);
+    if (band < 1.0) return vec3(0.200, 0.040, 0.180);
+    if (band < 2.0) return vec3(0.320, 0.100, 0.280);
+    if (band < 3.0) return vec3(0.080, 0.300, 0.480);
+    if (band < 4.0) return vec3(0.100, 0.550, 0.680);
+    if (band < 5.0) return vec3(0.120, 0.720, 0.620);
+    return vec3(0.880, 0.980, 1.000);
 }
 
 float frameHeight(float x, float seed, float t) {
@@ -61,9 +61,9 @@ vec4 paintWater(float distance, float shade, float lip, float pixel, float thres
     float shadow = (1.0 - smoothstep(pixel, pixel * 2.5,
         abs(distance + pixel * 3.2))) * lip;
     vec3 color = waterPalette(shade - shadow * 0.25, threshold);
-    if (foam > 0.17 + threshold * 0.36) color = vec3(0.40, 0.81, 0.76);
-    if (foam > 0.39 + threshold * 0.43) color = vec3(0.70, 0.94, 0.85);
-    if (foam > 0.80 + threshold * 0.19) color = vec3(0.88, 1.00, 0.94);
+    if (foam > 0.17 + threshold * 0.36) color = vec3(0.82, 0.42, 0.72);
+    if (foam > 0.39 + threshold * 0.43) color = vec3(0.35, 0.85, 0.95);
+    if (foam > 0.80 + threshold * 0.19) color = vec3(0.90, 0.98, 1.00);
     float alpha = OPACITY * (0.80 + 0.20 * smoothstep(0.0, 0.6, foam));
     return vec4(color * alpha, alpha);
 }

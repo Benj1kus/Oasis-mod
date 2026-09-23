@@ -38,18 +38,14 @@ public class TitanaHammerItem extends SwordItem implements GeoItem {
         if (!target.level().isClientSide() && attacker instanceof Player player) {
 
             boolean hasHammerPower = EnchantmentHelper.getItemEnchantmentLevel(Oasiso.HAMMER_POWER.get(), stack) > 0;
-
             int requiredHits = hasHammerPower ? 3 : 5;
-
             double attackRadius = hasHammerPower ? 20.0D : 10.0D;
-
             int hits = stack.getOrCreateTag().getInt("TitanaHits") + 1;
 
             if (hits >= requiredHits) {
                 hits = 0;
 
                 ServerLevel serverLevel = (ServerLevel) target.level();
-
                 serverLevel.playSound(null, attacker.blockPosition(), SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.PLAYERS, 1.0F, 0.8F);
 
                 double attackRadiusSqr = attackRadius * attackRadius;
@@ -64,11 +60,8 @@ public class TitanaHammerItem extends SwordItem implements GeoItem {
                     }
 
                     hand.moveTo(entity.getX(), entity.getY(), entity.getZ());
-
                     hand.setOwner(attacker);
-
                     serverLevel.addFreshEntity(hand);
-
                     serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.SAND.defaultBlockState()), entity.getX(), entity.getY() + 0.1D, entity.getZ(), 20, 0.4D, 0.0D, 0.4D, 0.1D);
                 }
             }
@@ -87,7 +80,7 @@ public class TitanaHammerItem extends SwordItem implements GeoItem {
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
                 if (this.renderer == null) {
-                    this.renderer = new GeoItemRenderer<>(new com.benji.oasiso.client.model.TitanaHammerModel());
+                    this.renderer = new com.benji.oasiso.client.renderer.TitanaHammerRenderer();
                 }
                 return this.renderer;
             }

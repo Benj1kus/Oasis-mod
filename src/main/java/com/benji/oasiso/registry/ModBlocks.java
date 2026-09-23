@@ -50,6 +50,7 @@ public final class ModBlocks {
     public static final RegistryObject<LiquidBlock> KR_WATER = BLOCKS.register("kr_water", () -> new LiquidBlock(ModKarakFluids.KR_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).lightLevel(state -> 10).noLootTable()));
     public static final RegistryObject<Block> KR_BIGGRASS = BLOCKS.register("kr_biggrass", () -> new KarakBigGrassBlock(BlockBehaviour.Properties.copy(Blocks.TALL_GRASS).noCollission().instabreak().noOcclusion()));
     public static final RegistryObject<Block> KR_SMALLGRASS = BLOCKS.register("kr_smallgrass", () -> new KarakSmallGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).instabreak().noOcclusion()));
+    public static final RegistryObject<LiquidBlock> ENTROPY_WATER = BLOCKS.register("entropy_water", () -> new LiquidBlock(ModKarakFluids.ENTROPY_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).lightLevel(state -> 10).noLootTable()));
 
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));

@@ -24,6 +24,8 @@
 
   "kr_water_loop": { "sounds": [ "oasiso:kr_water_loop" ] },
   "kr_water_loop_under": { "sounds": [ "oasiso:kr_water_loop_under" ] },
+  "entropy_water_loop": { "sounds": [ "oasiso:entropy_water_loop" ] },
+  "entropy_water_loop_under": { "sounds": [ "oasiso:entropy_water_loop_under" ] },
 
   "osiris_voice": { "sounds": [ "oasiso:osiris_voice" ] },
   "paladin_voice": { "sounds": [ "oasiso:paladin_voice" ] },

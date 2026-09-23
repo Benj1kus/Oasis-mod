@@ -83,6 +83,8 @@ public class Oasiso {
 
     public static final RegistryObject<SimpleParticleType> KARAK_BUBBLES = PARTICLES.register("karak_bubbles", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> KARAK_STEAM = PARTICLES.register("karak_steam", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENTROPY_BUBBLES = PARTICLES.register("entropy_bubbles", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENTROPY_STEAM = PARTICLES.register("entropy_steam", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> KR_SAND_DUST = PARTICLES.register("kr_sand_dust", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ENTROPY_LIGHTNING = PARTICLES.register("entropy_lightning", () -> new SimpleParticleType(false));
 
