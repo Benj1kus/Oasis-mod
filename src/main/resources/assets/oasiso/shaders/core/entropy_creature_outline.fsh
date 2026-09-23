@@ -54,12 +54,14 @@ void main() {
     vec2 q=(grid-Origin)/scale;
     float t=Time*FLAME_SPEED;
 
-    float bend=1.7*sin(q.y*.27-t*2.0)+.8*sin(q.y*.61-t*1.3);
-    float strand=.5+.5*sin((q.x+bend)*.64+q.y*.17-t*.7);
-    float secondary=.5+.5*sin(q.x*.29-q.y*.47+t*2.9);
-    float upward=clamp(.75+normal.y*.65,.22,1.35);
-    float tongue=FLAME_LENGTH*pow(strand,3.5)*(.45+.55*secondary)*upward;
-    float rim=BASE_WIDTH+.45*sin(q.y*.6+q.x*.3-t*2.0);
+    float bend = 2.2*sin(q.y*.12-t*.9)
+    + .6*sin(q.y*.25-t*.6);
+    float strand = .5+.5*sin((q.x+bend)*.28+q.y*.08-t*.45);
+    float secondary = .5+.5*sin(q.x*.12-q.y*.18+t*.9);
+    float upward = clamp(.75+normal.y*.65,.22,1.35);
+    float tongue = FLAME_LENGTH*pow(strand,1.7)
+    * (.75+.25*secondary)*upward;
+    float rim = BASE_WIDTH+.20*sin(q.y*.22+q.x*.12-t*.8);
     float body=1.0-smoothstep(rim+tongue-.8,rim+tongue+.7,distance);
 
     float coordinate=(q.x*.78+q.y*.36-t*1.3)/6.0;
