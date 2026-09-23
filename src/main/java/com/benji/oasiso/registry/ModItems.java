@@ -146,10 +146,10 @@ public final class ModItems {
     public static final RegistryObject<Item> BOMBUL_SPAWN_EGG = ITEMS.register("bombul_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BOMBUL, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> TITANA_SPAWN_EGG = ITEMS.register("titana_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.TITANA, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CACTO_SPAWN_EGG = ITEMS.register("cacto_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CACTO, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
-
     public static final RegistryObject<Item> DASHER_SPAWN_EGG = ITEMS.register("dasher_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.DASHER, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CASER_SPAWN_EGG = ITEMS.register("caser_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CASER, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> SAND_GOLEM_SPAWN_EGG = ITEMS.register("sand_golem_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.SAND_GOLEM, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_CREATURE_SPAWN_EGG = ITEMS.register("entropy_creature_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.ENTROPY_CREATURE, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
 
     public static final RegistryObject<Item> DOUM_PALM_SIGN_ITEM = ITEMS.register("doum_palm_sign", () -> new SignItem(new Item.Properties().stacksTo(16), ModBlocks.DOUM_PALM_SIGN.get(), ModBlocks.DOUM_PALM_WALL_SIGN.get()));
     public static final RegistryObject<Item> DOUM_PALM_HANGING_SIGN_ITEM = ITEMS.register("doum_palm_hanging_sign", () -> new HangingSignItem(ModBlocks.DOUM_PALM_HANGING_SIGN.get(), ModBlocks.DOUM_PALM_WALL_HANGING_SIGN.get(), new Item.Properties().stacksTo(16)));

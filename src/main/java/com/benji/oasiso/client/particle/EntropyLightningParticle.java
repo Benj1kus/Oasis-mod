@@ -8,7 +8,7 @@ public final class EntropyLightningParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
     private EntropyLightningParticle(ClientLevel world,double x,double y,double z,SpriteSet sprites) {
         super(world,x,y,z);this.sprites=sprites;
-        lifetime=20; // 10 кадров, каждый держится 2 тика. Вся молния — 1 секунда.
+        lifetime=20;
         quadSize=.48F+random.nextFloat()*.22F;
         hasPhysics=false;gravity=0;xd=yd=zd=0;
         roll=oRoll=(random.nextFloat()-.5F)*.65F;

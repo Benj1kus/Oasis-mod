@@ -2,6 +2,8 @@ package com.benji.oasiso.common.block;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.KrombulEntity;
+import com.benji.oasiso.common.entity.EntropyCreatureEntity;
+import com.benji.oasiso.common.world.EntropyCreatureSpawns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +17,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import com.benji.oasiso.ModSounds;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -56,7 +57,9 @@ public class EntropyBlock extends Block {
         double radiusSqr = KROMBUL_SPAWN_PLAYER_RADIUS * KROMBUL_SPAWN_PLAYER_RADIUS;
 
 
-        boolean hasNearbyPlayer = !level.getEntitiesOfClass(Player.class, spawnArea, player -> player.isAlive() && !player.isSpectator() && player.distanceToSqr(Vec3.atCenterOf(sourcePos)) <= radiusSqr).isEmpty();
+
+        boolean hasNearbyPlayer = !level.getEntitiesOfClass(Player.class, spawnArea,
+                player -> player.isAlive() && !player.isCreative() && !player.isSpectator() && player.distanceToSqr(Vec3.atCenterOf(sourcePos)) <= radiusSqr).isEmpty();
 
         if (!hasNearbyPlayer) {
             return;
@@ -103,6 +106,11 @@ public class EntropyBlock extends Block {
     public void tick(BlockState state, ServerLevel level, BlockPos sourcePos, RandomSource random) {
 
         applyEntropyAura(level, sourcePos);
+        EntropyCreatureSpawns.get(level).check(level, sourcePos);
+
+        if (random.nextInt(100) == 0) {
+            trySpawnKrombul(level, sourcePos, random);
+        }
 
         if (random.nextInt(100) == 0) {
             playRandomEntropySound(level, sourcePos, random);
@@ -128,7 +136,7 @@ public class EntropyBlock extends Block {
 
         AABB area = new AABB(sourcePos).inflate(ENTROPY_RADIUS);
 
-        List<Entity> entities = level.getEntitiesOfClass(Entity.class, area, entity -> entity.isAlive() && !entity.isSpectator() && !(entity instanceof KrombulEntity));
+        List<Entity> entities = level.getEntitiesOfClass(Entity.class, area, entity -> entity.isAlive() && !entity.isSpectator() && !(entity instanceof KrombulEntity) && !(entity instanceof EntropyCreatureEntity));
 
         for (Entity entity : entities) {
             double distanceSqr = entity.position().distanceToSqr(center);

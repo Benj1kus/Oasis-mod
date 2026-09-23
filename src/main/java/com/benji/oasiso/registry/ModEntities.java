@@ -53,6 +53,8 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<DoumPalmChestBoatEntity>> DOUM_PALM_CHEST_BOAT = ENTITIES.register("doum_palm_chest_boat", () -> EntityType.Builder.<DoumPalmChestBoatEntity>of(DoumPalmChestBoatEntity::new, MobCategory.MISC).sized(1.375F, 0.5625F).clientTrackingRange(10).build(ResourceLocation.fromNamespaceAndPath(MODID, "doum_palm_chest_boat").toString()));
     public static final RegistryObject<EntityType<ChaosPortalEntity>> CHAOS_PORTAL_ENTITY = ENTITIES.register("chaos_portal_entity", () -> EntityType.Builder.<ChaosPortalEntity>of(ChaosPortalEntity::new, MobCategory.MISC).sized(2.0F, 2.0F).clientTrackingRange(64).updateInterval(1).build(ResourceLocation.fromNamespaceAndPath(MODID, "chaos_portal_entity").toString()));
     public static final RegistryObject<EntityType<EntropyPhysicsBlockEntity>> ENTROPY_PHYSICS_BLOCK = ENTITIES.register("entropy_physics_block", () -> EntityType.Builder.<EntropyPhysicsBlockEntity>of(EntropyPhysicsBlockEntity::new, MobCategory.MISC).sized(0.98F, 0.98F).clientTrackingRange(12).updateInterval(1).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_physics_block").toString()));
+    public static final RegistryObject<EntityType<EntropyCreatureEntity>> ENTROPY_CREATURE = ENTITIES.register("entropy_creature", () -> EntityType.Builder.of(EntropyCreatureEntity::new, MobCategory.MONSTER).sized(1.5f, 5.0f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_creature").toString()));
+
     private ModEntities() {
     }
 

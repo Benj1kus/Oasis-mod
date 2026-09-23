@@ -1,0 +1,27 @@
+{
+  "vertex": "oasiso:entropy_creature_screen",
+  "fragment": "oasiso:entropy_creature_distance",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    },
+    {
+      "name": "Sampler1"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "FieldSize",
+      "type": "float",
+      "count": 2,
+      "values": [
+        1,
+        1
+      ]
+    }
+  ]
+}

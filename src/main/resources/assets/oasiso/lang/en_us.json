@@ -138,6 +138,9 @@
   "item.oasiso.ctank_spawn_egg": "Osiris' Crusader Barbarian Spawn Egg",
   "item.oasiso.cpaladin_spawn_egg": "Osiris' Paladin Ramiel Spawn Egg",
   "item.oasiso.scarab_core": "Osiris' Scarab core",
+  "item.oasiso.entropy_creature_spawn_egg": "Entropy Creature Spawn Egg",
+
+
   "item.oasiso.config_scroll": "Config Scroll",
 
   "entity.oasiso.azumaal": "Osiris",
@@ -161,6 +164,8 @@
   "entity.oasiso.crusader_wizard": "Crusader Wizard",
   "entity.oasiso.crusader_warrior": "Crusader Warrior",
   "entity.oasiso.paladin": "Paladin Ramiel",
+  "entity.oasiso.entropy_creature": "Entropy Creature",
+
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
   "enchantment.oasiso.hammer_power": "Sand Hand",

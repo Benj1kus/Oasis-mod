@@ -224,6 +224,10 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.ENTROPY_CREATURE.get(),
+                EntropyCreatureRenderer::new
+        );
+        event.registerEntityRenderer(
                 Oasiso.KROMBUL.get(),
                 KrombulRenderer::new
         );

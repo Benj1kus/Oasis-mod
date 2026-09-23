@@ -27,6 +27,12 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> BEAM_LOOP = registerSoundEvent("beam_loop");
 
+    public static final RegistryObject<SoundEvent> CREATURE_IDLE1 = registerSoundEvent("creature_idle1");
+    public static final RegistryObject<SoundEvent> CREATURE_IDLE2 = registerSoundEvent("creature_idle2");
+    public static final RegistryObject<SoundEvent> CREATURE_HIT = registerSoundEvent("creature_hit");
+    public static final RegistryObject<SoundEvent> CREATURE_DEATH = registerSoundEvent("creature_death");
+    public static final RegistryObject<SoundEvent> CREATURE_SPAWN = registerSoundEvent("creature_spawn");
+
     public static final RegistryObject<SoundEvent> SCARAB_IDLE = registerSoundEvent("scarab_idle");
     public static final RegistryObject<SoundEvent> SCARAB_IDLE2 = registerSoundEvent("scarab_idle2");
     public static final RegistryObject<SoundEvent> SCARAB_IDLE3 = registerSoundEvent("scarab_idle3");

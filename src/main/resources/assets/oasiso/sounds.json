@@ -49,6 +49,12 @@
   "scarab_death": { "sounds": [ "oasiso:scarab_death" ] },
   "scarab_step": { "sounds": [ "oasiso:scarab_step" ] },
 
+  "creature_idle1": { "sounds": [ "oasiso:creature_idle1" ] },
+  "creature_idle2": { "sounds": [ "oasiso:creature_idle2" ] },
+  "creature_hit": { "sounds": [ "oasiso:creature_hit" ] },
+  "creature_death": { "sounds": [ "oasiso:creature_death" ] },
+  "creature_spawn": { "sounds": [ "oasiso:creature_spawn" ] },
+
   "stage2_idle1": { "sounds": [ "oasiso:stage2_idle1" ] },
   "stage2_idle2": { "sounds": [ "oasiso:stage2_idle2" ] },
   "stage2_idle3": { "sounds": [ "oasiso:stage2_idle3" ] },
