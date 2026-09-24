@@ -9,6 +9,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -138,6 +140,19 @@ public final class EntropySpiderIK {
                 double f = leg.phase * leg.phase * (3 - 2 * leg.phase);
                 double lift = Math.sin(Math.PI * leg.phase) * STEP_HEIGHT;
                 leg.foot = leg.from.lerp(leg.to, f).add(0, lift, 0);
+
+                if (leg.phase >= 1.0F && entity.level().isClientSide && entity.isAlive() && !entity.isSilent()) {
+
+                    var contact = entity.level().clip(new ClipContext(leg.foot.add(0, 0.05, 0), leg.foot.add(0, -0.20, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
+                    if (contact.getType() == HitResult.Type.BLOCK && contact.getDirection() == net.minecraft.core.Direction.UP) {
+
+                        float volume = 0.30F; //volume
+                        float pitch = 0.85F + entity.getRandom().nextFloat() * 0.30F; // rand from 0.85-0.30
+
+                        entity.level().playLocalSound(leg.foot.x, leg.foot.y, leg.foot.z, ModSounds.SCARAB_STEP.get(),
+                                SoundSource.HOSTILE, volume, pitch, false);
+                    }
+                }
             }
 
             Vector3f target = toLocal(leg.foot, base, angle).sub(center).add(0, -state.lift, 0);

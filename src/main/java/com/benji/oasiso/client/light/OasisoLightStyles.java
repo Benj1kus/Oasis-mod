@@ -43,10 +43,15 @@ public final class OasisoLightStyles {
         return result;
     }
 
+    public static void register(String blockId, Style style, float height) {
+        register(blockId, new Style(style.color(), style.accent(), style.radius(), style.strength(), style.fogRadius(), style.fogDensity(), style.halo(), height));
+    }
+
     public record Style(int color, int accent, float radius, float strength, float fogRadius, float fogDensity,
                         float halo, float height) {
         public Style {
-            if (!Float.isFinite(radius) || radius < 0.5F || radius > 8.0F || !Float.isFinite(strength) || strength < 0 || strength > 2 || !Float.isFinite(fogRadius) || fogRadius < 0 || fogRadius > radius || !Float.isFinite(fogDensity) || fogDensity < 0 || fogDensity > 0.6F || !Float.isFinite(halo) || halo < 0 || halo > 1 || !Float.isFinite(height) || height < 0 || height > 3)
+            //LIMITS!!!! for optimization read it if you are not idiot :c
+            if (!Float.isFinite(radius) || radius < 0.5F || radius > 8.0F || !Float.isFinite(strength) || strength < 0 || strength > 2 || !Float.isFinite(fogRadius) || fogRadius < 0 || fogRadius > radius || !Float.isFinite(fogDensity) || fogDensity < 0 || fogDensity > 0.6F || !Float.isFinite(halo) || halo < 0 || halo > 1 || !Float.isFinite(height) || height < -3 || height > 3)
                 throw new IllegalArgumentException("YOU STUPID IDIOT");
         }
     }
