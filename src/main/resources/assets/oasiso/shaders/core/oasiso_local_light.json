@@ -1,0 +1,7 @@
+{
+  "vertex": "oasiso:oasiso_local_light",
+  "fragment": "oasiso:oasiso_local_light",
+  "attributes": ["Position", "UV0"],
+  "samplers": [{"name": "Scene"}, {"name": "Depth"}, {"name": "Shadows"}],
+  "uniforms": []
+}

@@ -87,6 +87,7 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> ENTROPY_STEAM = PARTICLES.register("entropy_steam", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> KR_SAND_DUST = PARTICLES.register("kr_sand_dust", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ENTROPY_LIGHTNING = PARTICLES.register("entropy_lightning", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENTROPY_EYE = PARTICLES.register("entropy_eye", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
@@ -424,6 +425,8 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.ENTROPY_WORM.get(), EntropyWormEntity.createAttributes().build());
+            event.put(ModEntities.ENTROPY_SPIDER.get(), EntropySpiderEntity.createAttributes().build());
             event.put(ModEntities.ENTROPY_CREATURE.get(), EntropyCreatureEntity.createAttributes().build());
             event.put(ModEntities.OSIRIS_SPLIT.get(), OsirisSplitEntity.createAttributes().build());
             event.put(ModEntities.OSIRIS_TENTACLE.get(), OsirisTentacleEntity.createAttributes().build());

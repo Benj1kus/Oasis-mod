@@ -35,9 +35,9 @@ vec3 waterPalette(float light, float threshold) {
     if (band < 1.0) return vec3(0.200, 0.040, 0.180);
     if (band < 2.0) return vec3(0.320, 0.100, 0.280);
     if (band < 3.0) return vec3(0.080, 0.300, 0.480);
-    if (band < 4.0) return vec3(0.100, 0.550, 0.680);
-    if (band < 5.0) return vec3(0.120, 0.720, 0.620);
-    return vec3(0.880, 0.980, 1.000);
+    if (band < 4.0) return vec3(0.200, 0.750, 0.920);
+    if (band < 5.0) return vec3(0.500, 0.920, 0.980);
+    return vec3(0.950, 0.990, 1.000);
 }
 
 float frameHeight(float x, float seed, float t) {
@@ -62,8 +62,8 @@ vec4 paintWater(float distance, float shade, float lip, float pixel, float thres
         abs(distance + pixel * 3.2))) * lip;
     vec3 color = waterPalette(shade - shadow * 0.25, threshold);
     if (foam > 0.17 + threshold * 0.36) color = vec3(0.82, 0.42, 0.72);
-    if (foam > 0.39 + threshold * 0.43) color = vec3(0.35, 0.85, 0.95);
-    if (foam > 0.80 + threshold * 0.19) color = vec3(0.90, 0.98, 1.00);
+    if (foam > 0.39 + threshold * 0.43) color = vec3(0.60, 0.94, 1.00);
+    if (foam > 0.80 + threshold * 0.19) color = vec3(0.95, 0.99, 1.00);
     float alpha = OPACITY * (0.80 + 0.20 * smoothstep(0.0, 0.6, foam));
     return vec4(color * alpha, alpha);
 }
@@ -72,6 +72,7 @@ vec4 bubble(vec2 p, float anchor, float random, float phase, float period,
             float seed, float pixel, float threshold) {
 
     float age = fract(Time / period + phase);
+
     if (age >= 0.97) return vec4(0.0);
     float growth = smoothstep(0.0, 0.18, age);
     float radius = (0.020 + 0.020 * random) * BUBBLE_SIZE * growth;

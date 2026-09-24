@@ -1,0 +1,99 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 10,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "worm",
+					"pivot": [0, 2.1, -0.05],
+					"cubes": [
+						{"origin": [1, 2.1, -1.05], "size": [0, 0, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "worm_head",
+					"parent": "worm",
+					"pivot": [0, 1, -31.5],
+					"cubes": [
+						{"origin": [-2, 0, -52.5], "size": [4, 4, 15], "uv": [92, 38]},
+						{"origin": [0, -3, -72.5], "size": [0, 12, 35], "uv": [0, 0]},
+						{"origin": [-8, -8, -38.5], "size": [16, 20, 0], "uv": [92, 57]}
+					]
+				},
+				{
+					"name": "worm_neck",
+					"parent": "worm_head",
+					"pivot": [0, 2, -37.54167],
+					"cubes": [
+						{"origin": [-2, 0, -37.5], "size": [4, 4, 15], "uv": [0, 86]}
+					]
+				},
+				{
+					"name": "worm_part1",
+					"parent": "worm_neck",
+					"pivot": [0, 2, -22.58333],
+					"cubes": [
+						{"origin": [-2, 0, -22.5], "size": [4, 4, 15], "uv": [0, 86]}
+					]
+				},
+				{
+					"name": "worm_part2",
+					"parent": "worm_part1",
+					"pivot": [0, 2, -7.4],
+					"cubes": [
+						{"origin": [-2, 0, -7.5], "size": [4, 4, 15], "uv": [0, 86]}
+					]
+				},
+				{
+					"name": "worm_part3",
+					"parent": "worm_part2",
+					"pivot": [0, 2, 7.5],
+					"cubes": [
+						{"origin": [-2, 0, 7.5], "size": [4, 4, 15], "uv": [0, 86]}
+					]
+				},
+				{
+					"name": "worm_part4",
+					"parent": "worm_part3",
+					"pivot": [0, 2, 22.33333],
+					"cubes": [
+						{"origin": [-2, 0, 22.5], "size": [4, 4, 15], "uv": [0, 86]}
+					]
+				},
+				{
+					"name": "worm_tail",
+					"parent": "worm_part4",
+					"pivot": [0, 2, 37.5],
+					"cubes": [
+						{"origin": [-2, 0, 37.5], "size": [4, 4, 15], "uv": [0, 86]},
+						{"origin": [0, -4, 44.5], "size": [0, 12, 27], "uv": [0, 47]}
+					]
+				},
+				{
+					"name": "eye_right",
+					"parent": "worm_head",
+					"pivot": [-2.2, 2, -48.5],
+					"cubes": [
+						{"origin": [-2.2, -4, -55.5], "size": [0, 14, 15], "uv": [226, 42], "mirror": true}
+					]
+				},
+				{
+					"name": "eye_left",
+					"parent": "worm_head",
+					"pivot": [2.2, 2, -48.5],
+					"cubes": [
+						{"origin": [2.2, -4, -55.5], "size": [0, 14, 15], "uv": [226, 42]}
+					]
+				}
+			]
+		}
+	]
+}

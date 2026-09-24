@@ -19,6 +19,7 @@
     "oasiso:nephritis_lamp",
     "oasiso:entropy_connector",
     "oasiso:entropy_magma",
-    "oasiso:entropy_soil"
+    "oasiso:entropy_soil",
+    "oasiso:entropy_lantern"
   ]
 }

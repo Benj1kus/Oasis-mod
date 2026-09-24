@@ -2,7 +2,7 @@
   "blend": {
     "func": "add",
     "srcrgb": "srcalpha",
-    "dstrgb": "1-srcalpha"
+    "dstrgb": "one"
   },
   "vertex": "oasiso:entropy_submerged",
   "fragment": "oasiso:entropy_submerged",

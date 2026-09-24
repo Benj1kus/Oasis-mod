@@ -45,7 +45,7 @@ public final class EntropyLiquidRender {
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA, com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE);
         try {
             RenderSystem.setShader(() -> shader);
            EntropyLiquidShaders.uniform(shader, "Time", (EntropyLiquidVfx.ticks + partial) / 20.0F);

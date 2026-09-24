@@ -54,6 +54,8 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<ChaosPortalEntity>> CHAOS_PORTAL_ENTITY = ENTITIES.register("chaos_portal_entity", () -> EntityType.Builder.<ChaosPortalEntity>of(ChaosPortalEntity::new, MobCategory.MISC).sized(2.0F, 2.0F).clientTrackingRange(64).updateInterval(1).build(ResourceLocation.fromNamespaceAndPath(MODID, "chaos_portal_entity").toString()));
     public static final RegistryObject<EntityType<EntropyPhysicsBlockEntity>> ENTROPY_PHYSICS_BLOCK = ENTITIES.register("entropy_physics_block", () -> EntityType.Builder.<EntropyPhysicsBlockEntity>of(EntropyPhysicsBlockEntity::new, MobCategory.MISC).sized(0.98F, 0.98F).clientTrackingRange(12).updateInterval(1).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_physics_block").toString()));
     public static final RegistryObject<EntityType<EntropyCreatureEntity>> ENTROPY_CREATURE = ENTITIES.register("entropy_creature", () -> EntityType.Builder.of(EntropyCreatureEntity::new, MobCategory.MONSTER).sized(1.5f, 5.0f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_creature").toString()));
+    public static final RegistryObject<EntityType<EntropyWormEntity>> ENTROPY_WORM = ENTITIES.register("entropy_worm", () -> EntityType.Builder.of(EntropyWormEntity::new, MobCategory.MONSTER).sized(1.75f, 1.75f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_worm").toString()));
+    public static final RegistryObject<EntityType<EntropySpiderEntity>> ENTROPY_SPIDER = ENTITIES.register("entropy_spider", () -> EntityType.Builder.of(EntropySpiderEntity::new, MobCategory.MONSTER).sized(1.125f, 1.125f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_spider").toString()));
 
     private ModEntities() {
     }
