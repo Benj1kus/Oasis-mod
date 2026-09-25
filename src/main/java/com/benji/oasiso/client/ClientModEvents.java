@@ -239,6 +239,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.APOLLYON.get(),
+                ApollyonRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.KROMBUL.get(),
                 KrombulRenderer::new
         );

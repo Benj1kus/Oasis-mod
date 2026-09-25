@@ -56,6 +56,7 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<EntropyCreatureEntity>> ENTROPY_CREATURE = ENTITIES.register("entropy_creature", () -> EntityType.Builder.of(EntropyCreatureEntity::new, MobCategory.MONSTER).sized(1.5f, 5.0f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_creature").toString()));
     public static final RegistryObject<EntityType<EntropyWormEntity>> ENTROPY_WORM = ENTITIES.register("entropy_worm", () -> EntityType.Builder.of(EntropyWormEntity::new, MobCategory.MONSTER).sized(1.75f, 1.75f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_worm").toString()));
     public static final RegistryObject<EntityType<EntropySpiderEntity>> ENTROPY_SPIDER = ENTITIES.register("entropy_spider", () -> EntityType.Builder.of(EntropySpiderEntity::new, MobCategory.MONSTER).sized(1.125f, 1.125f).build(ResourceLocation.fromNamespaceAndPath(MODID, "entropy_spider").toString()));
+    public static final RegistryObject<EntityType<ApollyonEntity>> APOLLYON = ENTITIES.register("apollyon", () -> EntityType.Builder.of(ApollyonEntity::new, MobCategory.MONSTER).sized(0.6f, 1.8f).build(ResourceLocation.fromNamespaceAndPath(MODID, "apollyon").toString()));
 
     private ModEntities() {
     }

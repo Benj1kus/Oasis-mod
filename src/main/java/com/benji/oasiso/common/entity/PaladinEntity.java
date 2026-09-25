@@ -374,7 +374,6 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     }
 
     public boolean isDeathSequenceActive() {
-
         return this.getAnimState() == STATE_DEATH;
     }
 

@@ -425,6 +425,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.APOLLYON.get(), ApollyonEntity.createAttributes().build());
             event.put(ModEntities.ENTROPY_WORM.get(), EntropyWormEntity.createAttributes().build());
             event.put(ModEntities.ENTROPY_SPIDER.get(), EntropySpiderEntity.createAttributes().build());
             event.put(ModEntities.ENTROPY_CREATURE.get(), EntropyCreatureEntity.createAttributes().build());

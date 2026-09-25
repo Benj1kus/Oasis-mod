@@ -9,11 +9,11 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-final class EntropyCreatureOutlinePass {
+final class ApollyonOutlinePass {
     private static int framebuffer, colorTexture, depthTexture, fieldFramebuffer, fieldTexture, width, height, fieldWidth, fieldHeight;
     private static int modelVao, modelVbo, screenVao, screenVbo;
 
-    private EntropyCreatureOutlinePass() {
+    private ApollyonOutlinePass() {
     }
 
     static void draw(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha) {
@@ -39,7 +39,7 @@ final class EntropyCreatureOutlinePass {
             GL30.glClearBufferfv(GL11.GL_COLOR, 0, memory.floats(0, 0, 0, 0));
             GL30.glClearBufferfv(GL11.GL_DEPTH, 0, memory.floats(1));
 
-            int mask = EntropyCreatureShaders.mask.getId();
+            int mask = ApollyonShaders.mask.getId();
             GL20.glUseProgram(mask);
             matrix(mask, "ModelViewMat", RenderSystem.getModelViewMatrix(), memory);
             matrix(mask, "ProjMat", RenderSystem.getProjectionMatrix(), memory);
@@ -62,7 +62,7 @@ final class EntropyCreatureOutlinePass {
             GL30.glClearBufferfv(GL11.GL_COLOR, 0, memory.floats(0, 0, 0, 0));
 
             if (!scissor(0, 0, fieldWidth, fieldHeight, null, minX, minY, maxX, maxY, crossesCamera, 22)) return;
-            int horizontal = EntropyCreatureShaders.distance.getId();
+            int horizontal = ApollyonShaders.distance.getId();
             GL20.glUseProgram(horizontal);
             GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler0"), 0);
             GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler1"), 1);
@@ -81,7 +81,7 @@ final class EntropyCreatureOutlinePass {
             GL11.glEnable(GL11.GL_BLEND);
             GL20.glBlendEquationSeparate(GL14.GL_FUNC_ADD, GL14.GL_FUNC_ADD);
             GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            int outline = EntropyCreatureShaders.outline.getId();
+            int outline = ApollyonShaders.outline.getId();
             GL20.glUseProgram(outline);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler0"), 0);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler1"), 1);
