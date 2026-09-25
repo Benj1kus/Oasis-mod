@@ -28,6 +28,12 @@ import java.util.*;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT)
 public final class AzumalitCrystalLightning {
+
+    public static final boolean DEBUG_ARCS = true;
+    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+    private static int stages, draws;
+    private static Matrix4f worldView, worldProjection;
+    private static ClientLevel matrixWorld;
     private static final double VIEW_RANGE = 48.0;
     private static final int MAX_VISIBLE_ARCS = 12;
     private static final float BOLT_WIDTH = .10F;
@@ -36,7 +42,6 @@ public final class AzumalitCrystalLightning {
     private static final MultiBufferSource.BufferSource BUFFER = MultiBufferSource.immediate(new BufferBuilder(8192));
     private static ClientLevel world;
     private static int ticks;
-    private static Matrix4f worldView, worldProjection;
     private static ShaderInstance shader;
 
     private AzumalitCrystalLightning() {
@@ -51,7 +56,9 @@ public final class AzumalitCrystalLightning {
             CRYSTALS.clear();
             CACHE.clear();
             ticks = 0;
+            stages = draws = 0;
             worldView = worldProjection = null;
+            matrixWorld = null;
         }
         if (world == null || mc.player == null || mc.isPaused()) return;
         if (ticks++ % 5 != 0) return;
@@ -59,41 +66,67 @@ public final class AzumalitCrystalLightning {
         Vec3 eye = mc.gameRenderer.getMainCamera().getPosition();
         BlockPos camera = BlockPos.containing(eye);
 
-        for (int x = (camera.getX() - 48) >> 4; x <= (camera.getX() + 48) >> 4; x++)
+        for (int x = (camera.getX() - 48) >> 4; x <= (camera.getX() + 48) >> 4; x++) {
             for (int z = (camera.getZ() - 48) >> 4; z <= (camera.getZ() + 48) >> 4; z++) {
                 var chunk = world.getChunkSource().getChunk(x, z, ChunkStatus.FULL, false);
                 if (chunk == null) continue;
-                for (var be : chunk.getBlockEntities().values())
-                    if (be instanceof AzumalitCrystalBlockEntity crystal && !crystal.isRemoved() && Vec3.atCenterOf(crystal.getBlockPos()).distanceToSqr(eye) < VIEW_RANGE * VIEW_RANGE)
+                for (var be : chunk.getBlockEntities().values()) {
+                    if (be instanceof AzumalitCrystalBlockEntity crystal && !crystal.isRemoved() && Vec3.atCenterOf(crystal.getBlockPos()).distanceToSqr(eye) < VIEW_RANGE * VIEW_RANGE) {
                         CRYSTALS.add(crystal);
+                    }
+                }
             }
+        }
+        // log debug
         CACHE.keySet().retainAll(CRYSTALS);
+        if (DEBUG_ARCS && ticks % 200 == 1) {
+            long valid = CRYSTALS.stream().filter(c -> c.strikeStart() >= 0 && c.path().size() >= 2).count();
+            long active = CRYSTALS.stream().filter(c -> c.visualAge(0) < AzumalitCrystalBlockEntity.LIFE_TICKS).count();
+            LOGGER.info("[AzumalitArc] shader={}, crystals={}, withPath={}, active={}, stages={}, draws={}", shader != null, CRYSTALS.size(), valid, active, stages, draws);
+            for (var c : CRYSTALS)
+                if (c.strikeStart() >= 0) {
+                    LOGGER.info("[AzumalitArc] pos={}, points={}, serverStart={}, clientTime={}, visualAge={}", c.getBlockPos(), c.path().size(), c.strikeStart(), world.getGameTime(), c.visualAge(0));
+                    break;
+                }
+            stages = draws = 0;
+        }
     }
 
     @SubscribeEvent
     public static void render(RenderLevelStageEvent event) {
+        Minecraft mc = Minecraft.getInstance();
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             worldView = new Matrix4f(event.getPoseStack().last().pose());
             worldProjection = new Matrix4f(RenderSystem.getProjectionMatrix());
+            matrixWorld = mc.level;
             return;
         }
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        stages++;
         Matrix4f view = worldView, projection = worldProjection;
+        ClientLevel capturedWorld = matrixWorld;
         worldView = worldProjection = null;
-        Minecraft mc = Minecraft.getInstance();
-        if (shader == null || world == null || world != mc.level || view == null || projection == null) return;
+        matrixWorld = null;
+        if (shader == null || world == null || world != mc.level || capturedWorld != world || view == null || projection == null)
+            return;
+
         Vec3 eye = event.getCamera().getPosition();
         float partial = mc.isPaused() ? mc.getFrameTime() : event.getPartialTick();
+
         List<AzumalitCrystalBlockEntity> active = new ArrayList<>();
         for (var crystal : CRYSTALS) {
-            float age = (world.getGameTime() - crystal.strikeStart()) + partial;
-            if (!crystal.isRemoved() && crystal.getLevel() == world && crystal.strikeStart() >= 0 && age >= 0 && age < AzumalitCrystalBlockEntity.LIFE_TICKS && crystal.path().size() >= 2 && event.getFrustum().isVisible(crystal.getRenderBoundingBox()))
+            if (crystal.isRemoved() || crystal.getLevel() != world || crystal.strikeStart() < 0) continue;
+            float age = crystal.visualAge(partial);
+            if (age >= 0 && age < AzumalitCrystalBlockEntity.LIFE_TICKS && crystal.path().size() >= 2 && event.getFrustum().isVisible(crystal.getRenderBoundingBox())) {
                 active.add(crystal);
+            }
         }
         if (active.isEmpty()) return;
+
         active.sort(Comparator.comparingDouble(c -> Vec3.atCenterOf(c.getBlockPos()).distanceToSqr(eye)));
-        ShaderInstance previous = RenderSystem.getShader();
+
         shader.safeGetUniform("ArcProjection").set(projection);
+        ShaderInstance previousShader = RenderSystem.getShader();
         VertexConsumer out = BUFFER.getBuffer(ArcRenderType.ARC);
         try {
             for (int i = 0; i < Math.min(MAX_VISIBLE_ARCS, active.size()); i++) {
@@ -103,24 +136,27 @@ public final class AzumalitCrystalLightning {
                     geometry = new Geometry(crystal);
                     CACHE.put(crystal, geometry);
                 }
-                float age = (world.getGameTime() - crystal.strikeStart()) + partial;
+                float age = crystal.visualAge(partial);
                 draw(out, view, eye, geometry, age);
+                draws++;
             }
         } finally {
             BUFFER.endBatch(ArcRenderType.ARC);
-            if (previous != null) RenderSystem.setShader(() -> previous);
+            if (previousShader != null) RenderSystem.setShader(() -> previousShader);
         }
     }
 
     private static void draw(VertexConsumer out, Matrix4f view, Vec3 eye, Geometry g, float age) {
-        int ageByte = Math.round(age / AzumalitCrystalBlockEntity.LIFE_TICKS * 255);
+        int ageByte = Math.round(Mth.clamp(age / AzumalitCrystalBlockEntity.LIFE_TICKS, 0F, 1F) * 255);
         int seedByte = (int) (g.seed & 255);
         float distanceFade = Mth.clamp((48F - (float) g.points.get(0).distanceTo(eye)) / 10F, 0, 1);
         int alpha = Math.round(distanceFade * 255);
         if (alpha <= 0) return;
+
         float growth = Mth.clamp(age / AzumalitCrystalBlockEntity.IMPACT_TICKS, 0, 1);
         double reached = g.length * growth;
         double walked = 0;
+
         if (age < 14) {
             for (int i = 1; i < g.points.size(); i++) {
                 Vec3 a = g.points.get(i - 1), b = g.points.get(i);
@@ -132,16 +168,21 @@ public final class AzumalitCrystalLightning {
                 walked += length;
             }
 
-            for (Branch branch : g.branches)
-                if (growth > branch.at)
+            for (Branch branch : g.branches) {
+                if (growth > branch.at) {
                     ribbon(out, view, eye, branch.from, branch.to, .14F, branch.at, branch.at + .08F, ageByte, 64, seedByte, alpha);
+                }
+            }
         }
+
         float since = age - AzumalitCrystalBlockEntity.IMPACT_TICKS;
         if (since < 0) return;
+
         if (since < 10) {
             float radius = .12F + .72F * Mth.clamp(since / 7F, 0, 1);
             quad(out, view, eye, g.impact, g.u.scale(radius), g.v.scale(radius), ageByte, 255, seedByte, alpha);
         }
+
         for (Spark spark : g.sparks) {
             float local = since - spark.delay;
             if (local < 0 || local > spark.life) continue;
@@ -162,6 +203,7 @@ public final class AzumalitCrystalLightning {
         if (side.lengthSqr() < .0000001) side = direction.cross(new Vec3(0, 1, 0));
         if (side.lengthSqr() < .0000001) side = direction.cross(new Vec3(1, 0, 0));
         side = side.normalize().scale(width * .5);
+
         vertex(out, view, eye, a.subtract(side), 0, v0, age, kind, seed, alpha);
         vertex(out, view, eye, a.add(side), 1, v0, age, kind, seed, alpha);
         vertex(out, view, eye, b.add(side), 1, v1, age, kind, seed, alpha);
@@ -222,15 +264,20 @@ public final class AzumalitCrystalLightning {
             }
         }
     }
+//debug=check
+    public static void registerArcShader(RegisterShadersEvent event) throws IOException {
+        LOGGER.info("[AzumalitArc] RegisterShadersEvent received");
 
-    @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static final class ShaderRegistration {
-        @SubscribeEvent
-        public static void register(RegisterShadersEvent event) throws IOException {
-            shader = null;
-            CACHE.clear();
-            event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "azumalit_crystal_arc"), DefaultVertexFormat.POSITION_COLOR_TEX), value -> shader = value);
-        }
+        shader = null;
+        CACHE.clear();
+        worldView = worldProjection = null;
+        matrixWorld = null;
+
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "azumalit_crystal_arc"), DefaultVertexFormat.POSITION_COLOR_TEX), loaded -> {
+            shader = loaded;
+
+            LOGGER.info("[AzumalitArc] Shader assigned; ArcProjection={}", loaded.getUniform("ArcProjection") != null);
+        });
     }
 
     private static final class ArcRenderType extends RenderType {

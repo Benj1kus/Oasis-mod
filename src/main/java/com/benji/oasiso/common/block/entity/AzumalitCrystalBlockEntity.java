@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -41,6 +42,8 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
     private Direction hitFace = Direction.UP;
     private List<Vec3> path = List.of();
     private boolean impactPending;
+    private int receivedArcAge;
+    private long clientArrivalTick = Long.MIN_VALUE;
 
     public AzumalitCrystalBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.AZUMALIT_CRYSTAL_BE.get(), pos, state);
@@ -86,7 +89,7 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
             break;
         }
         if (hit == null) {
-            nextStrike = now + 40 + server.random.nextInt(61); // Рядом только воздух — повторим позже.
+            nextStrike = now + 40 + server.random.nextInt(61);
             return;
         }
         Vec3 normal = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
@@ -160,6 +163,14 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
         return strikeStart;
     }
 
+    public float visualAge(float partialTick) {
+        if (level == null || strikeStart < 0 || path.size() < 2) return LIFE_TICKS;
+        if (!level.isClientSide) return (level.getGameTime() - strikeStart) + partialTick;
+        long now = level.getGameTime();
+        if (clientArrivalTick == Long.MIN_VALUE || now < clientArrivalTick) clientArrivalTick = now;
+        return receivedArcAge + (now - clientArrivalTick) + partialTick;
+    }
+
     public long seed() {
         return seed;
     }
@@ -186,7 +197,8 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        nextStrike = tag.getLong("NextArc");
+        if (tag.contains("NextArc")) nextStrike = tag.getLong("NextArc");
+        long previousStart = strikeStart, previousSeed = seed;
         strikeStart = tag.contains("ArcStart") ? tag.getLong("ArcStart") : -1;
         seed = tag.getLong("ArcSeed");
         hitFace = Direction.from3DDataValue(tag.getInt("ArcFace"));
@@ -198,13 +210,20 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
             if (Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z)) points.add(new Vec3(x, y, z));
         }
         path = List.copyOf(points);
+        if (strikeStart != previousStart || seed != previousSeed || clientArrivalTick == Long.MIN_VALUE) {
+            long fallback = level == null ? 0 : level.getGameTime() - strikeStart;
+            receivedArcAge = (int) Math.max(0, Math.min(LIFE_TICKS, tag.contains("ArcAge") ? tag.getInt("ArcAge") : fallback));
+            clientArrivalTick = level != null && level.isClientSide ? level.getGameTime() : Long.MIN_VALUE;
+        }
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
-        boolean active = level != null && strikeStart >= 0 && level.getGameTime() - strikeStart < LIFE_TICKS;
+        long age = level == null ? LIFE_TICKS : level.getGameTime() - strikeStart;
+        boolean active = level != null && strikeStart >= 0 && age >= 0 && age < LIFE_TICKS;
         tag.putLong("ArcStart", active ? strikeStart : -1);
+        tag.putInt("ArcAge", active ? (int) age : LIFE_TICKS);
         if (active) {
             tag.putLong("ArcSeed", seed);
             tag.putInt("ArcFace", hitFace.get3DDataValue());
@@ -224,6 +243,12 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         load(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
+        CompoundTag tag = packet.getTag();
+        if (tag != null) handleUpdateTag(tag);
     }
 
     @Override

@@ -39,6 +39,7 @@
     "oasiso:wizard_column",
     "oasiso:azumalit_block",
     "oasiso:azumalit_crystal",
+    "oasiso:not_azumalit_crystal",
     "oasiso:entropy_connector",
     "oasiso:kr_stone",
     "oasiso:entropy_magma",

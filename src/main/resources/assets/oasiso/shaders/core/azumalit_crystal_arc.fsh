@@ -7,7 +7,7 @@ const vec3 PURPLE=vec3(0.56,0.25,1.0);
 const vec3 PINK=vec3(1.0,0.32,0.77);
 const vec3 BLUE=vec3(0.14,0.73,1.0);
 const vec3 WHITE=vec3(1.0);
-const float IMPACT=4.0;
+const float IMPACT=2.0;
 const float LIFE=26.0;
 
 float bayer2(vec2 p) {
@@ -56,7 +56,6 @@ void main() {
         alpha=max(white,glow);
         float fade=1.0-smoothstep(3.0,9.0,after);
         if(kind>30.0)fade*=.65;
-
         vec2 cell=floor(vec2(texCoord.x*9.0,texCoord.y*64.0));
         float erosion=smoothstep(1.5,9.0,after);
         if(hash(cell+arcData.b*79.0)<erosion*.92)discard;
