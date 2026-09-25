@@ -98,6 +98,8 @@ public final class ModItems {
     public static final RegistryObject<Item> TITANA_STATUE_ITEM = ITEMS.register("titana_statue", () -> new GeoBlockItem(ModBlocks.TITANA_STATUE.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/titana_statue.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/titana_statue.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/empty.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> CACTOS_ITEM = ITEMS.register("cactos", () -> new BlockItem(ModBlocks.CACTOS.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_LANTERN_ITEM = ITEMS.register("entropy_lantern", () -> new BlockItem(ModBlocks.ENTROPY_LANTERN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> AZUMALIT_CRYSTAL_ITEM = ITEMS.register("azumalit_crystal", () -> new BlockItem(ModBlocks.AZUMALIT_CRYSTAL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> AZUMALINE_GROWTH_ITEM = ITEMS.register("azumaline_growth", () -> new BlockItem(ModBlocks.AZUMALINE_GROWTH.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));

@@ -24,6 +24,7 @@ public final class OasisoLightStyles {
     static {
         // registering blocks:
         register("entropy_lantern", ENTROPY);
+        register("azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
         // register("karak_lamp", new Style(0x88FFFF, 0xD899FF,5.0F, 0.8F, 2.0F, 0.15F, 0.20F, 0.5F)); btw this is example tho
     }
 

@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "oasiso:block/azumaline_growth"
+    },
+    "facing=down": {
+      "model": "oasiso:block/azumaline_growth",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "oasiso:block/azumaline_growth",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "oasiso:block/azumaline_growth",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "oasiso:block/azumaline_growth",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "oasiso:block/azumaline_growth",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/tinted_cross",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "cross": "oasiso:block/azumaline_growth",
+    "particle": "oasiso:block/azumaline_growth"
+  }
+}
