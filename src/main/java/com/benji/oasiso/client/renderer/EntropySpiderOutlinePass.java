@@ -9,11 +9,11 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-final class EntropyWormOutlinePass {
+final class EntropySpiderOutlinePass {
     private static int framebuffer, colorTexture, depthTexture, fieldFramebuffer, fieldTexture, width, height, fieldWidth, fieldHeight;
     private static int modelVao, modelVbo, screenVao, screenVbo;
 
-    private EntropyWormOutlinePass() {
+    private EntropySpiderOutlinePass() {
     }
 
     static void draw(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha) {
@@ -39,7 +39,7 @@ final class EntropyWormOutlinePass {
             GL30.glClearBufferfv(GL11.GL_COLOR, 0, memory.floats(0, 0, 0, 0));
             GL30.glClearBufferfv(GL11.GL_DEPTH, 0, memory.floats(1));
 
-            int mask = EntropyWormShaders.mask.getId();
+            int mask = EntropySpiderShaders.mask.getId();
             GL20.glUseProgram(mask);
             matrix(mask, "ModelViewMat", RenderSystem.getModelViewMatrix(), memory);
             matrix(mask, "ProjMat", RenderSystem.getProjectionMatrix(), memory);
@@ -62,7 +62,7 @@ final class EntropyWormOutlinePass {
             GL30.glClearBufferfv(GL11.GL_COLOR, 0, memory.floats(0, 0, 0, 0));
 
             if (!scissor(0, 0, fieldWidth, fieldHeight, null, minX, minY, maxX, maxY, crossesCamera, 22)) return;
-            int horizontal = EntropyWormShaders.distance.getId();
+            int horizontal = EntropySpiderShaders.distance.getId();
             GL20.glUseProgram(horizontal);
             GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler0"), 0);
             GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler1"), 1);
@@ -81,7 +81,7 @@ final class EntropyWormOutlinePass {
             GL11.glEnable(GL11.GL_BLEND);
             GL20.glBlendEquationSeparate(GL14.GL_FUNC_ADD, GL14.GL_FUNC_ADD);
             GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            int outline = EntropyWormShaders.outline.getId();
+            int outline = EntropySpiderShaders.outline.getId();
             GL20.glUseProgram(outline);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler0"), 0);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler1"), 1);
@@ -166,7 +166,7 @@ final class EntropyWormOutlinePass {
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, depthTexture, 0);
         GL11.glDrawBuffer(GL30.GL_COLOR_ATTACHMENT0);
         if (GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER) != GL30.GL_FRAMEBUFFER_COMPLETE)
-            throw new IllegalStateException("Entropy Worm mask framebuffer is incomplete");
+            throw new IllegalStateException("Entropy Spider mask framebuffer is incomplete");
         fieldWidth = Math.max(1, (w + 1) / 2);
         fieldHeight = Math.max(1, (h + 1) / 2);
         fieldFramebuffer = GL30.glGenFramebuffers();
@@ -175,7 +175,7 @@ final class EntropyWormOutlinePass {
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, fieldTexture, 0);
         GL11.glDrawBuffer(GL30.GL_COLOR_ATTACHMENT0);
         if (GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER) != GL30.GL_FRAMEBUFFER_COMPLETE)
-            throw new IllegalStateException("Entropy Worm distance framebuffer is incomplete");
+            throw new IllegalStateException("Entropy Spider distance framebuffer is incomplete");
     }
 
     private static int texture(int internal, int format, int type, int w, int h) {

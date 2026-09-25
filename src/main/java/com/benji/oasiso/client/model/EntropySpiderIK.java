@@ -146,10 +146,10 @@ public final class EntropySpiderIK {
                     var contact = entity.level().clip(new ClipContext(leg.foot.add(0, 0.05, 0), leg.foot.add(0, -0.20, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
                     if (contact.getType() == HitResult.Type.BLOCK && contact.getDirection() == net.minecraft.core.Direction.UP) {
 
-                        float volume = 0.30F; //volume
+                        float volume = 0.55F; //volume
                         float pitch = 0.85F + entity.getRandom().nextFloat() * 0.30F; // rand from 0.85-0.30
 
-                        entity.level().playLocalSound(leg.foot.x, leg.foot.y, leg.foot.z, ModSounds.SCARAB_STEP.get(),
+                        entity.level().playLocalSound(leg.foot.x, leg.foot.y, leg.foot.z, ModSounds.ESPIDER_STEP.get(),
                                 SoundSource.HOSTILE, volume, pitch, false);
                     }
                 }

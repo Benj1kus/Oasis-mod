@@ -33,6 +33,19 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> CREATURE_DEATH = registerSoundEvent("creature_death");
     public static final RegistryObject<SoundEvent> CREATURE_SPAWN = registerSoundEvent("creature_spawn");
 
+    public static final RegistryObject<SoundEvent> ENTROPY_DEATH = registerSoundEvent("entropy_death");
+
+    public static final RegistryObject<SoundEvent> ESPIDER_IDLE1 = registerSoundEvent("espider_idle1");
+    public static final RegistryObject<SoundEvent> ESPIDER_IDLE2 = registerSoundEvent("espider_idle2");
+    public static final RegistryObject<SoundEvent> ESPIDER_IDLE3 = registerSoundEvent("espider_idle3");
+    public static final RegistryObject<SoundEvent> ESPIDER_HURT = registerSoundEvent("espider_hurt");
+    public static final RegistryObject<SoundEvent> ESPIDER_STEP = registerSoundEvent("espider_step");
+
+    public static final RegistryObject<SoundEvent> EWORM_IDLE1 = registerSoundEvent("eworm_idle1");
+    public static final RegistryObject<SoundEvent> EWORM_IDLE2 = registerSoundEvent("eworm_idle2");
+    public static final RegistryObject<SoundEvent> EWORM_IDLE3 = registerSoundEvent("eworm_idle3");
+    public static final RegistryObject<SoundEvent> EWORM_HURT = registerSoundEvent("eworm_hurt");
+
     public static final RegistryObject<SoundEvent> SCARAB_IDLE = registerSoundEvent("scarab_idle");
     public static final RegistryObject<SoundEvent> SCARAB_IDLE2 = registerSoundEvent("scarab_idle2");
     public static final RegistryObject<SoundEvent> SCARAB_IDLE3 = registerSoundEvent("scarab_idle3");

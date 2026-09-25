@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -8,7 +9,9 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -283,6 +286,25 @@ public class EntropyWormEntity extends Monster implements GeoEntity, GlowmaskEnt
 
     public float wavePhase(float partial) {
         return Mth.lerp(partial, oldWavePhase, wavePhase) + (getId() & 255);
+    }
+
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {ModSounds.EWORM_IDLE1.get(), ModSounds.EWORM_IDLE2.get(), ModSounds.EWORM_IDLE3.get()};
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.EWORM_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.ENTROPY_DEATH.get();
     }
 
     @Override

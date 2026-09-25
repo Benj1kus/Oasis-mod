@@ -49,6 +49,19 @@
   "scarab_death": { "sounds": [ "oasiso:scarab_death" ] },
   "scarab_step": { "sounds": [ "oasiso:scarab_step" ] },
 
+  "espider_idle1": { "sounds": [ "oasiso:espider_idle1" ] },
+  "espider_idle2": { "sounds": [ "oasiso:espider_idle2" ] },
+  "espider_idle3": { "sounds": [ "oasiso:espider_idle3" ] },
+  "espider_hurt": { "sounds": [ "oasiso:espider_hurt" ] },
+  "espider_step": { "sounds": [ "oasiso:espider_step" ] },
+
+  "eworm_idle1": { "sounds": [ "oasiso:eworm_idle1" ] },
+  "eworm_idle2": { "sounds": [ "oasiso:eworm_idle2" ] },
+  "eworm_idle3": { "sounds": [ "oasiso:eworm_idle3" ] },
+  "eworm_hurt": { "sounds": [ "oasiso:eworm_hurt" ] },
+
+  "entropy_death": { "sounds": [ "oasiso:entropy_death" ] },
+
   "creature_idle1": { "sounds": [ "oasiso:creature_idle1" ] },
   "creature_idle2": { "sounds": [ "oasiso:creature_idle2" ] },
   "creature_hit": { "sounds": [ "oasiso:creature_hit" ] },
