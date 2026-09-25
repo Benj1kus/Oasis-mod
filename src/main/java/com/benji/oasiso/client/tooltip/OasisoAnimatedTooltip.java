@@ -49,6 +49,7 @@ public record OasisoAnimatedTooltip(List<Part> parts) implements TooltipComponen
     public record Sparks(int auraDark, int auraBright, int coreDark, int coreBright, int flash) {
         public static final Sparks RED = new Sparks(0x6C091B, 0xF23B4D, 0xA00E28, 0xFF5360, 0xFFD4C7);
         public static final Sparks BLUE = new Sparks(0x00FFC3, 0x69FFDC, 0x33DDFF, 0x2FF588, 0x45E0FF);
+        public static final Sparks PURPLE = new Sparks(0xB76CFF, 0xE7BAFF, 0x8000FF, 0xD042FF, 0xF1D3FF);
         public static final Sparks GOLD = new Sparks(0x6C4009, 0xF2BB3B, 0xA0660E, 0xFFD553, 0xFFF2C7);
     }
 

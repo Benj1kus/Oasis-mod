@@ -1,8 +1,7 @@
 package com.benji.oasiso.common.block;
 
 import com.benji.oasiso.Oasiso;
-import com.benji.oasiso.common.entity.KrombulEntity;
-import com.benji.oasiso.common.entity.EntropyCreatureEntity;
+import com.benji.oasiso.common.entity.*;
 import com.benji.oasiso.common.world.EntropyCreatureSpawns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -136,7 +135,13 @@ public class EntropyBlock extends Block {
 
         AABB area = new AABB(sourcePos).inflate(ENTROPY_RADIUS);
 
-        List<Entity> entities = level.getEntitiesOfClass(Entity.class, area, entity -> entity.isAlive() && !entity.isSpectator() && !(entity instanceof KrombulEntity) && !(entity instanceof EntropyCreatureEntity));
+        List<Entity> entities = level.getEntitiesOfClass(Entity.class, area, entity -> entity.isAlive()
+                && !entity.isSpectator()
+                && !(entity instanceof KrombulEntity)
+                && !(entity instanceof EntropyCreatureEntity)
+                && !(entity instanceof EntropySpiderEntity)
+                && !(entity instanceof EntropyWormEntity)
+                && !(entity instanceof ApollyonEntity));
 
         for (Entity entity : entities) {
             double distanceSqr = entity.position().distanceToSqr(center);

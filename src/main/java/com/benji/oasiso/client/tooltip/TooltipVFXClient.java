@@ -2,6 +2,7 @@ package com.benji.oasiso.client.tooltip;
 
 import com.benji.oasiso.common.item.*;
 import com.benji.oasiso.common.util.OasisoTextFx;
+import com.benji.oasiso.registry.ModItems;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -1067,10 +1068,66 @@ public final class TooltipVFXClient {
         // before part
         parts.add(part(Component.literal(before), CYAN_GRAD));
 
+        // highlited word
         parts.add(part(
                 Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
                 YELLOW_GRAD
         ).glow().sparks(OasisoAnimatedTooltip.Sparks.GOLD));
+
+        // after part
+        parts.add(part(Component.literal(after), CYAN_GRAD));
+
+        return new OasisoAnimatedTooltip(parts);
+    }
+
+    //APOLLYON SPAWN EGG
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onApollyonSpawnEggTooltip(
+            RenderTooltipEvent.GatherComponents event
+    ) {
+        if (!event.getItemStack().is(ModItems.APOLLYON_SPAWN_EGG.get())) {
+            return;
+        }
+
+        var elements = event.getTooltipElements();
+        if (elements.stream().anyMatch(e -> e.right().map(OasisoAnimatedTooltip.class::isInstance).orElse(false))) {
+            return;
+        }
+
+        int index = Math.min(1, elements.size());
+
+        elements.add(index++, Either.right(apollyonFirstLine()));
+    }
+
+    private static OasisoAnimatedTooltip apollyonFirstLine() {
+        String fullText = Component.translatable("tooltip.oasiso.apollyon1").getString();
+        String selectedText = Component.translatable("tooltip.oasiso.apollyon2").getString();
+
+        int start = selectedText.isEmpty() ? -1 : fullText.indexOf(selectedText);
+        if (start < 0) {
+            selectedText = "Apollyon";
+            start = fullText.indexOf(selectedText);
+        }
+
+        if (start < 0) {
+            return OasisoAnimatedTooltip.line(
+                    part(Component.literal(fullText), PURPLE_GRAD).withoutShine()
+            );
+        }
+
+        String before = fullText.substring(0, start);
+        String after = fullText.substring(start + selectedText.length());
+        var parts = new ArrayList<OasisoAnimatedTooltip.Part>();
+
+        // before part
+        parts.add(part(Component.literal(before), CYAN_GRAD));
+
+        // highlited word
+        parts.add(part(
+                Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
+                PURPLE_GRAD
+        ).glow().sparks(OasisoAnimatedTooltip.Sparks.PURPLE));
 
         // after part
         parts.add(part(Component.literal(after), CYAN_GRAD));

@@ -24,6 +24,7 @@ public final class ApollyonShaders {
 
     @SubscribeEvent
     public static void register(RegisterShadersEvent event) throws IOException {
+        ApollyonSpearImpact.registerShader(event);
         ApollyonOutlinePass.release();
         mask = distance = outline = null;
         event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "entropy_worm_mask"), DefaultVertexFormat.POSITION_TEX), shader -> mask = shader);

@@ -145,7 +145,7 @@
   "item.oasiso.entropy_creature_spawn_egg": "Entropy Creature Spawn Egg",
   "item.oasiso.espider_spawn_egg": "Entropy Spider Spawn Egg",
   "item.oasiso.eworm_spawn_egg": "Entropy Worm Spawn Egg",
-
+  "item.oasiso.apollyon_spawn_egg": "Apollyon Spawn Egg",
 
   "item.oasiso.config_scroll": "Config Scroll",
 
@@ -263,6 +263,8 @@
   "tooltip.oasiso.core22": "Oasis block",
   "tooltip.oasiso.ebk": "Press [G] to enter turret mode",
   "tooltip.oasiso.ebk1": "[G]",
+  "tooltip.oasiso.apollyon1": "Apollyon Angel of Entropy",
+  "tooltip.oasiso.apollyon2": "Apollyon",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

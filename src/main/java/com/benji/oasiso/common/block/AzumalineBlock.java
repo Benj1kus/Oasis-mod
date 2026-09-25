@@ -65,7 +65,8 @@ public class AzumalineBlock extends Block implements SimpleWaterloggedBlock {
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction direction = state.getValue(FACING);
         BlockPos attachedPos = pos.relative(direction.getOpposite());
-        return level.getBlockState(attachedPos).is(ModBlocks.AZUMALIT_CRYSTAL.get());
+        BlockState attachedState = level.getBlockState(attachedPos);
+        return attachedState.is(ModBlocks.AZUMALIT_CRYSTAL.get()) || attachedState.is(ModBlocks.NOT_AZUMALIT_CRYSTAL.get());
     }
 
     @Override

@@ -112,6 +112,7 @@ public class ApollyonRenderer extends GeoEntityRenderer<ApollyonEntity> {
             var p = bone.getLocalPosition();
             Vec3 worldTip = new Vec3(Mth.lerp(partial, entity.xo, entity.getX()) + p.x, Mth.lerp(partial, entity.yo, entity.getY()) + p.y, Mth.lerp(partial, entity.zo, entity.getZ()) + p.z);
             ApollyonSpearTrail.sample(entity, worldTip, partial);
+            ApollyonSpearImpact.sample(entity, worldTip);
         }
     }
 

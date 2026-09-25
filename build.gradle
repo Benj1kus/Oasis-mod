@@ -121,6 +121,9 @@ mixin {
 repositories {
     maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
     maven { url "https://maven.theillusivec4.top/" }
+    maven {
+        url = "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
@@ -132,6 +135,7 @@ dependencies {
     implementation "com.benji.dialoguestudio:dlgstd:1.0.0"
     implementation "com.benji.titlestudio:ttlstd:1.0.0"
 
+    compileOnly fg.deobf("curse.maven:embeddium-908741:5681725")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.9.1+1.20.1:api")
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.9.1+1.20.1")
 }

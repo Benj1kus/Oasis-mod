@@ -2,7 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.benji.oasiso.mixin.client",
+  "plugin": "com.benji.oasiso.mixin.OasisoEntropyMixinPlugin",
   "compatibilityLevel": "JAVA_17",
-  "client": ["EntropyBlockModelMixin"],
-  "injectors": {"defaultRequire": 1}
+  "client": [
+    "EntropyBlockModelMixin",
+    "embeddium.EmbeddiumEntropyBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

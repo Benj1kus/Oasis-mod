@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AzumalitCrystalBlockEntity extends BlockEntity {
+    public static final double MIN_RANGE = 6.0;
     public static final double RANGE = 20.0;
     public static final int IMPACT_TICKS = 2;
     public static final int LIFE_TICKS = 26;
@@ -76,7 +77,7 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
 
         Vec3 source = Vec3.atCenterOf(worldPosition);
         BlockHitResult hit = null;
-        for (int attempt = 0; attempt < 24; attempt++) {
+        for (int attempt = 0; attempt < 32; attempt++) {
             Vec3 direction = new Vec3(server.random.nextDouble() * 2 - 1, server.random.nextDouble() * 2 - 1, server.random.nextDouble() * 2 - 1);
             if (direction.lengthSqr() < .05) continue;
             Vec3 end = source.add(direction.normalize().scale(RANGE));
@@ -84,7 +85,7 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
             BlockHitResult test = clip(server, source, end);
             if (test.getType() != HitResult.Type.BLOCK || test.getBlockPos().equals(worldPosition)) continue;
             double distance = test.getLocation().distanceTo(source);
-            if (distance < .65 || distance > RANGE) continue;
+            if (distance < MIN_RANGE || distance > RANGE) continue;
             hit = test;
             break;
         }

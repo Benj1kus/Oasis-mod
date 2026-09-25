@@ -2,6 +2,7 @@ package com.benji.oasiso.common.entity;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.ApollyonTeleportController;
+import com.benji.oasiso.common.entity.ai.ApollyonSpearAttack;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -28,14 +29,22 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
-    // Время начала общее для сервера и всех наблюдающих клиентов.
+
     private static final EntityDataAccessor<Long> TELEPORT_START = SynchedEntityData.defineId(
             ApollyonEntity.class, EntityDataSerializers.LONG);
-    public static final int TELEPORT_OUT = 8;     // Распад: 0.4 секунды.
-    public static final int TELEPORT_HIDDEN = 4;  // Скрытая смена позиции: 0.2 секунды.
-    public static final int TELEPORT_IN = 8;      // Сборка: 0.4 секунды.
+    public static final int TELEPORT_OUT = 8;
+    public static final int TELEPORT_HIDDEN = 4;
+    public static final int TELEPORT_IN = 8;
     public static final int TELEPORT_TOTAL = TELEPORT_OUT + TELEPORT_HIDDEN + TELEPORT_IN;
+
     private final ApollyonTeleportController teleportController = new ApollyonTeleportController(this);
+    private static final EntityDataAccessor<Integer> COMBAT_MODE = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> PUSHED_PLAYER = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
+
+    private final ApollyonSpearAttack spearAttack = new ApollyonSpearAttack(this);
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("attack");
+    private static final RawAnimation JUMP = RawAnimation.begin().thenPlayAndHold("jump");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public ApollyonEntity(EntityType<? extends Monster> type, Level level) {
@@ -52,17 +61,46 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(TELEPORT_START, -1L);
+        entityData.define(COMBAT_MODE, 0);
+        entityData.define(PUSHED_PLAYER, -1);
     }
 
-    public long getTeleportStart() { return entityData.get(TELEPORT_START); }
-    public boolean isTeleporting() { return isAlive() && getTeleportStart() >= 0; }
-    public boolean isAttackControllingMovement() { return attackControlsMovement; }
+    public int getCombatMode() {
+        return entityData.get(COMBAT_MODE);
+    }
+
+    public void setCombatMode(int mode) {
+        entityData.set(COMBAT_MODE, mode);
+    }
+
+    public int getPushedPlayerId() {
+        return entityData.get(PUSHED_PLAYER);
+    }
+
+    public void setPushedPlayerId(int id) {
+        entityData.set(PUSHED_PLAYER, id);
+    }
+
+    public boolean isPushingPlayer() {
+        return isAlive() && getCombatMode() == 1 && getPushedPlayerId() >= 0;
+    }
+
+    public long getTeleportStart() {
+        return entityData.get(TELEPORT_START);
+    }
+
+    public boolean isTeleporting() {
+        return isAlive() && getTeleportStart() >= 0;
+    }
+
+    public boolean isAttackControllingMovement() {
+        return attackControlsMovement;
+    }
 
     public float teleportAge(float partial) {
-        return isTeleporting() ? (float)(level().getGameTime() - getTeleportStart()) + partial : -1;
+        return isTeleporting() ? (float) (level().getGameTime() - getTeleportStart()) + partial : -1;
     }
 
-    // 0 = обычная модель, 1 = полностью рассыпалась.
     public float teleportDissolve(float partial) {
         float age = teleportAge(partial);
         if (age < 0) return 0;
@@ -85,12 +123,15 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     @Override
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps, boolean teleport) {
         if (isTeleporting()) {
-            // Координаты от сервера ставим сразу: никакого полёта модели между точками.
             super.lerpTo(x, y, z, yaw, pitch, 0, teleport);
             setPos(x, y, z);
-            xo = x; yo = y; zo = z;
-            setYRot(yaw); setXRot(pitch);
-            yRotO = yaw; xRotO = pitch;
+            xo = x;
+            yo = y;
+            zo = z;
+            setYRot(yaw);
+            setXRot(pitch);
+            yRotO = yaw;
+            xRotO = pitch;
         } else {
             super.lerpTo(x, y, z, yaw, pitch, steps, teleport);
         }
@@ -101,7 +142,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
                 .add(Attributes.MAX_HEALTH, 650.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 20.0D)
+                .add(Attributes.ATTACK_DAMAGE, 15.0D)
                 .add(Attributes.FOLLOW_RANGE, 30.0D);
     }
 
@@ -138,11 +179,25 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (!isAlive()) {
-            if (isTeleporting()) endTeleport();
+            spearAttack.cancel();
             return;
         }
+        faceTarget();
+        if (spearAttack.tick()) return;
         if (teleportController.tick()) return;
         if (attackControlsMovement) return;
+        updateHover(.30, .12, .18);
+    }
+
+    public void resetHover() {
+        hoverY = Double.NaN;
+    }
+
+    public boolean atHoverHeight(double tolerance) {
+        return !Double.isNaN(hoverY) && Math.abs(getY() - hoverY) < tolerance;
+    }
+
+    public void updateHover(double maxSpeed, double response, double smoothing) {
         if (tickCount % 4 == 0 || Double.isNaN(hoverY)) {
             Vec3 from = position().add(0, .5, 0);
             Vec3 to = new Vec3(getX(), level().getMinBuildHeight(), getZ());
@@ -150,9 +205,26 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
             hoverY = hit.getType() == HitResult.Type.BLOCK ? hit.getLocation().y + HOVER_HEIGHT : getY();
         }
         double bob = Math.sin((tickCount + getId() * 7) * .045) * .09;
-        double desiredSpeed = Mth.clamp((hoverY + bob - getY()) * .12, -.30, .30);
-        double speed = Mth.lerp(.18, getDeltaMovement().y, desiredSpeed);
+        double desiredSpeed = Mth.clamp((hoverY + bob - getY()) * response, -maxSpeed, maxSpeed);
+        double speed = Mth.lerp(smoothing, getDeltaMovement().y, desiredSpeed);
         setDeltaMovement(0, speed, 0);
+    }
+
+    private void faceTarget() {
+        var target = getTarget();
+        if (target == null || !target.isAlive()) return;
+        double dx = target.getX() - getX(), dz = target.getZ() - getZ();
+        if (dx * dx + dz * dz < .0001) return;
+        float yaw = (float) (Math.atan2(dz, dx) * 180 / Math.PI) - 90;
+        setYRot(Mth.approachDegrees(getYRot(), yaw, 20));
+        yBodyRot = yHeadRot = getYRot();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (isAlive()) yBodyRot = yHeadRot = getYRot();
+        else if (!level().isClientSide) spearAttack.cancel();
     }
 
     @Override
@@ -167,8 +239,12 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 5, event -> {
-            return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
+        controllers.add(new AnimationController<ApollyonEntity>(this, "controller", 0, event ->
+                event.setAndContinue(switch (getCombatMode()) {
+                    case 1 -> ATTACK;
+                    case 2 -> JUMP;
+                    default -> IDLE;
+                })).setCustomInstructionKeyframeHandler(event -> {
         }));
     }
 
