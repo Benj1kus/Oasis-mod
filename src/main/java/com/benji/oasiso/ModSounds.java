@@ -137,6 +137,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY3 = registerSoundEvent("entropy3");
     public static final RegistryObject<SoundEvent> ENTROPY_PULSE = registerSoundEvent("entropy_pulse");
     public static final RegistryObject<SoundEvent> ENTROPY_LIGHTNING = registerSoundEvent("entropy_lightning");
+    public static final RegistryObject<SoundEvent> CRYSTAL_HIT = registerSoundEvent("crystal_hit");
 
 
     //caser
