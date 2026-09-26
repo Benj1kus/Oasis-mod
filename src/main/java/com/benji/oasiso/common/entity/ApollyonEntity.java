@@ -2,7 +2,8 @@ package com.benji.oasiso.common.entity;
 
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.ApollyonTeleportController;
-import com.benji.oasiso.common.entity.ai.ApollyonSpearAttack;
+import com.benji.oasiso.common.entity.ai.ApollyonCombatController;
+import org.joml.Vector3f;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,8 +31,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
 
-    private static final EntityDataAccessor<Long> TELEPORT_START = SynchedEntityData.defineId(
-            ApollyonEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Long> TELEPORT_START = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
     public static final int TELEPORT_OUT = 8;
     public static final int TELEPORT_HIDDEN = 4;
     public static final int TELEPORT_IN = 8;
@@ -41,7 +41,49 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     private static final EntityDataAccessor<Integer> COMBAT_MODE = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> PUSHED_PLAYER = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
 
-    private final ApollyonSpearAttack spearAttack = new ApollyonSpearAttack(this);
+    private static final EntityDataAccessor<Integer> RESTRAINED_PLAYER = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
+    private static final RawAnimation SUMMON = RawAnimation.begin().thenPlay("summon");
+
+    private static final EntityDataAccessor<Integer> SPEAR_TARGET = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> SPEAR_MARK_TIME = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
+    private final ApollyonCombatController combat = new ApollyonCombatController(this);
+    private static final RawAnimation DRILL = RawAnimation.begin().thenPlay("attack_drill");
+    private static final EntityDataAccessor<Long> DRILL_BEGAN = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Vector3f> DRILL_AXIS = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.VECTOR3);
+    private static final RawAnimation COMMON = RawAnimation.begin().thenPlay("attack_common");
+    private static final EntityDataAccessor<Long> SHOCK_START = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<BlockPos> SHOCK_ORIGIN = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<Vector3f> SHOCK_OFFSET = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.VECTOR3);
+    public static final int DEFENCE_TICKS = 40;
+    public static final float DEFENCE_CHANCE = .20F;
+    private static final RawAnimation DEFENCE = RawAnimation.begin().thenPlayAndHold("defence");
+    private long defenceUntil = -1;
+
+    public boolean isDefending() {
+        return isAlive() && getCombatMode() == 8 && (level().isClientSide || level().getGameTime() < defenceUntil);
+    }
+
+    public boolean tryBeginDefence() {
+        if (level().isClientSide || !isAlive() || isRemoved()) return false;
+        if (isDefending()) return true;
+        if (isTeleporting() || getRandom().nextFloat() >= DEFENCE_CHANCE) return false;
+        combat.cancel();
+        defenceUntil = level().getGameTime() + DEFENCE_TICKS;
+        setCombatMode(8);
+        setAttackControlsMovement(true);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        return true;
+    }
+
+    @Override
+    public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile projectile && com.benji.oasiso.common.entity.ai.ApollyonProjectileDefence.tryDeflect(this, projectile)) {
+            return false;
+        }
+        return super.hurt(source, amount);
+    }
+
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("attack");
     private static final RawAnimation JUMP = RawAnimation.begin().thenPlayAndHold("jump");
@@ -63,6 +105,85 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
         entityData.define(TELEPORT_START, -1L);
         entityData.define(COMBAT_MODE, 0);
         entityData.define(PUSHED_PLAYER, -1);
+        entityData.define(RESTRAINED_PLAYER, -1);
+        entityData.define(SPEAR_TARGET, -1);
+        entityData.define(SPEAR_MARK_TIME, -1L);
+        entityData.define(SHOCK_START, -1L);
+        entityData.define(DRILL_BEGAN, -1L);
+        entityData.define(DRILL_AXIS, new Vector3f(0, 0, 1));
+        entityData.define(SHOCK_ORIGIN, BlockPos.ZERO);
+        entityData.define(SHOCK_OFFSET, new Vector3f());
+    }
+
+    public void beginShockwave(Vec3 origin) {
+        BlockPos base = BlockPos.containing(origin);
+        entityData.set(SHOCK_ORIGIN, base);
+        entityData.set(SHOCK_OFFSET, new Vector3f((float) (origin.x - base.getX()), (float) (origin.y - base.getY()), (float) (origin.z - base.getZ())));
+        entityData.set(SHOCK_START, level().getGameTime());
+    }
+
+    public long getShockwaveStart() {
+        return entityData.get(SHOCK_START);
+    }
+
+    public Vec3 getShockwaveOrigin() {
+        BlockPos base = entityData.get(SHOCK_ORIGIN);
+        Vector3f offset = entityData.get(SHOCK_OFFSET);
+        return new Vec3(base.getX() + offset.x, base.getY() + offset.y, base.getZ() + offset.z);
+    }
+
+    public void beginDrill(Vec3 axis) {
+        setDrillAxis(axis);
+        entityData.set(DRILL_BEGAN, level().getGameTime());
+    }
+
+    public void setDrillAxis(Vec3 axis) {
+        entityData.set(DRILL_AXIS, new Vector3f((float) axis.x, (float) axis.y, (float) axis.z));
+    }
+
+    public Vec3 getDrillAxis() {
+        Vector3f v = entityData.get(DRILL_AXIS);
+        return new Vec3(v.x, v.y, v.z);
+    }
+
+    public float getDrillAge(float partial) {
+        long start = entityData.get(DRILL_BEGAN);
+        return start < 0 ? -1 : (float) (level().getGameTime() - start) + partial;
+    }
+
+    public boolean isDrilling() {
+        return isAlive() && !isRemoved() && getCombatMode() == 5;
+    }
+
+    public void setSpearTarget(int id) {
+        entityData.set(SPEAR_TARGET, id);
+        entityData.set(SPEAR_MARK_TIME, id < 0 ? -1L : level().getGameTime());
+    }
+
+    public int getSpearTargetId() {
+        return entityData.get(SPEAR_TARGET);
+    }
+
+    public long getSpearMarkTime() {
+        return entityData.get(SPEAR_MARK_TIME);
+    }
+
+    public int getRestrainedPlayerId() {
+        return entityData.get(RESTRAINED_PLAYER);
+    }
+
+    public void setRestrainedPlayerId(int id) {
+        entityData.set(RESTRAINED_PLAYER, id);
+    }
+
+    public boolean isRestrainingPlayer(int playerId) {
+        return isAlive() && !isRemoved() && getRestrainedPlayerId() == playerId && (getCombatMode() == 3 || getCombatMode() == 1);
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (!level().isClientSide) combat.cancel();
+        super.remove(reason);
     }
 
     public int getCombatMode() {
@@ -142,7 +263,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
                 .add(Attributes.MAX_HEALTH, 650.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 15.0D)
+                .add(Attributes.ATTACK_DAMAGE, 12.0D)
                 .add(Attributes.FOLLOW_RANGE, 30.0D);
     }
 
@@ -179,11 +300,21 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (!isAlive()) {
-            spearAttack.cancel();
+            combat.cancel();
             return;
         }
         faceTarget();
-        if (spearAttack.tick()) return;
+        if (getCombatMode() == 8) {
+            if (level().getGameTime() < defenceUntil) {
+                getNavigation().stop();
+                setDeltaMovement(Vec3.ZERO);
+                return;
+            }
+            defenceUntil = -1;
+            setCombatMode(0);
+            setAttackControlsMovement(false);
+        }
+        if (combat.tick()) return;
         if (teleportController.tick()) return;
         if (attackControlsMovement) return;
         updateHover(.30, .12, .18);
@@ -211,6 +342,8 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     }
 
     private void faceTarget() {
+        if (getCombatMode() == 5 && getDrillAge(0) >= com.benji.oasiso.common.entity.ai.ApollyonAttackTimeline.DRILL_START)
+            return;
         var target = getTarget();
         if (target == null || !target.isAlive()) return;
         double dx = target.getX() - getX(), dz = target.getZ() - getZ();
@@ -224,7 +357,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     public void tick() {
         super.tick();
         if (isAlive()) yBodyRot = yHeadRot = getYRot();
-        else if (!level().isClientSide) spearAttack.cancel();
+        else if (!level().isClientSide) combat.cancel();
     }
 
     @Override
@@ -239,12 +372,17 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<ApollyonEntity>(this, "controller", 0, event ->
-                event.setAndContinue(switch (getCombatMode()) {
-                    case 1 -> ATTACK;
-                    case 2 -> JUMP;
-                    default -> IDLE;
-                })).setCustomInstructionKeyframeHandler(event -> {
+        controllers.add(new AnimationController<ApollyonEntity>(this, "controller", 0, event -> event.setAndContinue(switch (getCombatMode()) {
+            case 1 -> ATTACK;
+            case 2 -> JUMP;
+            case 3 -> SUMMON;
+            case 4 -> COMMON;
+            case 5 -> DRILL;
+            case 6 -> SUMMON;
+            case 7 -> IDLE;
+            case 8 -> DEFENCE;
+            default -> IDLE;
+        })).setCustomInstructionKeyframeHandler(event -> {
         }));
     }
 

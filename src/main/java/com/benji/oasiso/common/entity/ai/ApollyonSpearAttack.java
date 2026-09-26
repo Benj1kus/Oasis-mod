@@ -1,6 +1,7 @@
 package com.benji.oasiso.common.entity.ai;
 
 import com.benji.oasiso.common.entity.ApollyonEntity;
+import com.benji.oasiso.Oasiso;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
@@ -14,42 +15,48 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-
 public final class ApollyonSpearAttack {
+
+    public static final int SUMMON_TICKS = 40;
     public static final double START_RANGE = 10;
     public static final double BACKSTEP = 2;
     public static final double DASH_SPEED = 1.10;
     public static final double PUSH_SPEED = .32;
-    public static final int UNARMED_INTERVAL = 20, ARMED_INTERVAL = 40;
+    public static final int UNARMED_INTERVAL = 10, ARMED_INTERVAL = 30;
     public static final TagKey<Item> RESIST_WEAPONS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("oasiso", "apollyon_resist_weapons"));
     private final ApollyonEntity mob;
     private Player victim;
-    private int cooldown = 40, age, recovery, lastDamage = -1000;
-    private boolean active, jumping, prepared, launched, caught, missed;
+    private int age, summonAge, recovery, lastDamage = -1000;
+    private boolean active, summoning, jumping, prepared, launched, caught, missed;
     private Vec3 retreat, dashAim, direction = Vec3.ZERO;
 
     public ApollyonSpearAttack(ApollyonEntity mob) {
         this.mob = mob;
     }
 
-    public boolean tick() {
+    public boolean isActive() {
+        return active;
+    }
+
+    public boolean tick(boolean allowStart) {
         if (!(mob.level() instanceof ServerLevel)) return false;
         if (!active) {
-            if (cooldown > 0) {
-                cooldown--;
-                return false;
-            }
+            if (!allowStart) return false;
             if (mob.isTeleporting() || mob.isAttackControllingMovement() || mob.isPassenger() || mob.isVehicle())
                 return false;
             if (!(mob.getTarget() instanceof Player player) || !valid(player) || !mob.hasLineOfSight(player) || horizontal(mob.position(), player.position()) > START_RANGE * START_RANGE || Math.abs(mob.getY() - player.getY()) > 12)
                 return false;
+            if (!(player instanceof ServerPlayer serverPlayer) || !ApollyonRestraint.acquire(mob, serverPlayer))
+                return false;
             active = true;
+            summoning = true;
+            summonAge = 0;
             jumping = prepared = launched = caught = missed = false;
             victim = player;
             age = 0;
             lastDamage = -1000;
             mob.setAttackControlsMovement(true);
-            mob.setCombatMode(1);
+            mob.setCombatMode(3);
             mob.getNavigation().stop();
             mob.setDeltaMovement(Vec3.ZERO);
         }
@@ -59,11 +66,24 @@ public final class ApollyonSpearAttack {
             if (recovery >= ApollyonAttackTimeline.JUMP_LENGTH && (mob.atHoverHeight(.45) || recovery > 80)) finish();
             return true;
         }
+
         if (!valid(victim) || victim.distanceToSqr(mob) > 24 * 24) {
             jump();
             return true;
         }
+        if (!ApollyonRestraint.refresh(mob, victim)) {
+            jump();
+            return true;
+        }
         mob.setTarget(victim);
+        spawnEyes();
+        if (summoning) {
+            mob.setDeltaMovement(Vec3.ZERO);
+            if (summonAge++ < SUMMON_TICKS) return true;
+            summoning = false;
+            age = 0;
+            mob.setCombatMode(1);
+        }
         if (age >= ApollyonAttackTimeline.END) {
             jump();
             return true;
@@ -123,15 +143,23 @@ public final class ApollyonSpearAttack {
             mob.setDeltaMovement(Vec3.ZERO);
             return;
         }
-        Vec3 old = victim.getDeltaMovement();
-        victim.setDeltaMovement(direction.x * PUSH_SPEED, old.y, direction.z * PUSH_SPEED);
-        victim.hurtMarked = true;
+        ApollyonRestraint.push(mob, victim, direction.scale(PUSH_SPEED));
         Vec3 desired = victim.position().subtract(direction.scale(2.05)).add(0, .75, 0);
         Vec3 correction = desired.subtract(mob.position()).scale(.40);
         mob.setDeltaMovement(limit(correction.add(direction.scale(PUSH_SPEED)), .50));
         int interval = hasWeapon(victim) ? ARMED_INTERVAL : UNARMED_INTERVAL;
         if (age - lastDamage >= interval) damage();
 
+    }
+
+    private void spawnEyes() {
+        if (mob.tickCount % 6 != 0) return;
+        var level = (ServerLevel) mob.level();
+        for (int i = 0; i < 2; i++) {
+            double angle = mob.getRandom().nextDouble() * Math.PI * 2;
+            double radius = .65 + mob.getRandom().nextDouble() * .30;
+            level.sendParticles(Oasiso.ENTROPY_EYE.get(), victim.getX() + Math.cos(angle) * radius, victim.getY() + .25 + mob.getRandom().nextDouble() * 1.65, victim.getZ() + Math.sin(angle) * radius, 1, 0, 0, 0, 0);
+        }
     }
 
     private void damage() {
@@ -148,7 +176,9 @@ public final class ApollyonSpearAttack {
     }
 
     private void jump() {
+        ApollyonRestraint.release(mob);
         jumping = true;
+        summoning = false;
         recovery = 0;
         caught = false;
         mob.setPushedPlayerId(-1);
@@ -158,17 +188,19 @@ public final class ApollyonSpearAttack {
     }
 
     private void finish() {
+        ApollyonRestraint.release(mob);
         active = false;
+        summoning = false;
         jumping = false;
         victim = null;
         mob.setCombatMode(0);
         mob.setPushedPlayerId(-1);
         mob.setAttackControlsMovement(false);
-        cooldown = 60 + mob.getRandom().nextInt(41);
     }
 
     public void cancel() {
         if (active) finish();
+        else ApollyonRestraint.release(mob);
     }
 
     public static boolean hasWeapon(Player player) {

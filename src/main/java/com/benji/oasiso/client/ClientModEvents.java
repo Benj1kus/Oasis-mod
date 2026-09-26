@@ -239,6 +239,12 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.SPEAR_ATTACK.get(),
+                SpearAttackRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
                 ModEntities.APOLLYON.get(),
                 ApollyonRenderer::new
         );
