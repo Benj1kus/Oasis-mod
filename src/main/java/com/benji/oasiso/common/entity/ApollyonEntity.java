@@ -1,8 +1,11 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ai.ApollyonTeleportController;
 import com.benji.oasiso.common.entity.ai.ApollyonCombatController;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import org.joml.Vector3f;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -55,7 +58,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     private static final EntityDataAccessor<BlockPos> SHOCK_ORIGIN = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Vector3f> SHOCK_OFFSET = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.VECTOR3);
     public static final int DEFENCE_TICKS = 40;
-    public static final float DEFENCE_CHANCE = .20F;
+    public static final float DEFENCE_CHANCE = .10F;
     private static final RawAnimation DEFENCE = RawAnimation.begin().thenPlayAndHold("defence");
     private long defenceUntil = -1;
 
@@ -384,6 +387,24 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
             default -> IDLE;
         })).setCustomInstructionKeyframeHandler(event -> {
         }));
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {ModSounds.APOL_IDLE1.get(), ModSounds.APOL_IDLE2.get(), ModSounds.APOL_IDLE3.get()};
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.APOL_HIT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.PALADIN_DEATH.get();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import com.benji.oasiso.Oasiso;
 import net.minecraft.server.level.ServerLevel;
@@ -59,6 +60,7 @@ public final class ApollyonSpearAttack {
             mob.setCombatMode(3);
             mob.getNavigation().stop();
             mob.setDeltaMovement(Vec3.ZERO);
+            mob.playSound(ModSounds.APOL_SUMMON.get(), 1.0F, 1.0F);
         }
         if (jumping) {
             mob.updateHover(.60, .24, .32);
@@ -97,6 +99,8 @@ public final class ApollyonSpearAttack {
             launched = true;
             direction = flatDirection(mob.position(), victim.position());
             dashAim = victim.position().subtract(direction.scale(2.05)).add(0, .75, 0);
+            mob.level().playSound(null, victim.getX(), victim.getY(), victim.getZ(),
+                    ModSounds.APOL_SWING.get(), mob.getSoundSource(), 2.5F, 1.0F);
         }
         if (!prepared) mob.setDeltaMovement(Vec3.ZERO);
         else if (!launched) {
@@ -130,6 +134,8 @@ public final class ApollyonSpearAttack {
             mob.setPushedPlayerId(victim.getId());
             lastDamage = age;
             mob.setDeltaMovement(limit(aim.subtract(mob.position()), .45));
+            mob.level().playSound(null, victim.getX(), victim.getY(), victim.getZ(),
+                    ModSounds.APOL_SPEAR.get(), mob.getSoundSource(), 3.0F, 1.0F);
         } else if (motion.lengthSqr() < .001) {
             missed = true;
         }

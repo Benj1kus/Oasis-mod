@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -80,6 +81,7 @@ public final class ApollyonCommonAttack {
             hit = true;
             victim.hurt(mob.damageSources().mobAttack(mob), (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE));
             mob.setDeltaMovement(Vec3.ZERO);
+            mob.playSound(ModSounds.APOL_HUH.get(), 1.0F, 1.0F);
         } else {
             mob.setDeltaMovement(motion);
             if (motion.lengthSqr() < .001) missed = true;

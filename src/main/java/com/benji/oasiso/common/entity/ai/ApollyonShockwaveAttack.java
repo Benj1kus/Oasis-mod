@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import net.minecraft.core.Direction;
@@ -14,7 +15,7 @@ public final class ApollyonShockwaveAttack {
     public static final double LOW_HEIGHT = 1;
     public static final int WAIT_TICKS = 40;
     public static final double JUMP_RISE = 10;
-    public static final double WAVE_RADIUS = 8;
+    public static final double WAVE_RADIUS = 10;
     public static final int WAVE_TICKS = 44;
     public static final int LIGHTNING_COUNT = 24;
     private final ApollyonEntity mob;
@@ -109,6 +110,7 @@ public final class ApollyonShockwaveAttack {
         spawnLightning(origin);
         launchPlayers(origin);
         double first = 1 - Math.pow(1 - 1.0 / Math.max(1, ApollyonAttackTimeline.JUMP_LENGTH), 3);
+        mob.playSound(ModSounds.PALADIN_SHOCK.get(), 1.0F, 1.0F);
         mob.setDeltaMovement(0, Math.min(1.5, JUMP_RISE * first), 0);
         age = 1;
     }

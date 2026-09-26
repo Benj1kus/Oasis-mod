@@ -41,6 +41,18 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ESPIDER_HURT = registerSoundEvent("espider_hurt");
     public static final RegistryObject<SoundEvent> ESPIDER_STEP = registerSoundEvent("espider_step");
 
+    public static final RegistryObject<SoundEvent> APOL_IDLE1 = registerSoundEvent("apol_idle1");
+    public static final RegistryObject<SoundEvent> APOL_IDLE2 = registerSoundEvent("apol_idle2");
+    public static final RegistryObject<SoundEvent> APOL_IDLE3 = registerSoundEvent("apol_idle3");
+    public static final RegistryObject<SoundEvent> APOL_HIT = registerSoundEvent("apol_hit");
+    public static final RegistryObject<SoundEvent> APOL_SWING = registerSoundEvent("apol_swing");
+    public static final RegistryObject<SoundEvent> APOL_HUH = registerSoundEvent("apol_huh");
+    public static final RegistryObject<SoundEvent> APOL_SPEAR = registerSoundEvent("apol_spear");
+    public static final RegistryObject<SoundEvent> APOL_SUMMON = registerSoundEvent("apol_summon");
+    public static final RegistryObject<SoundEvent> APOL_TEL = registerSoundEvent("apol_tel");
+    public static final RegistryObject<SoundEvent> APOL_ALERT = registerSoundEvent("apol_alert");
+    public static final RegistryObject<SoundEvent> APOL_DRILL = registerSoundEvent("apol_drill");
+
     public static final RegistryObject<SoundEvent> EWORM_IDLE1 = registerSoundEvent("eworm_idle1");
     public static final RegistryObject<SoundEvent> EWORM_IDLE2 = registerSoundEvent("eworm_idle2");
     public static final RegistryObject<SoundEvent> EWORM_IDLE3 = registerSoundEvent("eworm_idle3");

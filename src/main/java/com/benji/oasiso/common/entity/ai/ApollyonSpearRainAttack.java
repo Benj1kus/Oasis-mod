@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import com.benji.oasiso.common.entity.SpearAttackEntity;
@@ -50,6 +51,7 @@ public final class ApollyonSpearRainAttack {
         mob.setCombatMode(6);
         mob.getNavigation().stop();
         mob.setDeltaMovement(Vec3.ZERO);
+        mob.playSound(ModSounds.APOL_SUMMON.get(), 1.0F, 1.0F);
         return true;
     }
 
@@ -85,6 +87,7 @@ public final class ApollyonSpearRainAttack {
 
     private boolean spawnWave() {
         if (!(mob.level() instanceof ServerLevel level)) return false;
+        mob.playSound(ModSounds.APOL_ALERT.get(), 2.0F, 1.0F);
         Vec3 target = victim.position();
         float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
         var type = BuiltInRegistries.ENTITY_TYPE.get(SPEAR_ID);

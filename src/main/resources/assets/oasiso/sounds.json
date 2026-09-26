@@ -61,6 +61,18 @@
   "eworm_idle3": { "sounds": [ "oasiso:eworm_idle3" ] },
   "eworm_hurt": { "sounds": [ "oasiso:eworm_hurt" ] },
 
+  "apol_idle1": { "sounds": [ "oasiso:apol_idle1" ] },
+  "apol_idle2": { "sounds": [ "oasiso:apol_idle2" ] },
+  "apol_idle3": { "sounds": [ "oasiso:apol_idle3" ] },
+  "apol_hit": { "sounds": [ "oasiso:apol_hit" ] },
+  "apol_huh": { "sounds": [ "oasiso:apol_huh" ] },
+  "apol_swing": { "sounds": [ "oasiso:apol_swing" ] },
+  "apol_spear": { "sounds": [ "oasiso:apol_spear" ] },
+  "apol_summon": { "sounds": [ "oasiso:apol_summon" ] },
+  "apol_tel": { "sounds": [ "oasiso:apol_tel" ] },
+  "apol_alert": { "sounds": [ "oasiso:apol_alert" ] },
+  "apol_drill": { "sounds": [ "oasiso:apol_drill" ] },
+
   "entropy_death": { "sounds": [ "oasiso:entropy_death" ] },
 
   "creature_idle1": { "sounds": [ "oasiso:creature_idle1" ] },

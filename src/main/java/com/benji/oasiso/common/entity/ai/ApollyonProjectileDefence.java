@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -75,7 +76,7 @@ public final class ApollyonProjectileDefence {
         projectile.hasImpulse = true;
         level.getChunkSource().broadcastAndSend(projectile, new ClientboundTeleportEntityPacket(projectile));
         level.getChunkSource().broadcastAndSend(projectile, new ClientboundSetEntityMotionPacket(projectile));
-        boss.playSound(SoundEvents.ITEM_BREAK, .9F, .9F + boss.getRandom().nextFloat() * .2F);
+        boss.playSound(ModSounds.APOL_SWING.get(), 1.0F, 1.0F);
         return true;
     }
 

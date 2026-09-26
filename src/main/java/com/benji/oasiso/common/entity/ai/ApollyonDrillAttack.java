@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity.ai;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import net.minecraft.core.BlockPos;
@@ -93,6 +94,7 @@ public final class ApollyonDrillAttack {
         float yaw = (float) (Math.atan2(flat.z, flat.x) * 180 / Math.PI) - 90;
         mob.setYRot(yaw);
         mob.yBodyRot = mob.yHeadRot = yaw;
+        mob.playSound(ModSounds.APOL_DRILL.get(), 1.0F, 1.0F);
     }
 
     private void moveForward() {
