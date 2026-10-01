@@ -122,6 +122,7 @@ public final class ModItems {
     public static final RegistryObject<Item> BOMBUL_BOTTLE = ITEMS.register("bombul_bottle", () -> new BombulBottleItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY = ITEMS.register("bombul_bottle_empty", () -> new EmptyBotItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> TITANA_HAMMER = ITEMS.register("titana_hammer", () -> new TitanaHammerItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> APOL_SPEAR = ITEMS.register("apol_spear", () -> new ApolSpearItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> SUPER_GOLD_HELMET = ITEMS.register("super_gold_helmet", () -> new SuperGoldArmorItem(ArmorItem.Type.HELMET, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SUPER_GOLD_CHESTPLATE = ITEMS.register("super_gold_chestplate", () -> new SuperGoldArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));

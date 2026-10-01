@@ -231,6 +231,7 @@ public class Oasiso {
     public static final RegistryObject<Item> BOMBUL_BOTTLE = ModItems.BOMBUL_BOTTLE;
     public static final RegistryObject<Item> BOMBUL_BOTTLE_EMPTY = ModItems.BOMBUL_BOTTLE_EMPTY;
     public static final RegistryObject<Item> TITANA_HAMMER = ModItems.TITANA_HAMMER;
+    public static final RegistryObject<Item> APOL_SPEAR = ModItems.APOL_SPEAR;
     public static final RegistryObject<Item> SUPER_GOLD_HELMET = ModItems.SUPER_GOLD_HELMET;
     public static final RegistryObject<Item> SUPER_GOLD_CHESTPLATE = ModItems.SUPER_GOLD_CHESTPLATE;
     public static final RegistryObject<Item> SUPER_GOLD_LEGGINGS = ModItems.SUPER_GOLD_LEGGINGS;

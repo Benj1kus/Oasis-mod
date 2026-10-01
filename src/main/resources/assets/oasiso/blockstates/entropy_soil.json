@@ -3,7 +3,12 @@
     "sand_layer=0": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=1,sand_from=up": {
       "model": "oasiso:block/entropy_soil_fullsand",
@@ -107,7 +112,12 @@
     "sand_layer=5,sand_from=up,sand_corner=up": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=up,sand_corner=north": {
       "model": "oasiso:block/entropy_soil_corner_up_north"
@@ -124,7 +134,12 @@
     "sand_layer=5,sand_from=up,sand_corner=down": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=north,sand_corner=up": {
       "model": "oasiso:block/entropy_soil_corner_up_north"
@@ -132,7 +147,12 @@
     "sand_layer=5,sand_from=north,sand_corner=north": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=north,sand_corner=east": {
       "model": "oasiso:block/entropy_soil_corner_north_east"
@@ -140,7 +160,12 @@
     "sand_layer=5,sand_from=north,sand_corner=south": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=north,sand_corner=west": {
       "model": "oasiso:block/entropy_soil_corner_north_west"
@@ -157,7 +182,10 @@
     "sand_layer=5,sand_from=east,sand_corner=east": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=east,sand_corner=south": {
       "model": "oasiso:block/entropy_soil_corner_east_south"
@@ -165,7 +193,10 @@
     "sand_layer=5,sand_from=east,sand_corner=west": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=east,sand_corner=down": {
       "model": "oasiso:block/entropy_soil_corner_east_down"
@@ -176,7 +207,10 @@
     "sand_layer=5,sand_from=south,sand_corner=north": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=south,sand_corner=east": {
       "model": "oasiso:block/entropy_soil_corner_east_south"
@@ -184,7 +218,10 @@
     "sand_layer=5,sand_from=south,sand_corner=south": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=south,sand_corner=west": {
       "model": "oasiso:block/entropy_soil_corner_south_west"
@@ -201,7 +238,10 @@
     "sand_layer=5,sand_from=west,sand_corner=east": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=west,sand_corner=south": {
       "model": "oasiso:block/entropy_soil_corner_south_west"
@@ -209,7 +249,10 @@
     "sand_layer=5,sand_from=west,sand_corner=west": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=west,sand_corner=down": {
       "model": "oasiso:block/entropy_soil_corner_west_down"
@@ -217,7 +260,10 @@
     "sand_layer=5,sand_from=down,sand_corner=up": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ],
     "sand_layer=5,sand_from=down,sand_corner=north": {
       "model": "oasiso:block/entropy_soil_corner_north_down"
@@ -234,7 +280,10 @@
     "sand_layer=5,sand_from=down,sand_corner=down": [
       { "model": "oasiso:block/entropy_soil" },
       { "model": "oasiso:block/entropy_soil_2" },
-      { "model": "oasiso:block/entropy_soil_3" }
+      { "model": "oasiso:block/entropy_soil_3" },
+      { "model": "oasiso:block/entropy_soil_4" },
+      { "model": "oasiso:block/entropy_soil_5" },
+      { "model": "oasiso:block/entropy_soil_6" }
     ]
   }
 }

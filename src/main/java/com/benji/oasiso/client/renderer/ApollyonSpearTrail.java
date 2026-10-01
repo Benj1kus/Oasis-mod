@@ -33,6 +33,11 @@ public final class ApollyonSpearTrail {
     private static final int MAX_VISIBLE = 24;
     private static final Map<ApollyonEntity, History> TRAILS = new WeakHashMap<>();
     private static final MultiBufferSource.BufferSource BUFFER = MultiBufferSource.immediate(new BufferBuilder(32768));
+
+    private record ItemKey(long id, int perspective) {
+    }
+
+    private static final Map<ItemKey, History> ITEM_TRAILS = new HashMap<>();
     private static ClientLevel world;
     private static Matrix4f worldView, worldProjection;
     private static ShaderInstance shader;
@@ -45,6 +50,7 @@ public final class ApollyonSpearTrail {
         if (world != current) {
             world = current;
             TRAILS.clear();
+            ITEM_TRAILS.clear();
             worldView = worldProjection = null;
         }
     }
@@ -55,6 +61,7 @@ public final class ApollyonSpearTrail {
         checkWorld();
         if (world == null) return;
         double now = world.getGameTime();
+        ITEM_TRAILS.entrySet().removeIf(e -> now - e.getValue().lastTime > LIFE + 2);
         TRAILS.entrySet().removeIf(e -> e.getKey().isRemoved() || e.getKey().level() != world || now - e.getValue().lastTime > LIFE + 2);
     }
 
@@ -73,6 +80,10 @@ public final class ApollyonSpearTrail {
         if (tip.distanceToSqr(eye) > RANGE * RANGE) return;
         double now = world.getGameTime() + partial;
         History h = TRAILS.computeIfAbsent(entity, key -> new History());
+        sampleHistory(h, tip, now);
+    }
+
+    private static void sampleHistory(History h, Vec3 tip, double now) {
         if (h.last == null || now < h.lastTime || now - h.lastTime > 5 || h.last.distanceToSqr(tip) > 64) {
             h.points.clear();
             h.points.add(new Point(tip, now));
@@ -87,6 +98,38 @@ public final class ApollyonSpearTrail {
         h.lastTime = now;
         while (!h.points.isEmpty() && now - h.points.peekFirst().time > LIFE) h.points.removeFirst();
         while (h.points.size() > 34) h.points.removeFirst();
+    }
+
+
+    public static void renderItem(long id, int perspective, Matrix4f tipPose, float partial) {
+        checkWorld();
+        Minecraft mc = Minecraft.getInstance();
+        if (world == null || shader == null || id == Long.MAX_VALUE) return;
+        var camera = mc.gameRenderer.getMainCamera();
+        Vec3 eye = camera.getPosition();
+        var viewTip = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(tipPose).transform(new org.joml.Vector4f(0, 0, 0, 1));
+        var offset = camera.rotation().transform(new org.joml.Vector3f(viewTip.x(), viewTip.y(), viewTip.z()));
+        Vec3 tip = eye.add(offset.x(), offset.y(), offset.z());
+        if (!Double.isFinite(tip.lengthSqr()) || tip.distanceToSqr(eye) > RANGE * RANGE) return;
+        double now = world.getGameTime() + (mc.isPaused() ? mc.getFrameTime() : partial);
+        ItemKey key = new ItemKey(id, perspective);
+        if (ITEM_TRAILS.size() >= 96 && !ITEM_TRAILS.containsKey(key)) {
+            var oldest = ITEM_TRAILS.entrySet().stream().min(Comparator.comparingDouble(e -> e.getValue().lastTime));
+            oldest.ifPresent(e -> ITEM_TRAILS.remove(e.getKey()));
+        }
+        History h = ITEM_TRAILS.computeIfAbsent(key, k -> new History());
+        sampleHistory(h, tip, now);
+        Matrix4f view = new Matrix4f().rotation(new org.joml.Quaternionf(camera.rotation()).conjugate());
+        ShaderInstance previous = RenderSystem.getShader();
+        shader.safeGetUniform("TrailProjection").set(RenderSystem.getProjectionMatrix());
+        shader.safeGetUniform("Time").set((float) (now % 24000) / 20F);
+        try {
+            VertexConsumer out = BUFFER.getBuffer(TrailType.TRAIL);
+            draw(out, view, eye, h, now, (int) (id ^ (id >>> 32)));
+        } finally {
+            BUFFER.endBatch(TrailType.TRAIL);
+            if (previous != null) RenderSystem.setShader(() -> previous);
+        }
     }
 
     @SubscribeEvent
@@ -194,6 +237,7 @@ public final class ApollyonSpearTrail {
         public static void register(RegisterShadersEvent event) throws IOException {
             shader = null;
             TRAILS.clear();
+            ITEM_TRAILS.clear();
             event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "apollyon_spear_trail"), DefaultVertexFormat.POSITION_COLOR_TEX), value -> shader = value);
         }
     }
