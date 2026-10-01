@@ -24,15 +24,12 @@ public class ApolWingsArmorItem extends ArmorItem implements GeoItem {
 
     @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
-        return !stack.isDamageableItem() || stack.getDamageValue() < stack.getMaxDamage() - 1;
+        return !stack.isDamageableItem() || stack.getDamageValue() < stack.getMaxDamage();
     }
 
     @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         if (!canElytraFly(stack, entity)) return false;
-        if (!entity.level().isClientSide && (flightTicks + 1) % 20 == 0) {
-            stack.hurtAndBreak(1, entity, e -> e.broadcastBreakEvent(EquipmentSlot.CHEST));
-        }
         if ((flightTicks + 1) % 10 == 0) entity.gameEvent(net.minecraft.world.level.gameevent.GameEvent.ELYTRA_GLIDE);
         return true;
     }

@@ -15,7 +15,7 @@ public final class ApolWingsArmorMaterial implements ArmorMaterial {
 
     @Override
     public int getDurabilityForType(ArmorItem.Type type) {
-        return 0;
+        return 250;
     }
 
     @Override

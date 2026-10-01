@@ -1,0 +1,28 @@
+{
+  "vertex": "oasiso:apol_wings_transit",
+  "fragment": "oasiso:apol_wings_transit",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [],
+  "uniforms": [
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "Resolution",
+      "type": "float",
+      "count": 2,
+      "values": [
+        1920,
+        1080
+      ]
+    }
+  ]
+}

@@ -9,7 +9,6 @@ float bayer(vec2 pixel) {
 }
 void main() {
     float across=abs(uv.y*2.0-1.0);
-    // Ступенчатое яркое ядро и дизеринг вместо размытой реалистичной каймы.
     float core=1.0-smoothstep(.16,.40,across);
     float edge=1.0-smoothstep(.38,1.0,across);
     float coverage=edge*vertexColor.a;
