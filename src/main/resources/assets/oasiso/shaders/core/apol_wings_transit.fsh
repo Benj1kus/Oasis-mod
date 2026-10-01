@@ -3,18 +3,21 @@ uniform float Time;
 uniform vec2 Resolution;
 in vec2 uv;
 out vec4 fragColor;
+
 float hash(float n){return fract(sin(n*127.1+311.7)*43758.5453);}
 float bayer(vec2 p){
     ivec2 q=ivec2(mod(p,4.0));
     int m[16]=int[16](0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5);
     return (float(m[q.y*4+q.x])+.5)/16.0;
 }
+
 void main(){
     float pixelSize=max(3.0,floor(Resolution.y/180.0+.5));
     vec2 cells=max(vec2(1),floor(Resolution/pixelSize));
     vec2 p=(floor(uv*cells)+.5)/cells;
     float aspect=Resolution.x/max(1.0,Resolution.y);
-    vec3 color=vec3(0);float cover=0;
+    vec3 color=vec3(0); float cover=0;
+
     for(int edge=0;edge<4;edge++){
         vec2 q=edge==0?p:edge==1?vec2(1.0-p.x,p.y):edge==2?p.yx:vec2(1.0-p.y,p.x);
         float alongScale=edge<2?1.0:aspect;
@@ -25,7 +28,6 @@ void main(){
             float h=hash(seed);
             float base=(float(j)+.35+.3*h)/9.0;
 
-            // Чем ближе к углам, тем массивнее и короче щупальце.
             float corner=1.0-smoothstep(.08,.24,min(base,1.0-base));
 
             float reach=mix(.15+.20*hash(seed+8.0),
@@ -33,7 +35,6 @@ void main(){
             reach*=1.0+.10*sin(Time*(.85+.45*h)+seed);
             float t=q.x*depthScale/reach;
 
-            // Независимая скорость и усиленные изгибы в углах.
             float bend=(.018+.018*h+.055*corner)/alongScale;
             float speed=1.05+.85*hash(seed+4.0)+.7*corner;
             float sway=bend*(sin(t*5.6-Time*speed+seed)
@@ -43,6 +44,8 @@ void main(){
 
             float thickness=(.008+.026*hash(seed+12.0)
             +.044*corner)/alongScale;
+
+            // ВАЖНО: Добавлен float перед width
             float width=thickness*pow(max(0.0,1.0-t),.72);
             width*=.92+.08*sin(t*17.0-Time*1.3+seed);
 
@@ -61,7 +64,6 @@ void main(){
                             vec3(.74,.19,.57),
                             .5+.5*sin(seed+t*5.0-Time*.6));
 
-            // Ступенчатые тени и прерывистые цветные блики.
             float bands=floor(clamp(section,0.0,1.0)*3.0)/3.0;
             body*=.78+.32*bands;
             float glint=pow(.5+.5*sin(t*14.0-Time*1.5+seed),3.0);
@@ -71,6 +73,13 @@ void main(){
             if(ink>0.0){color=c;cover=1.0;}
         }
     }
+
+    float alpha = cover * smoothstep(0.0, 0.25, Time);
+
+    if (alpha <= 0.001) {
+        discard;
+    }
+
     color=floor(color*23.0+bayer(floor(uv*cells)))/23.0;
-    fragColor=vec4(color,cover*smoothstep(0.0,.25,Time));
+    fragColor=vec4(color, alpha);
 }

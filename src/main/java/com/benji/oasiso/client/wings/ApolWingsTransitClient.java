@@ -146,25 +146,33 @@ public final class ApolWingsTransitClient {
         if (!locked) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
+
         int w = mc.getWindow().getGuiScaledWidth(), h = mc.getWindow().getGuiScaledHeight();
         var g = e.getGuiGraphics();
-        g.fill(0, 0, w, h, 0xff000000);
-        g.flush();
+
+        g.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         g.blit(BLACK, 0, 0, w, h, 0, 0, 1920, 1080, 1920, 1080);
         g.flush();
+
         var shader = ApolWingsTransitShaders.shader;
         if (shader == null) {
             RenderSystem.disableBlend();
             return;
         }
+
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         try {
             RenderSystem.setShader(() -> shader);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+
             shader.safeGetUniform("Time").set((mc.level.getGameTime() - start + e.getPartialTick()) / 20F);
             shader.safeGetUniform("Resolution").set((float) mc.getWindow().getWidth(), (float) mc.getWindow().getHeight());
+
             BufferBuilder b = Tesselator.getInstance().getBuilder();
             b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
             b.vertex(-1, -1, 0).uv(0, 0).endVertex();
@@ -176,7 +184,7 @@ public final class ApolWingsTransitClient {
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
 
