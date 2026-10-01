@@ -268,6 +268,10 @@
   "tooltip.oasiso.ebk1": "[G]",
   "tooltip.oasiso.apollyon1": "Apollyon Angel of Entropy",
   "tooltip.oasiso.apollyon2": "Apollyon",
+  "tooltip.oasiso.jwings": "Hold [SPACE] for jump boost",
+  "tooltip.oasiso.jwings1": "[SPACE]",
+  "tooltip.oasiso.wwings": "Can fly through walls",
+  "tooltip.oasiso.wwings1": "walls",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",
