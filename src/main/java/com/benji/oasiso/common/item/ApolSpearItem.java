@@ -41,7 +41,7 @@ public class ApolSpearItem extends SwordItem implements GeoItem {
     private static final UUID SPEAR_REACH_UUID = UUID.fromString("50388c39-63a4-4b57-93e3-dd820096a801");
 
     public ApolSpearItem(Properties properties) {
-        super(ApolSpearTier.INSTANCE, 14, -3F, properties.durability(600));
+        super(ApolSpearTier.INSTANCE, 9, -3F, properties.durability(600));
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
