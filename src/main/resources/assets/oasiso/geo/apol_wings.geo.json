@@ -1,0 +1,214 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 18,
+				"visible_bounds_height": 4,
+				"visible_bounds_offset": [0, 1, 0]
+			},
+			"bones": [
+				{
+					"name": "bipedHead",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorHead",
+					"parent": "bipedHead",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "bipedBody",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorBody",
+					"parent": "bipedBody",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4.5, 11.5, -2.5], "size": [9, 13, 5], "uv": [110, 0]}
+					]
+				},
+				{
+					"name": "wings",
+					"parent": "armorBody",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [4.5, 11.5, -2.5], "size": [0, 0, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "wing_main_left",
+					"parent": "wings",
+					"pivot": [-1.33333, 6.5, 3],
+					"cubes": [
+						{"origin": [-0.33333, 6.5, 2], "size": [0, 0, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "wing_left",
+					"parent": "wing_main_left",
+					"pivot": [1, 14, 3],
+					"cubes": [
+						{"origin": [1, -8, 3], "size": [37, 44, 0], "uv": [80, 52]}
+					]
+				},
+				{
+					"name": "wingp_left",
+					"parent": "wing_left",
+					"pivot": [38, 14, 3],
+					"cubes": [
+						{"origin": [38, -8, 3], "size": [40, 44, 0], "uv": [0, 52]}
+					]
+				},
+				{
+					"name": "eye_left",
+					"parent": "wingp_left",
+					"pivot": [57.75, 16.5, 0.85],
+					"cubes": [
+						{"origin": [43, 4, 2], "size": [29, 26, 0], "uv": [0, 96]}
+					]
+				},
+				{
+					"name": "eye_ball_left",
+					"parent": "eye_left",
+					"pivot": [57.5, 16.5, 1.7],
+					"cubes": [
+						{"origin": [49, 9, 1.7], "size": [17, 15, 0], "uv": [58, 96]}
+					]
+				},
+				{
+					"name": "wingpp_left",
+					"parent": "wingp_left",
+					"pivot": [78, 10, 3],
+					"cubes": [
+						{"origin": [78, -16, 3], "size": [55, 52, 0], "uv": [0, 0]},
+						{"origin": [131.25, -1, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [131.25, -2, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [130.5, -2, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [130.5, -4.5, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [131, -4.5, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [131, -1, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [130, -1, 2], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [130, -1, 0], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [130, -18, 0], "size": [2, 2, 2], "uv": [0, 0], "mirror": true},
+						{"origin": [77, -18, 0], "size": [2, 2, 2], "uv": [0, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "trail_left",
+					"parent": "wingpp_left",
+					"pivot": [132, -0.25, 2],
+					"cubes": [
+						{"origin": [132, -0.25, 2], "size": [0, 0, 0], "uv": [2, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "wing_main_right",
+					"parent": "wings",
+					"pivot": [1.33333, 6.5, 3],
+					"cubes": [
+						{"origin": [0.33333, 6.5, 2], "size": [0, 0, 0], "uv": [0, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "wing_right",
+					"parent": "wing_main_right",
+					"pivot": [-1, 14, 3],
+					"cubes": [
+						{"origin": [-38, -8, 3], "size": [37, 44, 0], "uv": [80, 52], "mirror": true}
+					]
+				},
+				{
+					"name": "wingp_right",
+					"parent": "wing_right",
+					"pivot": [-38, 14, 3],
+					"cubes": [
+						{"origin": [-78, -8, 3], "size": [40, 44, 0], "uv": [0, 52], "mirror": true}
+					]
+				},
+				{
+					"name": "eye_right",
+					"parent": "wingp_right",
+					"pivot": [-57.75, 16.5, 0.85],
+					"cubes": [
+						{"origin": [-72, 4, 2], "size": [29, 26, 0], "uv": [0, 96], "mirror": true}
+					]
+				},
+				{
+					"name": "eye_ball_right",
+					"parent": "eye_right",
+					"pivot": [-57.5, 16.5, 1.7],
+					"cubes": [
+						{"origin": [-66, 9, 1.7], "size": [17, 15, 0], "uv": [58, 96], "mirror": true}
+					]
+				},
+				{
+					"name": "wingpp_right",
+					"parent": "wingp_right",
+					"pivot": [-78, 10, 3],
+					"cubes": [
+						{"origin": [-133, -16, 3], "size": [55, 52, 0], "uv": [0, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "trail_right",
+					"parent": "wingpp_right",
+					"pivot": [-132, -0.25, 2],
+					"cubes": [
+						{"origin": [-132, -0.25, 2], "size": [0, 0, 0], "uv": [4, 2]}
+					]
+				},
+				{
+					"name": "bipedRightArm",
+					"pivot": [-5, 22, 0]
+				},
+				{
+					"name": "armorRightArm",
+					"parent": "bipedRightArm",
+					"pivot": [-5, 22, 0]
+				},
+				{
+					"name": "bipedLeftArm",
+					"pivot": [5, 22, 0]
+				},
+				{
+					"name": "armorLeftArm",
+					"parent": "bipedLeftArm",
+					"pivot": [5, 22, 0]
+				},
+				{
+					"name": "bipedLeftLeg",
+					"pivot": [2, 12, 0]
+				},
+				{
+					"name": "armorLeftLeg",
+					"parent": "bipedLeftLeg",
+					"pivot": [2, 12, 0]
+				},
+				{
+					"name": "armorLeftBoot",
+					"parent": "bipedLeftLeg",
+					"pivot": [2, 12, 0]
+				},
+				{
+					"name": "bipedRightLeg",
+					"pivot": [-2, 12, 0]
+				},
+				{
+					"name": "armorRightLeg",
+					"parent": "bipedRightLeg",
+					"pivot": [-2, 12, 0]
+				},
+				{
+					"name": "armorRightBoot",
+					"parent": "bipedRightLeg",
+					"pivot": [-2, 12, 0]
+				}
+			]
+		}
+	]
+}

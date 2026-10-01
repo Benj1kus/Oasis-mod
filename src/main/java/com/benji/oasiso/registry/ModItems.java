@@ -133,6 +133,8 @@ public final class ModItems {
     public static final RegistryObject<Item> AZUMALIT_LEGGINGS = ITEMS.register("azumalit_leggings", () -> new AzumalitArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AZUMALIT_BOOTS = ITEMS.register("azumalit_boots", () -> new AzumalitArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> APOL_WINGS = ITEMS.register("apol_wings", () -> new ApolWingsArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> ENTROPY_CHESTPLATE = ITEMS.register("entropy_chestplate", () -> new EntropyChestplateItem(new Item.Properties().stacksTo(1).fireResistant()));
 
     public static final RegistryObject<Item> SCARAB_CORE = ITEMS.register("scarab_core", () -> new ScarabCoreItem(ModEntities.SCARAB, 0xFFFFFF, 0xFFFFFF, new Item.Properties().durability(5)));
