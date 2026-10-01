@@ -48,12 +48,13 @@ public class ApollyonRenderer extends GeoEntityRenderer<ApollyonEntity> {
     @Override
     public void render(ApollyonEntity entity, float yaw, float partial, PoseStack pose, MultiBufferSource source, int light) {
         mesh.clear();
-        glitchAmount = entity.teleportDissolve(partial);
-        glitchAge = entity.teleportAge(partial);
-        glitch = entity.isTeleporting() && ApollyonTeleportFx.ready() && !entity.isInvisible();
+        boolean dissolving = entity.isDissolvingDeath();
+        glitchAmount = dissolving ? entity.deathDissolve(partial) : entity.teleportDissolve(partial);
+        glitchAge = dissolving ? entity.deathVisualAge(partial) * ApollyonEntity.TELEPORT_OUT / ApollyonEntity.DEATH_DURATION : entity.teleportAge(partial);
+        glitch = (dissolving || entity.isTeleporting()) && ApollyonTeleportFx.ready() && !entity.isInvisible();
         renderingEntity = entity;
         shadowRadius = .4F * (1 - glitchAmount);
-        if (entity.isTeleporting()) ApollyonSpearTrail.clear(entity);
+        if (entity.isTeleporting() || dissolving) ApollyonSpearTrail.clear(entity);
 
         if (entity.isTeleporting() && glitchAmount >= .999F) {
             renderingEntity = null;
@@ -108,7 +109,7 @@ public class ApollyonRenderer extends GeoEntityRenderer<ApollyonEntity> {
         } finally {
             glitchBone = oldBone;
         }
-        if (tip && !reRender && !entity.isInvisible() && entity.isAlive() && !entity.isTeleporting()) {
+        if (tip && !reRender && !entity.isInvisible() && entity.isAlive() && !entity.isTeleporting() && !entity.isDissolvingDeath()) {
             var p = bone.getLocalPosition();
             Vec3 worldTip = new Vec3(Mth.lerp(partial, entity.xo, entity.getX()) + p.x, Mth.lerp(partial, entity.yo, entity.getY()) + p.y, Mth.lerp(partial, entity.zo, entity.getZ()) + p.z);
             ApollyonSpearTrail.sample(entity, worldTip, partial);

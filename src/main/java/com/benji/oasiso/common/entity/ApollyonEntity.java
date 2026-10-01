@@ -34,6 +34,74 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
 
+    public static final int DEATH_DURATION = 100; // 5 секунд.
+    private static final EntityDataAccessor<Integer> DEATH_TICKS = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
+    private DamageSource finalDamageSource;
+
+    public boolean isDissolvingDeath() {
+        return entityData.get(DEATH_TICKS) >= 0;
+    }
+
+    public float deathVisualAge(float partial) {
+        return Math.min(DEATH_DURATION, entityData.get(DEATH_TICKS) + partial);
+    }
+
+    public float deathDissolve(float partial) {
+        return .89F * Mth.clamp(deathVisualAge(partial) / DEATH_DURATION, 0, 1);
+    }
+
+    @Override
+    public void die(DamageSource source) {
+        if (level().isClientSide || isDissolvingDeath() || isRemoved()) return;
+        finalDamageSource = source;
+        combat.cancel();
+        endTeleport();
+        defenceUntil = -1;
+        setCombatMode(0);
+        setTarget(null);
+        getNavigation().stop();
+        setNoAi(true);
+        setHealth(.01F);
+        setDeltaMovement(Vec3.ZERO);
+        entityData.set(DEATH_TICKS, 0);
+        setPersistenceRequired();
+    }
+
+    @Override
+    public boolean isPushable() {
+        return !isDissolvingDeath() && super.isPushable();
+    }
+
+    @Override
+    public boolean isPickable() {
+        return !isDissolvingDeath() && super.isPickable();
+    }
+
+    @Override
+    protected void dropAllDeathLoot(DamageSource source) {
+        if (!isDissolvingDeath()) super.dropAllDeathLoot(source);
+    }
+
+    @Override
+    public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("ApollyonDeathTicks", entityData.get(DEATH_TICKS));
+    }
+
+    @Override
+    public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("ApollyonDeathTicks")) {
+            entityData.set(DEATH_TICKS, Mth.clamp(tag.getInt("ApollyonDeathTicks"), -1, DEATH_DURATION));
+            if (isDissolvingDeath()) {
+                setHealth(.01F);
+                setNoAi(true);
+                setCombatMode(0);
+                setDeltaMovement(Vec3.ZERO);
+            }
+        }
+    }
+
     private static final EntityDataAccessor<Long> TELEPORT_START = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
     public static final int TELEPORT_OUT = 8;
     public static final int TELEPORT_HIDDEN = 4;
@@ -67,7 +135,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     }
 
     public boolean tryBeginDefence() {
-        if (level().isClientSide || !isAlive() || isRemoved()) return false;
+        if (level().isClientSide || !isAlive() || isRemoved() || isDissolvingDeath()) return false;
         if (isDefending()) return true;
         if (isTeleporting() || getRandom().nextFloat() >= DEFENCE_CHANCE) return false;
         combat.cancel();
@@ -81,6 +149,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public boolean hurt(net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (isDissolvingDeath()) return false;
         if (source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile projectile && com.benji.oasiso.common.entity.ai.ApollyonProjectileDefence.tryDeflect(this, projectile)) {
             return false;
         }
@@ -99,12 +168,13 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public boolean showMiniBossHealthBar() {
-        return this.isAlive() && !isTeleporting();
+        return this.isAlive() && !isTeleporting() && !isDissolvingDeath();
     }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(DEATH_TICKS, -1);
         entityData.define(TELEPORT_START, -1L);
         entityData.define(COMBAT_MODE, 0);
         entityData.define(PUSHED_PLAYER, -1);
@@ -301,6 +371,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     protected void customServerAiStep() {
+        if (isDissolvingDeath()) return;
         super.customServerAiStep();
         if (!isAlive()) {
             combat.cancel();
@@ -359,12 +430,30 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     @Override
     public void tick() {
         super.tick();
+        if (isDissolvingDeath()) {
+            setDeltaMovement(Vec3.ZERO);
+            fallDistance = 0;
+            yBodyRot = yHeadRot = getYRot();
+            if (level() instanceof net.minecraft.server.level.ServerLevel server) {
+                int age = entityData.get(DEATH_TICKS) + 1;
+                entityData.set(DEATH_TICKS, age);
+                if (age >= DEATH_DURATION) {
+                    // Сначала штатно учитываем убийство, затем единственная награда и удаление.
+                    setHealth(0);
+                    super.die(finalDamageSource != null ? finalDamageSource : damageSources().generic());
+                    com.benji.oasiso.common.entity.ai.ApollyonDeathReward.finish(server, this);
+                    remove(RemovalReason.KILLED);
+                }
+            }
+            return;
+        }
         if (isAlive()) yBodyRot = yHeadRot = getYRot();
         else if (!level().isClientSide) combat.cancel();
     }
 
     @Override
     public void travel(Vec3 input) {
+        if (isDissolvingDeath()) { setDeltaMovement(Vec3.ZERO); return; }
         if (isEffectiveAi()) {
             if (isTeleporting()) setDeltaMovement(Vec3.ZERO);
             move(MoverType.SELF, getDeltaMovement());
@@ -391,6 +480,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (isDissolvingDeath()) return null;
 
         SoundEvent[] sounds = {ModSounds.APOL_IDLE1.get(), ModSounds.APOL_IDLE2.get(), ModSounds.APOL_IDLE3.get()};
 

@@ -7,8 +7,8 @@
 				"texture_width": 256,
 				"texture_height": 256,
 				"visible_bounds_width": 18,
-				"visible_bounds_height": 4,
-				"visible_bounds_offset": [0, 1, 0]
+				"visible_bounds_height": 5,
+				"visible_bounds_offset": [0, 1.5, 0]
 			},
 			"bones": [
 				{
@@ -30,6 +30,14 @@
 					"pivot": [0, 24, 0],
 					"cubes": [
 						{"origin": [-4.5, 11.5, -2.5], "size": [9, 13, 5], "uv": [110, 0]}
+					]
+				},
+				{
+					"name": "jack",
+					"parent": "armorBody",
+					"pivot": [0, 20.5, 5.25],
+					"cubes": [
+						{"origin": [-3.5, 15, 3.75], "size": [7, 11, 3], "pivot": [0, 20.5, 5.25], "rotation": [-10, 0, 0], "uv": [236, 0]}
 					]
 				},
 				{

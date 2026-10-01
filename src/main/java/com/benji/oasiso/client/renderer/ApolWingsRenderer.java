@@ -76,6 +76,30 @@ public class ApolWingsRenderer extends GeoArmorRenderer<ApolWingsArmorItem> {
     }
 
     @Override
+    public void renderRecursively(PoseStack pose, ApolWingsArmorItem item,
+                                  software.bernie.geckolib.cache.object.GeoBone bone, RenderType type,
+                                  MultiBufferSource source, VertexConsumer vertices, boolean reRender,
+                                  float partial, int light, int overlay, float red, float green, float blue, float alpha) {
+        int wing = "trail_left".equals(bone.getName()) ? 0 : "trail_right".equals(bone.getName()) ? 1 : -1;
+        if (wing >= 0 && !reRender && getCurrentEntity() instanceof net.minecraft.world.entity.player.Player player
+                && player.isFallFlying() && !player.isInvisible()) {
+
+            pose.pushPose();
+            try {
+                software.bernie.geckolib.util.RenderUtils.translateMatrixToBone(pose, bone);
+                software.bernie.geckolib.util.RenderUtils.translateToPivotPoint(pose, bone);
+                software.bernie.geckolib.util.RenderUtils.rotateMatrixAroundBone(pose, bone);
+                software.bernie.geckolib.util.RenderUtils.scaleMatrixForBone(pose, bone);
+                ApolWingsLightningTrail.sample(player, wing, pose.last().pose(), partial);
+            } finally {
+                pose.popPose();
+            }
+        }
+        super.renderRecursively(pose, item, bone, type, source, vertices, reRender,
+                partial, light, overlay, red, green, blue, alpha);
+    }
+
+    @Override
     public void createVerticesOfQuad(GeoQuad quad, Matrix4f pose, Vector3f normal, VertexConsumer buffer, int light, int overlay, float red, float green, float blue, float alpha) {
         super.createVerticesOfQuad(quad, pose, normal, buffer, light, overlay, red, green, blue, alpha);
         if (!capture) return;

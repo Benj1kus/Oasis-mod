@@ -19,6 +19,24 @@ import java.util.function.Consumer;
 public class ApolWingsArmorItem extends ArmorItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
+    private static final RawAnimation FLY = RawAnimation.begin().thenLoop("fly");
+    private static final RawAnimation JUMP = RawAnimation.begin().thenPlayAndHold("jump");
+
+    @Override
+    public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
+        return !stack.isDamageableItem() || stack.getDamageValue() < stack.getMaxDamage() - 1;
+    }
+
+    @Override
+    public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
+        if (!canElytraFly(stack, entity)) return false;
+        if (!entity.level().isClientSide && (flightTicks + 1) % 20 == 0) {
+            stack.hurtAndBreak(1, entity, e -> e.broadcastBreakEvent(EquipmentSlot.CHEST));
+        }
+        if ((flightTicks + 1) % 10 == 0) entity.gameEvent(net.minecraft.world.level.gameevent.GameEvent.ELYTRA_GLIDE);
+        return true;
+    }
+
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
 
     public ApolWingsArmorItem(Type type, Properties properties) {
@@ -43,7 +61,15 @@ public class ApolWingsArmorItem extends ArmorItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "idle_controller", 0, state -> state.setAndContinue(IDLE)));
+        controllers.add(new AnimationController<>(this, "idle_controller", 0, state -> {
+            var entity = state.getData(software.bernie.geckolib.constant.DataTickets.ENTITY);
+            if (entity instanceof LivingEntity living) {
+                long end = living.getPersistentData().getLong(com.benji.oasiso.common.wings.ApolWingsMechanics.JUMP_UNTIL);
+                if (end > living.level().getGameTime()) return state.setAndContinue(JUMP);
+                if (living.isFallFlying()) return state.setAndContinue(FLY);
+            }
+            return state.setAndContinue(IDLE);
+        }));
     }
 
     @Override
