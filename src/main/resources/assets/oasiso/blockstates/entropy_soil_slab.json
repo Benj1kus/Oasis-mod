@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "oasiso:block/entropy_soil_slab"
+    },
+    "type=top": {
+      "model": "oasiso:block/entropy_soil_slab_top"
+    },
+    "type=double": {
+      "model": "oasiso:block/entropy_soil"
+    }
+  }
+}

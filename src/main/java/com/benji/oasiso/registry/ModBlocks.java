@@ -86,6 +86,10 @@ public final class ModBlocks {
     public static final RegistryObject<Block> ENTROPY_MAGMA = BLOCKS.register("entropy_magma", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).lightLevel(state -> 5).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).strength(5.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> ENTROPY_MAGMA_LITTLE = BLOCKS.register("entropy_magma_little", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).lightLevel(state -> 5).strength(5.0F).requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> ENTROPY_SOIL_SLAB = BLOCKS.register("entropy_soil_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
+    public static final RegistryObject<Block> ENTROPY_SOIL_STAIRS = BLOCKS.register("entropy_soil_stairs", () -> new StairBlock(() -> ENTROPY_SOIL.get().defaultBlockState(), BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
+    public static final RegistryObject<Block> ENTROPY_SOIL_WALL = BLOCKS.register("entropy_soil_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
+
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein", () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN).sound(SoundType.SMALL_AMETHYST_BUD).lightLevel(state -> 10).noCollission().noOcclusion().replaceable().strength(0.2F)));

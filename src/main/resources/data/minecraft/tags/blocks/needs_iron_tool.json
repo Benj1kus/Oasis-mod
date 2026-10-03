@@ -23,6 +23,9 @@
     "oasiso:entropy_connector",
     "oasiso:entropy_magma",
     "oasiso:entropy_soil",
-    "oasiso:entropy_lantern"
+    "oasiso:entropy_lantern",
+    "oasiso:entropy_soil_slab",
+    "oasiso:entropy_soil_stairs",
+    "oasiso:entropy_soil_wall"
   ]
 }

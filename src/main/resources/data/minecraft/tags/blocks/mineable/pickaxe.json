@@ -45,6 +45,9 @@
     "oasiso:entropy_magma",
     "oasiso:entropy_magma_little",
     "oasiso:entropy_soil",
-    "oasiso:entropy_lantern"
+    "oasiso:entropy_lantern",
+    "oasiso:entropy_soil_slab",
+    "oasiso:entropy_soil_stairs",
+    "oasiso:entropy_soil_wall"
   ]
 }

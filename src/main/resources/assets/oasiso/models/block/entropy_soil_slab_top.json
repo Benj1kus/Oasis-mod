@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "oasiso:block/entropy_soil",
+    "top": "oasiso:block/entropy_soil",
+    "side": "oasiso:block/entropy_soil"
+  }
+}

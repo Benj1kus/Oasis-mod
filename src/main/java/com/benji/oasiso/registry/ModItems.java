@@ -3,6 +3,7 @@ package com.benji.oasiso.registry;
 import com.benji.oasiso.Oasiso;
 
 import static com.benji.oasiso.Oasiso.MODID;
+import static com.benji.oasiso.registry.ModBlocks.*;
 
 import com.benji.oasiso.common.item.*;
 import net.minecraft.resources.ResourceLocation;
@@ -69,6 +70,10 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_SOIL_ITEM = ITEMS.register("entropy_soil", () -> new BlockItem(ModBlocks.ENTROPY_SOIL.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_MAGMA_ITEM = ITEMS.register("entropy_magma", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_MAGMA_LITTLE_ITEM = ITEMS.register("entropy_magma_little", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA_LITTLE.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> ENTROPY_SOIL_STAIRS_ITEM = ITEMS.register("entropy_soil_stairs", () -> new BlockItem(ENTROPY_SOIL_STAIRS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_SOIL_WALL_ITEM = ITEMS.register("entropy_soil_wall", () -> new BlockItem(ENTROPY_SOIL_WALL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_SOIL_SLAB_ITEM = ITEMS.register("entropy_soil_slab", () -> new BlockItem(ENTROPY_SOIL_SLAB.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block", () -> new BlockItem(ModBlocks.ENTROPY_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein", () -> new BlockItem(ModBlocks.ENTROPY_VEIN.get(), new Item.Properties()));
