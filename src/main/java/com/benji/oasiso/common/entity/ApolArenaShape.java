@@ -1,12 +1,13 @@
 package com.benji.oasiso.common.entity;
 
 public final class ApolArenaShape {
-    public static final int SIZE = 8, DEPTH = 8;
+    public static final int SIZE = 7, DEPTH = 8;
 
     public static boolean contains(int x, int z) {
         if (x < 0 || z < 0 || x >= SIZE || z >= SIZE) return false;
-        double dx = x - 3.5, dz = z - 3.5;
-        return dx * dx + dz * dz <= 16;
+        double dx = x - 3.0;
+        double dz = z - 3.0;
+        return dx * dx + dz * dz <= 3.5 * 3.5;
     }
 
     public static int first(int row) {

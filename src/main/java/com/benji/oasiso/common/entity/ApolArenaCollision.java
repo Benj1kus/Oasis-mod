@@ -41,6 +41,11 @@ public final class ApolArenaCollision extends Entity {
         }
         if (owner == null) return;
         int row = entityData.get(ROW), first = ApolArenaShape.first(row), last = ApolArenaShape.last(row);
+        if (first > last) {
+            setPos(owner.getX(), owner.getY(), owner.getZ());
+            setBoundingBox(new AABB(getX(), getY(), getZ(), getX(), getY(), getZ()));
+            return;
+        }
         double x0 = owner.origin().getX() - 3 + first, z0 = owner.origin().getZ() - 3 + row, y = owner.getY();
         setPos(x0 + (last - first + 1) * .5, y, z0 + .5);
         setBoundingBox(new AABB(x0, y, z0, x0 + last - first + 1, y + 8, z0 + 1));
@@ -55,7 +60,8 @@ public final class ApolArenaCollision extends Entity {
 
     @Override
     public boolean canBeCollidedWith() {
-        return !isRemoved() && owner != null && !owner.settled();
+        int row = entityData.get(ROW);
+        return !isRemoved() && owner != null && !owner.settled() && row >= 0 && row < ApolArenaShape.SIZE;
     }
 
     @Override
