@@ -144,23 +144,35 @@ public class SpearAttackEntity extends Projectile implements GeoEntity, Glowmask
         }
         var level = (net.minecraft.server.level.ServerLevel) level();
         Entity owner = getOwner();
-        if (!(owner instanceof Player player) || !player.isAlive() || player.isRemoved() || ++artilleryAge > 100 || getY() < level.getMinBuildHeight() - 4) {
+
+        if (!(owner instanceof Player player) || !player.isAlive() || player.isRemoved() || ++artilleryAge > 140) {
             discard();
             return;
         }
+
         int windup = SpearArtilleryPath.WINDUP_TICKS + launchDelay;
         Vec3 from = position(), next;
+
         if (artilleryAge <= windup) {
             double t = Math.max(0, artilleryAge - launchDelay) / (double) SpearArtilleryPath.WINDUP_TICKS;
             next = SpearArtilleryPath.recoil(formation, aim, t);
             if (artilleryAge % 4 == 0)
                 level.sendParticles(Oasiso.ENTROPY_LIGHTNING.get(), getX(), getY() - .5, getZ(), 1, .2, .5, .2, 0);
+
             if (artilleryAge == windup) {
                 Entity target = artilleryTarget == null ? null : level.getEntity(artilleryTarget);
-                if (target instanceof LivingEntity living && living.isAlive() && target.position().distanceToSqr(aim) < 64) {
+                if (target instanceof LivingEntity living && living.isAlive()) {
                     Vec3 ground = com.benji.oasiso.common.item.ApolSpearVolley.ground(level, target.position(), this);
-                    if (ground != null) aim = ground;
+                    if (ground != null) {
+                        aim = ground;
+                    } else {
+                        aim = target.position();
+                    }
                 }
+                if (aim == null || Double.isNaN(aim.x)) {
+                    aim = from.add(0, -5, 0);
+                }
+
                 arcStart = next;
                 aim = aim.add(0, -.06, 0);
                 control1 = SpearArtilleryPath.control1(arcStart, aim, level.getMaxBuildHeight() - 1);
@@ -169,38 +181,41 @@ public class SpearAttackEntity extends Projectile implements GeoEntity, Glowmask
             }
         } else {
             double progress = (artilleryAge - windup) / (double) SpearArtilleryPath.FLIGHT_TICKS;
-            next = SpearArtilleryPath.point(arcStart, control1, control2, aim, progress);
+
+            if (progress < 0.85 && artilleryTarget != null) {
+                Entity target = level.getEntity(artilleryTarget);
+                if (target instanceof LivingEntity living && living.isAlive()) {
+                    Vec3 ground = com.benji.oasiso.common.item.ApolSpearVolley.ground(level, living.position(), this);
+
+                    if (ground != null) {
+                        aim = aim.lerp(ground.add(0, -.06, 0), 0.25);
+                    }
+                    control1 = SpearArtilleryPath.control1(arcStart, aim, level.getMaxBuildHeight() - 1);
+                    control2 = SpearArtilleryPath.control2(arcStart, aim, level.getMaxBuildHeight() - 1);
+                }
+            }
+
+            next = progress <= 1.0 ? SpearArtilleryPath.point(arcStart, control1, control2, aim, progress) : from.add(0, -MAX_SPEED, 0);
         }
-        if (!loadedSegment(level, from, next)) {
-            discard();
-            return;
-        }
+
         var collision = level.clip(new ClipContext(from, next, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
         Vec3 motion = next.subtract(from);
+
         if (artilleryAge > windup && motion.lengthSqr() > 1e-10) {
             yRotO = getYRot();
             xRotO = getXRot();
             setYRot((float) Math.toDegrees(Math.atan2(motion.x, motion.z)));
             setXRot((float) Math.toDegrees(Math.atan2(motion.y, Math.sqrt(motion.x * motion.x + motion.z * motion.z))));
         }
+
         if (collision.getType() == HitResult.Type.BLOCK) {
             impactArtillery(level, player, collision.getLocation(), Vec3.atLowerCornerOf(collision.getDirection().getNormal()));
             return;
         }
+
         setDeltaMovement(motion);
         setPos(next.x, next.y, next.z);
         hasImpulse = true;
-        if (artilleryAge >= windup + SpearArtilleryPath.FLIGHT_TICKS)
-            discard();
-    }
-
-    private boolean loadedSegment(net.minecraft.server.level.ServerLevel level, Vec3 from, Vec3 to) {
-        int steps = Math.max(1, (int) Math.ceil(from.distanceTo(to) * 2));
-        for (int i = 0; i <= steps; i++) {
-            var pos = net.minecraft.core.BlockPos.containing(from.lerp(to, i / (double) steps));
-            if (!level.hasChunkAt(pos) || !level.getWorldBorder().isWithinBounds(pos)) return false;
-        }
-        return true;
     }
 
     private void impactArtillery(net.minecraft.server.level.ServerLevel level, Player player, Vec3 point, Vec3 normal) {

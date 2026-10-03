@@ -34,6 +34,7 @@ public class ApolSummoningEntity extends Entity {
     private static final EntityDataAccessor<Integer> AGE = SynchedEntityData.defineId(ApolSummoningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<CompoundTag> DATA = SynchedEntityData.defineId(ApolSummoningEntity.class, EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<Boolean> SETTLED = SynchedEntityData.defineId(ApolSummoningEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Long> BEAM_TIME = SynchedEntityData.defineId(ApolSummoningEntity.class, EntityDataSerializers.LONG);
     public static EntityType<ApolSummoningEntity> TYPE;
     private boolean spawned;
     private int liftHeight = RISE;
@@ -71,6 +72,11 @@ public class ApolSummoningEntity extends Entity {
         entityData.define(AGE, 0);
         entityData.define(DATA, new CompoundTag());
         entityData.define(SETTLED, false);
+        entityData.define(BEAM_TIME, -1L);
+    }
+
+    public long beamStartTime() {
+        return entityData.get(BEAM_TIME);
     }
 
     public int age() {
@@ -399,6 +405,7 @@ public class ApolSummoningEntity extends Entity {
                     }
         server.setBlock(base, altar, 3);
         if (server.getBlockEntity(base) instanceof ApolAltarBlockEntity be) be.activate();
+        entityData.set(BEAM_TIME, server.getGameTime() + ACTIVATE_TICKS);
         entityData.set(SETTLED, true);
         blocksBuilding = false;
         removeCollisionRows();
@@ -444,6 +451,7 @@ public class ApolSummoningEntity extends Entity {
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.put("Platform", entityData.get(DATA).copy());
         tag.putInt("Age", age());
+        tag.putLong("BeamTime", beamStartTime());
         tag.putBoolean("Settled", settled());
         tag.putBoolean("Spawned", spawned);
         if (bossId != null) tag.putUUID("Boss", bossId);
@@ -456,6 +464,7 @@ public class ApolSummoningEntity extends Entity {
         readVisualData(entityData.get(DATA));
         entityData.set(AGE, tag.getInt("Age"));
         entityData.set(SETTLED, tag.getBoolean("Settled"));
+        entityData.set(BEAM_TIME, tag.contains("BeamTime") ? tag.getLong("BeamTime") : tag.getBoolean("Settled") ? level().getGameTime() - (tag.getInt("Age") - BEAM_START) : -1L);
         spawned = tag.getBoolean("Spawned");
         bossId = tag.hasUUID("Boss") ? tag.getUUID("Boss") : null;
         summoner = tag.hasUUID("Summoner") ? tag.getUUID("Summoner") : null;

@@ -79,7 +79,7 @@ public final class ApolSpearImpactFx {
                 shader.safeGetUniform("Seed").set((float) (f.seed() & 255));
                 Vec3 n = f.normal(), axis = Math.abs(n.y) > .7 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
                 Vec3 right = n.cross(axis).normalize(), up = right.cross(n).normalize();
-                double radius = .7 + 1.1 * Math.min(1, age / 4);
+                double radius = 1.8 + 2.2 * Math.min(1, age / 4);
                 VertexConsumer out = BUFFER.getBuffer(FlashType.TYPE);
                 quad(out, v, eye, f.pos().add(n.scale(.025)), right.scale(radius), up.scale(radius));
                 if (age < 7) {

@@ -274,6 +274,8 @@
   "tooltip.oasiso.jwings1": "[SPACE]",
   "tooltip.oasiso.wwings": "Can fly through walls",
   "tooltip.oasiso.wwings1": "walls",
+  "tooltip.oasiso.spear": "Press [RMB] for special attack",
+  "tooltip.oasiso.spear1": "[RMB]",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

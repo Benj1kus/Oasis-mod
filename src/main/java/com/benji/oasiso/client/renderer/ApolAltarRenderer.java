@@ -8,6 +8,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 public class ApolAltarRenderer extends GeoBlockRenderer<ApolAltarBlockEntity> {
 
@@ -15,6 +20,12 @@ public class ApolAltarRenderer extends GeoBlockRenderer<ApolAltarBlockEntity> {
 
     public ApolAltarRenderer(BlockEntityRendererProvider.Context context) {
         super(new ApolAltarModel());
+        this.addRenderLayer(new GeoRenderLayer<ApolAltarBlockEntity>(this) {
+            @Override
+            public void render(PoseStack poseStack, ApolAltarBlockEntity altar, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
+                ApolSummoningBeam.trackAltar(altar);
+            }
+        });
 
         this.addRenderLayer(new AutoGlowingGeoLayer<ApolAltarBlockEntity>(this) {
 

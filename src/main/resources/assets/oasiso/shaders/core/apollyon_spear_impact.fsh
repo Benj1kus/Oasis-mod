@@ -14,7 +14,6 @@ void main(){
     vec3 color;
     if(data.r<.5){
         vec2 p=q*2.0-1.0;
-        // Обратное вращение координат = вращение изображения по часовой стрелке.
         float angle=Time*7.5;
         float c=cos(angle),s=sin(angle);
         p=vec2(c*p.x-s*p.y,s*p.x+c*p.y);
