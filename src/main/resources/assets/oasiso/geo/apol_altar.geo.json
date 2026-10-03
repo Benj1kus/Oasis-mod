@@ -1,0 +1,63 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "bb_main",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, 0, -8], "size": [16, 3, 16], "pivot": [0, 1.5, 0], "rotation": [0, 0, -180], "uv": [0, 40]},
+						{"origin": [-8, 3, -8], "size": [16, 5, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "top",
+					"pivot": [0, 14.5, 0],
+					"cubes": [
+						{"origin": [-8, 13, -8], "size": [16, 3, 16], "uv": [0, 40]},
+						{"origin": [-8, 16, -8], "size": [16, 5, 16], "uv": [0, 0]},
+						{"origin": [-8, 8, -8], "size": [16, 5, 16], "pivot": [0, 10.5, 0], "rotation": [0, 0, -180], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "sliuna",
+					"pivot": [0, 3, 0],
+					"cubes": [
+						{"origin": [-7, 3, -7], "size": [14, 10, 14], "uv": [0, 59]}
+					]
+				},
+				{
+					"name": "sphere",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{"origin": [-4, 4, -4], "size": [8, 8, 8], "uv": [56, 59]}
+					]
+				},
+				{
+					"name": "sphere2",
+					"pivot": [0, 8, 0],
+					"rotation": [0, 0, 0],
+					"cubes": [
+						{"origin": [-4, 4, -4], "size": [8, 8, 8], "uv": [56, 59]}
+					]
+				},
+				{
+					"name": "sphere3",
+					"pivot": [0, 8, 0],
+					"cubes": [
+						{"origin": [-4, 4, -4], "size": [8, 8, 8], "uv": [56, 59]}
+					]
+				}
+			]
+		}
+	]
+}

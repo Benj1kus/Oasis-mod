@@ -362,6 +362,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.APOL_ALTAR_BE.get(),
+                ApolAltarRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.MOUTH_POINT_BE.get(),
                 MouthPointRenderer::new
         );

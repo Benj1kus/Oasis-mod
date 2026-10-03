@@ -114,6 +114,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> MOUTH_POINT = BLOCKS.register("mouth_point", () -> new MouthPointBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(50.0F).requiresCorrectToolForDrops().noOcclusion().dynamicShape()));
     public static final RegistryObject<Block> TITANA_STATUE = BLOCKS.register("titana_statue", () -> new StatueBlock(TITANA_SHAPE, BlockBehaviour.Properties.copy(Blocks.STONE).strength(300.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> CACTOS = BLOCKS.register("cactos", () -> new CactosBlock(BlockBehaviour.Properties.copy(Blocks.CACTUS).noOcclusion().instabreak()));
+    public static final RegistryObject<Block> APOL_ALTAR = BLOCKS.register("apol_altar", () -> new ApolAltarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).lightLevel(state -> 10).requiresCorrectToolForDrops().noOcclusion()));
 
     public static final RegistryObject<Block> DOUM_PALM_LOG = BLOCKS.register("doum_palm_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
     public static final RegistryObject<Block> DOUM_PALM_WOOD = BLOCKS.register("doum_palm_wood", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WOOD)));

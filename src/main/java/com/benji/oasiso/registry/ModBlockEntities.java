@@ -12,6 +12,7 @@ public final class ModBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<BlockEntityType<ApolAltarBlockEntity>> APOL_ALTAR_BE = BLOCK_ENTITIES.register("apol_altar", () -> BlockEntityType.Builder.of(ApolAltarBlockEntity::new, ModBlocks.APOL_ALTAR.get()).build(null));
     public static final RegistryObject<BlockEntityType<AzumalitCrystalBlockEntity>> AZUMALIT_CRYSTAL_BE = BLOCK_ENTITIES.register("azumalit_crystal", () -> BlockEntityType.Builder.of(AzumalitCrystalBlockEntity::new, ModBlocks.AZUMALIT_CRYSTAL.get()).build(null));
     public static final RegistryObject<BlockEntityType<EntropyLanternBlockEntity>> ENTROPY_LANTERN_BE = BLOCK_ENTITIES.register("entropy_lantern", () -> BlockEntityType.Builder.of(EntropyLanternBlockEntity::new, ModBlocks.ENTROPY_LANTERN.get()).build(null));
     public static final RegistryObject<BlockEntityType<SeamlessCurveChainBlockEntity>> SEEMLESS_CURVE_CHAIN_BE = BLOCK_ENTITIES.register("seemless_curve_chain", () -> BlockEntityType.Builder.of(SeamlessCurveChainBlockEntity::new, ModBlocks.SEEMLESS_CURVE_CHAIN.get()).build(null));

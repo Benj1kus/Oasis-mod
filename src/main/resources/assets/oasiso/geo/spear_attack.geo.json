@@ -494,7 +494,7 @@
 					]
 				},
 				{
-					"name": "bone",
+					"name": "back_spear",
 					"parent": "apollyon_spear_attack",
 					"pivot": [-0.17678, 44.93287, 0.5],
 					"cubes": [

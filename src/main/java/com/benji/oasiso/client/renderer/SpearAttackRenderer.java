@@ -28,7 +28,7 @@ public class SpearAttackRenderer extends GeoEntityRenderer<SpearAttackEntity> {
     private static final int[] TRIANGLES = {0, 1, 2, 0, 2, 3};
     private final MultiBufferSource.BufferSource ownBuffers = MultiBufferSource.immediate(new BufferBuilder(131072));
     private final ArrayList<float[]> mesh = new ArrayList<>();
-    private Matrix4f clipMatrix;
+    private Matrix4f clipMatrix, trailPose;
     private boolean capture, crossesCamera;
     private float minX, minY, maxX, maxY;
 
@@ -39,9 +39,9 @@ public class SpearAttackRenderer extends GeoEntityRenderer<SpearAttackEntity> {
     }
 
     @Override
-    public void render(SpearAttackEntity entity, float yaw, float partial, PoseStack pose,
-                       MultiBufferSource source, int light) {
+    public void render(SpearAttackEntity entity, float yaw, float partial, PoseStack pose, MultiBufferSource source, int light) {
         mesh.clear();
+        trailPose = null;
         minX = minY = Float.POSITIVE_INFINITY;
         maxX = maxY = Float.NEGATIVE_INFINITY;
         crossesCamera = false;
@@ -53,6 +53,8 @@ public class SpearAttackRenderer extends GeoEntityRenderer<SpearAttackEntity> {
             capture = false;
             ownBuffers.endBatch();
         }
+        if (entity.isArtillery() && !entity.isLanded() && trailPose != null)
+            ApollyonSpearTrail.renderItem(-1L - entity.getId(), 99, trailPose, partial);
         if (mesh.isEmpty() || !SpearAttackShaders.ready()) return;
         int texture = Minecraft.getInstance().getTextureManager().getTexture(getTextureLocation(entity)).getId();
         float time = (entity.tickCount + partial) / 20F;
@@ -63,27 +65,78 @@ public class SpearAttackRenderer extends GeoEntityRenderer<SpearAttackEntity> {
     }
 
     @Override
-    public void actuallyRender(PoseStack pose, SpearAttackEntity entity, BakedGeoModel model,
-                               RenderType type, MultiBufferSource source, VertexConsumer vertices,
-                               boolean reRender, float partial, int light, int overlay,
-                               float red, float green, float blue, float alpha) {
+    public void actuallyRender(PoseStack pose, SpearAttackEntity entity, BakedGeoModel model, RenderType type, MultiBufferSource source, VertexConsumer vertices, boolean reRender, float partial, int light, int overlay, float red, float green, float blue, float alpha) {
         boolean previous = capture;
-        capture = !reRender && !entity.isInvisible() && SpearAttackShaders.ready()
-                && entity.position().distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())
-                <= OUTLINE_DISTANCE * OUTLINE_DISTANCE;
+        capture = !reRender && !entity.isInvisible() && SpearAttackShaders.ready() && entity.position().distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()) <= OUTLINE_DISTANCE * OUTLINE_DISTANCE;
         try {
 
-            super.actuallyRender(pose, entity, model, type, source, vertices, reRender,
-                    partial, light, overlay, red, green, blue, alpha);
+            super.actuallyRender(pose, entity, model, type, source, vertices, reRender, partial, light, overlay, red, green, blue, alpha);
         } finally {
             capture = previous;
         }
     }
 
     @Override
-    public void createVerticesOfQuad(GeoQuad quad, Matrix4f pose, Vector3f normal,
-                                     VertexConsumer buffer, int light, int overlay,
-                                     float red, float green, float blue, float alpha) {
+    protected void applyRotations(SpearAttackEntity entity, PoseStack pose, float age, float yaw, float partial) {
+        if (!entity.isArtillery()) {
+            super.applyRotations(entity, pose, age, yaw, partial);
+            return;
+        }
+        float pitch = net.minecraft.util.Mth.lerp(partial, entity.xRotO, entity.getXRot());
+        float heading = net.minecraft.util.Mth.rotLerp(partial, entity.yRotO, entity.getYRot());
+        double a = Math.toRadians(heading), b = Math.toRadians(pitch);
+        org.joml.Vector3f direction = entity.isArtilleryLaunched() ? new org.joml.Vector3f((float) (Math.sin(a) * Math.cos(b)), (float) Math.sin(b), (float) (Math.cos(a) * Math.cos(b))) : new org.joml.Vector3f(0, 1, 0);
+        pose.mulPose(new org.joml.Quaternionf().rotationTo(new org.joml.Vector3f(0, -1, 0), direction));
+    }
+
+    @Override
+    public void renderRecursively(PoseStack pose, SpearAttackEntity entity, software.bernie.geckolib.cache.object.GeoBone bone, RenderType type, MultiBufferSource source, VertexConsumer vertices, boolean reRender, float partial, int light, int overlay, float red, float green, float blue, float alpha) {
+        float[] saved = null;
+        if (entity.isArtillery()) {
+            saved = new float[]{bone.getRotX(), bone.getRotY(), bone.getRotZ(), bone.getPosX(), bone.getPosY(), bone.getPosZ(), bone.getScaleX(), bone.getScaleY(), bone.getScaleZ()};
+            var initial = bone.getInitialSnapshot();
+            bone.setRotX(initial.getRotX());
+            bone.setRotY(initial.getRotY());
+            bone.setRotZ(initial.getRotZ());
+            bone.setPosX(initial.getOffsetX());
+            bone.setPosY(initial.getOffsetY());
+            bone.setPosZ(initial.getOffsetZ());
+            bone.setScaleX(initial.getScaleX());
+            bone.setScaleY(initial.getScaleY());
+            bone.setScaleZ(initial.getScaleZ());
+        }
+        try {
+            boolean emitter = "back_spear".equals(bone.getName()) || ("bone".equals(bone.getName()) && getGeoModel().getBone("back_spear").isEmpty());
+            if (entity.isArtillery() && !entity.isLanded() && !reRender && emitter) {
+                pose.pushPose();
+                try {
+                    software.bernie.geckolib.util.RenderUtils.translateMatrixToBone(pose, bone);
+                    software.bernie.geckolib.util.RenderUtils.translateToPivotPoint(pose, bone);
+                    software.bernie.geckolib.util.RenderUtils.rotateMatrixAroundBone(pose, bone);
+                    software.bernie.geckolib.util.RenderUtils.scaleMatrixForBone(pose, bone);
+                    trailPose = new Matrix4f(pose.last().pose());
+                } finally {
+                    pose.popPose();
+                }
+            }
+            super.renderRecursively(pose, entity, bone, type, source, vertices, reRender, partial, light, overlay, red, green, blue, alpha);
+        } finally {
+            if (saved != null) {
+                bone.setRotX(saved[0]);
+                bone.setRotY(saved[1]);
+                bone.setRotZ(saved[2]);
+                bone.setPosX(saved[3]);
+                bone.setPosY(saved[4]);
+                bone.setPosZ(saved[5]);
+                bone.setScaleX(saved[6]);
+                bone.setScaleY(saved[7]);
+                bone.setScaleZ(saved[8]);
+            }
+        }
+    }
+
+    @Override
+    public void createVerticesOfQuad(GeoQuad quad, Matrix4f pose, Vector3f normal, VertexConsumer buffer, int light, int overlay, float red, float green, float blue, float alpha) {
         super.createVerticesOfQuad(quad, pose, normal, buffer, light, overlay, red, green, blue, alpha);
         if (!capture) return;
         float[][] corners = new float[4][];
@@ -93,10 +146,15 @@ public class SpearAttackRenderer extends GeoEntityRenderer<SpearAttackEntity> {
             Vector4f transformed = pose.transform(new Vector4f(p.x(), p.y(), p.z(), 1));
             corners[i] = new float[]{transformed.x(), transformed.y(), transformed.z(), vertex.texU(), vertex.texV()};
             Vector4f clip = clipMatrix.transform(new Vector4f(transformed));
-            if (clip.w() <= 0.0001F) { crossesCamera = true; continue; }
+            if (clip.w() <= 0.0001F) {
+                crossesCamera = true;
+                continue;
+            }
             float x = clip.x() / clip.w(), y = clip.y() / clip.w();
-            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
         }
         for (int index : TRIANGLES) mesh.add(corners[index]);
     }

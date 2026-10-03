@@ -101,6 +101,7 @@ public final class ModItems {
     public static final RegistryObject<Item> AZUMALIT_CRYSTAL_ITEM = ITEMS.register("azumalit_crystal", () -> new BlockItem(ModBlocks.AZUMALIT_CRYSTAL.get(), new Item.Properties()));
     public static final RegistryObject<Item> AZUMALINE_GROWTH_ITEM = ITEMS.register("azumaline_growth", () -> new BlockItem(ModBlocks.AZUMALINE_GROWTH.get(), new Item.Properties()));
     public static final RegistryObject<Item> NOT_AZUMALIT_CRYSTAL_ITEM = ITEMS.register("not_azumalit_crystal", () -> new BlockItem(ModBlocks.NOT_AZUMALIT_CRYSTAL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> APOL_ALTAR_ITEM = ITEMS.register("apol_altar", () -> new GeoBlockItem(ModBlocks.APOL_ALTAR.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/apol_altar.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/apol_altar.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/apol_altar.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
 
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));

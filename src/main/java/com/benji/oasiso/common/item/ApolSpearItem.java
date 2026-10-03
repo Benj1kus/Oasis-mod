@@ -46,6 +46,16 @@ public class ApolSpearItem extends SwordItem implements GeoItem {
     }
 
     @Override
+    public net.minecraft.world.InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (hand != InteractionHand.MAIN_HAND || player.getCooldowns().isOnCooldown(this))
+            return net.minecraft.world.InteractionResultHolder.fail(stack);
+        if (level instanceof ServerLevel server && !ApolSpearVolley.cast(server, player, stack))
+            return net.minecraft.world.InteractionResultHolder.fail(stack);
+        return net.minecraft.world.InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    }
+
+    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
         if (level instanceof ServerLevel server) GeoItem.getOrAssignId(stack, server);
@@ -97,6 +107,7 @@ public class ApolSpearItem extends SwordItem implements GeoItem {
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private ApolSpearRenderer renderer;
+
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
                 if (renderer == null) renderer = new ApolSpearRenderer();
