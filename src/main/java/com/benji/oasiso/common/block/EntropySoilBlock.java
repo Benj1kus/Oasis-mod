@@ -73,6 +73,12 @@ public final class EntropySoilBlock extends Block {
         return (cover.layer() == 1 || cover.layer() == 4) && cover.from() == side.getOpposite();
     }
 
+    @Override
+    @net.minecraftforge.api.distmarker.OnlyIn(net.minecraftforge.api.distmarker.Dist.CLIENT)
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        com.benji.oasiso.client.particle.SoilParticle.trySpawn(level, pos, random);
+    }
+
     private BlockState primaryState(BlockState state, BlockGetter level, BlockPos pos) {
         Cover base = baseCover(level, pos);
         if (base.layer() != 3) {

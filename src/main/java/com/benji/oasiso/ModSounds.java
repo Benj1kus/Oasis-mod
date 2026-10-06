@@ -122,6 +122,18 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> AZUMAAL_SONG = registerSoundEvent("azumaal_song");
 
 
+    public static final RegistryObject<SoundEvent> EZOMBIE_IDLE1 = registerSoundEvent("ezombie_idle1");
+    public static final RegistryObject<SoundEvent> EZOMBIE_IDLE2 = registerSoundEvent("ezombie_idle2");
+    public static final RegistryObject<SoundEvent> EZOMBIE_IDLE3 = registerSoundEvent("ezombie_idle3");
+    public static final RegistryObject<SoundEvent> EZOMBIE_HURT = registerSoundEvent("ezombie_hurt");
+    public static final RegistryObject<SoundEvent> EZOMBIE_DEATH = registerSoundEvent("ezombie_death");
+
+    public static final RegistryObject<SoundEvent> ECREEPER_IDLE1 = registerSoundEvent("ecreeper_idle1");
+    public static final RegistryObject<SoundEvent> ECREEPER_IDLE2 = registerSoundEvent("ecreeper_idle2");
+    public static final RegistryObject<SoundEvent> ECREEPER_IDLE3 = registerSoundEvent("ecreeper_idle3");
+    public static final RegistryObject<SoundEvent> ECREEPER_HURT = registerSoundEvent("ecreeper_hurt");
+    public static final RegistryObject<SoundEvent> ECREEPER_DEATH = registerSoundEvent("ecreeper_death");
+
     public static final RegistryObject<SoundEvent> AZUMAAL_LOOPED = registerSoundEvent("azumaal_looped");
 
 

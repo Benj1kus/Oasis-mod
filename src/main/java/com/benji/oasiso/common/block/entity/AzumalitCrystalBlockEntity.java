@@ -43,6 +43,7 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
     private Direction hitFace = Direction.UP;
     private List<Vec3> path = List.of();
     private boolean impactPending;
+    private java.util.UUID mobTarget;
     private int receivedArcAge;
     private long clientArrivalTick = Long.MIN_VALUE;
 
@@ -61,9 +62,24 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
 
             if (now <= strikeStart + IMPACT_TICKS + 2 && !path.isEmpty()) {
                 Vec3 hit = path.get(path.size() - 1);
-                server.playSound(null, hit.x, hit.y, hit.z, ModSounds.CRYSTAL_HIT.get(), SoundSource.BLOCKS, 0.65F, 0.90F + server.random.nextFloat() * 0.20F);
+                boolean converted = false;
+                if (mobTarget != null) {
+                    var entity = server.getEntity(mobTarget);
+                    Vec3 source = Vec3.atCenterOf(worldPosition);
+                    if (entity instanceof net.minecraft.world.entity.Mob mob && com.benji.oasiso.common.entropy.EntropyInfection.eligible(mob) && canReachMob(server, source, mob)) {
+                        hit = mob.getBoundingBox().getCenter();
+                        seed = server.random.nextLong();
+                        path = buildPath(server, source, hit, seed);
+                        BlockState state = getBlockState();
+                        server.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
+                        converted = com.benji.oasiso.common.entropy.EntropyInfection.convert(server, mob, true) != null;
+                    }
+                }
+                if (!converted)
+                    server.playSound(null, hit.x, hit.y, hit.z, ModSounds.CRYSTAL_HIT.get(), SoundSource.BLOCKS, 0.65F, 0.90F + server.random.nextFloat() * 0.20F);
             }
         }
+        if (!impactPending) mobTarget = null;
         if (nextStrike == 0 || nextStrike > now + MAX_DELAY) {
             nextStrike = now + delay(server.random);
             setChanged();
@@ -76,6 +92,17 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
             return;
 
         Vec3 source = Vec3.atCenterOf(worldPosition);
+        //30% chance
+        if (server.random.nextFloat() < .30F) {
+            var targets = server.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(worldPosition).inflate(RANGE), mob -> com.benji.oasiso.common.entropy.EntropyInfection.eligible(mob) && canReachMob(server, source, mob));
+            if (!targets.isEmpty()) {
+                var target = targets.get(server.random.nextInt(targets.size()));
+                mobTarget = target.getUUID();
+                beginArc(server, source, target.getBoundingBox().getCenter(), Direction.UP, now);
+                return;
+            }
+        }
+        mobTarget = null;
         BlockHitResult hit = null;
         for (int attempt = 0; attempt < 32; attempt++) {
             Vec3 direction = new Vec3(server.random.nextDouble() * 2 - 1, server.random.nextDouble() * 2 - 1, server.random.nextDouble() * 2 - 1);
@@ -96,8 +123,17 @@ public final class AzumalitCrystalBlockEntity extends BlockEntity {
         Vec3 normal = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
         Vec3 end = hit.getLocation().add(normal.scale(.035));
 
+        beginArc(server, source, end, hit.getDirection(), now);
+    }
+
+    private boolean canReachMob(ServerLevel server, Vec3 source, net.minecraft.world.entity.Mob mob) {
+        Vec3 end = mob.getBoundingBox().getCenter();
+        return source.distanceToSqr(end) <= RANGE * RANGE && loaded(server, source, end) && clip(server, source, end).getType() == HitResult.Type.MISS;
+    }
+
+    private void beginArc(ServerLevel server, Vec3 source, Vec3 end, Direction face, long now) {
         seed = server.random.nextLong();
-        hitFace = hit.getDirection();
+        hitFace = face;
         path = buildPath(server, source, end, seed);
         strikeStart = now;
         impactPending = true;

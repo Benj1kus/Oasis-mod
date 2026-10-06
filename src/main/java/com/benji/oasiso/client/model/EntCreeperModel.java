@@ -13,7 +13,7 @@ public class EntCreeperModel extends GeoModel<EntCreeperEntity> {
 
     @Override
     public ResourceLocation getTextureResource(EntCreeperEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/ent_creeper.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, animatable.isEntropyStriking()?"textures/entity/ent_creeper_strike.png":"textures/entity/ent_creeper.png");
     }
 
     @Override

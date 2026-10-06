@@ -56,6 +56,18 @@
   "espider_hurt": { "sounds": [ "oasiso:espider_hurt" ] },
   "espider_step": { "sounds": [ "oasiso:espider_step" ] },
 
+  "ezombie_idle1": { "sounds": [ "oasiso:ezombie_idle1" ] },
+  "ezombie_idle2": { "sounds": [ "oasiso:ezombie_idle2" ] },
+  "ezombie_idle3": { "sounds": [ "oasiso:ezombie_idle3" ] },
+  "ezombie_hurt": { "sounds": [ "oasiso:ezombie_hurt" ] },
+  "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
+
+  "ecreeper_idle1": { "sounds": [ "oasiso:ecreeper_idle1" ] },
+  "ecreeper_idle2": { "sounds": [ "oasiso:ecreeper_idle2" ] },
+  "ecreeper_idle3": { "sounds": [ "oasiso:ecreeper_idle3" ] },
+  "ecreeper_hurt": { "sounds": [ "oasiso:ecreeper_hurt" ] },
+  "ecreeper_death": { "sounds": [ "oasiso:ecreeper_death" ] },
+
   "eworm_idle1": { "sounds": [ "oasiso:eworm_idle1" ] },
   "eworm_idle2": { "sounds": [ "oasiso:eworm_idle2" ] },
   "eworm_idle3": { "sounds": [ "oasiso:eworm_idle3" ] },

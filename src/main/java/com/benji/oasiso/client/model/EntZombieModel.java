@@ -13,7 +13,7 @@ public class EntZombieModel extends GeoModel<EntZombieEntity> {
 
     @Override
     public ResourceLocation getTextureResource(EntZombieEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/ent_zombie.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, animatable.isEntropyStriking()?"textures/entity/ent_zombie_strike.png":"textures/entity/ent_zombie.png");
     }
 
     @Override

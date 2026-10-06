@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 // ВАЖНО: Замени ModParticles на свой класс-реестр (DeferredRegister), где зарегистрированы партиклы!
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -7,6 +8,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +32,41 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
 
 public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEntity {
+
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Long> ENTROPY_STRIKE_END =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(EntCreeperEntity.class, net.minecraft.network.syncher.EntityDataSerializers.LONG);
+    private boolean restoreNoAi;
+    private boolean strikePendingRestore;
+
+    public boolean isEntropyStriking() {
+        return entityData.get(ENTROPY_STRIKE_END) > level().getGameTime();
+    }
+    public void beginEntropyStrike() {
+        if(level().isClientSide)return;
+        restoreNoAi=isNoAi();strikePendingRestore=true;
+        entityData.set(ENTROPY_STRIKE_END,level().getGameTime()+10);
+        getNavigation().stop();setNoAi(true);
+        setDeltaMovement(0,getDeltaMovement().y,0);
+    }
+    private void finishEntropyStrike() {
+        if(!level().isClientSide && strikePendingRestore && !isEntropyStriking()) {
+            setNoAi(restoreNoAi);strikePendingRestore=false;
+            entityData.set(ENTROPY_STRIKE_END,-1L);
+        }
+    }
+    @Override public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putLong("EntropyStrikeEnd",entityData.get(ENTROPY_STRIKE_END));
+        tag.putBoolean("EntropyStrikeRestore",strikePendingRestore);
+        tag.putBoolean("EntropyStrikeNoAi",restoreNoAi);
+    }
+    @Override public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        entityData.set(ENTROPY_STRIKE_END,tag.contains("EntropyStrikeEnd")?tag.getLong("EntropyStrikeEnd"):-1L);
+        strikePendingRestore=tag.getBoolean("EntropyStrikeRestore");restoreNoAi=tag.getBoolean("EntropyStrikeNoAi");
+        finishEntropyStrike();
+    }
+
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     private static final EntityDataAccessor<Boolean> DATA_IGNITED = SynchedEntityData.defineId(EntCreeperEntity.class, EntityDataSerializers.BOOLEAN);
@@ -42,13 +79,19 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 40.0D).add(Attributes.MOVEMENT_SPEED, 0.25D).add(Attributes.KNOCKBACK_RESISTANCE, 0.3D).add(Attributes.ATTACK_DAMAGE, 0.0D).add(Attributes.FOLLOW_RANGE, 30.0D);
+        return Monster.createMonsterAttributes()
+                .add(Attributes.MAX_HEALTH, 40.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.25D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.3D)
+                .add(Attributes.ATTACK_DAMAGE, 0.0D)
+                .add(Attributes.FOLLOW_RANGE, 30.0D);
     }
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DATA_IGNITED, false);
+        entityData.define(ENTROPY_STRIKE_END,-1L);
     }
 
     @Override
@@ -61,7 +104,10 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this,"entropy_strike",0,event ->
+                isEntropyStriking()?event.setAndContinue(RawAnimation.begin().thenPlay("strike")):PlayState.STOP));
         controllers.add(new AnimationController<>(this, "movement", 5, event -> {
+            if(isEntropyStriking())return PlayState.STOP;
             if (this.isIgnited()) {
                 return PlayState.STOP;
             }
@@ -71,13 +117,15 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
             return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
         }));
 
-        controllers.add(new AnimationController<>(this, "action", 2, event -> PlayState.STOP).triggerableAnim("hit", RawAnimation.begin().thenPlay("hit")).triggerableAnim("explode", RawAnimation.begin().thenPlay("explode")) // Добавили триггер взрыва
+        controllers.add(new AnimationController<>(this, "action", 2, event -> PlayState.STOP).triggerableAnim("hit", RawAnimation.begin().thenPlay("hit")).triggerableAnim("explode", RawAnimation.begin().thenPlay("explode"))
         );
     }
 
     @Override
     public void tick() {
         super.tick();
+        finishEntropyStrike();
+        if(isEntropyStriking())return;
 
         if (this.isAlive() && this.isIgnited()) {
             this.setDeltaMovement(0, this.getDeltaMovement().y, 0);
@@ -94,17 +142,17 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
     }
 
     public void ignite() {
-        if (!this.isIgnited()) {
+        if (!this.isIgnited() && !isEntropyStriking()) {
             this.entityData.set(DATA_IGNITED, true);
             if (!this.level().isClientSide) {
-                this.triggerAnim("action", "explode"); // Запускаем анимацию
+                this.triggerAnim("action", "explode");
             }
         }
     }
 
     private void explode() {
         if (!this.level().isClientSide) {
-            float radius = 6.0F;
+            float radius = 4.0F;
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), radius, Level.ExplosionInteraction.MOB);
             ServerLevel serverLevel = (ServerLevel) this.level();
 
@@ -118,7 +166,7 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
     @Override
     public boolean hurt(DamageSource source, float amount) {
         boolean wasHurt = super.hurt(source, amount);
-        if (wasHurt && !this.level().isClientSide && this.isAlive() && !this.isIgnited()) {
+        if (wasHurt && !isEntropyStriking() && !this.level().isClientSide && this.isAlive() && !this.isIgnited()) {
             this.triggerAnim("action", "hit");
         }
         return wasHurt;
@@ -126,7 +174,26 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
 
     @Override
     public ResourceLocation getGlowmaskTexture() {
+        if(isEntropyStriking())return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID,"textures/entity/ent_creeper_strike.png");
         return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/emissive/ent_creeper_emissive.png");
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {ModSounds.ECREEPER_IDLE1.get(), ModSounds.ECREEPER_IDLE2.get(), ModSounds.ECREEPER_IDLE3.get()};
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.ECREEPER_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.ECREEPER_DEATH.get();
     }
 
     @Override
@@ -146,7 +213,7 @@ public class EntCreeperEntity extends Monster implements GeoEntity, GlowmaskEnti
         @Override
         public boolean canUse() {
             LivingEntity livingTarget = this.creeper.getTarget();
-            return this.creeper.isIgnited() || (livingTarget != null && this.creeper.distanceToSqr(livingTarget) < 9.0D);
+            return !this.creeper.isEntropyStriking() && (this.creeper.isIgnited() || (livingTarget != null && this.creeper.distanceToSqr(livingTarget) < 9.0D));
         }
 
         @Override
