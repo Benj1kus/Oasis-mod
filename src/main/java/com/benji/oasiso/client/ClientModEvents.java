@@ -155,6 +155,16 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.ENT_ZOMBIE.get(),
+                EntZombieRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.ENT_CREEPER.get(),
+                EntCreeperRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 Oasiso.OSIRIS_TENTACLE.get(),
                 OsirisTentacleRenderer::new
         );

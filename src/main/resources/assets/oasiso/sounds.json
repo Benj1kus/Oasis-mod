@@ -72,6 +72,7 @@
   "apol_tel": { "sounds": [ "oasiso:apol_tel" ] },
   "apol_alert": { "sounds": [ "oasiso:apol_alert" ] },
   "apol_drill": { "sounds": [ "oasiso:apol_drill" ] },
+  "apol_beam": { "sounds": [ "oasiso:apol_beam" ] },
 
   "entropy_death": { "sounds": [ "oasiso:entropy_death" ] },
 

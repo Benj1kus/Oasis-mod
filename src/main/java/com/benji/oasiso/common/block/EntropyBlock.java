@@ -139,9 +139,13 @@ public class EntropyBlock extends Block {
                 && !entity.isSpectator()
                 && !(entity instanceof KrombulEntity)
                 && !(entity instanceof EntropyCreatureEntity)
+                && !(entity instanceof EntZombieEntity)
+                && !(entity instanceof EntCreeperEntity)
                 && !(entity instanceof EntropySpiderEntity)
                 && !(entity instanceof EntropyWormEntity)
+                && !(entity instanceof SpearAttackEntity)
                 && !(entity instanceof ApollyonEntity));
+
 
         for (Entity entity : entities) {
             double distanceSqr = entity.position().distanceToSqr(center);

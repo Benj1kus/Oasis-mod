@@ -23,6 +23,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.benji.oasiso.ModSounds;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.*;
 
@@ -361,6 +363,11 @@ public class ApolSummoningEntity extends Entity {
         if (age() >= LIFT_TICKS && !settled()) {
             if (!settle(server)) return;
         }
+
+        if (age() == BEAM_START) {
+            server.playSound(null, raisedAltar(), ModSounds.APOL_BEAM.get(), SoundSource.BLOCKS, 5.3F, 1.0F);
+        }
+
         if (age() >= LIFT_TICKS && age() < SPAWN_AT && age() % 3 == 0)
             server.sendParticles(Oasiso.ENTROPY_LIGHTNING.get(), origin.getX() + .5, raisedAltar().getY() + 1, origin.getZ() + .5, 3, .7, .9, .7, .03);
         if (age() >= SPAWN_AT && !spawned) {

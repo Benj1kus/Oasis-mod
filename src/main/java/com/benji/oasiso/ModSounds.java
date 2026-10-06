@@ -52,6 +52,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> APOL_TEL = registerSoundEvent("apol_tel");
     public static final RegistryObject<SoundEvent> APOL_ALERT = registerSoundEvent("apol_alert");
     public static final RegistryObject<SoundEvent> APOL_DRILL = registerSoundEvent("apol_drill");
+    public static final RegistryObject<SoundEvent> APOL_BEAM = registerSoundEvent("apol_beam");
 
     public static final RegistryObject<SoundEvent> EWORM_IDLE1 = registerSoundEvent("eworm_idle1");
     public static final RegistryObject<SoundEvent> EWORM_IDLE2 = registerSoundEvent("eworm_idle2");

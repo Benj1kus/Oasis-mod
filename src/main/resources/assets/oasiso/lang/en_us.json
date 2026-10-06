@@ -178,6 +178,8 @@
   "entity.oasiso.entropy_worm": "Entropy Worm",
   "entity.oasiso.apollyon": "Apollyon",
   "entity.oasiso.spear_attack": "Apollyon Spear",
+  "entity.oasiso.ent_zombie": "Entropy Zombie",
+  "entity.oasiso.ent_creeper": "Entropy Creeper",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
