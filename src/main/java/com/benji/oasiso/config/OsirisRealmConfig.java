@@ -8,6 +8,8 @@ public final class OsirisRealmConfig {
 
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
+    // Apollyon wings
+    public static final ForgeConfigSpec.BooleanValue APOL_WINGS_WALL_COLLISION_DAMAGE;
 
     // Super Gold armor
     public static final ForgeConfigSpec.IntValue SUPER_GOLD_HELMET_DEFENSE;
@@ -135,6 +137,12 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CHAOS_SPAWNER_GOLEMS_MOBS;
 
     static {
+        BUILDER.push("Apollyon Wings");
+
+        APOL_WINGS_WALL_COLLISION_DAMAGE = BUILDER.comment("Whether players wearing Apollyon Wings receive wall collision damage.", "Disable to prevent impact damage when entering wall transit.").define("wallCollisionDamage", false);
+
+        BUILDER.pop();
+
         BUILDER.push("Super Gold Armor");
         SUPER_GOLD_HELMET_DEFENSE = armorDefense("helmetDefense", "Protection points granted by the Karakolum helmet.", 3);
         SUPER_GOLD_CHESTPLATE_DEFENSE = armorDefense("chestplateDefense", "Protection points granted by the Karakolum chestplate.", 8);

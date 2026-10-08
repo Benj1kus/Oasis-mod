@@ -23,6 +23,8 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
+import com.benji.oasiso.config.OsirisRealmConfig;
+import net.minecraft.world.damagesource.DamageTypes;
 
 import java.util.*;
 
@@ -235,7 +237,14 @@ public final class ApolWingsTransit {
 
     @SubscribeEvent
     public static void damage(LivingAttackEvent e) {
-        if (e.getEntity() instanceof Player p && active(p)) e.setCanceled(true);
+        if (!(e.getEntity() instanceof ServerPlayer p)) return;
+        if (active(p)) {
+            e.setCanceled(true);
+            return;
+        }
+        if (!OsirisRealmConfig.APOL_WINGS_WALL_COLLISION_DAMAGE.get() && e.getSource().is(DamageTypes.FLY_INTO_WALL) && p.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof ApolWingsArmorItem) {
+            e.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

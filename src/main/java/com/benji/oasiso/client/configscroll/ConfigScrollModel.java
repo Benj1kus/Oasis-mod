@@ -157,6 +157,9 @@ final class ConfigScrollModel {
         }
 
         boolean accepts(Object candidate) {
+            if (bool) {
+                return candidate instanceof Boolean && definition.test(candidate);
+            }
             return definition.test(candidate) && Objects.equals(candidate, definition.correct(copy(candidate)));
         }
 
