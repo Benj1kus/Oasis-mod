@@ -10,7 +10,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class OasisoLightStyles {
-    public static final int MAX_LIGHTS = 4;
+    public static final int MAX_LIGHTS = 10;
     public static final int SEARCH_RADIUS = 24;
     public static final int SHADOW_SIZE = 16;
     public static final int RAYS_PER_TICK = 256;

@@ -1,4 +1,5 @@
 #version 150
+#define MAX_LIGHTS 10
 uniform sampler2D Scene;
 uniform sampler2D Depth;
 uniform sampler2D Shadows;
@@ -7,22 +8,18 @@ uniform vec2 Resolution;
 uniform vec3 CameraCell;
 uniform float Time;
 uniform int Count;
-// xyz = положение относительно камеры, w = радиус света.
-uniform vec4 LightPosition[4];
-// rgb = основной цвет, w = сила света с учётом появления/дистанции.
-uniform vec4 LightColor[4];
-// rgb = второй цвет, w = радиус дымки.
-uniform vec4 LightAccent[4];
-// x = плотность дымки, y = ореол, z = плавное появление, w = seed.
-uniform vec4 LightSettings[4];
+uniform vec4 LightPosition[MAX_LIGHTS];
+uniform vec4 LightColor[MAX_LIGHTS];
+uniform vec4 LightAccent[MAX_LIGHTS];
+uniform vec4 LightSettings[MAX_LIGHTS];
 
 in vec2 texCoord;
 out vec4 fragColor;
 
 const float SURFACE_PIXELS_PER_BLOCK = 12.0;
 const float SHADE_STEPS = 7.0;
-const float FOG_PIXEL_SIZE = 3.0; // экранные пиксели при высоте кадра 1080
-const float SHADOW_SIZE = 16.0; // совпадает с SHADOW_SIZE в Java
+const float FOG_PIXEL_SIZE = 3.0;
+const float SHADOW_SIZE = 16.0;
 const int FOG_SAMPLES = 8;
 
 float bayer2(vec2 p) {
@@ -54,7 +51,6 @@ float quantize(float value,float steps,float dither) {
     return (floor(s)+step(dither,fract(s)))/steps;
 }
 
-// Небольшая карта расстояний вокруг источника: учитывает и стены вне экрана.
 float visibility(int index,vec3 offset) {
     float distance=length(offset);
     if(distance<0.12) return 1.0;
@@ -72,15 +68,12 @@ float visibility(int index,vec3 offset) {
     }
     vec2 cell=clamp(floor((uv*0.5+0.5)*SHADOW_SIZE),vec2(0),vec2(SHADOW_SIZE-1.0));
     vec2 atlas=(vec2(face*SHADOW_SIZE,float(index)*SHADOW_SIZE)+cell+0.5)
-            /vec2(SHADOW_SIZE*6.0,SHADOW_SIZE*4.0);
+    /vec2(SHADOW_SIZE*6.0, SHADOW_SIZE*float(MAX_LIGHTS));
     float wall=texture(Shadows,atlas).r;
-    // Допуск для дискретной карты: сами освещаемые грани не затеняют себя.
     float bias=0.09+distance*0.038;
     return 1.0-smoothstep(wall+bias,wall+bias+0.10,distance);
 }
 
-// Нормаль из глубины. Выбираем соседа с меньшим скачком,
-// чтобы силуэт блока не создавал длинные ложные блики.
 vec3 surfaceNormal(vec3 p) {
     vec2 px=1.0/Resolution;
     vec3 r=reconstruct(texCoord+vec2(px.x,0),texture(Depth,texCoord+vec2(px.x,0)).r)-p;
@@ -101,7 +94,7 @@ void main() {
     vec3 p=reconstruct(texCoord,min(depth,0.99999));
     vec3 normal=vec3(0);
     bool needNormal=false;
-    for(int i=0;i<4;++i) {
+    for(int i=0;i<MAX_LIGHTS;++i) {
         if(i>=Count) break;
         if(surface && distance(p,LightPosition[i].xyz)<LightPosition[i].w) needNormal=true;
     }
@@ -113,20 +106,18 @@ void main() {
                      (absNormal.x>absNormal.z?grid.zy:grid.xy);
     float surfaceDither=bayer4(surfaceCell);
 
-    // Только дымка пикселизируется в экранных координатах; сами блоки не размываются.
     float pixel=max(1.0,floor(FOG_PIXEL_SIZE*Resolution.y/1080.0));
     vec2 fogCell=floor(texCoord*Resolution/pixel);
     vec2 fogUV=(fogCell+0.5)*pixel/Resolution;
     vec3 ray=normalize(reconstruct(fogUV,0.99999));
     float fogDepth=texture(Depth,fogUV).r;
-    // Берём ближайшую глубину из центрального и текущего пикселя, чтобы дымка не текла через края стен.
     float stop=surface?length(p):10000.0;
     if(fogDepth<0.999999) stop=min(stop,length(reconstruct(fogUV,fogDepth)));
     float fogDither=bayer4(fogCell);
     vec3 added=vec3(0),fogColor=vec3(0);
     float fogAlpha=0.0;
 
-    for(int i=0;i<4;++i) {
+    for(int i=0;i<MAX_LIGHTS;++i) {
         if(i>=Count) break;
         vec3 light=LightPosition[i].xyz;
         float radius=LightPosition[i].w;
@@ -142,7 +133,6 @@ void main() {
             falloff*=mix(0.12,1.0,facing)*visibility(i,delta);
             falloff=quantize(falloff,SHADE_STEPS,surfaceDither);
             vec3 tint=mix(primary,accent,0.06+0.07*sin(p.y*1.2+Time*0.35+seed));
-            // Сохраняем рисунок уже отрендеренной поверхности.
             added+=tint*(vec3(0.19)+scene.rgb*0.68)*falloff*strength*flicker;
         }
 
@@ -172,8 +162,6 @@ void main() {
         fogColor+=mistColor*alpha;
         fogAlpha+=alpha;
 
-        // Мягкий локальный ореол, ограниченный глубиной сцены и преградами.
-        // Это свечение источника, а не размытие всего кадра/интерфейса.
         if(along>0.0 && along<stop+0.12) {
             vec3 closest=ray*along-light;
             float glow=exp(-max(sideways,0.0)/0.38)*visibility(i,closest);

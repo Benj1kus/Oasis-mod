@@ -10,6 +10,7 @@ import java.util.List;
 
 final class OasisoLightPass {
     private static int sceneTexture, depthTexture, shadowTexture, vao, vbo, width, height;
+    private static final FloatBuffer SHADOW_ATLAS = org.lwjgl.BufferUtils.createFloatBuffer(OasisoLightStyles.SHADOW_SIZE * OasisoLightStyles.SHADOW_SIZE * 6 * OasisoLightStyles.MAX_LIGHTS);
 
     private OasisoLightPass() {
     }
@@ -37,8 +38,11 @@ final class OasisoLightPass {
             GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, old.viewport[0], old.viewport[1], w, h);
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, shadowTexture);
-            int size = OasisoLightStyles.SHADOW_SIZE, atlasWidth = size * 6, atlasHeight = size * 4;
-            FloatBuffer atlas = memory.mallocFloat(atlasWidth * atlasHeight);
+            int size = OasisoLightStyles.SHADOW_SIZE;
+            int atlasWidth = size * 6;
+            int atlasHeight = size * OasisoLightStyles.MAX_LIGHTS;
+            FloatBuffer atlas = SHADOW_ATLAS;
+            atlas.clear();
             for (int i = 0; i < atlasWidth * atlasHeight; i++) atlas.put(i, 0.0F);
             for (int light = 0; light < sources.size(); light++) {
                 float[] data = sources.get(light).shadow;
@@ -61,7 +65,13 @@ final class OasisoLightPass {
             FloatBuffer matrix = memory.mallocFloat(16);
             inverse.get(matrix);
             GL20.glUniformMatrix4fv(location(program, "InverseViewProjection"), false, matrix);
-            FloatBuffer positions = memory.mallocFloat(16), colors = memory.mallocFloat(16), accents = memory.mallocFloat(16), settings = memory.mallocFloat(16);
+            int components = sources.size() * 4;
+
+            FloatBuffer positions = memory.mallocFloat(components);
+            FloatBuffer colors = memory.mallocFloat(components);
+            FloatBuffer accents = memory.mallocFloat(components);
+            FloatBuffer settings = memory.mallocFloat(components);
+
             for (var source : sources) {
                 var style = source.style;
                 float distance = (float) source.center.distanceTo(camera);
@@ -131,7 +141,7 @@ final class OasisoLightPass {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         sceneTexture = texture(GL11.GL_RGBA8, w, h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         depthTexture = texture(GL30.GL_DEPTH_COMPONENT32F, w, h, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT);
-        shadowTexture = texture(GL30.GL_R32F, OasisoLightStyles.SHADOW_SIZE * 6, OasisoLightStyles.SHADOW_SIZE * 4, GL11.GL_RED, GL11.GL_FLOAT);
+        shadowTexture = texture(GL30.GL_R32F, OasisoLightStyles.SHADOW_SIZE * 6, OasisoLightStyles.SHADOW_SIZE * OasisoLightStyles.MAX_LIGHTS, GL11.GL_RED, GL11.GL_FLOAT);
     }
 
     private static int texture(int internal, int w, int h, int format, int type) {
