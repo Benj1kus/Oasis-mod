@@ -26,6 +26,8 @@
     "oasiso:entropy_lantern",
     "oasiso:entropy_soil_slab",
     "oasiso:entropy_soil_stairs",
-    "oasiso:entropy_soil_wall"
+    "oasiso:entropy_soil_wall",
+    "oasiso:geyser_small",
+    "oasiso:geyser_big"
   ]
 }

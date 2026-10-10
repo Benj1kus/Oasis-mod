@@ -90,6 +90,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> ENTROPY_SOIL_STAIRS = BLOCKS.register("entropy_soil_stairs", () -> new StairBlock(() -> ENTROPY_SOIL.get().defaultBlockState(), BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
     public static final RegistryObject<Block> ENTROPY_SOIL_WALL = BLOCKS.register("entropy_soil_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
 
+    public static final RegistryObject<Block> ENTROPY_FOUNTAIN = BLOCKS.register("entropy_fountain", () -> new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 10).strength(10.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein", () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN).sound(SoundType.SMALL_AMETHYST_BUD).lightLevel(state -> 10).noCollission().noOcclusion().replaceable().strength(0.2F)));
@@ -103,6 +105,9 @@ public final class ModBlocks {
     public static final RegistryObject<Block> POTTED_CACTULO = BLOCKS.register("potted_cactulo", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CACTULO, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase", () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.DECORATED_POT).sound(SoundType.DECORATED_POT).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> GEYSER_SMALL = BLOCKS.register("geyser_small", () -> new GeyserSmallBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> GEYSER_BIG = BLOCKS.register("geyser_big", () -> new GeyserBigBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(10.0F).requiresCorrectToolForDrops().noOcclusion()));
+
     public static final RegistryObject<Block> BALL_CACTUS = BLOCKS.register("ball_cactus", () -> new com.benji.oasiso.common.block.BallCactusBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).sound(SoundType.WOOL).instabreak().noOcclusion().randomTicks()));
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue", () -> new AzazelDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).strength(2.0F).noOcclusion()));
     public static final RegistryObject<Block> STORM_TOTEM = BLOCKS.register("storm_totem", () -> new StormTotemBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));

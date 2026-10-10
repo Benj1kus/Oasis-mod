@@ -78,6 +78,7 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block", () -> new BlockItem(ModBlocks.ENTROPY_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein", () -> new BlockItem(ModBlocks.ENTROPY_VEIN.get(), new Item.Properties()));
     public static final RegistryObject<Item> CHAOS_SPAWNER_ITEM = ITEMS.register("chaos_spawner", () -> new BlockItem(ModBlocks.CHAOS_SPAWNER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_FOUNTAIN_ITEM = ITEMS.register("entropy_fountain", () -> new BlockItem(ENTROPY_FOUNTAIN.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> SANDSTONE_CORNER_ITEM = ITEMS.register("sandstone_corner", () -> new BlockItem(ModBlocks.SANDSTONE_CORNER.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_LINE_ITEM = ITEMS.register("sandstone_line", () -> new BlockItem(ModBlocks.SANDSTONE_LINE.get(), new Item.Properties()));
@@ -85,7 +86,8 @@ public final class ModItems {
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
 
-
+    public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(GEYSER_SMALL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(GEYSER_BIG.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase", () -> new BlockItem(ModBlocks.GEN_VASE.get(), new Item.Properties()));
     public static final RegistryObject<Item> BALL_CACTUS_ITEM = ITEMS.register("ball_cactus", () -> new BlockItem(ModBlocks.BALL_CACTUS.get(), new Item.Properties()));
     public static final RegistryObject<Item> STORM_TOTEM_ITEM = ITEMS.register("storm_totem", () -> new BlockItem(ModBlocks.STORM_TOTEM.get(), new Item.Properties()));

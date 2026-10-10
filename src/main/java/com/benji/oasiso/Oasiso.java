@@ -90,6 +90,9 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> ENTROPY_EYE = PARTICLES.register("entropy_eye", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> SOIL_PARTICLE = PARTICLES.register("soil_particle", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> ENTROPY_BULB = PARTICLES.register("entropy_bulb", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> GEYSER_SMOKE = PARTICLES.register("geyser_smoke", () -> new SimpleParticleType(false));
+
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
             output.accept(item.get());
