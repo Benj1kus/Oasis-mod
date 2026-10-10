@@ -32,6 +32,7 @@
     "oasiso:e_bricks",
     "oasiso:e_polish",
     "oasiso:e_tile",
-    "oasiso:e_column"
+    "oasiso:e_column",
+    "oasiso:entropy_fountain"
   ]
 }

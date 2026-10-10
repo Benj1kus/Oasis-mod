@@ -44,22 +44,23 @@ public final class EntropyFountainClient {
         var mc = Minecraft.getInstance();
         if (world == null || block == null || mc.player == null || mc.isPaused()) return;
         BlockPos camera = BlockPos.containing(mc.gameRenderer.getMainCamera().getPosition());
-        for (int n = 0; n < 4; n++) {
+
+        for (int n = 0; n < 6; n++) {
             int index = scanIndex;
-            scanIndex = (scanIndex + 1) % 175;
-            int sx = (camera.getX() >> 4) + index % 5 - 2;
-            int sz = (camera.getZ() >> 4) + (index / 5) % 5 - 2;
-            int sy = (camera.getY() >> 4) + index / 25 - 3;
+            scanIndex = (scanIndex + 1) % 343;
+            int sx = (camera.getX() >> 4) + index % 7 - 3;
+            int sz = (camera.getZ() >> 4) + (index / 7) % 7 - 3;
+            int sy = (camera.getY() >> 4) + index / 49 - 3;
             scanSection(sx, sy, sz);
         }
         if (++ticks % 10 != 0) return;
-        KNOWN.removeIf(p -> Math.abs((p.getX() >> 4) - (camera.getX() >> 4)) > 2 || Math.abs((p.getZ() >> 4) - (camera.getZ() >> 4)) > 2 || Math.abs((p.getY() >> 4) - (camera.getY() >> 4)) > 3 || !world.hasChunkAt(p) || world.getBlockState(p).getBlock() != block);
+        KNOWN.removeIf(p -> Math.abs((p.getX() >> 4) - (camera.getX() >> 4)) > 3 || Math.abs((p.getZ() >> 4) - (camera.getZ() >> 4)) > 3 || Math.abs((p.getY() >> 4) - (camera.getY() >> 4)) > 3 || !world.hasChunkAt(p) || world.getBlockState(p).getBlock() != block);
         List<EntropyFountainLayout.Cell> cells = new ArrayList<>();
-        for (BlockPos floor : KNOWN) {
-            int roof = findRoof(floor);
-            if (roof != Integer.MIN_VALUE)
-                cells.add(new EntropyFountainLayout.Cell(floor.getX(), floor.getY(), floor.getZ(), roof));
-        }
+        for (BlockPos start : KNOWN)
+            for (var axis : EntropyFountainLayout.Axis.values()) {
+                int end = findEnd(start, axis);
+                if (end != Integer.MIN_VALUE) cells.add(axis.cell(start.getX(), start.getY(), start.getZ(), end));
+            }
         fountains = EntropyFountainLayout.merge(cells);
     }
 
@@ -76,13 +77,19 @@ public final class EntropyFountainClient {
                         KNOWN.add(new BlockPos(sx * 16 + x, sy * 16 + y, sz * 16 + z));
     }
 
-    private static int findRoof(BlockPos floor) {
+    private static int findEnd(BlockPos start, EntropyFountainLayout.Axis axis) {
         BlockPos.MutableBlockPos sample = new BlockPos.MutableBlockPos();
-        for (int dy = 1; dy <= EntropyFountainLayout.MAX_GAP + 1; dy++) {
-            sample.set(floor.getX(), floor.getY() + dy, floor.getZ());
-            if (sample.getY() >= world.getMaxBuildHeight() || !world.hasChunkAt(sample)) return Integer.MIN_VALUE;
+        int dx = axis == EntropyFountainLayout.Axis.X ? 1 : 0;
+        int dy = axis == EntropyFountainLayout.Axis.Y ? 1 : 0;
+        int dz = axis == EntropyFountainLayout.Axis.Z ? 1 : 0;
+
+        for (int distance = 1; distance <= EntropyFountainLayout.MAX_GAP + 1; distance++) {
+            sample.set(start.getX() + dx * distance, start.getY() + dy * distance, start.getZ() + dz * distance);
+            if (sample.getY() < world.getMinBuildHeight() || sample.getY() >= world.getMaxBuildHeight() || !world.hasChunkAt(sample))
+                return Integer.MIN_VALUE;
             var state = world.getBlockState(sample);
-            if (state.getBlock() == block) return dy >= 2 ? sample.getY() : Integer.MIN_VALUE;
+            if (state.getBlock() == block)
+                return distance >= 2 ? axis.coordinate(sample.getX(), sample.getY(), sample.getZ()) : Integer.MIN_VALUE;
             if (!state.getFluidState().isEmpty() || !state.getCollisionShape(world, sample).isEmpty())
                 return Integer.MIN_VALUE;
         }

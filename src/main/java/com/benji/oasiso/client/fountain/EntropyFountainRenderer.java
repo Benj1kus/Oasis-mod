@@ -34,7 +34,7 @@ public final class EntropyFountainRenderer {
     private static Vec3 frameCamera;
 
     private static Vec3 center(EntropyFountainLayout.Fountain f) {
-        return new Vec3(f.centerX(), f.y() + 1 + f.height() * .5, f.centerZ());
+        return vector(f.center());
     }
 
     @SubscribeEvent
@@ -67,8 +67,7 @@ public final class EntropyFountainRenderer {
             Vec3 c = center(f);
             if (c.distanceToSqr(camera) > EntropyFountainClient.VIEW_DISTANCE * EntropyFountainClient.VIEW_DISTANCE)
                 continue;
-            if (!event.getFrustum().isVisible(new AABB(f.x(), f.y() + 1, f.z(), f.x() + f.size(), f.roof(), f.z() + f.size())))
-                continue;
+            if (!event.getFrustum().isVisible(new AABB(vector(f.min()), vector(f.max())))) continue;
             visible.add(f);
         }
         visible.sort(Comparator.comparingDouble(f -> center(f).distanceToSqr(camera)));
@@ -111,15 +110,18 @@ public final class EntropyFountainRenderer {
                 shader.safeGetUniform("Seed").set((float) f.seed());
                 shader.safeGetUniform("Reveal").set(fade);
                 shader.safeGetUniform("Dimensions").set(width, (float) f.height());
-                Vec3 base = new Vec3(f.centerX(), f.y() + 1.003, f.centerZ()).subtract(camera);
-                double length = Math.hypot(base.x, base.z);
-                double rx = length < .0001 ? 1 : base.z / length, rz = length < .0001 ? 0 : -base.x / length;
+                Vec3 base = vector(f.start()).subtract(camera);
+                Vec3 along = vector(f.direction());
+                Vec3 right = along.cross(base);
+                if (right.lengthSqr() < 1.0e-8) {
+                    right = f.axis() == EntropyFountainLayout.Axis.X ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+                } else right = right.normalize();
                 double half = width * .5, h = f.height() - .006;
                 BUILDER.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
-                vertex(base, rx, rz, -half, 0, 0, 0);
-                vertex(base, rx, rz, half, 0, 1, 0);
-                vertex(base, rx, rz, half, h, 1, 1);
-                vertex(base, rx, rz, -half, h, 0, 1);
+                vertex(base, right, along, -half, 0, 0, 0);
+                vertex(base, right, along, half, 0, 1, 0);
+                vertex(base, right, along, half, h, 1, 1);
+                vertex(base, right, along, -half, h, 0, 1);
                 BufferUploader.drawWithShader(BUILDER.end());
             }
         } finally {
@@ -138,8 +140,12 @@ public final class EntropyFountainRenderer {
         }
     }
 
-    private static void vertex(Vec3 base, double rx, double rz, double x, double y, float u, float v) {
-        BUILDER.vertex(base.x + rx * x, base.y + y, base.z + rz * x).color(1F, 1F, 1F, 1F).uv(u, v).endVertex();
+    private static Vec3 vector(EntropyFountainLayout.Point p) {
+        return new Vec3(p.x(), p.y(), p.z());
+    }
+
+    private static void vertex(Vec3 base, Vec3 right, Vec3 along, double x, double y, float u, float v) {
+        BUILDER.vertex(base.x + right.x * x + along.x * y, base.y + right.y * x + along.y * y, base.z + right.z * x + along.z * y).color(1F, 1F, 1F, 1F).uv(u, v).endVertex();
     }
 
     @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)

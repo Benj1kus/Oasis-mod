@@ -18,20 +18,17 @@ float bayer4(vec2 p) { return (4.0*bayer2(p)+bayer2(floor(p*.5))+.5)/16.0; }
 float ball(vec2 delta,vec2 radii,float kind) {
     vec2 d=delta/radii;
     float r=dot(d,d);
-    // A few pointed/diamond-shaped droplets among the softer blobs.
     r=mix(r,pow(abs(d.x)+abs(d.y)*.82,2.0),kind);
     float support=max(0.0,1.0-r);
     return support*support*2.5;
 }
 void main() {
-    // Physical pixel size stays consistent for both a single block and a 5x5 fountain.
     float pixel=1.0/20.0;
     vec2 physical=vec2((texCoord.x-.5)*Dimensions.x,texCoord.y*Dimensions.y);
     vec2 cell=floor(physical/pixel);
     vec2 p=(cell+.5)*pixel;
     float dither=bayer4(cell);
     vec2 q=vec2(p.x/(Dimensions.x*.5),p.y);
-    // Flames pull the contour into thin moving tongues; inner matter moves more slowly.
     q.x+=.065*sin(q.y*6.0-Time*2.3+Seed)+.026*sin(q.y*13.0-Time*3.2);
     q.y+=.035*sin(q.x*19.0+Time*1.4);
     float field=0.0;
@@ -43,7 +40,6 @@ void main() {
         delta.x+=delta.y*lean;
         field+=ball(delta,b.zw,(i%4==0)?.5:0.0);
     }
-    // Small pools at both emitters keep the stream attached to floor and ceiling.
     float poolHeight=min(.70,Dimensions.y*.34);
     field+=ball(q-vec2(0,-poolHeight*.24),vec2(.78,poolHeight),0.0);
     field+=ball(q-vec2(0,Dimensions.y+poolHeight*.24),vec2(.78,poolHeight),0.0);
@@ -54,7 +50,7 @@ void main() {
     vec2 swirl=vec2(q.x*1.5,q.y*.7);
     swirl.x+=.21*sin(swirl.y*2.3-Time*.32);
     float spiral=sin(atan(swirl.y-Dimensions.y*.35,swirl.x+.001)*3.0
-            -length(vec2(swirl.x,swirl.y-Dimensions.y*.35))*6.0+Time*.55);
+    -length(vec2(swirl.x,swirl.y-Dimensions.y*.35))*6.0+Time*.55);
     spiral+=.6*sin(q.y*3.4+q.x*5.5-Time*.4);
     vec3 darkBlue=vec3(.022,.032,.095);
     vec3 darkPurple=vec3(.095,.045,.23);
@@ -63,18 +59,17 @@ void main() {
     vec3 dark=mix(darkBlue,darkPurple,band);
     dark=mix(dark,blue,step(.72,fract(q.y*.24+q.x*.7-Time*.035))*.45);
 
-    // Groups of five crisp stars appear, twinkle and vanish inside the dark material.
     float group=floor(Time/3.6);
     float phase=fract(Time/3.6);
     float envelope=smoothstep(.08,.24,phase)*(1.0-smoothstep(.65,.91,phase));
     int groupIndex=int(mod(group*7.0+mod(Seed,19.0),float(max(BlobCount,1))));
     vec2 groupCenter=vec2(Blobs[groupIndex].x*Dimensions.x*.5,
-                         clamp(Blobs[groupIndex].y,.05*Dimensions.y,.95*Dimensions.y));
+    clamp(Blobs[groupIndex].y,.05*Dimensions.y,.95*Dimensions.y));
     float stars=0.0;
     for(int i=0;i<5;i++) {
         float f=float(i);
         vec2 offset=vec2((hash(vec2(group+f,31))-.5)*min(.85,Dimensions.x*.45),
-                         (hash(vec2(group+f,43))-.5)*min(1.2,Dimensions.y*.4));
+        (hash(vec2(group+f,43))-.5)*min(1.2,Dimensions.y*.4));
         vec2 c=floor((groupCenter+offset)/pixel)*pixel+pixel*.5;
         vec2 d=abs(p-c)/pixel;
         float arm=2.0+floor(hash(vec2(f,group))*2.0);
@@ -86,7 +81,9 @@ void main() {
     dark=mix(dark,vec3(.65,.98,1.0),stars*step(1.2,field));
     float gradient=.5+.5*sin(q.y*.85+Time*.45+q.x*2.0+Seed*.1);
     gradient=floor(gradient*7.0+dither)/7.0;
-    vec3 edge=mix(vec3(.14,.91,1.0),vec3(1.0,.19,.69),gradient);
+
+    vec3 edge=mix(vec3(0.384, 1.0, 0.890), vec3(0.631, 0.224, 0.835), gradient);
+
     edge=mix(edge,vec3(.74,.98,1.0),.12+.10*sin(Time*3.0+q.y*2.0));
     vec3 color=mix(edge,dark,step(dither,interior));
     float alpha=mix(.82,.99,interior)*Reveal*vertexAlpha;
