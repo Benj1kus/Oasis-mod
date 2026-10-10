@@ -28,6 +28,10 @@
     "oasiso:entropy_soil_stairs",
     "oasiso:entropy_soil_wall",
     "oasiso:geyser_small",
-    "oasiso:geyser_big"
+    "oasiso:geyser_big",
+    "oasiso:e_bricks",
+    "oasiso:e_polish",
+    "oasiso:e_tile",
+    "oasiso:e_column"
   ]
 }

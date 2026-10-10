@@ -1,5 +1,5 @@
 #version 150
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 6
 uniform sampler2D Scene;
 uniform sampler2D Depth;
 uniform sampler2D Shadows;

@@ -45,6 +45,13 @@ public final class ModBlocks {
 
     public static final RegistryObject<Block> KR_SAND = BLOCKS.register("kr_sand", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.SAND).strength(0.5F)));
     public static final RegistryObject<Block> KR_STONE = BLOCKS.register("kr_stone", () -> new KarakStoneBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KR_BRICKS = BLOCKS.register("kr_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KR_COLUMN = BLOCKS.register("kr_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Block> KR_SLAB = BLOCKS.register("kr_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(KR_STONE.get())));
+    public static final RegistryObject<Block> KR_STAIRS = BLOCKS.register("kr_stairs", () -> new StairBlock(() -> KR_STONE.get().defaultBlockState(), BlockBehaviour.Properties.copy(KR_STONE.get())));
+    public static final RegistryObject<Block> KR_WALL = BLOCKS.register("kr_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(KR_STONE.get())));
+
     public static final RegistryObject<Block> KR_SANDGRASS = BLOCKS.register("kr_sandgrass", () -> new KarakSandGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).instabreak().noOcclusion()));
     public static final RegistryObject<Block> KR_GRASS = BLOCKS.register("kr_grass", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).sound(SoundType.SAND).strength(0.5F)));
     public static final RegistryObject<LiquidBlock> KR_WATER = BLOCKS.register("kr_water", () -> new LiquidBlock(ModKarakFluids.KR_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).lightLevel(state -> 10).noLootTable()));
@@ -64,6 +71,11 @@ public final class ModBlocks {
     public static final RegistryObject<Block> AZUMALIT_CRYSTAL = BLOCKS.register("azumalit_crystal", () -> new AzumalitCrystalBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).strength(10.0F).lightLevel(state -> 5).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NOT_AZUMALIT_CRYSTAL = BLOCKS.register("not_azumalit_crystal", () -> new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).strength(10.0F).lightLevel(state -> 5).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> AZUMALINE_GROWTH = BLOCKS.register("azumaline_growth", () -> new AzumalineBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).instabreak().lightLevel(state -> 5).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).noOcclusion()));
+
+    public static final RegistryObject<Block> E_BRICKS = BLOCKS.register("e_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> E_POLISH = BLOCKS.register("e_polish", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> E_TILE = BLOCKS.register("e_tile", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> E_COLUMN = BLOCKS.register("e_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> SANDSTONE_COLORED = BLOCKS.register("sandstone_colored", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> SANDSTONE_STRIPE = BLOCKS.register("sandstone_stripe", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).strength(2.0F).requiresCorrectToolForDrops()));

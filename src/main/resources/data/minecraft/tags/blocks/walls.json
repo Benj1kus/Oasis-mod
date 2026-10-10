@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "oasiso:entropy_soil_wall"
+    "oasiso:entropy_soil_wall",
+    "oasiso:kr_wall"
   ]
 }

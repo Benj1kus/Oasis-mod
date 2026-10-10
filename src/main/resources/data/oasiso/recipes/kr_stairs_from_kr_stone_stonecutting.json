@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "oasiso:kr_stone"
+  },
+  "result": "oasiso:kr_stairs",
+  "count": 1
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "oasiso:kr_stone"
+    }
+  },
+  "result": {
+    "item": "oasiso:kr_stairs",
+    "count": 4
+  }
+}

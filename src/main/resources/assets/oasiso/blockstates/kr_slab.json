@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "oasiso:block/kr_slab"
+    },
+    "type=top": {
+      "model": "oasiso:block/kr_slab_top"
+    },
+    "type=double": {
+      "model": "oasiso:block/kr_stone"
+    }
+  }
+}

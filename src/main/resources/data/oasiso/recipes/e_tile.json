@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:e_polish"
+    }
+  ],
+  "result": {
+    "item": "oasiso:e_tile"
+  }
+}

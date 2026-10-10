@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:e_bricks"
+    }
+  ],
+  "result": {
+    "item": "oasiso:e_polish"
+  }
+}

@@ -18,7 +18,12 @@
     "oasiso:skelet_believer",
     "oasiso:sand_goose",
     "oasiso:kr_stone",
+    "oasiso:kr_bricks",
+    "oasiso:kr_column",
     "oasiso:kr_sand",
-    "oasiso:kr_grass"
+    "oasiso:kr_grass",
+    "oasiso:kr_slab",
+    "oasiso:kr_stairs",
+    "oasiso:kr_wall"
   ]
 }

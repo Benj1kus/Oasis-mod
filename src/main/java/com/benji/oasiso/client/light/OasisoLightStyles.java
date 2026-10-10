@@ -10,7 +10,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class OasisoLightStyles {
-    public static final int MAX_LIGHTS = 10;
+    public static final int MAX_LIGHTS = 6;
     public static final int SEARCH_RADIUS = 24;
     public static final int SHADOW_SIZE = 16;
     public static final int RAYS_PER_TICK = 256;
@@ -27,6 +27,7 @@ public final class OasisoLightStyles {
         register("apol_altar", ENTROPY);
         register("not_azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
         register("azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
+        register("nephritis_lamp", new Style(0x0FFFBB, 0x0FFFEB,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1.5F));
         // register("karak_lamp", new Style(0x88FFFF, 0xD899FF,5.0F, 0.8F, 2.0F, 0.15F, 0.20F, 0.5F)); btw this is example tho
     }
 
@@ -53,7 +54,7 @@ public final class OasisoLightStyles {
     public record Style(int color, int accent, float radius, float strength, float fogRadius, float fogDensity,
                         float halo, float height) {
         public Style {
-            //LIMITS!!!! for optimization read it if you are not idiot :c
+            //LIMITS!!!! :c
             if (!Float.isFinite(radius) || radius < 0.5F || radius > 8.0F || !Float.isFinite(strength) || strength < 0 || strength > 2 || !Float.isFinite(fogRadius) || fogRadius < 0 || fogRadius > radius || !Float.isFinite(fogDensity) || fogDensity < 0 || fogDensity > 0.6F || !Float.isFinite(halo) || halo < 0 || halo > 1 || !Float.isFinite(height) || height < -3 || height > 3)
                 throw new IllegalArgumentException("YOU STUPID IDIOT");
         }

@@ -47,6 +47,12 @@ public final class ModItems {
     public static final RegistryObject<Item> KR_BIGGRASS_ITEM = ITEMS.register("kr_biggrass", () -> new BlockItem(ModBlocks.KR_BIGGRASS.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_SMALLGRASS_ITEM = ITEMS.register("kr_smallgrass", () -> new BlockItem(ModBlocks.KR_SMALLGRASS.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_WATER_BUCKET = ITEMS.register("entropy_water_bucket", () -> new BucketItem(ModKarakFluids.ENTROPY_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final RegistryObject<Item> KR_BRICKS_ITEM = ITEMS.register("kr_bricks", () -> new BlockItem(ModBlocks.KR_BRICKS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_COLUMN_ITEM = ITEMS.register("kr_column", () -> new BlockItem(ModBlocks.KR_COLUMN.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> KR_SLAB_ITEM = ITEMS.register("kr_slab", () -> new BlockItem(KR_SLAB.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_STAIRS_ITEM = ITEMS.register("kr_stairs", () -> new BlockItem(KR_STAIRS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_WALL_ITEM = ITEMS.register("kr_wall", () -> new BlockItem(KR_WALL.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> MEMORY_PUZ_ITEM = ITEMS.register("memory_puz", () -> new BlockItem(ModBlocks.MEMORY_PUZ.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEMORY_CORE_ITEM = ITEMS.register("memory_core", () -> new BlockItem(ModBlocks.MEMORY_CORE.get(), new Item.Properties()));
@@ -84,6 +90,11 @@ public final class ModItems {
 
     public static final RegistryObject<Item> SANDSTONE_CORNER_ITEM = ITEMS.register("sandstone_corner", () -> new BlockItem(ModBlocks.SANDSTONE_CORNER.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_LINE_ITEM = ITEMS.register("sandstone_line", () -> new BlockItem(ModBlocks.SANDSTONE_LINE.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> E_BRICKS_ITEM = ITEMS.register("e_bricks", () -> new BlockItem(ModBlocks.E_BRICKS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> E_POLISH_ITEM = ITEMS.register("e_polish", () -> new BlockItem(ModBlocks.E_POLISH.get(), new Item.Properties()));
+    public static final RegistryObject<Item> E_TILE_ITEM = ITEMS.register("e_tile", () -> new BlockItem(ModBlocks.E_TILE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> E_COLUMN_ITEM = ITEMS.register("e_column", () -> new BlockItem(ModBlocks.E_COLUMN.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
