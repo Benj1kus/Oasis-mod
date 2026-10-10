@@ -5,7 +5,6 @@ in vec2 texCoord;
 in vec4 vertexColor;
 out vec4 fragColor;
 
-// Основные настройки. RGB записывается как обычные значения 0..255.
 const vec3 CORE = vec3(16.0, 7.0, 25.0) / 255.0;
 const vec3 WHITE = vec3(255.0, 253.0, 255.0) / 255.0;
 const vec3 MINT = vec3(91.0, 255.0, 207.0) / 255.0;
@@ -29,8 +28,6 @@ float bayer4(vec2 p) {
     return (4.0 * bayer2(p) + bayer2(floor(p * 0.5)) + 0.5) / 16.0;
 }
 
-// Единый угловатый силуэт. Двигаются вершины, а не пиксели внутри:
-// поэтому стороны остаются прямыми, как у геометрического пламени на референсе.
 float flameDistance(vec2 p, float t) {
     vec2 v[19];
     v[0] = vec2(0.00, 0.025);
@@ -103,8 +100,6 @@ void main() {
     float coverage = 1.0 - smoothstep(-edge, edge, outer);
     vec3 color = outerColor(p.y);
 
-    // Вложенные слои: бирюза -> белый -> почти чёрная сердцевина.
-    // Числа в vec2 = ширина и высота слоя относительно внешнего огня.
     if (outer < edge) {
         vec2 base = p - vec2(0.0, 0.045);
         float mint = flameDistance(base / vec2(0.76, 0.79), t) * 0.76;
@@ -118,9 +113,6 @@ void main() {
             color = CORE;
     }
 
-    // Шесть постоянных циклов осколков. Начинаются внутри языка,
-    // вылетают вверх/вбок, сужаются и растворяются через дизеринг.
-    // Это часть одного шейдера: игровые Particle/Entity не создаются.
     for (int i = 0; i < 6; ++i) {
         float id = float(i);
         float life = fract(t * (0.29 + 0.025 * mod(id, 3.0)) + id * 0.173);
@@ -150,7 +142,6 @@ void main() {
         }
     }
 
-    // Отброшенные пиксели НЕ записывают глубину. Прозрачного прямоугольника нет.
     if (coverage * vertexColor.a <= threshold) discard;
     fragColor = vec4(color, 1.0);
 }

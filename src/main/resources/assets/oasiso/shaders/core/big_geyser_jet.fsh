@@ -38,28 +38,28 @@ void main() {
     float alpha=(shard?.98:.97)*fade*DistanceFade*smoothstep(.12,.65,cameraDistance);
     if(alpha<.008) discard;
 
-    vec3 whiteCyan=vec3(.83,1.0,1.0);
-    vec3 cyan=vec3(.10,.91,1.0);
-    vec3 blueCyan=vec3(.08,.57,1.0);
-    vec3 pink=vec3(1.0,.13,.64);
-    vec3 lilac=vec3(.78,.22,1.0);
-    vec3 violet=vec3(.40,.045,.94);
-    vec3 blue=vec3(.105,.075,.58);
+    vec3 white = vec3(255.0, 253.0, 255.0) / 255.0;
+    vec3 mint = vec3(91.0, 255.0, 207.0) / 255.0;
+    vec3 cyan = vec3(98.0, 227.0, 255.0) / 255.0;
+    vec3 outerTop = vec3(167.0, 111.0, 255.0) / 255.0;
+    vec3 outerBottom = vec3(245.0, 118.0, 204.0) / 255.0;
+    vec3 deepCore = vec3(16.0, 7.0, 25.0) / 255.0;
+
     float stripe=triangle(u*5.0+y*1.7-beat*1.6+Seed*.013)+zig*.24;
     vec3 color;
     if(shard) {
-        color=band(cyan,whiteCyan,fragment,.4,dither);
+        color=band(cyan,white,fragment,.4,dither);
     } else if(layer<.17) {
-        color=band(cyan,whiteCyan,stripe,.02,dither);
-        color=band(blueCyan,color,1.0-angular,.12,dither);
+        color=band(cyan,white,stripe,.02,dither);
+        color=band(mint,color,1.0-angular,.12,dither);
     } else if(layer<.5) {
-        color=band(pink,lilac,stripe,.48,dither);
+        color=band(outerBottom,outerTop,stripe,.48,dither);
         color=band(cyan,color,angular,.47+zig*.04,dither);
     } else if(layer<.84) {
-        color=band(violet,pink,stripe,.27,dither);
+        color=band(outerTop,outerBottom,stripe,.27,dither);
     } else {
-        color=band(blue,violet,stripe,.08,dither);
+        color=band(deepCore,outerTop,stripe,.08,dither);
     }
-    if(dissolve<.85 && layer<.5 && !shard) color=band(color,whiteCyan,fragment,.56,dither);
+    if(dissolve<.85 && layer<.5 && !shard) color=band(color,white,fragment,.56,dither);
     fragColor=vec4(color,alpha);
 }

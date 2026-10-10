@@ -68,9 +68,11 @@ public final class KarakGrassColors {
     public static void registerItems(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tint) -> tint == 0 ? DRY : 0xFFFFFF, ModBlocks.KR_GRASS.get());
     }
+
     private static int sample(BlockAndTintGetter level, BlockPos center) {
-        double nearestSand = RADIUS, nearestWater = RADIUS;
+        double nearestWater = RADIUS;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+
         for (int dy = -VERTICAL_RADIUS; dy <= VERTICAL_RADIUS; dy++) {
             for (int dz = -RADIUS; dz <= RADIUS; dz++) {
                 for (int dx = -RADIUS; dx <= RADIUS; dx++) {
@@ -78,21 +80,28 @@ public final class KarakGrassColors {
                     if (distance > RADIUS) continue;
                     cursor.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
                     BlockState neighbor = level.getBlockState(cursor);
-                    if (neighbor.is(ModBlocks.KR_SAND.get())) nearestSand = Math.min(nearestSand, distance);
-                    if (neighbor.getFluidState().getType().isSame(ModKarakFluids.KR_WATER.get()))
+                    if (neighbor.getFluidState().getType().isSame(ModKarakFluids.KR_WATER.get())) {
                         nearestWater = Math.min(nearestWater, distance);
+                    }
                 }
             }
         }
-        double wet = influence(nearestWater);
-        double dry = Math.max(1.0 - wet, influence(nearestSand));
-        double t = wet / (wet + dry);
-        return t <= 0.5 ? blend(DRY, MIDDLE, t * 2) : blend(MIDDLE, WET, t * 2 - 1);
-    }
 
-    private static double influence(double distance) {
-        double t = Math.max(0, Math.min(1, (RADIUS - distance) / (RADIUS - 1.0)));
-        return t * t * (3 - 2 * t);
+        if (nearestWater >= RADIUS) {
+            return DRY;
+        }
+
+        double d = Math.max(1.0, nearestWater);
+
+        if (d <= 2.5) {
+            double t = (d - 1.0) / 1.5;
+            t = Math.max(0.0, Math.min(1.0, t));
+            return blend(WET, MIDDLE, t);
+        } else {
+            double t = (d - 2.5) / (RADIUS - 2.5);
+            t = Math.max(0.0, Math.min(1.0, t));
+            return blend(MIDDLE, DRY, t);
+        }
     }
 
     private static int blend(int a, int b, double t) {

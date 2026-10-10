@@ -91,6 +91,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> ENTROPY_SOIL_WALL = BLOCKS.register("entropy_soil_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(ENTROPY_SOIL.get())));
 
     public static final RegistryObject<Block> ENTROPY_FOUNTAIN = BLOCKS.register("entropy_fountain", () -> new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 10).strength(10.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KARAK_LOG = BLOCKS.register("karak_log", () -> new KarakLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_LOG = BLOCKS.register("entropy_log", () -> new EntropyLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));

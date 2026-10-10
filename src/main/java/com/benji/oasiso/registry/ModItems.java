@@ -79,6 +79,8 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein", () -> new BlockItem(ModBlocks.ENTROPY_VEIN.get(), new Item.Properties()));
     public static final RegistryObject<Item> CHAOS_SPAWNER_ITEM = ITEMS.register("chaos_spawner", () -> new BlockItem(ModBlocks.CHAOS_SPAWNER.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_FOUNTAIN_ITEM = ITEMS.register("entropy_fountain", () -> new BlockItem(ENTROPY_FOUNTAIN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KARAK_LOG_ITEM = ITEMS.register("karak_log", () -> new BlockItem(ModBlocks.KARAK_LOG.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_LOG_ITEM = ITEMS.register("entropy_log", () -> new BlockItem(ModBlocks.ENTROPY_LOG.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> SANDSTONE_CORNER_ITEM = ITEMS.register("sandstone_corner", () -> new BlockItem(ModBlocks.SANDSTONE_CORNER.get(), new Item.Properties()));
     public static final RegistryObject<Item> SANDSTONE_LINE_ITEM = ITEMS.register("sandstone_line", () -> new BlockItem(ModBlocks.SANDSTONE_LINE.get(), new Item.Properties()));

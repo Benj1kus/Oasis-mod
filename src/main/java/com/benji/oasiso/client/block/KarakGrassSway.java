@@ -32,7 +32,7 @@ import java.util.*;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class KarakGrassSway {
-    private static final int MAX_ACTIVE = 16; // Согласовано с 16 парами uniform в шейдере.
+    private static final int MAX_ACTIVE = 16;
     private static final int DURATION = 25;
     private static final double VIEW_RANGE = 32;
     private static final LinkedHashMap<BlockPos, Motion> ACTIVE = new LinkedHashMap<>();
