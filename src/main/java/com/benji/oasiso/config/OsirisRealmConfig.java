@@ -10,6 +10,8 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec SPEC;
     // Apollyon wings
     public static final ForgeConfigSpec.BooleanValue APOL_WINGS_WALL_COLLISION_DAMAGE;
+    // CUSTOM LIGHT
+    public static final ForgeConfigSpec.BooleanValue CUSTOM_LIGHTING_ENABLED;
 
     // Super Gold armor
     public static final ForgeConfigSpec.IntValue SUPER_GOLD_HELMET_DEFENSE;
@@ -137,6 +139,12 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CHAOS_SPAWNER_GOLEMS_MOBS;
 
     static {
+
+
+        BUILDER.push("Custom Color Light");
+        CUSTOM_LIGHTING_ENABLED = BUILDER.comment("CCL").define("custom_lighting_enabled", true);
+        BUILDER.pop();
+
         BUILDER.push("Apollyon Wings");
 
         APOL_WINGS_WALL_COLLISION_DAMAGE = BUILDER.comment("Whether players wearing Apollyon Wings receive wall collision damage.", "Disable to prevent impact damage when entering wall transit.").define("wallCollisionDamage", false);

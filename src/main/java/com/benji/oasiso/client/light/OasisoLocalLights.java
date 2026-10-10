@@ -54,11 +54,12 @@ public final class OasisoLocalLights {
             worldView = worldProjection = null;
             matrixLevel = null;
         }
-        if (mc.level == null || mc.player == null || !OasisoLightStyles.ENABLED) {
+        if (mc.level == null || mc.player == null || !OasisoLightStyles.isEnabled()) {
             KNOWN.clear();
             ACTIVE.clear();
             return;
         }
+
         if (mc.isPaused()) return;
         if ((ticks++ % 10L) == 0L) discover(mc);
         Vec3 eye = mc.gameRenderer.getMainCamera().getPosition();
@@ -135,8 +136,9 @@ public final class OasisoLocalLights {
         ClientLevel capturedLevel = matrixLevel;
         worldView = worldProjection = null;
         matrixLevel = null;
-        if (failed || !OasisoLightStyles.ENABLED || mc.level == null || mc.level != currentLevel || view == null || projection == null || capturedLevel != mc.level || ACTIVE.isEmpty() || !OasisoLightShaders.ready())
+        if (failed || !OasisoLightStyles.isEnabled() || mc.level == null || mc.level != currentLevel || view == null || projection == null || capturedLevel != mc.level || ACTIVE.isEmpty() || !OasisoLightShaders.ready())
             return;
+
         var camera = event.getCamera();
         List<Source> visible = new ArrayList<>();
         for (Source source : ACTIVE) {

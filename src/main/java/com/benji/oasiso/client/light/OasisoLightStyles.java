@@ -4,6 +4,7 @@ import com.benji.oasiso.Oasiso;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
+import com.benji.oasiso.config.OsirisRealmConfig;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -14,7 +15,14 @@ public final class OasisoLightStyles {
     public static final int SEARCH_RADIUS = 24;
     public static final int SHADOW_SIZE = 16;
     public static final int RAYS_PER_TICK = 256;
-    public static boolean ENABLED = true;
+
+    public static boolean isEnabled() {
+        try {
+            return OsirisRealmConfig.CUSTOM_LIGHTING_ENABLED != null && OsirisRealmConfig.CUSTOM_LIGHTING_ENABLED.get();
+        } catch (Exception e) {
+            return true;
+        }
+    }
 
     //ENTROPY style (my style you can add your here or in register)
     public static final Style ENTROPY = new Style(0x2754F5, 0xDD8BEA, 5.5F, 1.80F, 2.3F, 0.18F, 0.24F, 1.55F);
