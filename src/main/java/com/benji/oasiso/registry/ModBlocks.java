@@ -139,6 +139,9 @@ public final class ModBlocks {
     public static final RegistryObject<Block> CACTOS = BLOCKS.register("cactos", () -> new CactosBlock(BlockBehaviour.Properties.copy(Blocks.CACTUS).noOcclusion().instabreak()));
     public static final RegistryObject<Block> APOL_ALTAR = BLOCKS.register("apol_altar", () -> new ApolAltarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).lightLevel(state -> 10).requiresCorrectToolForDrops().noOcclusion()));
 
+    public static final RegistryObject<Block> E_PIPE = BLOCKS.register("e_pipe", () -> new EPipeBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHERITE_BLOCK).noOcclusion().strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ENTROPY_BARREL = BLOCKS.register("entropy_barrel", () -> new EntropyBarrelBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHERITE_BLOCK).noOcclusion().strength(4.0F).requiresCorrectToolForDrops()));
+
     public static final RegistryObject<Block> DOUM_PALM_LOG = BLOCKS.register("doum_palm_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
     public static final RegistryObject<Block> DOUM_PALM_WOOD = BLOCKS.register("doum_palm_wood", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.JUNGLE_WOOD)));
     public static final RegistryObject<Block> STRIPPED_DOUM_PALM_LOG = BLOCKS.register("stripped_doum_palm_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_LOG)));

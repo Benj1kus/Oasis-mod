@@ -60,6 +60,8 @@
     "oasiso:kr_slab",
     "oasiso:kr_stairs",
     "oasiso:kr_wall",
-    "oasiso:entropy_fountain"
+    "oasiso:entropy_fountain",
+    "oasiso:e_pipe",
+    "oasiso:entropy_barrel"
   ]
 }

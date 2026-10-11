@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "particle": "oasiso:block/entropy_barrel",
+    "bottom": "oasiso:block/entropy_barrel_bottom",
+    "top": "oasiso:block/entropy_barrel_top",
+    "side": "oasiso:block/entropy_barrel"
+  }
+}

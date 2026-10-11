@@ -24,6 +24,8 @@
     "oasiso:kr_grass",
     "oasiso:kr_slab",
     "oasiso:kr_stairs",
-    "oasiso:kr_wall"
+    "oasiso:kr_wall",
+    "oasiso:e_pipe",
+    "oasiso:entropy_barrel"
   ]
 }
