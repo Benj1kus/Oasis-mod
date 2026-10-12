@@ -1,0 +1,99 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 8,
+				"visible_bounds_height": 7.5,
+				"visible_bounds_offset": [0, 3.25, 0]
+			},
+			"bones": [
+				{
+					"name": "wel",
+					"pivot": [0.05357, 0.6875, -0.25],
+					"cubes": [
+						{"origin": [23, 11, -1], "size": [0, 0, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "rail",
+					"parent": "wel",
+					"pivot": [35, 40.25, 0],
+					"cubes": [
+						{"origin": [26, 0, 0], "size": [6, 70, 0], "uv": [22, 84]},
+						{"origin": [32, 0, -3], "size": [5, 70, 6], "uv": [0, 84]},
+						{"origin": [32, 0, 0], "size": [23, 90, 0], "uv": [210, 166]}
+					]
+				},
+				{
+					"name": "rail2",
+					"parent": "wel",
+					"pivot": [-35, 40.25, 0],
+					"cubes": [
+						{"origin": [-37, 0, -3], "size": [5, 70, 6], "uv": [0, 84], "mirror": true},
+						{"origin": [-32, 0, 0], "size": [6, 70, 0], "uv": [22, 84], "mirror": true},
+						{"origin": [-55, 0, 0], "size": [23, 90, 0], "uv": [210, 166], "mirror": true}
+					]
+				},
+				{
+					"name": "piston",
+					"parent": "wel",
+					"pivot": [0.21429, 37.25, 0],
+					"cubes": [
+						{"origin": [-10, 17, -10], "size": [20, 38, 20], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "con",
+					"parent": "piston",
+					"pivot": [10, 41.33333, 0],
+					"cubes": [
+						{"origin": [17, 38, -2], "size": [15, 6, 4], "uv": [88, 73]},
+						{"origin": [10, 17, 0], "size": [12, 38, 0], "uv": [34, 84]},
+						{"origin": [10, 35, -5], "size": [7, 12, 10], "uv": [88, 51]}
+					]
+				},
+				{
+					"name": "con2",
+					"parent": "piston",
+					"pivot": [-10, 41.33333, 0],
+					"cubes": [
+						{"origin": [-32, 38, -2], "size": [15, 6, 4], "uv": [88, 73], "mirror": true},
+						{"origin": [-22, 17, 0], "size": [12, 38, 0], "uv": [34, 84], "mirror": true},
+						{"origin": [-17, 35, -5], "size": [7, 12, 10], "uv": [88, 51], "mirror": true}
+					]
+				},
+				{
+					"name": "drill",
+					"parent": "piston",
+					"pivot": [0, 16.75, -0.25],
+					"cubes": [
+						{"origin": [-5, 9, -5], "size": [10, 8, 10], "uv": [82, 33]},
+						{"origin": [-10, 0, -0.25], "size": [20, 17, 0], "pivot": [0, 11, -0.25], "rotation": [0, 90, 0], "uv": [58, 84]},
+						{"origin": [-10, 0, -0.25], "size": [20, 17, 0], "uv": [58, 84]}
+					]
+				},
+				{
+					"name": "pp",
+					"parent": "piston",
+					"pivot": [0, 55, 0],
+					"cubes": [
+						{"origin": [-7, 55, -7], "size": [14, 17, 14], "uv": [80, 0]},
+						{"origin": [-11, 72, -11], "size": [22, 4, 22], "uv": [0, 58]}
+					]
+				},
+				{
+					"name": "well_smoke",
+					"parent": "pp",
+					"pivot": [-0.25, 76, 0],
+					"cubes": [
+						{"origin": [-0.25, 76, 0], "size": [0, 0, 0], "uv": [28, 80]}
+					]
+				}
+			]
+		}
+	]
+}

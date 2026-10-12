@@ -19,6 +19,9 @@
   "entropy_pulse": { "sounds": [ "oasiso:entropy_pulse" ] },
   "entropy_lightning": { "sounds": [ "oasiso:entropy_lightning" ] },
 
+  "well_idle": { "sounds": [ "oasiso:well_idle" ] },
+  "well_punch": { "sounds": [ "oasiso:well_punch" ] },
+
   "glov_bounce": { "sounds": [ "oasiso:glov_bounce" ] },
   "beam_loop": { "sounds": [ "oasiso:beam_loop" ] },
   "crystal_hit": { "sounds": [ "oasiso:crystal_hit" ] },

@@ -12,6 +12,8 @@ public final class ModBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<BlockEntityType<FactoryCoreBlockEntity>> FACTORY_CORE_BE = BLOCK_ENTITIES.register("factory_core", () -> BlockEntityType.Builder.of(FactoryCoreBlockEntity::new, ModBlocks.FACTORY_CORE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<WindmillBlockEntity>> WINDMILL_BE = BLOCK_ENTITIES.register("windmill", () -> BlockEntityType.Builder.of(WindmillBlockEntity::new, ModBlocks.WINDMILL.get()).build(null));
     public static final RegistryObject<BlockEntityType<ApolAltarBlockEntity>> APOL_ALTAR_BE = BLOCK_ENTITIES.register("apol_altar", () -> BlockEntityType.Builder.of(ApolAltarBlockEntity::new, ModBlocks.APOL_ALTAR.get()).build(null));
     public static final RegistryObject<BlockEntityType<AzumalitCrystalBlockEntity>> AZUMALIT_CRYSTAL_BE = BLOCK_ENTITIES.register("azumalit_crystal", () -> BlockEntityType.Builder.of(AzumalitCrystalBlockEntity::new, ModBlocks.AZUMALIT_CRYSTAL.get()).build(null));
     public static final RegistryObject<BlockEntityType<EntropyLanternBlockEntity>> ENTROPY_LANTERN_BE = BLOCK_ENTITIES.register("entropy_lantern", () -> BlockEntityType.Builder.of(EntropyLanternBlockEntity::new, ModBlocks.ENTROPY_LANTERN.get()).build(null));

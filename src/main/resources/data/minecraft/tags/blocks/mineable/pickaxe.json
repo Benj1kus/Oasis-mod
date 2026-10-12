@@ -62,6 +62,12 @@
     "oasiso:kr_wall",
     "oasiso:entropy_fountain",
     "oasiso:e_pipe",
-    "oasiso:entropy_barrel"
+    "oasiso:entropy_barrel",
+    "oasiso:entropy_well",
+    "oasiso:entropy_well_part",
+    "oasiso:windmill",
+    "oasiso:windmill_part",
+    "oasiso:factory_core",
+    "oasiso:factory_core_part"
   ]
 }

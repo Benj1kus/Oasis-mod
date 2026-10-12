@@ -377,6 +377,16 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.WINDMILL_BE.get(),
+                WindmillRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.FACTORY_CORE_BE.get(),
+                FactoryCoreRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.MOUTH_POINT_BE.get(),
                 MouthPointRenderer::new
         );

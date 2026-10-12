@@ -16,7 +16,7 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class GeyserSmokeParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
-    private final float baseSize;
+    private float baseSize;
 
     private GeyserSmokeParticle(ClientLevel level, double x, double y, double z, SpriteSet sprites) {
         super(level, x, y, z);
@@ -73,6 +73,31 @@ public final class GeyserSmokeParticle extends TextureSheetParticle {
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    }
+
+
+    public static void spawnWellShockwave(ClientLevel level, double x, double y, double z) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        int count = switch (mc.options.particles().get()) {
+            case ALL -> 48;
+            case DECREASED -> 24;
+            case MINIMAL -> 12;
+        };
+        for (int i = 0; i < count; i++) {
+            double angle = (i + level.random.nextDouble() * .4) * Math.PI * 2 / count;
+            double dx = Math.cos(angle), dz = Math.sin(angle);
+            double radius = 1.03 / Math.max(Math.abs(dx), Math.abs(dz));
+            Particle particle = mc.particleEngine.createParticle(Oasiso.GEYSER_SMOKE.get(), x + dx * radius, y, z + dz * radius, 0, 0, 0);
+            if (particle instanceof GeyserSmokeParticle smoke) {
+                double speed = .13 + level.random.nextDouble() * .065;
+                smoke.xd = dx * speed;
+                smoke.zd = dz * speed;
+                smoke.yd = .035 + level.random.nextDouble() * .035;
+                smoke.lifetime = 32 + level.random.nextInt(15);
+                smoke.baseSize = .19F + level.random.nextFloat() * .10F;
+                smoke.quadSize = smoke.baseSize;
+            }
+        }
     }
 
     @SubscribeEvent

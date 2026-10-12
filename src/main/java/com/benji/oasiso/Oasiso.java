@@ -338,6 +338,7 @@ public class Oasiso {
         IEventBus modEventBus = context.getModEventBus();
 
         ModBlocks.register(modEventBus);
+        com.benji.oasiso.registry.EntropyWellRegistry.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);

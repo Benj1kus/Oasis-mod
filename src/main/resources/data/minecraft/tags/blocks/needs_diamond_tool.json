@@ -6,6 +6,12 @@
     "oasiso:wizard_eye",
     "oasiso:wizard_column",
     "oasiso:chaos_spawner",
-    "oasiso:azumalit_block"
+    "oasiso:azumalit_block",
+    "oasiso:entropy_well",
+    "oasiso:entropy_well_part",
+    "oasiso:windmill",
+    "oasiso:windmill_part",
+    "oasiso:factory_core",
+    "oasiso:factory_core_part"
   ]
 }
