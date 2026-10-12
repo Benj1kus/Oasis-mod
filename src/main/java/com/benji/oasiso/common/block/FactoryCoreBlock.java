@@ -22,6 +22,21 @@ public class FactoryCoreBlock extends BaseEntityBlock {
     }
 
     @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return level.isClientSide ? null : createTickerHelper(type,
+                com.benji.oasiso.registry.ModBlockEntities.FACTORY_CORE_BE.get(), FactoryCoreBlockEntity::serverTick);
+    }
+
+    @Override
+    public void onProjectileHit(Level level, BlockState state,
+            net.minecraft.world.phys.BlockHitResult hit,
+            net.minecraft.world.entity.projectile.Projectile projectile) {
+        com.benji.oasiso.common.factory.FactoryCoreProjectileHandler.hit(level, hit.getBlockPos(), projectile);
+        super.onProjectileHit(level, state, hit, projectile);
+    }
+
+    @Override
     public BlockState getStateForPlacement(BlockPlaceContext c) {
         BlockPos base = c.getClickedPos();
         Level level = c.getLevel();

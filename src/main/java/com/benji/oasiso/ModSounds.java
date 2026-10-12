@@ -21,6 +21,8 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> WELL_IDLE = registerSoundEvent("well_idle");
     public static final RegistryObject<SoundEvent> WELL_PUNCH = registerSoundEvent("well_punch");
+    public static final RegistryObject<SoundEvent> ENTROPY_EXPLODE = registerSoundEvent("entropy_explode");
+    public static final RegistryObject<SoundEvent> WARNING = registerSoundEvent("warning");
 
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");

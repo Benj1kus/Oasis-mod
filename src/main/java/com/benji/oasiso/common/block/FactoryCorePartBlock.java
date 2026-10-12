@@ -19,6 +19,14 @@ public final class FactoryCorePartBlock extends Block {
     }
 
     @Override
+    public void onProjectileHit(Level level, BlockState state,
+            net.minecraft.world.phys.BlockHitResult hit,
+            net.minecraft.world.entity.projectile.Projectile projectile) {
+        com.benji.oasiso.common.factory.FactoryCoreProjectileHandler.hit(level, hit.getBlockPos(), projectile);
+        super.onProjectileHit(level, state, hit, projectile);
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
         b.add(X, Y, Z);
     }

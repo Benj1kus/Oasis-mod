@@ -100,6 +100,34 @@ public final class GeyserSmokeParticle extends TextureSheetParticle {
         }
     }
 
+    /** Expanding reactor wave: uses the same colliding, emissive smoke as the geyser. */
+    public static void spawnReactorWave(ClientLevel level, Vec3 origin, double radius) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        int count = switch (mc.options.particles().get()) {
+            case ALL -> 64; case DECREASED -> 32; case MINIMAL -> 12;
+        };
+        for (int i = 0; i < count; i++) {
+            double angle = (i + level.random.nextDouble() * .8) * Math.PI * 2 / count;
+            double dx = Math.cos(angle), dz = Math.sin(angle);
+            double x = origin.x + dx * radius, z = origin.z + dz * radius;
+            if (!level.hasChunkAt(net.minecraft.core.BlockPos.containing(x, origin.y, z))) continue;
+            Vec3 start = new Vec3(x, origin.y + 4, z), end = new Vec3(x, origin.y - 8, z);
+            var hit = level.clip(new net.minecraft.world.level.ClipContext(start, end,
+                    net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                    net.minecraft.world.level.ClipContext.Fluid.NONE, mc.player));
+            double y = hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS ? origin.y + .1 : hit.getLocation().y + .1;
+            Particle p = mc.particleEngine.createParticle(Oasiso.GEYSER_SMOKE.get(), x, y, z, 0, 0, 0);
+            if (p instanceof GeyserSmokeParticle smoke) {
+                smoke.xd = dx * (.08 + level.random.nextDouble() * .09);
+                smoke.zd = dz * (.08 + level.random.nextDouble() * .09);
+                smoke.yd = .07 + level.random.nextDouble() * .06;
+                smoke.baseSize = .65F + level.random.nextFloat() * .55F;
+                smoke.quadSize = smoke.baseSize;
+                smoke.lifetime = 46 + level.random.nextInt(20);
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void register(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(Oasiso.GEYSER_SMOKE.get(), Provider::new);

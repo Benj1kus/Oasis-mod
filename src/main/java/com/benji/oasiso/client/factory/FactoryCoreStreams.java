@@ -73,6 +73,7 @@ public final class FactoryCoreStreams {
             previousTime = Double.NaN;
             clockOrigin = Double.NaN;
         }
+
         if (shader == null || level == null || level != mc.level || view == null || projection == null || camera == null)
             return;
         float partial = mc.isPaused() ? mc.getFrameTime() : event.getPartialTick();
@@ -195,7 +196,6 @@ public final class FactoryCoreStreams {
         BUILDER.vertex(p.x, p.y, p.z).color((float) (f.phase / (Math.PI * 2)), 1F, 1F, opacity).uv(u, v).endVertex();
     }
 
-    @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static final class Shaders {
         @SubscribeEvent
         public static void register(RegisterShadersEvent event) throws IOException {

@@ -21,6 +21,8 @@
 
   "well_idle": { "sounds": [ "oasiso:well_idle" ] },
   "well_punch": { "sounds": [ "oasiso:well_punch" ] },
+  "entropy_explode": { "sounds": [ "oasiso:entropy_explode" ] },
+  "warning": { "sounds": [ "oasiso:warning" ] },
 
   "glov_bounce": { "sounds": [ "oasiso:glov_bounce" ] },
   "beam_loop": { "sounds": [ "oasiso:beam_loop" ] },
