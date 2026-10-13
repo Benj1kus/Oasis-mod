@@ -87,7 +87,7 @@ public class EPipeBlock extends Block implements LiquidBlockContainer {
             level.scheduleTick(currentPos, this, 1);
         }
 
-        return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
+        return calculateShape(state, level, currentPos);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class EPipeBlock extends Block implements LiquidBlockContainer {
             if (e || w) return state.setValue(AXIS, Direction.Axis.X).setValue(TYPE, EPipeType.STRAIGHT);
         }
 
-        return state;
+        return state.setValue(TYPE, EPipeType.STRAIGHT);
     }
 
     @Override

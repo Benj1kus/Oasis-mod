@@ -67,14 +67,19 @@ public final class ApolWingsWave {
                 shader.safeGetUniform("WaveProjection").set(proj);
                 shader.safeGetUniform("Progress").set(progress);
                 shader.safeGetUniform("Seed").set((float) (wave.seed() & 1023));
-                double half = ApollyonShockwaveAttack.WAVE_RADIUS + .25;
+                double half = wave.radius() + .25;
 
-                Vec3 center = origin.add(0, .85 * progress * progress, 0);
+                Vec3 normal = wave.normal();
+                Vec3 reference = Math.abs(normal.y) > .95 ? new Vec3(0, 0, 1) : new Vec3(0, 1, 0);
+                Vec3 right = normal.cross(reference).normalize().scale(half);
+                Vec3 up = right.normalize().cross(normal).normalize().scale(half);
+                double drift = (wave.air() ? -.85 : .85) * progress * progress;
+                Vec3 center = origin.add(normal.scale(drift));
                 VertexConsumer out = BUFFER.getBuffer(WaveType.TYPE);
-                vertex(out, matrix, center.add(-half, 0, -half), 0, 0);
-                vertex(out, matrix, center.add(half, 0, -half), 1, 0);
-                vertex(out, matrix, center.add(half, 0, half), 1, 1);
-                vertex(out, matrix, center.add(-half, 0, half), 0, 1);
+                vertex(out, matrix, center.subtract(right).subtract(up), 0, 0);
+                vertex(out, matrix, center.add(right).subtract(up), 1, 0);
+                vertex(out, matrix, center.add(right).add(up), 1, 1);
+                vertex(out, matrix, center.subtract(right).add(up), 0, 1);
                 BUFFER.endBatch(WaveType.TYPE);
             }
         } finally {
