@@ -431,6 +431,8 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.BOMBO_BOT.get(), BomboBotEntity.createAttributes().build());
+            event.put(ModEntities.CRUSADER_SCIENCE.get(), CrusaderScienceEntity.createAttributes().build());
             event.put(ModEntities.ENT_CREEPER.get(), EntCreeperEntity.createAttributes().build());
             event.put(ModEntities.ENT_ZOMBIE.get(), EntZombieEntity.createAttributes().build());
             event.put(ModEntities.APOLLYON.get(), ApollyonEntity.createAttributes().build());

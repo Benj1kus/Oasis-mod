@@ -1,87 +1,99 @@
 {
-  "credit": "Made with Blockbench",
-  "parent": "builtin/entity",
-  "texture_size": [
-    64,
-    64
-  ],
-  "display": {
-    "thirdperson_righthand": {
-      "translation": [
-        0,
-        -7.75,
-        1.75
-      ],
-      "scale": [
-        0.73,
-        0.73,
-        0.73
-      ]
-    },
-    "thirdperson_lefthand": {
-      "translation": [
-        0,
-        -6.75,
-        1.25
-      ],
-      "scale": [
-        0.73,
-        0.73,
-        0.73
-      ]
-    },
-    "firstperson_righthand": {
-      "rotation": [
-        -7,
-        13,
-        0
-      ],
-      "translation": [
-        6.75,
-        -12,
-        -8.25
-      ]
-    },
-    "firstperson_lefthand": {
-      "rotation": [
-        -8,
-        11,
-        0
-      ],
-      "translation": [
-        7.25,
-        -12,
-        -8.5
-      ]
-    },
-    "ground": {
-      "translation": [
-        0,
-        3,
-        0
-      ],
-      "scale": [
-        0.39,
-        0.39,
-        0.39
-      ]
-    },
+  "loader": "forge:separate_transforms",
+  "gui_light": "front",
+  "base": {
+    "credit": "Made with Blockbench",
+    "parent": "builtin/entity",
+    "texture_size": [
+      64,
+      64
+    ],
+    "display": {
+      "thirdperson_righthand": {
+        "translation": [
+          0,
+          -7.75,
+          1.75
+        ],
+        "scale": [
+          0.73,
+          0.73,
+          0.73
+        ]
+      },
+      "thirdperson_lefthand": {
+        "translation": [
+          0,
+          -6.75,
+          1.25
+        ],
+        "scale": [
+          0.73,
+          0.73,
+          0.73
+        ]
+      },
+      "firstperson_righthand": {
+        "rotation": [
+          -7,
+          13,
+          0
+        ],
+        "translation": [
+          6.75,
+          -12,
+          -8.25
+        ]
+      },
+      "firstperson_lefthand": {
+        "rotation": [
+          -8,
+          11,
+          0
+        ],
+        "translation": [
+          7.25,
+          -12,
+          -8.5
+        ]
+      },
+      "ground": {
+        "translation": [
+          0,
+          3,
+          0
+        ],
+        "scale": [
+          0.39,
+          0.39,
+          0.39
+        ]
+      },
+      "gui": {
+        "rotation": [
+          16,
+          -135,
+          0
+        ],
+        "translation": [
+          0,
+          -4.5,
+          0
+        ],
+        "scale": [
+          0.33,
+          0.33,
+          0.33
+        ]
+      }
+    }
+  },
+  "perspectives": {
     "gui": {
-      "rotation": [
-        16,
-        -135,
-        0
-      ],
-      "translation": [
-        0,
-        -4.5,
-        0
-      ],
-      "scale": [
-        0.33,
-        0.33,
-        0.33
-      ]
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/fist_item"
+      }
     }
   }
 }

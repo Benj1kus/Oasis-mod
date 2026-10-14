@@ -70,8 +70,19 @@ public final class FactoryCoreBlockEntity extends BlockEntity implements GeoBloc
             default -> 2.0F;
         };
         level.playSound(null, worldPosition, com.benji.oasiso.ModSounds.ECHO1.get(), net.minecraft.sounds.SoundSource.BLOCKS, 2.0F, pitch);
-        if (isArmed())
-            detonateAt = level.getGameTime() + com.benji.oasiso.common.factory.FactoryCoreBlastRules.CHARGE_TICKS;
+        if (isArmed()) {
+            detonateAt = level.getGameTime()
+                    + com.benji.oasiso.common.factory.FactoryCoreBlastRules.CHARGE_TICKS;
+
+            if (level instanceof net.minecraft.server.level.ServerLevel server
+                    && projectile.getOwner() instanceof net.minecraft.world.entity.player.Player player) {
+                com.benji.oasiso.common.entity.CrusaderScienceEntity.onCoreDetonationStarted(
+                        server,
+                        com.benji.oasiso.common.factory.FactoryCoreDetonation.center(worldPosition),
+                        player
+                );
+            }
+        }
         setChanged();
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 

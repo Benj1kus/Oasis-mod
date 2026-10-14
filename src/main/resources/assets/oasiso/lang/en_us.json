@@ -124,34 +124,29 @@
   "item.oasiso.titana_hammer": "Fistus Hammer",
   "item.oasiso.doum_palm_boat": "Doum Palm Boat",
   "item.oasiso.doum_palm_chest_boat": "Doum Palm Chest Boat",
-
   "item.oasiso.orb_chaos": "Orb of Chaos",
   "item.oasiso.orb_domination": "Orb of Dominance",
   "item.oasiso.melted_nephritis": "Melted Nephritis",
   "item.oasiso.chaos_scissors": "Chaos Scissors",
-
   "item.oasiso.super_gold_helmet": "Karakol-um Helmet",
   "item.oasiso.super_gold_chestplate": "Karakol-um Chestplate",
   "item.oasiso.super_gold_leggings": "Karakol-um Leggings",
   "item.oasiso.super_gold_boots": "Karakol-um Boots",
-
   "item.oasiso.azumalit_helmet": "Azumalite Helmet",
   "item.oasiso.azumalit_chestplate": "Azumalit Chestplate",
   "item.oasiso.azumalit_leggings": "Azumalite Leggings",
   "item.oasiso.azumalit_boots": "Azumalite Boots",
-
   "item.oasiso.apol_wings": "Apollyon's Wings",
-
   "item.oasiso.azumalit_shard": "Azumalite Shard",
   "item.oasiso.azumalit_upgrade": "Azumalite Upgrade",
   "item.oasiso.azumalit_piece": "Piece of Azumalite",
-
   "item.oasiso.karakolit_ingot": "Karakolite Ingot",
   "item.oasiso.nephritis": "Nephritis",
   "item.oasiso.karakolit_key": "Karakolite Key",
   "item.oasiso.nephritis_core": "Nephritis Core",
   "item.oasiso.bombul_bottle": "Karakolite Bottle",
   "item.oasiso.bombul_bottle_empty": "Karakolite Bottle",
+  "item.oasiso.science_heart": "Science Heart",
 
   "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
   "item.oasiso.krombul_spawn_egg": "Krombul Spawn Egg",
@@ -171,6 +166,7 @@
   "item.oasiso.espider_spawn_egg": "Entropy Spider Spawn Egg",
   "item.oasiso.eworm_spawn_egg": "Entropy Worm Spawn Egg",
   "item.oasiso.apollyon_spawn_egg": "Apollyon Spawn Egg",
+  "item.oasiso.cscience_spawn_egg": "Crusader Scientist Spawn Egg",
 
   "item.oasiso.config_scroll": "Config Scroll",
 
@@ -202,6 +198,8 @@
   "entity.oasiso.spear_attack": "Apollyon Spear",
   "entity.oasiso.ent_zombie": "Entropy Zombie",
   "entity.oasiso.ent_creeper": "Entropy Creeper",
+  "entity.oasiso.crusader_science": "Crusaders Scientist",
+  "entity.oasiso.bombo_bot": "Bombo-bot",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
@@ -220,6 +218,21 @@
   "dialogue.oasiso.paladin.4": "Sin. Its not you, is it?",
   "dialogue.oasiso.paladin.5": "Of course it is!",
   "dialogue.oasiso.paladin.6": "Youre the sinner!",
+
+  "dialogue.oasiso.scien.1": "Hold on, hold on![br]I’m not your enemy[br]Well, technically I am, but...",
+  "dialogue.oasiso.scien.2": "That’s not the point :P",
+  "dialogue.oasiso.scien.3": "I’m more interested in business[br]I only help the Order out of curiosity",
+  "dialogue.oasiso.scien.4": "I’m curious[br]what is this Entropy...",
+  "dialogue.oasiso.scien.5": "Btw[br]Why don\u0027t we trade instead of fighting?",
+  "dialogue.oasiso.scien.6": "Here’s one of my hearts [player] [br]Squeeze it, and you’ll be able to trade with me",
+
+
+  "gui.oasiso.science_store.title": "Science Store",
+  "gui.oasiso.science_store.hold": "Hold RMB to buy",
+  "gui.oasiso.science_store.purchased": "Oh, you bought something!",
+  "gui.oasiso.science_store.not_enough": "Are you poor?",
+  "gui.oasiso.science_store.no_space": "You are full bro",
+  "gui.oasiso.science_store.unavailable": "Item unavailable rn",
 
   "message.oasiso.annoying_goose.name": "Annoying Goose",
 

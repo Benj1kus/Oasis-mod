@@ -18,6 +18,7 @@
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
   "entropy_pulse": { "sounds": [ "oasiso:entropy_pulse" ] },
   "entropy_lightning": { "sounds": [ "oasiso:entropy_lightning" ] },
+  "science_txt": { "sounds": [ "oasiso:science_txt" ] },
 
   "well_idle": { "sounds": [ "oasiso:well_idle" ] },
   "well_punch": { "sounds": [ "oasiso:well_punch" ] },
@@ -66,6 +67,13 @@
   "ezombie_idle3": { "sounds": [ "oasiso:ezombie_idle3" ] },
   "ezombie_hurt": { "sounds": [ "oasiso:ezombie_hurt" ] },
   "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
+
+
+  "science_idle1": { "sounds": [ "oasiso:science_idle1" ] },
+  "science_idle2": { "sounds": [ "oasiso:science_idle2" ] },
+  "science_idle3": { "sounds": [ "oasiso:science_idle3" ] },
+  "science_hurt": { "sounds": [ "oasiso:science_hurt" ] },
+  "science_death": { "sounds": [ "oasiso:science_death" ] },
 
   "ecreeper_idle1": { "sounds": [ "oasiso:ecreeper_idle1" ] },
   "ecreeper_idle2": { "sounds": [ "oasiso:ecreeper_idle2" ] },

@@ -23,6 +23,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> WELL_PUNCH = registerSoundEvent("well_punch");
     public static final RegistryObject<SoundEvent> ENTROPY_EXPLODE = registerSoundEvent("entropy_explode");
     public static final RegistryObject<SoundEvent> WARNING = registerSoundEvent("warning");
+    public static final RegistryObject<SoundEvent> SCIENCE_TXT = registerSoundEvent("science_txt");
 
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
@@ -38,6 +39,13 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> CREATURE_SPAWN = registerSoundEvent("creature_spawn");
 
     public static final RegistryObject<SoundEvent> ENTROPY_DEATH = registerSoundEvent("entropy_death");
+
+
+    public static final RegistryObject<SoundEvent> SCIENCE_IDLE1 = registerSoundEvent("science_idle1");
+    public static final RegistryObject<SoundEvent> SCIENCE_IDLE2 = registerSoundEvent("science_idle2");
+    public static final RegistryObject<SoundEvent> SCIENCE_IDLE3 = registerSoundEvent("science_idle3");
+    public static final RegistryObject<SoundEvent> SCIENCE_HURT = registerSoundEvent("science_hurt");
+    public static final RegistryObject<SoundEvent> SCIENCE_DEATH = registerSoundEvent("science_death");
 
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE1 = registerSoundEvent("espider_idle1");
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE2 = registerSoundEvent("espider_idle2");

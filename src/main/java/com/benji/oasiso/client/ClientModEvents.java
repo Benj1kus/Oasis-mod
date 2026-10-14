@@ -165,6 +165,17 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.CRUSADER_SCIENCE.get(),
+                CrusaderScienceRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.BOMBO_BOT.get(),
+                BomboBotRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
                 Oasiso.OSIRIS_TENTACLE.get(),
                 OsirisTentacleRenderer::new
         );
