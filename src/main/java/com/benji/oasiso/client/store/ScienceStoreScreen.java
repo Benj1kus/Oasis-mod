@@ -35,6 +35,7 @@ public final class ScienceStoreScreen extends Screen {
     private Component message = Component.empty();
     private int messageColor = 0xF6B7E8;
     private float scale, originX, originY;
+    private ScienceStoreMusic music;
 
     private static final class Card {
         float x, y, angle, fromX, fromY, fromAngle, toX, toY, toAngle;
@@ -80,6 +81,13 @@ public final class ScienceStoreScreen extends Screen {
         scale = Math.min(width / 192F, height / 108F);
         originX = (width - 192 * scale) / 2F;
         originY = (height - 108 * scale) / 2F;
+
+        if (minecraft != null && minecraft.getSoundManager() != null) {
+            if (music == null || !minecraft.getSoundManager().isActive(music)) {
+                music = new ScienceStoreMusic(0.35f);
+                minecraft.getSoundManager().play(music);
+            }
+        }
     }
 
     private void layout(boolean initial) {
@@ -412,6 +420,11 @@ public final class ScienceStoreScreen extends Screen {
         cancel();
         awaiting = false;
         closeSession();
+
+        if (music != null && minecraft != null && minecraft.getSoundManager() != null) {
+            music.fadeOut();
+        }
+
         closeStarted = time();
         closeFrom = Math.min(INTRO_END, closeStarted);
         closing = true;
@@ -426,6 +439,9 @@ public final class ScienceStoreScreen extends Screen {
     }
 
     private void finishClose() {
+        if (music != null && minecraft != null && minecraft.getSoundManager() != null) {
+            music.fadeOut();
+        }
         if (minecraft != null && minecraft.screen == this) minecraft.setScreen(null);
     }
 
@@ -433,6 +449,9 @@ public final class ScienceStoreScreen extends Screen {
     public void removed() {
         closeSession();
         icons.close();
+        if (music != null && minecraft != null && minecraft.getSoundManager() != null) {
+            music.fadeOut();
+        }
         super.removed();
     }
 }

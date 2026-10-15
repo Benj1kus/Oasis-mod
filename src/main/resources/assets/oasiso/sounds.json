@@ -49,6 +49,7 @@
   "honk": { "sounds": [ "oasiso:honk" ] },
   "tower_place": { "sounds": [ "oasiso:tower_place" ] },
   "cast": { "sounds": [ "oasiso:cast" ] },
+  "store_theme": { "sounds": [ "oasiso:store_theme" ] },
 
   "scarab_idle": { "sounds": [ "oasiso:scarab_idle" ] },
   "scarab_idle2": { "sounds": [ "oasiso:scarab_idle2" ] },

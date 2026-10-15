@@ -24,6 +24,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY_EXPLODE = registerSoundEvent("entropy_explode");
     public static final RegistryObject<SoundEvent> WARNING = registerSoundEvent("warning");
     public static final RegistryObject<SoundEvent> SCIENCE_TXT = registerSoundEvent("science_txt");
+    public static final RegistryObject<SoundEvent> STORE_THEME = registerSoundEvent("store_theme");
 
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
