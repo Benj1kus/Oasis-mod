@@ -13,6 +13,10 @@
   "flowery12": { "sounds": [ "oasiso:flowery12" ] },
   "flowery13": { "sounds": [ "oasiso:flowery13" ] },
 
+  "spring1": { "sounds": [ "oasiso:spring1" ] },
+  "spring2": { "sounds": [ "oasiso:spring2" ] },
+  "spring3": { "sounds": [ "oasiso:spring3" ] },
+
   "entropy1": { "sounds": [ "oasiso:entropy1" ] },
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },
@@ -69,12 +73,17 @@
   "ezombie_hurt": { "sounds": [ "oasiso:ezombie_hurt" ] },
   "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
 
-
   "science_idle1": { "sounds": [ "oasiso:science_idle1" ] },
   "science_idle2": { "sounds": [ "oasiso:science_idle2" ] },
   "science_idle3": { "sounds": [ "oasiso:science_idle3" ] },
   "science_hurt": { "sounds": [ "oasiso:science_hurt" ] },
   "science_death": { "sounds": [ "oasiso:science_death" ] },
+
+  "giver_idle1": { "sounds": [ "oasiso:giver_idle1" ] },
+  "giver_idle2": { "sounds": [ "oasiso:giver_idle2" ] },
+  "giver_idle3": { "sounds": [ "oasiso:giver_idle3" ] },
+  "giver_hurt": { "sounds": [ "oasiso:giver_hurt" ] },
+  "giver_death": { "sounds": [ "oasiso:giver_death" ] },
 
   "ecreeper_idle1": { "sounds": [ "oasiso:ecreeper_idle1" ] },
   "ecreeper_idle2": { "sounds": [ "oasiso:ecreeper_idle2" ] },

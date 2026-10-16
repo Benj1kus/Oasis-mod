@@ -1,0 +1,67 @@
+{
+  "vertex": "oasiso:soul_outline",
+  "fragment": "oasiso:soul_outline",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    },
+    {
+      "name": "Sampler1"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "ScreenSize",
+      "type": "float",
+      "count": 2,
+      "values": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "name": "Radius",
+      "type": "float",
+      "count": 1,
+      "values": [
+        10
+      ]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "Seed",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "Mode",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "Amount",
+      "type": "float",
+      "count": 1,
+      "values": [
+        1
+      ]
+    }
+  ]
+}

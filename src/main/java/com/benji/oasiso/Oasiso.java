@@ -92,6 +92,8 @@ public class Oasiso {
 
     public static final RegistryObject<SimpleParticleType> ENTROPY_BULB = PARTICLES.register("entropy_bulb", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> GEYSER_SMOKE = PARTICLES.register("geyser_smoke", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> SOUL_SMOKE = PARTICLES.register("soul_smoke", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENT_SOUL = PARTICLES.register("ent_soul", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
@@ -431,6 +433,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.SOUL_GIVER.get(), SoulGiverEntity.createAttributes().build());
             event.put(ModEntities.BOMBO_BOT.get(), BomboBotEntity.createAttributes().build());
             event.put(ModEntities.CRUSADER_SCIENCE.get(), CrusaderScienceEntity.createAttributes().build());
             event.put(ModEntities.ENT_CREEPER.get(), EntCreeperEntity.createAttributes().build());

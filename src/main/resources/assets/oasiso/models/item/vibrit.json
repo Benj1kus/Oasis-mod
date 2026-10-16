@@ -1,0 +1,51 @@
+{
+  "loader": "forge:separate_transforms",
+  "gui_light": "front",
+  "base": {
+    "parent": "builtin/entity"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "ground": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "fixed": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "firstperson_righthand": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "firstperson_lefthand": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "thirdperson_righthand": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    },
+    "thirdperson_lefthand": {
+      "parent": "item/generated",
+      "textures": {
+        "layer0": "oasiso:item/vibrit_icon"
+      }
+    }
+  }
+}

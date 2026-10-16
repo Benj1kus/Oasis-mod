@@ -1,0 +1,39 @@
+{
+  "vertex": "oasiso:vibrit_soul",
+  "fragment": "oasiso:vibrit_soul",
+  "attributes": [
+    "Position",
+    "Color",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "SoulProjection",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ]
+}

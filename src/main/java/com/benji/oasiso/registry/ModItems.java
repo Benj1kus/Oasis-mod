@@ -106,6 +106,7 @@ public final class ModItems {
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> GRAVE_ITEM = ITEMS.register("grave", () -> new BlockItem(ModBlocks.GRAVE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase", () -> new BlockItem(ModBlocks.GEN_VASE.get(), new Item.Properties()));
@@ -134,6 +135,7 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_WELL_ITEM = ITEMS.register("entropy_well", () -> new GeoBlockItem(ModBlocks.ENTROPY_WELL.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/entropy_well.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/entropy_well.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/entropy_well.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> WINDMILL_ITEM = ITEMS.register("windmill", () -> new GeoBlockItem(ModBlocks.WINDMILL.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/windmill.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/windmill.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/windmill.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> FACTORY_CORE_ITEM = ITEMS.register("factory_core", () -> new GeoBlockItem(ModBlocks.FACTORY_CORE.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/factory_core.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/factory_core.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/factory_core.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
+    public static final RegistryObject<Item> VIBRIT_ITEM = ITEMS.register("vibrit", () -> new GeoBlockItem(ModBlocks.VIBRIT.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/vibrit.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/vibrit.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/vibrit.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
 
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
@@ -177,6 +179,7 @@ public final class ModItems {
     public static final RegistryObject<Item> SEEMLESS_CURVE_BANNER_ITEM = ITEMS.register("seemless_curve_banner", () -> new SeamlessCurveBannerItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> SEEMLESS_CURVE_CHAIN_ITEM = ITEMS.register("seemless_curve_chain", () -> new SeamlessCurveChainItem(new Item.Properties().stacksTo(16)));
 
+    public static final RegistryObject<Item> GIVER_SPAWN_EGG = ITEMS.register("giver_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.SOUL_GIVER, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CSCIENCE_SPAWN_EGG = ITEMS.register("cscience_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_SCIENCE, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CASSASIN_SPAWN_EGG = ITEMS.register("cassasin_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_ASSASIN, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> CTANK_SPAWN_EGG = ITEMS.register("ctank_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.CRUSADER_TANK, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));

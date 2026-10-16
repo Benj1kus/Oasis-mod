@@ -271,6 +271,12 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.SOUL_GIVER.get(),
+                SoulGiverRenderer::new
+        );
+
+
+        event.registerEntityRenderer(
                 Oasiso.KROMBUL.get(),
                 KrombulRenderer::new
         );
@@ -390,6 +396,11 @@ public class ClientModEvents {
         event.registerBlockEntityRenderer(
                 ModBlockEntities.WINDMILL_BE.get(),
                 WindmillRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
+                ModBlockEntities.VIBRIT_BE.get(),
+                VibritRenderer::new
         );
 
         event.registerBlockEntityRenderer(

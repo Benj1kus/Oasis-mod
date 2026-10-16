@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "facing=north,type=normal": { "model": "oasiso:block/grave" },
+    "facing=east,type=normal":  { "model": "oasiso:block/grave", "y": 90 },
+    "facing=south,type=normal": { "model": "oasiso:block/grave", "y": 180 },
+    "facing=west,type=normal":  { "model": "oasiso:block/grave", "y": 270 },
+
+    "facing=north,type=big":    { "model": "oasiso:block/grave_big" },
+    "facing=east,type=big":     { "model": "oasiso:block/grave_big", "y": 90 },
+    "facing=south,type=big":    { "model": "oasiso:block/grave_big", "y": 180 },
+    "facing=west,type=big":     { "model": "oasiso:block/grave_big", "y": 270 },
+
+    "facing=north,type=small":  { "model": "oasiso:block/grave_small" },
+    "facing=east,type=small":   { "model": "oasiso:block/grave_small", "y": 90 },
+    "facing=south,type=small":  { "model": "oasiso:block/grave_small", "y": 180 },
+    "facing=west,type=small":   { "model": "oasiso:block/grave_small", "y": 270 }
+  }
+}

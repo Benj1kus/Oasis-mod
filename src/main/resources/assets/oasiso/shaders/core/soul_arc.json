@@ -1,0 +1,35 @@
+{
+  "vertex": "oasiso:soul_arc",
+  "fragment": "oasiso:soul_arc",
+  "attributes": [
+    "Position",
+    "Color",
+    "UV0"
+  ],
+  "samplers": [],
+  "uniforms": [
+    {
+      "name": "ArcProjection",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ]
+}

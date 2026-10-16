@@ -16,12 +16,27 @@ final class EntropySpiderOutlinePass {
     private EntropySpiderOutlinePass() {
     }
 
+
     static void draw(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha) {
-        State old = new State();
+        Matrix4f modelView = new Matrix4f(RenderSystem.getModelViewMatrix());
+        Matrix4f projection = new Matrix4f(RenderSystem.getProjectionMatrix());
+
+        if (LateOutlineQueue.isCollecting()) {
+            List<float[]> snapshot = new java.util.ArrayList<>(vertices.size());
+            for (float[] vertex : vertices) snapshot.add(vertex.clone());
+            LateOutlineQueue.submit(() -> drawNow(snapshot, texture, minX, minY, maxX, maxY, crossesCamera, time, alpha, modelView, projection));
+        } else {
+            drawNow(vertices, texture, minX, minY, maxX, maxY, crossesCamera, time, alpha, modelView, projection);
+        }
+    }
+
+    private static void drawNow(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha, Matrix4f modelView, Matrix4f projection) {
+        EntropySpiderOutlinePass.State old = new EntropySpiderOutlinePass.State();
         try (MemoryStack memory = MemoryStack.stackPush()) {
             int w = old.viewport[2], h = old.viewport[3];
             if (w <= 0 || h <= 0) return;
             ensure(w, h);
+
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
             GL11.glDisable(GL11.GL_CULL_FACE);
             GL11.glDisable(GL11.GL_BLEND);
@@ -33,6 +48,7 @@ final class EntropySpiderOutlinePass {
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             GL11.glDepthMask(true);
             GL11.glColorMask(true, true, true, true);
+
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebuffer);
             GL11.glViewport(0, 0, w, h);
 
@@ -41,11 +57,12 @@ final class EntropySpiderOutlinePass {
 
             int mask = EntropySpiderShaders.mask.getId();
             GL20.glUseProgram(mask);
-            matrix(mask, "ModelViewMat", RenderSystem.getModelViewMatrix(), memory);
-            matrix(mask, "ProjMat", RenderSystem.getProjectionMatrix(), memory);
+            matrix(mask, "ModelViewMat", modelView, memory);
+            matrix(mask, "ProjMat", projection, memory);
             GL20.glUniform1i(GL20.glGetUniformLocation(mask, "Sampler0"), 0);
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
+
             FloatBuffer data = MemoryUtil.memAllocFloat(vertices.size() * 5);
             try {
                 for (float[] vertex : vertices) data.put(vertex);
@@ -55,6 +72,7 @@ final class EntropySpiderOutlinePass {
                 MemoryUtil.memFree(data);
             }
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.size());
+
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fieldFramebuffer);
             GL11.glViewport(0, 0, fieldWidth, fieldHeight);
             GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -62,34 +80,38 @@ final class EntropySpiderOutlinePass {
             GL30.glClearBufferfv(GL11.GL_COLOR, 0, memory.floats(0, 0, 0, 0));
 
             if (!scissor(0, 0, fieldWidth, fieldHeight, null, minX, minY, maxX, maxY, crossesCamera, 22)) return;
-            int horizontal = EntropySpiderShaders.distance.getId();
-            GL20.glUseProgram(horizontal);
-            GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler0"), 0);
-            GL20.glUniform1i(GL20.glGetUniformLocation(horizontal, "Sampler1"), 1);
-            GL20.glUniform2f(GL20.glGetUniformLocation(horizontal, "FieldSize"), fieldWidth, fieldHeight);
+
+            int distanceShader = EntropySpiderShaders.distance.getId();
+            GL20.glUseProgram(distanceShader);
+            GL20.glUniform1i(GL20.glGetUniformLocation(distanceShader, "Sampler0"), 0);
+            GL20.glUniform1i(GL20.glGetUniformLocation(distanceShader, "Sampler1"), 1);
+            GL20.glUniform2f(GL20.glGetUniformLocation(distanceShader, "FieldSize"), fieldWidth, fieldHeight);
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexture);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTexture);
-            screen(horizontal, memory);
+            screen(distanceShader, memory);
 
             old.bindFramebuffer();
             toggle(GL30.GL_FRAMEBUFFER_SRGB, old.srgb);
             if (!scissor(old.viewport[0], old.viewport[1], w, h, old.scissor ? old.box : null, minX, minY, maxX, maxY, crossesCamera, 44))
                 return;
+
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glEnable(GL11.GL_BLEND);
             GL20.glBlendEquationSeparate(GL14.GL_FUNC_ADD, GL14.GL_FUNC_ADD);
             GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
             int outline = EntropySpiderShaders.outline.getId();
             GL20.glUseProgram(outline);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler0"), 0);
             GL20.glUniform1i(GL20.glGetUniformLocation(outline, "Sampler1"), 1);
             GL20.glUniform2f(GL20.glGetUniformLocation(outline, "FieldSize"), fieldWidth, fieldHeight);
-            GL20.glUniform2f(GL20.glGetUniformLocation(outline, "Origin"), Float.isFinite(minX) ? (minX + maxX + 2F) * .25F * fieldWidth : fieldWidth * .5F, Float.isFinite(minY) ? (minY + maxY + 2F) * .25F * fieldHeight : fieldHeight * .5F);
+            GL20.glUniform2f(GL20.glGetUniformLocation(outline, "Origin"), Float.isFinite(minX) ? (minX + maxX + 2F) * .25F - fieldWidth : fieldWidth - .5F, Float.isFinite(minY) ? (minY + maxY + 2F) * .25F - fieldHeight : fieldHeight - .5F);
             GL20.glUniform1f(GL20.glGetUniformLocation(outline, "WidthScale"), Math.max(.65F, Math.min(1.35F, h / 1080F)));
             GL20.glUniform1f(GL20.glGetUniformLocation(outline, "Time"), time);
             GL20.glUniform1f(GL20.glGetUniformLocation(outline, "Opacity"), alpha);
+
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexture);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);

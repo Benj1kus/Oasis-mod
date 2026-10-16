@@ -42,11 +42,21 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY_DEATH = registerSoundEvent("entropy_death");
 
 
+    public static final RegistryObject<SoundEvent> SPRING1 = registerSoundEvent("spring1");
+    public static final RegistryObject<SoundEvent> SPRING2 = registerSoundEvent("spring2");
+    public static final RegistryObject<SoundEvent> SPRING3 = registerSoundEvent("spring3");
+
     public static final RegistryObject<SoundEvent> SCIENCE_IDLE1 = registerSoundEvent("science_idle1");
     public static final RegistryObject<SoundEvent> SCIENCE_IDLE2 = registerSoundEvent("science_idle2");
     public static final RegistryObject<SoundEvent> SCIENCE_IDLE3 = registerSoundEvent("science_idle3");
     public static final RegistryObject<SoundEvent> SCIENCE_HURT = registerSoundEvent("science_hurt");
     public static final RegistryObject<SoundEvent> SCIENCE_DEATH = registerSoundEvent("science_death");
+
+    public static final RegistryObject<SoundEvent> GIVER_IDLE1 = registerSoundEvent("giver_idle1");
+    public static final RegistryObject<SoundEvent> GIVER_IDLE2 = registerSoundEvent("giver_idle2");
+    public static final RegistryObject<SoundEvent> GIVER_IDLE3 = registerSoundEvent("giver_idle3");
+    public static final RegistryObject<SoundEvent> GIVER_HURT = registerSoundEvent("giver_hurt");
+    public static final RegistryObject<SoundEvent> GIVER_DEATH = registerSoundEvent("giver_death");
 
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE1 = registerSoundEvent("espider_idle1");
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE2 = registerSoundEvent("espider_idle2");

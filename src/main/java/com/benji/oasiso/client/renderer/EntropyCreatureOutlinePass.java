@@ -17,6 +17,19 @@ final class EntropyCreatureOutlinePass {
     }
 
     static void draw(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha) {
+        Matrix4f modelView = new Matrix4f(RenderSystem.getModelViewMatrix());
+        Matrix4f projection = new Matrix4f(RenderSystem.getProjectionMatrix());
+        if (LateOutlineQueue.isCollecting()) {
+            // Renderers reuse their lists: keep this frame's vertices, including each array.
+            List<float[]> snapshot = new java.util.ArrayList<>(vertices.size());
+            for (float[] vertex : vertices) snapshot.add(vertex.clone());
+            LateOutlineQueue.submit(() -> drawNow(snapshot, texture, minX, minY, maxX, maxY, crossesCamera, time, alpha, modelView, projection));
+        } else {
+            drawNow(vertices, texture, minX, minY, maxX, maxY, crossesCamera, time, alpha, modelView, projection);
+        }
+    }
+
+    private static void drawNow(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha, Matrix4f modelView, Matrix4f projection) {
         State old = new State();
         try (MemoryStack memory = MemoryStack.stackPush()) {
             int w = old.viewport[2], h = old.viewport[3];
@@ -41,8 +54,8 @@ final class EntropyCreatureOutlinePass {
 
             int mask = EntropyCreatureShaders.mask.getId();
             GL20.glUseProgram(mask);
-            matrix(mask, "ModelViewMat", RenderSystem.getModelViewMatrix(), memory);
-            matrix(mask, "ProjMat", RenderSystem.getProjectionMatrix(), memory);
+            matrix(mask, "ModelViewMat", modelView, memory);
+            matrix(mask, "ProjMat", projection, memory);
             GL20.glUniform1i(GL20.glGetUniformLocation(mask, "Sampler0"), 0);
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);

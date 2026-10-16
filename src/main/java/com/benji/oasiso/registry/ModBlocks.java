@@ -129,6 +129,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase", () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.DECORATED_POT).sound(SoundType.DECORATED_POT).instabreak().noOcclusion()));
     public static final RegistryObject<Block> GEYSER_SMALL = BLOCKS.register("geyser_small", () -> new GeyserSmallBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> GEYSER_BIG = BLOCKS.register("geyser_big", () -> new GeyserBigBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(10.0F).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> GRAVE = BLOCKS.register("grave", () -> new GraveBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
 
     public static final RegistryObject<Block> BALL_CACTUS = BLOCKS.register("ball_cactus", () -> new com.benji.oasiso.common.block.BallCactusBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).sound(SoundType.WOOL).instabreak().noOcclusion().randomTicks()));
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue", () -> new AzazelDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).strength(2.0F).noOcclusion()));
@@ -151,6 +152,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> WINDMILL_PART = BLOCKS.register("windmill_part", () -> new WindmillPartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion().noLootTable()));
     public static final RegistryObject<Block> FACTORY_CORE = BLOCKS.register("factory_core", () -> new FactoryCoreBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> FACTORY_CORE_PART = BLOCKS.register("factory_core_part", () -> new FactoryCorePartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion().noLootTable()));
+
+    public static final RegistryObject<Block> VIBRIT = BLOCKS.register("vibrit", () -> new VibritBlock(BlockBehaviour.Properties.of().sound(SoundType.BASALT).instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> E_PIPE = BLOCKS.register("e_pipe", () -> new EPipeBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHERITE_BLOCK).noOcclusion().strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> ENTROPY_BARREL = BLOCKS.register("entropy_barrel", () -> new EntropyBarrelBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHERITE_BLOCK).noOcclusion().strength(4.0F).requiresCorrectToolForDrops()));

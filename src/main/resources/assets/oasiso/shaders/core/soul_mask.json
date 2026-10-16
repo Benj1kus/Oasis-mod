@@ -1,0 +1,38 @@
+{
+  "vertex": "oasiso:soul_mask",
+  "fragment": "oasiso:soul_mask",
+  "attributes": [
+    "Position",
+    "UV0"
+  ],
+  "samplers": [
+    {
+      "name": "Sampler0"
+    }
+  ],
+  "uniforms": [
+    {
+      "name": "FxProjection",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ]
+}

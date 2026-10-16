@@ -92,6 +92,8 @@
   "block.oasiso.entropy_lantern": "Entropy Light",
   "block.oasiso.e_pipe": "Karakolite Pipe",
   "block.oasiso.entropy_barrel": "Barrel with Entropy",
+  "block.oasiso.grave": "Grave of the Entropy War",
+  "block.oasiso.vibrit": "Vibrit Plant",
 
 
   "block.oasiso.kr_grass": "Karak Grass",
@@ -174,6 +176,7 @@
   "item.oasiso.eworm_spawn_egg": "Entropy Worm Spawn Egg",
   "item.oasiso.apollyon_spawn_egg": "Apollyon Spawn Egg",
   "item.oasiso.cscience_spawn_egg": "Crusader Scientist Spawn Egg",
+  "item.oasiso.giver_spawn_egg": "Soulgiver Spawn Egg",
 
   "item.oasiso.config_scroll": "Config Scroll",
 
@@ -207,6 +210,7 @@
   "entity.oasiso.ent_creeper": "Entropy Creeper",
   "entity.oasiso.crusader_science": "Crusaders Scientist",
   "entity.oasiso.bombo_bot": "Bombo-bot",
+  "entity.oasiso.soul_giver": "Crusader Soulgiver",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",

@@ -19,6 +19,7 @@ public final class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<EntityType<SoulGiverEntity>> SOUL_GIVER = ENTITIES.register("soul_giver", () -> EntityType.Builder.of(SoulGiverEntity::new, MobCategory.MONSTER).sized(1.375F, 4.375F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "soul_giver").toString()));
     public static final RegistryObject<EntityType<BomboBotEntity>> BOMBO_BOT = ENTITIES.register("bombo_bot", () -> EntityType.Builder.of(BomboBotEntity::new, MobCategory.MONSTER).sized(0.5F, 1.0F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "bombo_bot").toString()));
     public static final RegistryObject<EntityType<CrusaderScienceEntity>> CRUSADER_SCIENCE = ENTITIES.register("crusader_science", () -> EntityType.Builder.of(CrusaderScienceEntity::new, MobCategory.MONSTER).sized(1.125F, 2.1875F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "crusader_science").toString()));
     public static final RegistryObject<EntityType<EntZombieEntity>> ENT_ZOMBIE = ENTITIES.register("ent_zombie", () -> EntityType.Builder.of(EntZombieEntity::new, MobCategory.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "ent_zombie").toString()));

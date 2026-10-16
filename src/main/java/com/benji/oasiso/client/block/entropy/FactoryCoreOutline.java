@@ -1,6 +1,7 @@
 package com.benji.oasiso.client.block.entropy;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.client.renderer.LateOutlineQueue;
 import com.benji.oasiso.client.factory.FactoryCoreVisuals;
 import org.joml.Matrix4f;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -85,16 +86,10 @@ public final class FactoryCoreOutline {
             RenderSystem.setShader(() -> h);
             quad();
 
-            main.bindWrite(true);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            ShaderInstance outline = EntropyBlockShaders.outline;
-            RenderSystem.setShaderTexture(0, horizontal.getColorTextureId());
-            outline.safeGetUniform("FieldSize").set((float) horizontal.width, (float) horizontal.height);
-            outline.safeGetUniform("Time").set(((tick % 240000) + partial) / 20F);
-            outline.safeGetUniform("WidthScale").set(Math.max(.65F, Math.min(1.65F, main.height / 1080F)));
-            RenderSystem.setShader(() -> outline);
-            quad();
+            // The mask and horizontal field belong to this frame. Only the final
+            // screen-space overlay must wait until clouds/transparency are finished.
+            TextureTarget field = horizontal;
+            LateOutlineQueue.submit(() -> composite(main, field, tick, partial));
         } finally {
             main.bindWrite(true);
             RenderSystem.polygonOffset(0, 0);
@@ -166,6 +161,34 @@ public final class FactoryCoreOutline {
         if (horizontal != null) {
             horizontal.destroyBuffers();
             horizontal = null;
+        }
+    }
+
+    private static void composite(RenderTarget main, TextureTarget field, long tick, float partial) {
+        if (field != horizontal || EntropyBlockShaders.outline == null) return;
+        var modelView = RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.setIdentity();
+        RenderSystem.applyModelViewMatrix();
+        try {
+            RenderSystem.disableScissor();
+            RenderSystem.disableDepthTest(); // Visibility was already tested when drawing the mask.
+            RenderSystem.depthMask(false);
+            RenderSystem.disableCull();
+            RenderSystem.setShaderColor(1, 1, 1, 1);
+            main.bindWrite(true);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            ShaderInstance outline = EntropyBlockShaders.outline;
+            RenderSystem.setShaderTexture(0, field.getColorTextureId());
+            outline.safeGetUniform("FieldSize").set((float) field.width, (float) field.height);
+            outline.safeGetUniform("Time").set(((tick % 240000) + partial) / 20F);
+            outline.safeGetUniform("WidthScale").set(Math.max(.65F, Math.min(1.65F, main.height / 1080F)));
+            RenderSystem.setShader(() -> outline);
+            quad();
+        } finally {
+            modelView.popPose();
+            RenderSystem.applyModelViewMatrix();
         }
     }
 
