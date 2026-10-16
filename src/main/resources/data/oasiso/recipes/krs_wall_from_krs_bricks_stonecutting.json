@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "oasiso:krs_bricks"
+  },
+  "result": "oasiso:krs_wall",
+  "count": 1
+}

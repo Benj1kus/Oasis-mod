@@ -48,6 +48,14 @@ public final class ModBlocks {
     public static final RegistryObject<Block> KR_BRICKS = BLOCKS.register("kr_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KR_COLUMN = BLOCKS.register("kr_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> KRS_BRICKS = BLOCKS.register("krs_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KRS_COLUMN = BLOCKS.register("krs_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KRS_TILES = BLOCKS.register("krs_tiles", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KRS_POLISH = BLOCKS.register("krs_polish", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KRS_SLAB = BLOCKS.register("krs_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(ModBlocks.KRS_BRICKS.get())));
+    public static final RegistryObject<Block> KRS_STAIRS = BLOCKS.register("krs_stairs", () -> new StairBlock(() -> ModBlocks.KRS_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(ModBlocks.KRS_BRICKS.get())));
+    public static final RegistryObject<Block> KRS_WALL = BLOCKS.register("krs_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(ModBlocks.KRS_BRICKS.get())));
+
     public static final RegistryObject<Block> KR_SLAB = BLOCKS.register("kr_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(KR_STONE.get())));
     public static final RegistryObject<Block> KR_STAIRS = BLOCKS.register("kr_stairs", () -> new StairBlock(() -> KR_STONE.get().defaultBlockState(), BlockBehaviour.Properties.copy(KR_STONE.get())));
     public static final RegistryObject<Block> KR_WALL = BLOCKS.register("kr_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(KR_STONE.get())));

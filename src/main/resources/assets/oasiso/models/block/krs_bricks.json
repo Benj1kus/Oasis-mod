@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "particle": "oasiso:block/krs_bricks",
+    "end": "oasiso:block/krs_bricks",
+    "side": "oasiso:block/krs_bricks"
+  }
+}

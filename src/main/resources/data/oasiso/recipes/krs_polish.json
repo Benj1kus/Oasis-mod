@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "oasiso:krs_tiles"
+    }
+  ],
+  "result": {
+    "item": "oasiso:krs_polish"
+  }
+}

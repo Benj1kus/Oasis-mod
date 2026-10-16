@@ -26,6 +26,13 @@
     "oasiso:kr_stairs",
     "oasiso:kr_wall",
     "oasiso:e_pipe",
-    "oasiso:entropy_barrel"
+    "oasiso:entropy_barrel",
+    "oasiso:krs_bricks",
+    "oasiso:krs_tiles",
+    "oasiso:krs_column",
+    "oasiso:krs_polish",
+    "oasiso:krs_wall",
+    "oasiso:krs_slab",
+    "oasiso:krs_stairs"
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "oasiso:block/krs_column"
+    },
+    "axis=x": {
+      "model": "oasiso:block/krs_column",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "oasiso:block/krs_column",
+      "x": 90
+    }
+  }
+}

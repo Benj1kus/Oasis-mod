@@ -68,6 +68,13 @@
     "oasiso:windmill",
     "oasiso:windmill_part",
     "oasiso:factory_core",
-    "oasiso:factory_core_part"
+    "oasiso:factory_core_part",
+    "oasiso:krs_bricks",
+    "oasiso:krs_tiles",
+    "oasiso:krs_column",
+    "oasiso:krs_polish",
+    "oasiso:krs_wall",
+    "oasiso:krs_slab",
+    "oasiso:krs_stairs"
   ]
 }

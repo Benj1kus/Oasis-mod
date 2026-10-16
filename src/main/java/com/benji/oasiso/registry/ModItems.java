@@ -3,7 +3,6 @@ package com.benji.oasiso.registry;
 import com.benji.oasiso.Oasiso;
 
 import static com.benji.oasiso.Oasiso.MODID;
-import static com.benji.oasiso.registry.ModBlocks.*;
 
 import com.benji.oasiso.common.item.*;
 import net.minecraft.resources.ResourceLocation;
@@ -50,9 +49,17 @@ public final class ModItems {
     public static final RegistryObject<Item> KR_BRICKS_ITEM = ITEMS.register("kr_bricks", () -> new BlockItem(ModBlocks.KR_BRICKS.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_COLUMN_ITEM = ITEMS.register("kr_column", () -> new BlockItem(ModBlocks.KR_COLUMN.get(), new Item.Properties()));
 
-    public static final RegistryObject<Item> KR_SLAB_ITEM = ITEMS.register("kr_slab", () -> new BlockItem(KR_SLAB.get(), new Item.Properties()));
-    public static final RegistryObject<Item> KR_STAIRS_ITEM = ITEMS.register("kr_stairs", () -> new BlockItem(KR_STAIRS.get(), new Item.Properties()));
-    public static final RegistryObject<Item> KR_WALL_ITEM = ITEMS.register("kr_wall", () -> new BlockItem(KR_WALL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_COLUMN_ITEM = ITEMS.register("krs_column", () -> new BlockItem(ModBlocks.KRS_COLUMN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_BRICKS_ITEM = ITEMS.register("krs_bricks", () -> new BlockItem(ModBlocks.KRS_BRICKS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_TILES_ITEM = ITEMS.register("krs_tiles", () -> new BlockItem(ModBlocks.KRS_TILES.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_POLISH_ITEM = ITEMS.register("krs_polish", () -> new BlockItem(ModBlocks.KRS_POLISH.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_SLAB_ITEM = ITEMS.register("krs_slab", () -> new BlockItem(ModBlocks.KRS_SLAB.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_STAIRS_ITEM = ITEMS.register("krs_stairs", () -> new BlockItem(ModBlocks.KRS_STAIRS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KRS_WALL_ITEM = ITEMS.register("krs_wall", () -> new BlockItem(ModBlocks.KRS_WALL.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> KR_SLAB_ITEM = ITEMS.register("kr_slab", () -> new BlockItem(ModBlocks.KR_SLAB.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_STAIRS_ITEM = ITEMS.register("kr_stairs", () -> new BlockItem(ModBlocks.KR_STAIRS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_WALL_ITEM = ITEMS.register("kr_wall", () -> new BlockItem(ModBlocks.KR_WALL.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> MEMORY_PUZ_ITEM = ITEMS.register("memory_puz", () -> new BlockItem(ModBlocks.MEMORY_PUZ.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEMORY_CORE_ITEM = ITEMS.register("memory_core", () -> new BlockItem(ModBlocks.MEMORY_CORE.get(), new Item.Properties()));
@@ -77,14 +84,14 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_MAGMA_ITEM = ITEMS.register("entropy_magma", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_MAGMA_LITTLE_ITEM = ITEMS.register("entropy_magma_little", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA_LITTLE.get(), new Item.Properties()));
 
-    public static final RegistryObject<Item> ENTROPY_SOIL_STAIRS_ITEM = ITEMS.register("entropy_soil_stairs", () -> new BlockItem(ENTROPY_SOIL_STAIRS.get(), new Item.Properties()));
-    public static final RegistryObject<Item> ENTROPY_SOIL_WALL_ITEM = ITEMS.register("entropy_soil_wall", () -> new BlockItem(ENTROPY_SOIL_WALL.get(), new Item.Properties()));
-    public static final RegistryObject<Item> ENTROPY_SOIL_SLAB_ITEM = ITEMS.register("entropy_soil_slab", () -> new BlockItem(ENTROPY_SOIL_SLAB.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_SOIL_STAIRS_ITEM = ITEMS.register("entropy_soil_stairs", () -> new BlockItem(ModBlocks.ENTROPY_SOIL_STAIRS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_SOIL_WALL_ITEM = ITEMS.register("entropy_soil_wall", () -> new BlockItem(ModBlocks.ENTROPY_SOIL_WALL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_SOIL_SLAB_ITEM = ITEMS.register("entropy_soil_slab", () -> new BlockItem(ModBlocks.ENTROPY_SOIL_SLAB.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> ENTROPY_BLOCK_ITEM = ITEMS.register("entropy_block", () -> new BlockItem(ModBlocks.ENTROPY_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_VEIN_ITEM = ITEMS.register("entropy_vein", () -> new BlockItem(ModBlocks.ENTROPY_VEIN.get(), new Item.Properties()));
     public static final RegistryObject<Item> CHAOS_SPAWNER_ITEM = ITEMS.register("chaos_spawner", () -> new BlockItem(ModBlocks.CHAOS_SPAWNER.get(), new Item.Properties()));
-    public static final RegistryObject<Item> ENTROPY_FOUNTAIN_ITEM = ITEMS.register("entropy_fountain", () -> new BlockItem(ENTROPY_FOUNTAIN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_FOUNTAIN_ITEM = ITEMS.register("entropy_fountain", () -> new BlockItem(ModBlocks.ENTROPY_FOUNTAIN.get(), new Item.Properties()));
     public static final RegistryObject<Item> KARAK_LOG_ITEM = ITEMS.register("karak_log", () -> new BlockItem(ModBlocks.KARAK_LOG.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_LOG_ITEM = ITEMS.register("entropy_log", () -> new BlockItem(ModBlocks.ENTROPY_LOG.get(), new Item.Properties()));
 
@@ -99,8 +106,8 @@ public final class ModItems {
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
 
-    public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(GEYSER_SMALL.get(), new Item.Properties()));
-    public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(GEYSER_BIG.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase", () -> new BlockItem(ModBlocks.GEN_VASE.get(), new Item.Properties()));
     public static final RegistryObject<Item> BALL_CACTUS_ITEM = ITEMS.register("ball_cactus", () -> new BlockItem(ModBlocks.BALL_CACTUS.get(), new Item.Properties()));
     public static final RegistryObject<Item> STORM_TOTEM_ITEM = ITEMS.register("storm_totem", () -> new BlockItem(ModBlocks.STORM_TOTEM.get(), new Item.Properties()));
@@ -123,7 +130,7 @@ public final class ModItems {
     public static final RegistryObject<Item> NOT_AZUMALIT_CRYSTAL_ITEM = ITEMS.register("not_azumalit_crystal", () -> new BlockItem(ModBlocks.NOT_AZUMALIT_CRYSTAL.get(), new Item.Properties()));
     public static final RegistryObject<Item> APOL_ALTAR_ITEM = ITEMS.register("apol_altar", () -> new GeoBlockItem(ModBlocks.APOL_ALTAR.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/apol_altar.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/apol_altar.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/apol_altar.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> EPIPE_ITEM = ITEMS.register("e_pipe", () -> new BlockItem(ModBlocks.E_PIPE.get(), new Item.Properties()));
-    public static final RegistryObject<Item> ENTROPY_BARREL_ITEM = ITEMS.register("entropy_barrel", () -> new BlockItem(ENTROPY_BARREL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENTROPY_BARREL_ITEM = ITEMS.register("entropy_barrel", () -> new BlockItem(ModBlocks.ENTROPY_BARREL.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_WELL_ITEM = ITEMS.register("entropy_well", () -> new GeoBlockItem(ModBlocks.ENTROPY_WELL.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/entropy_well.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/entropy_well.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/entropy_well.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> WINDMILL_ITEM = ITEMS.register("windmill", () -> new GeoBlockItem(ModBlocks.WINDMILL.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/windmill.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/windmill.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/windmill.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
     public static final RegistryObject<Item> FACTORY_CORE_ITEM = ITEMS.register("factory_core", () -> new GeoBlockItem(ModBlocks.FACTORY_CORE.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/factory_core.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/factory_core.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/factory_core.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
