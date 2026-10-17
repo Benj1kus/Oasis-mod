@@ -27,7 +27,7 @@ public final class VibritBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, VibritBlockEntity entity) {
-        if (entity.vibrationDelay < 0) entity.vibrationDelay = 60 + level.random.nextInt(141);
+        if (entity.vibrationDelay < 0) entity.vibrationDelay = 200 + level.random.nextInt(301);
         if (--entity.vibrationDelay <= 0) {
             entity.triggerAnim("idle", "vibr");
 
@@ -43,7 +43,7 @@ public final class VibritBlockEntity extends BlockEntity implements GeoBlockEnti
             if (level instanceof net.minecraft.server.level.ServerLevel server) {
                 com.benji.oasiso.common.soul.VibritSoulLogic.release(server, pos, state);
             }
-            entity.vibrationDelay = 60 + level.random.nextInt(141);
+            entity.vibrationDelay = 200 + level.random.nextInt(301);
         }
     }
 
