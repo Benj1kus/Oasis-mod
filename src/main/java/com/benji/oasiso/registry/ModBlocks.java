@@ -47,6 +47,8 @@ public final class ModBlocks {
     public static final RegistryObject<Block> KR_STONE = BLOCKS.register("kr_stone", () -> new KarakStoneBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KR_BRICKS = BLOCKS.register("kr_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KR_COLUMN = BLOCKS.register("kr_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> KR_COLUMN_CORE = BLOCKS.register("kr_column_core", () -> new KrColumnCoreBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).lightLevel(state -> 5).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> GUILTY_EYE = BLOCKS.register("guilty_eye", () -> new SimpleGeoBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops().noOcclusion()));
 
     public static final RegistryObject<Block> KRS_BRICKS = BLOCKS.register("krs_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KRS_COLUMN = BLOCKS.register("krs_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(3.0F).requiresCorrectToolForDrops()));

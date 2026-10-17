@@ -389,6 +389,12 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.CLEAN_GEO_BE.get(),
+                GuiltyEyeRenderer::new
+        );
+
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.APOL_ALTAR_BE.get(),
                 ApolAltarRenderer::new
         );

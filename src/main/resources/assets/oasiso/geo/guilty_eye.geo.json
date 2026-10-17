@@ -1,0 +1,103 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
+			},
+			"bones": [
+				{
+					"name": "main",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-7, 0, -7], "size": [14, 3, 14], "uv": [0, 0]},
+						{"origin": [-7, 3, -7], "size": [14, 3, 14], "uv": [0, 17]},
+						{"origin": [-3, 3, -3], "size": [6, 5, 6], "uv": [56, 12]}
+					]
+				},
+				{
+					"name": "head",
+					"parent": "main",
+					"pivot": [0, 7.96429, -0.02857],
+					"cubes": [
+						{"origin": [-6, 8, -6], "size": [12, 12, 12], "uv": [0, 34]},
+						{"origin": [-9, 17, 0], "size": [18, 20, 0], "uv": [48, 34]},
+						{"origin": [-9, 17, 0], "size": [18, 20, 0], "pivot": [0, 27, 0], "rotation": [0, 90, 0], "uv": [48, 34]}
+					]
+				},
+				{
+					"name": "eye_front",
+					"parent": "head",
+					"pivot": [0, 14, -6.3],
+					"cubes": [
+						{"origin": [-6, 8, -6.2], "size": [12, 12, 0], "uv": [48, 54]}
+					]
+				},
+				{
+					"name": "eball_front",
+					"parent": "eye_front",
+					"pivot": [0, 14, -6.4],
+					"cubes": [
+						{"origin": [-2, 12, -6.4], "size": [4, 4, 0], "uv": [60, 4]}
+					]
+				},
+				{
+					"name": "eye_back",
+					"parent": "head",
+					"pivot": [0, 14, 6.2],
+					"rotation": [0, 180, 0],
+					"cubes": [
+						{"origin": [-6, 8, 6.3], "size": [12, 12, 0], "uv": [48, 54]}
+					]
+				},
+				{
+					"name": "eball_back",
+					"parent": "eye_back",
+					"pivot": [0, 14, 6.1],
+					"cubes": [
+						{"origin": [-2, 12, 6.1], "size": [4, 4, 0], "uv": [60, 4]}
+					]
+				},
+				{
+					"name": "eye_left",
+					"parent": "head",
+					"pivot": [6.25, 14, -0.05],
+					"rotation": [0, -90, 0],
+					"cubes": [
+						{"origin": [0.25, 8, 0.05], "size": [12, 12, 0], "uv": [48, 54]}
+					]
+				},
+				{
+					"name": "eball_left",
+					"parent": "eye_left",
+					"pivot": [6.25, 14, -0.15],
+					"cubes": [
+						{"origin": [4.25, 12, -0.15], "size": [4, 4, 0], "uv": [60, 4]}
+					]
+				},
+				{
+					"name": "eye_right",
+					"parent": "head",
+					"pivot": [-6.25, 14, -0.05],
+					"rotation": [0, 90, 0],
+					"cubes": [
+						{"origin": [-12.25, 8, 0.05], "size": [12, 12, 0], "uv": [48, 54], "mirror": true}
+					]
+				},
+				{
+					"name": "eball_right",
+					"parent": "eye_right",
+					"pivot": [-6.25, 14, -0.15],
+					"cubes": [
+						{"origin": [-8.25, 12, -0.15], "size": [4, 4, 0], "uv": [60, 4], "mirror": true}
+					]
+				}
+			]
+		}
+	]
+}

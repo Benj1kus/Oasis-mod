@@ -48,6 +48,8 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_WATER_BUCKET = ITEMS.register("entropy_water_bucket", () -> new BucketItem(ModKarakFluids.ENTROPY_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
     public static final RegistryObject<Item> KR_BRICKS_ITEM = ITEMS.register("kr_bricks", () -> new BlockItem(ModBlocks.KR_BRICKS.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_COLUMN_ITEM = ITEMS.register("kr_column", () -> new BlockItem(ModBlocks.KR_COLUMN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> KR_COLUMN_CORE_ITEM = ITEMS.register("kr_column_core", () -> new BlockItem(ModBlocks.KR_COLUMN_CORE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GUILTY_EYE_ITEM = ITEMS.register("guilty_eye", () -> new GeoBlockItem(ModBlocks.GUILTY_EYE.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/guilty_eye.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/guilty_eye.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/guilty_eye.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
 
     public static final RegistryObject<Item> KRS_COLUMN_ITEM = ITEMS.register("krs_column", () -> new BlockItem(ModBlocks.KRS_COLUMN.get(), new Item.Properties()));
     public static final RegistryObject<Item> KRS_BRICKS_ITEM = ITEMS.register("krs_bricks", () -> new BlockItem(ModBlocks.KRS_BRICKS.get(), new Item.Properties()));
