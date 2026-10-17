@@ -367,7 +367,9 @@ public class Oasiso {
             BossDialogueNetwork.register();
 
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.FLOWERY.getId(), ModBlocks.POTTED_FLOWERY);
-
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.SAD_FLOWER.getId(), ModBlocks.POTTED_SAD);
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.HAPPY_FLOWER.getId(), ModBlocks.POTTED_HAPPY);
+            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.ANGER_FLOWER.getId(), ModBlocks.POTTED_ANGER);
             ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.CACTULO.getId(), ModBlocks.POTTED_CACTULO);
         });
     }

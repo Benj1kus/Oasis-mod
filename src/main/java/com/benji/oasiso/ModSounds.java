@@ -26,6 +26,10 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> SCIENCE_TXT = registerSoundEvent("science_txt");
     public static final RegistryObject<SoundEvent> STORE_THEME = registerSoundEvent("store_theme");
 
+    public static final RegistryObject<SoundEvent> HAPPY_TXT = registerSoundEvent("happy_txt");
+    public static final RegistryObject<SoundEvent> SAD_TXT = registerSoundEvent("sad_txt");
+    public static final RegistryObject<SoundEvent> ANGER_TXT = registerSoundEvent("anger_txt");
+
     public static final RegistryObject<SoundEvent> PALADIN_VOICE = registerSoundEvent("paladin_voice");
     public static final RegistryObject<SoundEvent> OSIRIS_VOICE = registerSoundEvent("osiris_voice");
 

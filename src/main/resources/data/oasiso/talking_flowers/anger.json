@@ -1,0 +1,76 @@
+{
+  "enabled": true,
+  "block": "oasiso:anger_flower",
+  "voice": "oasiso:anger_txt",
+  "text_color": "#FF5151",
+  "activation_radius": 5,
+  "reply_radius": 8,
+  "view_radius": 24,
+  "flame_height": 2.0,
+  "flame_size": 0.4,
+  "text_height": 1.45,
+  "text_scale": 0.018,
+  "frame_ticks": 3,
+  "voice_volume": 0.35,
+  "voice_pitch": 1.0,
+  "flame_frames": [
+    "oasiso:textures/particle/anger_flame1.png",
+    "oasiso:textures/particle/anger_flame2.png",
+    "oasiso:textures/particle/anger_flame3.png",
+    "oasiso:textures/particle/anger_flame4.png",
+    "oasiso:textures/particle/anger_flame5.png"
+  ],
+  "lines": {
+    "quiet": {
+      "key": "dialogue.oasiso.flower.anger.quiet",
+      "random": true,
+      "typing_ticks": 70,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:happy",
+          "line": "protect_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
+    "fire": {
+      "key": "dialogue.oasiso.flower.anger.fire",
+      "random": true,
+      "typing_ticks": 84,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:sad",
+          "line": "scared_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
+    "stomp": {
+      "key": "dialogue.oasiso.flower.anger.stomp",
+      "random": true,
+      "typing_ticks": 86,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "war_reply": {
+      "key": "dialogue.oasiso.flower.anger.war_reply",
+      "random": false,
+      "typing_ticks": 72,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "noise_reply": {
+      "key": "dialogue.oasiso.flower.anger.noise_reply",
+      "random": false,
+      "typing_ticks": 70,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    }
+  }
+}

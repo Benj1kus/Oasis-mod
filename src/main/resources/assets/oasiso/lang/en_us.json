@@ -131,6 +131,9 @@
 
   "block.oasiso.flowery": "Yellow Flowery",
   "block.oasiso.cactulo": "Cactulo plant",
+  "block.oasiso.sad_flower": "Sad Soul Plant",
+  "block.oasiso.happy_flower": "Happy Soul Plant",
+  "block.oasiso.anger_flower": "Angry Soul Plant",
 
   "item.oasiso.titana_hammer": "Fistus Hammer",
   "item.oasiso.doum_palm_boat": "Doum Palm Boat",
@@ -238,6 +241,25 @@
   "dialogue.oasiso.scien.4": "I’m curious[br]what is this Entropy...",
   "dialogue.oasiso.scien.5": "Btw[br]Why don\u0027t we trade instead of fighting?",
   "dialogue.oasiso.scien.6": "Here’s one of my hearts [player] [br]Squeeze it, and you’ll be able to trade with me",
+
+
+  "dialogue.oasiso.flower.anger.quiet": "This place pisses me off! I'm not supposed to be here!",
+  "dialogue.oasiso.flower.anger.fire": "I'll burn you all, you bastards!",
+  "dialogue.oasiso.flower.anger.stomp": "Let me out!",
+  "dialogue.oasiso.flower.anger.war_reply": "I remember every single one of them",
+  "dialogue.oasiso.flower.anger.noise_reply": "If I had a body, I'd kill you",
+
+  "dialogue.oasiso.flower.happy.sunshine": "Another lovely day in the dark!",
+  "dialogue.oasiso.flower.happy.still_here": "Oh, you're still here! Sing me a song! ...Help me",
+  "dialogue.oasiso.flower.happy.spring": "Getting a bit hot in here, isn't it?",
+  "dialogue.oasiso.flower.happy.lonely_reply": "But I don't, haha",
+  "dialogue.oasiso.flower.happy.protect_reply": "Well,I think it's fun here! Together forever!",
+
+  "dialogue.oasiso.flower.sad.lonely": "I feel lonely here...",
+  "dialogue.oasiso.flower.sad.fallen": "Do you think anyone remembers who fell here?",
+  "dialogue.oasiso.flower.sad.quiet": "The wind sounds like voices I used to know",
+  "dialogue.oasiso.flower.sad.disagree": "What's so lovely about it...",
+  "dialogue.oasiso.flower.sad.scared_reply": "Please...don't...",
 
 
   "gui.oasiso.science_store.title": "Science Store",

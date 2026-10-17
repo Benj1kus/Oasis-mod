@@ -60,6 +60,9 @@ public class SoulGiverEntity extends Monster implements GeoEntity, GlowmaskEntit
             retaliationCooldown = 100;
             attacker.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 300, 0));
             attacker.addEffect(new MobEffectInstance(MobEffects.POISON, 300, 0));
+            if (attacker instanceof net.minecraft.server.level.ServerPlayer player) {
+                com.benji.oasiso.common.soul.SoulSmokeNetwork.send(player);
+            }
             for (int i = 0; i < 36; i++) {
                 double angle = random.nextDouble() * Math.PI * 2.0;
                 double vertical = random.nextDouble() * 2.0 - 1.0;

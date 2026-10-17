@@ -108,6 +108,10 @@ public final class ModItems {
     public static final RegistryObject<Item> FLOWERY_ITEM = ITEMS.register("flowery", () -> new BlockItem(ModBlocks.FLOWERY.get(), new Item.Properties()));
     public static final RegistryObject<Item> CACTULO_ITEM = ITEMS.register("cactulo", () -> new BlockItem(ModBlocks.CACTULO.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> SAD_FLOWER_ITEM = ITEMS.register("sad_flower", () -> new BlockItem(ModBlocks.SAD_FLOWER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ANGER_FLOWER_ITEM = ITEMS.register("anger_flower", () -> new BlockItem(ModBlocks.ANGER_FLOWER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> HAPPY_FLOWER_ITEM = ITEMS.register("happy_flower", () -> new BlockItem(ModBlocks.HAPPY_FLOWER.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> GRAVE_ITEM = ITEMS.register("grave", () -> new BlockItem(ModBlocks.GRAVE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));

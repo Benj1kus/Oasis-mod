@@ -128,6 +128,14 @@ public final class ModBlocks {
     public static final RegistryObject<Block> POTTED_FLOWERY = BLOCKS.register("potted_flowery", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, FLOWERY, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> POTTED_CACTULO = BLOCKS.register("potted_cactulo", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CACTULO, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
 
+    public static final RegistryObject<Block> ANGER_FLOWER = BLOCKS.register("anger_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> SAD_FLOWER = BLOCKS.register("sad_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> HAPPY_FLOWER = BLOCKS.register("happy_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+
+    public static final RegistryObject<Block> POTTED_ANGER = BLOCKS.register("potted_anger", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, ANGER_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> POTTED_SAD = BLOCKS.register("potted_sad", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SAD_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> POTTED_HAPPY = BLOCKS.register("potted_happy", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, HAPPY_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
+
     public static final RegistryObject<Block> GEN_VASE = BLOCKS.register("gen_vase", () -> new GenDecorateBlock(BlockBehaviour.Properties.copy(Blocks.DECORATED_POT).sound(SoundType.DECORATED_POT).instabreak().noOcclusion()));
     public static final RegistryObject<Block> GEYSER_SMALL = BLOCKS.register("geyser_small", () -> new GeyserSmallBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> GEYSER_BIG = BLOCKS.register("geyser_big", () -> new GeyserBigBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(10.0F).requiresCorrectToolForDrops().noOcclusion()));

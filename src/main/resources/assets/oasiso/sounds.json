@@ -23,6 +23,9 @@
   "entropy_pulse": { "sounds": [ "oasiso:entropy_pulse" ] },
   "entropy_lightning": { "sounds": [ "oasiso:entropy_lightning" ] },
   "science_txt": { "sounds": [ "oasiso:science_txt" ] },
+  "sad_txt": { "sounds": [ "oasiso:sad_txt" ] },
+  "anger_txt": { "sounds": [ "oasiso:anger_txt" ] },
+  "happy_txt": { "sounds": [ "oasiso:happy_txt" ] },
 
   "well_idle": { "sounds": [ "oasiso:well_idle" ] },
   "well_punch": { "sounds": [ "oasiso:well_punch" ] },
