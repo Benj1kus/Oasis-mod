@@ -246,20 +246,26 @@
   "dialogue.oasiso.flower.anger.quiet": "This place pisses me off! I'm not supposed to be here!",
   "dialogue.oasiso.flower.anger.fire": "I'll burn you all, you bastards!",
   "dialogue.oasiso.flower.anger.stomp": "Let me out!",
+  "dialogue.oasiso.flower.anger.am": "Cogito, ergo sum,I think, therefore I am. I am AM. I am the AM. I think, therefore I AM. I am I AM, I AM. AM! I am!",
+
   "dialogue.oasiso.flower.anger.war_reply": "I remember every single one of them",
   "dialogue.oasiso.flower.anger.noise_reply": "If I had a body, I'd kill you",
 
   "dialogue.oasiso.flower.happy.sunshine": "Another lovely day in the dark!",
   "dialogue.oasiso.flower.happy.still_here": "Oh, you're still here! Sing me a song! ...Help me",
   "dialogue.oasiso.flower.happy.spring": "Getting a bit hot in here, isn't it?",
+
+  "dialogue.oasiso.flower.happy.am_reply": "Hi, AM!",
   "dialogue.oasiso.flower.happy.lonely_reply": "But I don't, haha",
   "dialogue.oasiso.flower.happy.protect_reply": "Well,I think it's fun here! Together forever!",
 
   "dialogue.oasiso.flower.sad.lonely": "I feel lonely here...",
   "dialogue.oasiso.flower.sad.fallen": "Do you think anyone remembers who fell here?",
   "dialogue.oasiso.flower.sad.quiet": "The wind sounds like voices I used to know",
+
   "dialogue.oasiso.flower.sad.disagree": "What's so lovely about it...",
   "dialogue.oasiso.flower.sad.scared_reply": "Please...don't...",
+  "dialogue.oasiso.flower.sad.amm_reply": "You made me think about the meaning of life... pain",
 
 
   "gui.oasiso.science_store.title": "Science Store",

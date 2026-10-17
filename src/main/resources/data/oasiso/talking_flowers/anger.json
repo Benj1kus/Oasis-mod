@@ -58,6 +58,27 @@
       "hold_ticks": 50,
       "fade_ticks": 12
     },
+    "am": {
+      "key": "dialogue.oasiso.flower.anger.am",
+      "random": true,
+      "typing_ticks": 300,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:happy",
+          "line": "am_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        },
+        {
+          "flower": "oasiso:sad",
+          "line": "amm_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
     "war_reply": {
       "key": "dialogue.oasiso.flower.anger.war_reply",
       "random": false,

@@ -65,6 +65,13 @@
       "hold_ticks": 50,
       "fade_ticks": 12
     },
+    "am_reply": {
+      "key": "dialogue.oasiso.flower.happy.am_reply",
+      "random": false,
+      "typing_ticks": 34,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
     "protect_reply": {
       "key": "dialogue.oasiso.flower.happy.protect_reply",
       "random": false,
