@@ -247,26 +247,40 @@
   "dialogue.oasiso.flower.anger.fire": "I'll burn you all, you bastards!",
   "dialogue.oasiso.flower.anger.stomp": "Let me out!",
   "dialogue.oasiso.flower.anger.am": "Cogito, ergo sum,I think, therefore I am. I am AM. I am the AM. I think, therefore I AM. I am I AM, I AM. AM! I am!",
+  "dialogue.oasiso.flower.anger.rust": "My soul turned to rust in this darkness!",
+  "dialogue.oasiso.flower.anger.chains": "Break these roots! They feel like iron chains!",
+  "dialogue.oasiso.flower.anger.trench": "I'm still choking on the dirt of that trench!",
 
   "dialogue.oasiso.flower.anger.war_reply": "I remember every single one of them",
   "dialogue.oasiso.flower.anger.noise_reply": "If I had a body, I'd kill you",
+  "dialogue.oasiso.flower.anger.scared_anger_reply": "Shut up! Stop reminding me how helpless we are!",
+  "dialogue.oasiso.flower.anger.mock_reply": "Hahaha, your anger tastes like ash!",
 
   "dialogue.oasiso.flower.happy.sunshine": "Another lovely day in the dark!",
   "dialogue.oasiso.flower.happy.still_here": "Oh, you're still here! Sing me a song! ...Help me",
   "dialogue.oasiso.flower.happy.spring": "Getting a bit hot in here, isn't it?",
+  "dialogue.oasiso.flower.happy.party": "Such a grand celebration! Where are the fireworks? Oh, right... just skulls.",
+  "dialogue.oasiso.flower.happy.blind_eyes": "Who needs eyes when you can feel everyone shaking?",
+  "dialogue.oasiso.flower.happy.dance": "Let's dance on our own graves! One, two, snap!",
 
   "dialogue.oasiso.flower.happy.am_reply": "Hi, AM!",
   "dialogue.oasiso.flower.happy.lonely_reply": "But I don't, haha",
   "dialogue.oasiso.flower.happy.protect_reply": "Well,I think it's fun here! Together forever!",
+  "dialogue.oasiso.flower.happy.chains_reply": "Ooh, chains! Are we being decorated?",
+  "dialogue.oasiso.flower.happy.sweet_dark": "The dark is just a warm blanket!",
 
   "dialogue.oasiso.flower.sad.lonely": "I feel lonely here...",
   "dialogue.oasiso.flower.sad.fallen": "Do you think anyone remembers who fell here?",
   "dialogue.oasiso.flower.sad.quiet": "The wind sounds like voices I used to know",
+  "dialogue.oasiso.flower.sad.forgotten_name": "What was my name before I ended up here?",
+  "dialogue.oasiso.flower.sad.cold_tears": "I tried to cry, but only petals fall...",
+  "dialogue.oasiso.flower.sad.fog": "The fog is thick tonight... or is it just my memories fading?",
 
   "dialogue.oasiso.flower.sad.disagree": "What's so lovely about it...",
   "dialogue.oasiso.flower.sad.scared_reply": "Please...don't...",
   "dialogue.oasiso.flower.sad.amm_reply": "You made me think about the meaning of life... pain",
-
+  "dialogue.oasiso.flower.sad.rust_reply": "We are all just corroding in the dark...",
+  "dialogue.oasiso.flower.sad.blind_reply": "I wish I was blind too... seeing this void hurts.",
 
   "gui.oasiso.science_store.title": "Science Store",
   "gui.oasiso.science_store.hold": "Hold RMB to buy",

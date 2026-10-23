@@ -36,6 +36,36 @@
         }
       ]
     },
+    "forgotten_name": {
+      "key": "dialogue.oasiso.flower.sad.forgotten_name",
+      "random": true,
+      "typing_ticks": 85,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:happy",
+          "line": "sweet_dark",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
+    "cold_tears": {
+      "key": "dialogue.oasiso.flower.sad.cold_tears",
+      "random": true,
+      "typing_ticks": 80,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:anger",
+          "line": "scared_anger_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
     "fallen": {
       "key": "dialogue.oasiso.flower.sad.fallen",
       "random": true,
@@ -51,6 +81,13 @@
         }
       ]
     },
+    "fog": {
+      "key": "dialogue.oasiso.flower.sad.fog",
+      "random": true,
+      "typing_ticks": 78,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
     "quiet": {
       "key": "dialogue.oasiso.flower.sad.quiet",
       "random": true,
@@ -62,6 +99,20 @@
       "key": "dialogue.oasiso.flower.sad.disagree",
       "random": false,
       "typing_ticks": 80,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "rust_reply": {
+      "key": "dialogue.oasiso.flower.sad.rust_reply",
+      "random": false,
+      "typing_ticks": 72,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "blind_reply": {
+      "key": "dialogue.oasiso.flower.sad.blind_reply",
+      "random": false,
+      "typing_ticks": 75,
       "hold_ticks": 50,
       "fade_ticks": 12
     },

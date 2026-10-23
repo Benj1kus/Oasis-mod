@@ -58,6 +58,36 @@
       "hold_ticks": 50,
       "fade_ticks": 12
     },
+    "rust": {
+      "key": "dialogue.oasiso.flower.anger.rust",
+      "random": true,
+      "typing_ticks": 75,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:sad",
+          "line": "rust_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
+    "chains": {
+      "key": "dialogue.oasiso.flower.anger.chains",
+      "random": true,
+      "typing_ticks": 80,
+      "hold_ticks": 50,
+      "fade_ticks": 12,
+      "replies": [
+        {
+          "flower": "oasiso:happy",
+          "line": "chains_reply",
+          "delay_ticks": 8,
+          "chance": 1.0
+        }
+      ]
+    },
     "am": {
       "key": "dialogue.oasiso.flower.anger.am",
       "random": true,
@@ -79,10 +109,31 @@
         }
       ]
     },
+    "trench": {
+      "key": "dialogue.oasiso.flower.anger.trench",
+      "random": true,
+      "typing_ticks": 85,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
     "war_reply": {
       "key": "dialogue.oasiso.flower.anger.war_reply",
       "random": false,
       "typing_ticks": 72,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "scared_anger_reply": {
+      "key": "dialogue.oasiso.flower.anger.scared_anger_reply",
+      "random": false,
+      "typing_ticks": 70,
+      "hold_ticks": 50,
+      "fade_ticks": 12
+    },
+    "mock_reply": {
+      "key": "dialogue.oasiso.flower.anger.mock_reply",
+      "random": false,
+      "typing_ticks": 65,
       "hold_ticks": 50,
       "fade_ticks": 12
     },
