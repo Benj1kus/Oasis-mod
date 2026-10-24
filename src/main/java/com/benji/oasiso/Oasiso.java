@@ -71,6 +71,7 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> PURPLE_STARS = PARTICLES.register("purple_stars", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> GOLDEN_STARS = PARTICLES.register("golden_stars", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> GOLDEN_HEART = PARTICLES.register("golden_heart", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PURPLE_HEART = PARTICLES.register("purple_heart", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_CENTER_SMOKE = PARTICLES.register("chaos_bomb_center_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_FIRE_SMOKE = PARTICLES.register("chaos_bomb_fire_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHAOS_BOMB_SPARKS = PARTICLES.register("chaos_bomb_sparks", () -> new SimpleParticleType(false));

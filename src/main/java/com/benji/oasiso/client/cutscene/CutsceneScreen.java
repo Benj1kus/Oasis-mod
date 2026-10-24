@@ -45,6 +45,7 @@ public final class CutsceneScreen extends Screen {
         return boss;
     }
 
+    private CutsceneMusic music;
     private Entity boss, previous;
     private ArmorStand anchor;
     private CameraType previousType;
@@ -66,7 +67,14 @@ public final class CutsceneScreen extends Screen {
             if (active != null) active.cleanup();
             active = new CutsceneScreen(p);
             Minecraft.getInstance().setScreen(active);
+            com.benji.oasiso.client.gui.CutsceneFightOverlay.prepare();
+            active.music = new CutsceneMusic();
+            Minecraft.getInstance().getSoundManager().play(active.music);
         } catch (Exception ex) {
+            if (active != null) {
+                active.cleanup();
+                Minecraft.getInstance().setScreen(null);
+            }
             com.mojang.logging.LogUtils.getLogger().error("Cannot start cutscene", ex);
             CutsceneNetwork.finish(p.token());
         }
@@ -106,7 +114,10 @@ public final class CutsceneScreen extends Screen {
     }
 
     private void leave() {
-        if (exitAt < 0) exitAt = System.nanoTime();
+        if (exitAt < 0) {
+            exitAt = System.nanoTime();
+            if (music != null) music.fadeOut();
+        }
     }
 
     @Override
@@ -166,6 +177,7 @@ public final class CutsceneScreen extends Screen {
         if (exitAt >= 0 && (System.nanoTime() - exitAt) / 1e9 > CutsceneTiming.total(config)) {
             cleanup();
             minecraft.setScreen(null);
+            com.benji.oasiso.client.gui.CutsceneFightOverlay.afterCutscene(boss);
         }
     }
 
@@ -180,6 +192,7 @@ public final class CutsceneScreen extends Screen {
     }
 
     private void cleanup() {
+        if (music != null) music.fadeOut();
         restore();
         CutsceneForeground.release();
         if (!finished) {

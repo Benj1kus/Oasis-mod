@@ -54,6 +54,10 @@ public class PaladinEntity extends Monster implements com.benji.oasiso.common.cu
 
     private static final EntityDataAccessor<String> CUTSCENE = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Long> CUTSCENE_START = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Boolean> INTRO_DIALOGUE_DONE = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public boolean isIntroDialogueDone() { return this.entityData.get(INTRO_DIALOGUE_DONE); }
+
     private boolean introCutsceneAttempted;
     private boolean introLocked;
     private boolean introPanelFinished;
@@ -117,6 +121,7 @@ public class PaladinEntity extends Monster implements com.benji.oasiso.common.cu
         this.entityData.define(ANIM_STATE, STATE_WAIT);
         this.entityData.define(CUTSCENE, "");
         this.entityData.define(CUTSCENE_START, 0L);
+        this.entityData.define(INTRO_DIALOGUE_DONE, false);
     }
 
     @Override
@@ -239,6 +244,7 @@ public class PaladinEntity extends Monster implements com.benji.oasiso.common.cu
 
         this.awakeTicks = 0;
         this.introLocked = true;
+        this.entityData.set(INTRO_DIALOGUE_DONE, false);
         this.introCutsceneAttempted = false;
         this.introPanelFinished = false;
         this.introDialogueStarted = false;
@@ -387,6 +393,7 @@ public class PaladinEntity extends Monster implements com.benji.oasiso.common.cu
 
 
         finishIntroDialogueInternal();
+        this.entityData.set(INTRO_DIALOGUE_DONE, true);
     }
 
 
