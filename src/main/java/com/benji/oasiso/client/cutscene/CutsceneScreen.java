@@ -45,6 +45,32 @@ public final class CutsceneScreen extends Screen {
         return boss;
     }
 
+    double flareX, flareY;
+    boolean flareValid;
+
+    @SubscribeEvent
+    public static void projectFlare(RenderLevelStageEvent event) {
+        CutsceneScreen scene = active;
+        if (scene == null) return;
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY) scene.flareValid = false;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !scene.hasCamera() || scene.boss == null)
+            return;
+        Entity actor = scene.boss;
+        var eye = event.getCamera().getPosition();
+        float partial = event.getPartialTick();
+        double x = net.minecraft.util.Mth.lerp(partial, actor.xo, actor.getX()) - eye.x;
+        double y = net.minecraft.util.Mth.lerp(partial, actor.yo, actor.getY()) - eye.y + actor.getBbHeight() * .55;
+        double z = net.minecraft.util.Mth.lerp(partial, actor.zo, actor.getZ()) - eye.z;
+        Vector4f point = new Vector4f((float) x, (float) y, (float) z, 1);
+        new Matrix4f(event.getProjectionMatrix()).mul(com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()).mul(event.getPoseStack().last().pose()).transform(point);
+        if (point.w <= .001F || !Float.isFinite(point.w)) return;
+        double nx = point.x / point.w, ny = point.y / point.w;
+        if (!Double.isFinite(nx) || !Double.isFinite(ny)) return;
+        scene.flareX = (nx * .5 + .5) * scene.width;
+        scene.flareY = (.5 - ny * .5) * scene.height;
+        scene.flareValid = true;
+    }
+
     private CutsceneMusic music;
     private Entity boss, previous;
     private ArmorStand anchor;

@@ -80,27 +80,8 @@ final class CutsceneVisuals {
     }
 
     static void title(GuiGraphics g, CutsceneScreen s, int mx, int my, double time) {
-        int w = s.width, h = s.height, a = color(s.string("checker_a", "#7F38D9")), c = color(s.string("checker_b", "#43DFF5")), edge = color(s.string("edge_color", "#9957E5"));
-        double reveal = clamp(time / .75);
-        BufferBuilder b = begin(g);
-        Matrix4f m = g.pose().last().pose();
-        int cell = 3;
-        for (int y = 0; y < h; y += cell)
-            for (int x = 0; x < w; x += cell) {
-                double nx = x / (double) w, ny = y / (double) h, along = (nx + 1 - ny) * .5, cross = nx + ny - 1;
-                double band = clamp(s.number("checker_width", .30)), soft = clamp((band - Math.abs(cross)) / .035);
-                double dith = (BAYER[((x / cell) & 3) + 4 * ((y / cell) & 3)] + .5) / 16.0;
-                if (along < reveal * 1.3 && Math.abs(cross) < band && soft > dith) {
-                    int check = ((int) Math.floor((along * 10 - time * .55)) + (int) Math.floor(cross * 12)) & 1;
-                    double tint = (Math.sin(along * 5 - time * 1.5) + 1) * .5;
-                    int rgb = mix(a, c, tint);
-                    if (check == 0) rgb = mix(rgb, 0x120922, .7);
-                    quad(b, m, x, y, cell, cell, rgb, reveal * (.78 + .2 * soft));
-                }
-
-            }
-        end(b);
-        bottomGradient(g, s, time);
+        int w = s.width, h = s.height;
+        backdrop(g, s, time);
         float tw = (float) Math.min(w * .44, h * .75), th = tw * 136 / 356;
         String align = s.string("title_position", "left");
         float cx = align.equals("right") ? w * .74F : align.equals("center") ? w * .5F : w * .26F, cy = h * .5F;
@@ -135,6 +116,101 @@ final class CutsceneVisuals {
         g.pose().popPose();
     }
 
+
+    static void backdrop(GuiGraphics g, CutsceneScreen s, double time) {
+        int w = s.width, h = s.height;
+        if (w <= 0 || h <= 0) return;
+        double reveal = clamp(time / .85);
+        reveal = reveal * reveal * (3 - 2 * reveal);
+        int ca = color(s.string("checker_a", "#7F38D9"));
+        int cb = color(s.string("checker_b", "#43DFF5"));
+        int light = color(s.string("flare_color", "#AC64FF"));
+        double bandWidth = Math.max(.04, Math.min(.8, s.number("checker_width", .30)));
+        double bandOpacity = clamp(s.number("checker_opacity", .96));
+        double spiralScale = Math.max(.2, Math.min(2, s.number("spiral_scale", .75)));
+        double spiralWidth = Math.max(.02, Math.min(.95, s.number("spiral_width", .23)));
+        double spiralOpacity = clamp(s.number("spiral_opacity", .48));
+        int spiralOutline = color(s.string("spiral_outline_color", "#AC64FF"));
+        double outlineThickness = Math.max(0, Math.min(.5, s.number("spiral_outline_thickness", .12)));
+        double outlineOpacity = clamp(s.number("spiral_outline_opacity", .85));
+        double gradientProgress = clamp(time / .9);
+        double gradientSlide = gradientProgress * gradientProgress * (3 - 2 * gradientProgress);
+        double gradientHeight = h * Math.max(.1, Math.min(.9, s.number("bottom_gradient_height", .5)));
+        double gradientTop = h - gradientHeight * gradientSlide;
+        double gradientOpacity = clamp(s.number("bottom_gradient_opacity", .95));
+        double speed = s.number("spiral_speed", .22);
+        double jitter = s.number("spiral_jitter", .012);
+        int step = (int) Math.floor(time * 12);
+        double twitch = (hash(step + 523) - .5) * jitter;
+        double rotation = time * s.number("flare_speed", .16);
+        double cx = s.flareX + s.number("flare_offset_x", 0) * w;
+        double cy = s.flareY + s.number("flare_offset_y", 0) * h;
+        double radius = h * Math.max(.05, Math.min(2, s.number("flare_radius", .43)));
+        double intensity = clamp(s.number("flare_opacity", 1));
+        int cell = Math.max(2, (int) Math.ceil(h / 180.0));
+        try (CutsceneRenderState saved = new CutsceneRenderState()) {
+            BufferBuilder b = begin(g);
+            RenderSystem.disableCull();
+            Matrix4f m = g.pose().last().pose();
+            for (int y = 0; y < h; y += cell) {
+                double ny = (y + cell * .5) / h;
+                for (int x = 0; x < w; x += cell) {
+                    double px = x + cell * .5, py = y + cell * .5;
+                    double dx = (px - w * .5) / h, dy = (py - h * .47) / h;
+                    double angle = Math.atan2(dy, dx);
+                    double sector = Math.PI * 2 / 10;
+                    double polygonRadius = Math.hypot(dx, dy) * Math.cos((angle + Math.PI * 4 + sector * .5) % sector - sector * .5);
+                    double phase = angle * 3 - polygonRadius * 14 / spiralScale - time * speed + twitch;
+                    double stripe = phase / (Math.PI * 2);
+                    stripe -= Math.floor(stripe);
+                    float qw = Math.min(cell, w - x), qh = Math.min(cell, h - y);
+                    double dither = (BAYER[((x / cell) & 3) + 4 * ((y / cell) & 3)] + .5) / 16;
+                    double nx = px / w;
+                    double along = (nx + 1 - ny) * .5;
+                    double cross = nx + ny - 1;
+                    double edgeFade = clamp((bandWidth - Math.abs(cross)) / .035);
+                    if (Math.abs(cross) < bandWidth && edgeFade > dither && along < reveal * 1.3) {
+                        int check = ((int) Math.floor(along * 10 - time * .55) + (int) Math.floor(cross * 12)) & 1;
+                        int rgb = mix(ca, cb, (Math.sin(along * 5 - time * 1.5) + 1) * .5);
+                        if (check == 0) rgb = mix(rgb, 0x120922, .7);
+                        quad(b, m, x, y, qw, qh, rgb, reveal * bandOpacity);
+                    }
+                    if (Math.abs(cross) >= bandWidth && stripe < spiralWidth) {
+                        double inset = Math.min(stripe, spiralWidth - stripe);
+                        boolean outline = outlineThickness > 0 && inset < spiralWidth * outlineThickness;
+                        quad(b, m, x, y, qw, qh, outline ? spiralOutline : 0x000000, reveal * (outline ? outlineOpacity : spiralOpacity));
+                    }
+                    // Restore the sliding gradient above the decoration, below the bright flare/title/actor.
+                    if (py > gradientTop) {
+                        double vertical = clamp((py - gradientTop) / gradientHeight);
+                        double alpha = Math.pow(vertical, 1.25) * gradientOpacity;
+                        double dithered = Math.floor(alpha * 4 + dither) / 4;
+                        if (dithered > 0) quad(b, m, x, y, qw, qh, 0x000000, dithered);
+                    }
+                    if (s.flareValid) {
+                        double fx = (px - cx) / radius, fy = (py - cy) / radius;
+                        double r = Math.hypot(fx, fy);
+                        double theta = Math.atan2(fy, fx) - rotation;
+                        double tooth = Math.abs(2 * fract(theta * 7 / (Math.PI * 2)) - 1);
+                        double boundary = .36 + .64 * Math.pow(tooth, 3);
+                        double glow = clamp((boundary - r) / .24) * clamp(1.4 - r) * intensity;
+                        double core = clamp(1 - r / .44) * intensity;
+                        double opacity = Math.max(glow, core);
+                        // Four alpha levels, with a stable Bayer pattern on the screen.
+                        opacity = Math.floor(opacity * 4 + dither) / 4;
+                        int flareTint = mix(light, 0xFFFFFF, clamp(1 - r / .42) * .65);
+                        if (opacity > 0) quad(b, m, x, y, qw, qh, flareTint, reveal * clamp(opacity));
+                    }
+
+                }
+            }
+            end(b);
+        }
+    }
+
+    private static double fract(double value) {
+        return value - Math.floor(value);
+    }
 
     static void bottomGradient(GuiGraphics g, CutsceneScreen s, double time) {
         double t = clamp(time / .9);
