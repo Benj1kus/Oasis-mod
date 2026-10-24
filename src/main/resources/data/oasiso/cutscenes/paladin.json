@@ -1,0 +1,63 @@
+{
+  "enabled": true,
+  "animation": "paladin_cutscene",
+  "duration": 1,
+  "radius": 10,
+  "fov": 80,
+  "aspect": 2.379,
+  "model_scale": 1,
+  "title": "oasiso:textures/gui/paladin_title.png",
+  "title_position": "right",
+  "checker_a": "#27F5B4",
+  "checker_b": "#7688B5",
+  "edge_color": "#000000",
+  "skip": "oasiso:textures/gui/space_skip.png",
+  "skip_hold": "oasiso:textures/gui/space_skip_hold.png",
+  "camera": {
+    "position": [
+      [
+        0.0,
+        -4.75,
+        -15.0,
+        -34.0
+      ],
+      [
+        0.1667,
+        -4.75,
+        -6.0,
+        -50.0
+      ],
+      [
+        0.6667,
+        7.0,
+        0.0,
+        -50.0
+      ]
+    ],
+    "rotation": [
+      [
+        0.0,
+        -22.5,
+        180.0,
+        0.0
+      ],
+      [
+        0.25,
+        -7.5,
+        180.0,
+        0.0
+      ],
+      [
+        0.75,
+        -7.5,
+        175.0,
+        -17.5
+      ]
+    ],
+    "pivot": [
+      5,
+      22,
+      0
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "enabled": true,
+  "animation": "apol_cutscene",
+  "duration": 2.375,
+  "radius": 10,
+  "fov": 80,
+  "aspect": 2.379,
+  "model_scale": 1,
+  "title": "oasiso:textures/gui/apol_title.png",
+  "title_position": "left",
+  "checker_a": "#7F38D9",
+  "checker_b": "#43DFF5",
+  "edge_color": "#000000",
+  "skip": "oasiso:textures/gui/space_skip.png",
+  "skip_hold": "oasiso:textures/gui/space_skip_hold.png",
+  "camera": {
+    "position": [
+      [
+        0.0,
+        0,
+        -4,
+        -37.75
+      ],
+      [
+        0.5417,
+        0,
+        40,
+        -8.75
+      ],
+      [
+        0.875,
+        0,
+        49,
+        33.25
+      ],
+      [
+        1.2917,
+        0,
+        33,
+        28.25
+      ],
+      [
+        1.625,
+        20.58,
+        31.41,
+        -27
+      ],
+      [
+        2.0417,
+        40.3,
+        36,
+        -7.15
+      ]
+    ],
+    "rotation": [
+      [
+        0.0833,
+        -37.5,
+        177.5,
+        0
+      ],
+      [
+        0.4583,
+        -37.5,
+        177.5,
+        0
+      ],
+      [
+        0.7917,
+        40,
+        177.5,
+        0
+      ],
+      [
+        1.2083,
+        130,
+        177.5,
+        0
+      ],
+      [
+        1.5417,
+        15,
+        123,
+        7.5
+      ],
+      [
+        1.9583,
+        26,
+        86,
+        16
+      ]
+    ]
+  }
+}

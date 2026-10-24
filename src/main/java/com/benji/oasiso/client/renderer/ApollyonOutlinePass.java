@@ -19,8 +19,7 @@ final class ApollyonOutlinePass {
     static void draw(List<float[]> vertices, int texture, float minX, float minY, float maxX, float maxY, boolean crossesCamera, float time, float alpha) {
         Matrix4f modelView = new Matrix4f(RenderSystem.getModelViewMatrix());
         Matrix4f projection = new Matrix4f(RenderSystem.getProjectionMatrix());
-        if (LateOutlineQueue.isCollecting()) {
-            // Renderers reuse their lists: keep this frame's vertices, including each array.
+        if (LateOutlineQueue.isCollecting() && !com.benji.oasiso.client.cutscene.CutsceneForeground.isCapturing()) {
             List<float[]> snapshot = new java.util.ArrayList<>(vertices.size());
             for (float[] vertex : vertices) snapshot.add(vertex.clone());
             LateOutlineQueue.submit(() -> drawNow(snapshot, texture, minX, minY, maxX, maxY, crossesCamera, time, alpha, modelView, projection));

@@ -1,6 +1,7 @@
 package com.benji.oasiso.client.renderer;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.client.cutscene.CutsceneForeground;
 import com.benji.oasiso.common.entity.ApollyonEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -151,6 +152,7 @@ public final class ApollyonSpearTrail {
         var active = new ArrayList<Map.Entry<ApollyonEntity, History>>();
         for (var entry : TRAILS.entrySet()) {
             var e = entry.getKey();
+            if (CutsceneForeground.owns(e)) continue; // Draw this boss only in the portrait pass.
             var h = entry.getValue();
             if (!e.isRemoved() && e.isAlive() && !e.isInvisible() && !e.isTeleporting() && h.last != null && now - h.lastTime < 2 && h.last.distanceToSqr(eye) < RANGE * RANGE)
                 active.add(entry);
@@ -166,6 +168,29 @@ public final class ApollyonSpearTrail {
                 var entry = active.get(i);
                 draw(out, view, eye, entry.getValue(), now, entry.getKey().getId());
             }
+        } finally {
+            BUFFER.endBatch(TrailType.TRAIL);
+            if (previous != null) RenderSystem.setShader(() -> previous);
+        }
+    }
+
+    @SubscribeEvent
+    public static void renderCutscene(CutsceneForeground.EffectsEvent event) {
+        if (!(event.entity instanceof ApollyonEntity entity)) return;
+        checkWorld();
+        Minecraft mc = Minecraft.getInstance();
+        if (shader == null || world == null || world != mc.level || entity.level() != world
+                || entity.isRemoved() || !entity.isAlive() || entity.isInvisible() || entity.isTeleporting()) return;
+        History history = TRAILS.get(entity);
+        double now = world.getGameTime() + (mc.isPaused() ? mc.getFrameTime() : event.partial);
+        if (history == null || history.last == null || now - history.lastTime >= 2
+                || history.last.distanceToSqr(event.eye) >= RANGE * RANGE) return;
+        ShaderInstance previous = RenderSystem.getShader();
+        shader.safeGetUniform("TrailProjection").set(event.projection);
+        shader.safeGetUniform("Time").set((float) (now % 24000) / 20F);
+        try {
+            VertexConsumer out = BUFFER.getBuffer(TrailType.TRAIL);
+            draw(out, event.view, event.eye, history, now, entity.getId());
         } finally {
             BUFFER.endBatch(TrailType.TRAIL);
             if (previous != null) RenderSystem.setShader(() -> previous);

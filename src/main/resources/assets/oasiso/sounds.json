@@ -27,6 +27,10 @@
   "anger_txt": { "sounds": [ "oasiso:anger_txt" ] },
   "happy_txt": { "sounds": [ "oasiso:happy_txt" ] },
 
+  "fight": { "sounds": [ "oasiso:fight" ] },
+  "apollyon_theme": { "sounds": [ "oasiso:apollyon_theme" ] },
+  "cutscene_theme": { "sounds": [ "oasiso:cutscene_theme" ] },
+
   "well_idle": { "sounds": [ "oasiso:well_idle" ] },
   "well_punch": { "sounds": [ "oasiso:well_punch" ] },
   "entropy_explode": { "sounds": [ "oasiso:entropy_explode" ] },

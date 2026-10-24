@@ -32,7 +32,13 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
+public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar, com.benji.oasiso.common.cutscene.CutsceneActor {
+
+    private static final EntityDataAccessor<String> CUTSCENE = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Long> CUTSCENE_START = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.LONG);
+    @Override public void setCutscene(String animation, long start) { entityData.set(CUTSCENE, animation); entityData.set(CUTSCENE_START, start); }
+    @Override public void endCutscene() { entityData.set(CUTSCENE, ""); }
+    public boolean inCutscene() { return !entityData.get(CUTSCENE).isEmpty(); }
 
     public static final int DEATH_DURATION = 100; // 5 секунд.
     private static final EntityDataAccessor<Integer> DEATH_TICKS = SynchedEntityData.defineId(ApollyonEntity.class, EntityDataSerializers.INT);
@@ -174,6 +180,8 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(CUTSCENE, "");
+        entityData.define(CUTSCENE_START, 0L);
         entityData.define(DEATH_TICKS, -1);
         entityData.define(TELEPORT_START, -1L);
         entityData.define(COMBAT_MODE, 0);
@@ -371,6 +379,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     protected void customServerAiStep() {
+        if (inCutscene()) return;
         if (isDissolvingDeath()) return;
         super.customServerAiStep();
         if (!isAlive()) {
@@ -453,6 +462,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public void travel(Vec3 input) {
+        if (inCutscene()) { setDeltaMovement(Vec3.ZERO); return; }
         if (isDissolvingDeath()) { setDeltaMovement(Vec3.ZERO); return; }
         if (isEffectiveAi()) {
             if (isTeleporting()) setDeltaMovement(Vec3.ZERO);
@@ -464,7 +474,10 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<ApollyonEntity>(this, "controller", 0, event -> event.setAndContinue(switch (getCombatMode()) {
+        controllers.add(new AnimationController<ApollyonEntity>(this, "controller", 0, event -> {
+            if (inCutscene() && level().getGameTime() >= entityData.get(CUTSCENE_START))
+                return event.setAndContinue(RawAnimation.begin().thenPlayAndHold(entityData.get(CUTSCENE)));
+            return event.setAndContinue(switch (getCombatMode()) {
             case 1 -> ATTACK;
             case 2 -> JUMP;
             case 3 -> SUMMON;
@@ -474,7 +487,7 @@ public class ApollyonEntity extends Monster implements GeoEntity, GlowmaskEntity
             case 7 -> IDLE;
             case 8 -> DEFENCE;
             default -> IDLE;
-        })).setCustomInstructionKeyframeHandler(event -> {
+        }); }).setCustomInstructionKeyframeHandler(event -> {
         }));
     }
 

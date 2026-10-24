@@ -32,10 +32,16 @@ public class PaladinOutlineMaskLayer extends GeoRenderLayer<PaladinEntity> {
             return;
         }
 
+        boolean portrait = com.benji.oasiso.client.cutscene.CutsceneForeground.isCapturing();
+        if (portrait) PaladinOutlineSystem.beginCutsceneMask();
+        try {
         renderMask(poseStack, entity, bakedModel, partialTick, PaladinOutlineSystem.goldMask(), PaladinRenderer.OutlineMaskMode.GOLD);
         renderMask(poseStack, entity, bakedModel, partialTick, PaladinOutlineSystem.swordMask(), PaladinRenderer.OutlineMaskMode.SWORD);
 
         PaladinOutlineSystem.markCaptured();
+        } finally {
+            if (portrait) PaladinOutlineSystem.endCutsceneMask();
+        }
     }
 
 

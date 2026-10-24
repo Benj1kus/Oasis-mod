@@ -19,6 +19,10 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP = registerSoundEvent("entropy_water_loop");
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP_UNDER = registerSoundEvent("entropy_water_loop_under");
 
+    public static final RegistryObject<SoundEvent> FIGHT = registerSoundEvent("fight");
+    public static final RegistryObject<SoundEvent> APOLLYON_THEME = registerSoundEvent("apollyon_theme");
+    public static final RegistryObject<SoundEvent> CUTSCENE_THEME = registerSoundEvent("cutscene_theme");
+
     public static final RegistryObject<SoundEvent> WELL_IDLE = registerSoundEvent("well_idle");
     public static final RegistryObject<SoundEvent> WELL_PUNCH = registerSoundEvent("well_punch");
     public static final RegistryObject<SoundEvent> ENTROPY_EXPLODE = registerSoundEvent("entropy_explode");

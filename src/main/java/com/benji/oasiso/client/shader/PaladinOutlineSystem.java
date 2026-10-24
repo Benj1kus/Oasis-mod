@@ -23,6 +23,25 @@ import org.lwjgl.opengl.GL30;
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class PaladinOutlineSystem {
 
+    private static RenderTarget cutsceneTarget;
+
+    public static void beginCutsceneMask() {
+        cutsceneTarget = com.benji.oasiso.client.cutscene.CutsceneForeground.captureTarget();
+        ensureFromMinecraft();
+        goldMask.clear(Minecraft.ON_OSX);
+        swordMask.clear(Minecraft.ON_OSX);
+        cutsceneTarget.bindWrite(false);
+    }
+
+    public static void endCutsceneMask() { cutsceneTarget = null; }
+
+    @SubscribeEvent
+    public static void cutsceneEffects(com.benji.oasiso.client.cutscene.CutsceneForeground.EffectsEvent event) {
+        if (!(event.entity instanceof com.benji.oasiso.common.entity.PaladinEntity)) return;
+        cutsceneTarget = com.benji.oasiso.client.cutscene.CutsceneForeground.captureTarget();
+        try { composite(event.partial); } finally { cutsceneTarget = null; }
+    }
+
     private static TextureTarget goldMask;
     private static TextureTarget swordMask;
     private static TextureTarget sceneDepth;
@@ -46,7 +65,7 @@ public final class PaladinOutlineSystem {
             return;
         }
 
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
             composite(event.getPartialTick());
         }
     }
@@ -105,7 +124,7 @@ public final class PaladinOutlineSystem {
 
     public static void copySceneDepth(RenderTarget destination) {
         ensureFromMinecraft();
-        RenderTarget source = sceneDepthCaptured ? sceneDepth : Minecraft.getInstance().getMainRenderTarget();
+        RenderTarget source = cutsceneTarget != null ? cutsceneTarget : sceneDepthCaptured ? sceneDepth : Minecraft.getInstance().getMainRenderTarget();
 
         blitDepth(source, destination);
         destination.bindWrite(false);
@@ -120,7 +139,7 @@ public final class PaladinOutlineSystem {
 
 
     public static void restoreMainTarget() {
-        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+        (cutsceneTarget != null ? cutsceneTarget : Minecraft.getInstance().getMainRenderTarget()).bindWrite(false);
     }
 
     private static void composite(float partialTick) {
@@ -136,12 +155,12 @@ public final class PaladinOutlineSystem {
             return;
         }
 
-        RenderTarget main = minecraft.getMainRenderTarget();
+        RenderTarget main = cutsceneTarget != null ? cutsceneTarget : minecraft.getMainRenderTarget();
         main.bindWrite(false);
 
 
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();

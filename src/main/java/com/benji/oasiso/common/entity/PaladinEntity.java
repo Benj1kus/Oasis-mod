@@ -36,8 +36,8 @@ import com.benji.oasiso.common.effect.SmellOfSinManager;
 
 import java.util.UUID;
 
-public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity, MiniBossHealthBar {
-//show healthbar
+public class PaladinEntity extends Monster implements com.benji.oasiso.common.cutscene.CutsceneActor, GeoEntity, GlowmaskEntity, MiniBossHealthBar {
+    //show healthbar
     @Override
     public boolean showMiniBossHealthBar() {
         return !this.isDeathSequenceActive();
@@ -52,6 +52,9 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
 
     private static final int INTRO_FAILSAFE_TICKS = 20 * 45;
 
+    private static final EntityDataAccessor<String> CUTSCENE = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Long> CUTSCENE_START = SynchedEntityData.defineId(PaladinEntity.class, EntityDataSerializers.LONG);
+    private boolean introCutsceneAttempted;
     private boolean introLocked;
     private boolean introPanelFinished;
     private boolean introDialogueStarted;
@@ -112,6 +115,8 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ANIM_STATE, STATE_WAIT);
+        this.entityData.define(CUTSCENE, "");
+        this.entityData.define(CUTSCENE_START, 0L);
     }
 
     @Override
@@ -125,6 +130,11 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     @Override
     public void tick() {
         super.tick();
+        if (inCutscene()) {
+            this.setDeltaMovement(Vec3.ZERO);
+            this.swordSplashActive = false;
+            return;
+        }
         int state = this.getAnimState();
         if (this.level().isClientSide) {
 
@@ -229,6 +239,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
 
         this.awakeTicks = 0;
         this.introLocked = true;
+        this.introCutsceneAttempted = false;
         this.introPanelFinished = false;
         this.introDialogueStarted = false;
 
@@ -250,22 +261,50 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     //dialog methhods
 
     public void onIntroPanelFinished(ServerPlayer player) {
-        if (!this.introLocked) {
+        if (!this.introLocked || this.introPanelFinished || (this.introPlayerId != null && !this.introPlayerId.equals(player.getUUID())))
             return;
-        }
-
         this.introPanelFinished = true;
-        this.introPlayerId = player.getUUID();
-
-
-        if (this.level() instanceof ServerLevel level) {
-            tryStartIntroDialogue(level);
-        }
+        if (this.introPlayerId == null) this.introPlayerId = player.getUUID();
     }
 
+    private void tryStartIntroCutscene(ServerLevel level) {
+        if (!introPanelFinished || getAnimState() != STATE_IDLE || introCutsceneAttempted) return;
+        introCutsceneAttempted = true;
+        com.benji.oasiso.common.cutscene.CutsceneServer.begin(this, ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "paladin"));
+        if (!inCutscene()) tryStartIntroDialogue(level);
+    }
+
+    public boolean inCutscene() {
+        return !this.entityData.get(CUTSCENE).isEmpty();
+    }
+
+    @Override
+    public void setCutscene(String animation, long startTick) {
+        this.entityData.set(CUTSCENE, animation);
+        this.entityData.set(CUTSCENE_START, startTick);
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+        this.swordSplashActive = false;
+    }
+
+    @Override
+    public void endCutscene() {
+        this.entityData.set(CUTSCENE, "");
+        this.entityData.set(CUTSCENE_START, 0L);
+        this.introDialogueTicks = 0;
+    }
+
+    @Override
+    public void travel(Vec3 movement) {
+        if (inCutscene()) {
+            this.setDeltaMovement(Vec3.ZERO);
+            return;
+        }
+        super.travel(movement);
+    }
 
     private void tryStartIntroDialogue(ServerLevel level) {
-        if (!this.introLocked || this.introDialogueStarted || !this.introPanelFinished || this.getAnimState() != STATE_IDLE) {
+        if (!this.introLocked || inCutscene() || !introCutsceneAttempted || this.introDialogueStarted || !this.introPanelFinished || this.getAnimState() != STATE_IDLE) {
 
             return;
         }
@@ -304,12 +343,20 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
 
         if (!this.introPanelFinished && this.introDialogueTicks >= 160) {
             this.introPanelFinished = true;
-            tryStartIntroDialogue(level);
             this.introDialogueTicks = 0;
 
             return;
         }
 
+        if (this.introPanelFinished && !this.introDialogueStarted) {
+            tryStartIntroCutscene(level);
+            if (inCutscene()) return;
+            tryStartIntroDialogue(level);
+        }
+        if (this.introPanelFinished && player == null && this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
+            finishIntroDialogueInternal();
+            return;
+        }
         if (this.introDialogueStarted && this.introDialogueTicks >= INTRO_FAILSAFE_TICKS) {
             finishIntroDialogueInternal();
         }
@@ -527,6 +574,9 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         AnimationController<PaladinEntity> controller = new AnimationController<>(this, "controller", 0, state -> {
+            if (inCutscene() && this.level().getGameTime() >= this.entityData.get(CUTSCENE_START)) {
+                return state.setAndContinue(RawAnimation.begin().thenPlayAndHold(this.entityData.get(CUTSCENE)));
+            }
             return switch (this.getAnimState()) {
                 case STATE_WAIT -> state.setAndContinue(WAIT_ANIMATION);
                 case STATE_AWAKE -> state.setAndContinue(AWAKE_ANIMATION);
@@ -581,11 +631,7 @@ public class PaladinEntity extends Monster implements GeoEntity, GlowmaskEntity,
     @Override
     protected SoundEvent getAmbientSound() {
 
-        SoundEvent[] sounds = {
-                ModSounds.PALADIN_IDLE1.get(),
-                ModSounds.PALADIN_IDLE2.get(),
-                ModSounds.PALADIN_IDLE3.get()
-        };
+        SoundEvent[] sounds = {ModSounds.PALADIN_IDLE1.get(), ModSounds.PALADIN_IDLE2.get(), ModSounds.PALADIN_IDLE3.get()};
 
         return sounds[this.random.nextInt(sounds.length)];
     }

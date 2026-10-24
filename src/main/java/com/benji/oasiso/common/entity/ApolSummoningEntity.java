@@ -446,6 +446,7 @@ public class ApolSummoningEntity extends Entity {
             return false;
         }
         spawned = true;
+        com.benji.oasiso.common.cutscene.CutsceneServer.begin(boss, ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "apollyon"));
         if (server.getBlockState(raisedAltar()).getBlock() == altar.getBlock())
             server.destroyBlock(raisedAltar(), false);
         server.sendParticles(Oasiso.ENTROPY_LIGHTNING.get(), boss.getX(), boss.getY() + 1, boss.getZ(), 36, 2, 2, 2, .12);

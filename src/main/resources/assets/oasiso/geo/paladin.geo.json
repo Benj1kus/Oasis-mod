@@ -7,10 +7,14 @@
 				"texture_width": 128,
 				"texture_height": 128,
 				"visible_bounds_width": 9,
-				"visible_bounds_height": 4.5,
-				"visible_bounds_offset": [0, 1.75, 0]
+				"visible_bounds_height": 7,
+				"visible_bounds_offset": [0, 0.5, 0]
 			},
 			"bones": [
+				{
+					"name": "camera",
+					"pivot": [5, 22, 0]
+				},
 				{
 					"name": "main",
 					"pivot": [0.25, 0, -0.25],
@@ -197,11 +201,7 @@
 					"parent": "paladin sword",
 					"pivot": [-6.1, 27.5, 0],
 					"cubes": [
-						{
-							"origin": [-6.1, 27.5, 0],
-							"size": [0, 0, 0],
-							"uv": [3, 2]
-						}
+						{"origin": [-6.1, 27.5, 0], "size": [0, 0, 0], "uv": [3, 2]}
 					]
 				},
 				{
@@ -209,11 +209,7 @@
 					"parent": "paladin sword",
 					"pivot": [-6.1, 46.5, 0],
 					"cubes": [
-						{
-							"origin": [-6.1, 46.5, 0],
-							"size": [0, 0, 0],
-							"uv": [3, 2]
-						}
+						{"origin": [-6.1, 46.5, 0], "size": [0, 0, 0], "uv": [3, 2]}
 					]
 				},
 				{
@@ -221,11 +217,7 @@
 					"parent": "paladin sword",
 					"pivot": [-6.1, 66.5, 0],
 					"cubes": [
-						{
-							"origin": [-6.1, 66.5, 0],
-							"size": [0, 0, 0],
-							"uv": [3, 2]
-						}
+						{"origin": [-6.1, 66.5, 0], "size": [0, 0, 0], "uv": [3, 2]}
 					]
 				},
 				{
