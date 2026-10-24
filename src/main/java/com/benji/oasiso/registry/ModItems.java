@@ -85,6 +85,7 @@ public final class ModItems {
     public static final RegistryObject<Item> ENTROPY_SOIL_ITEM = ITEMS.register("entropy_soil", () -> new BlockItem(ModBlocks.ENTROPY_SOIL.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_MAGMA_ITEM = ITEMS.register("entropy_magma", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_MAGMA_LITTLE_ITEM = ITEMS.register("entropy_magma_little", () -> new BlockItem(ModBlocks.ENTROPY_MAGMA_LITTLE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> NEPHRITIS_MAGMA_ITEM = ITEMS.register("nephritis_magma", () -> new BlockItem(ModBlocks.NEPHRITIS_MAGMA.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> ENTROPY_SOIL_STAIRS_ITEM = ITEMS.register("entropy_soil_stairs", () -> new BlockItem(ModBlocks.ENTROPY_SOIL_STAIRS.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENTROPY_SOIL_WALL_ITEM = ITEMS.register("entropy_soil_wall", () -> new BlockItem(ModBlocks.ENTROPY_SOIL_WALL.get(), new Item.Properties()));

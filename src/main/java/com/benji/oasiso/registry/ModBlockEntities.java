@@ -36,6 +36,8 @@ public final class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<MemoryPuzzleBlockEntity>> MEMORY_PUZ_BE = BLOCK_ENTITIES.register("memory_puz", () -> BlockEntityType.Builder.of(MemoryPuzzleBlockEntity::new, ModBlocks.MEMORY_PUZ.get()).build(null));
     public static final RegistryObject<BlockEntityType<MemoryCoreBlockEntity>> MEMORY_CORE_BE = BLOCK_ENTITIES.register("memory_core", () -> BlockEntityType.Builder.of(MemoryCoreBlockEntity::new, ModBlocks.MEMORY_CORE.get()).build(null));
     public static final RegistryObject<BlockEntityType<ChaosSpawnerBlockEntity>> CHAOS_SPAWNER_BE = BLOCK_ENTITIES.register("chaos_spawner", () -> BlockEntityType.Builder.of(ChaosSpawnerBlockEntity::new, ModBlocks.CHAOS_SPAWNER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<NephritisMagmaBlockEntity>> NEPHRITIS_MAGMA_BE = BLOCK_ENTITIES.register("nephritis_magma", () -> BlockEntityType.Builder.of(NephritisMagmaBlockEntity::new, ModBlocks.NEPHRITIS_MAGMA.get()).build(null));
+
     private ModBlockEntities() {
     }
 

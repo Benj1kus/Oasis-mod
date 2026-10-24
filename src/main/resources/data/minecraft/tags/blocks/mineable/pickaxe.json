@@ -78,6 +78,7 @@
     "oasiso:krs_wall",
     "oasiso:krs_slab",
     "oasiso:krs_stairs",
-    "oasiso:grave"
+    "oasiso:grave",
+    "oasiso:nephritis_magma"
   ]
 }

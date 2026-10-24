@@ -59,6 +59,7 @@
   "block.oasiso.entropy_block": "Block of Entropy",
   "block.oasiso.entropy_soil": "Entropy Soil",
   "block.oasiso.entropy_magma": "Entropy Magma",
+  "block.oasiso.nephritis_magma": "Nephritis Magma",
   "block.oasiso.entropy_magma_little": "Entropy Low-Viscosity Magma",
   "block.oasiso.entropy_vein": "Entropy vein",
   "block.oasiso.chaos_altar": "Altar of Entropy",
@@ -216,6 +217,7 @@
   "entity.oasiso.crusader_science": "Crusaders Scientist",
   "entity.oasiso.bombo_bot": "Bombo-bot",
   "entity.oasiso.soul_giver": "Crusader Soulgiver",
+  "entity.oasiso.doum_palm_chest_boat": "Doum Palm Chest Boat",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
