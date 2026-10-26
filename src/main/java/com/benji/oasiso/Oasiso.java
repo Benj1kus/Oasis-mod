@@ -95,6 +95,9 @@ public class Oasiso {
     public static final RegistryObject<SimpleParticleType> GEYSER_SMOKE = PARTICLES.register("geyser_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> SOUL_SMOKE = PARTICLES.register("soul_smoke", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> ENT_SOUL = PARTICLES.register("ent_soul", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ANGER_PART = PARTICLES.register("anger_part", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> SAD_BOP = PARTICLES.register("sad_bop", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> HAPPY_FLARE = PARTICLES.register("happy_flare", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<CreativeModeTab> OASISO_TAB = CREATIVE_MODE_TABS.register("oasiso_tab", () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.NEPHRITIS_CORE.get())).title(Component.translatable("creativetab.oasiso_tab")).displayItems((parameters, output) -> {
         for (RegistryObject<Item> item : ModItems.ITEMS.getEntries()) {
@@ -436,6 +439,9 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.HAPPINESS.get(), HappinessEntity.createAttributes().build());
+            event.put(ModEntities.SADNESS.get(), SadnessEntity.createAttributes().build());
+            event.put(ModEntities.ANGER.get(), AngerEntity.createAttributes().build());
             event.put(ModEntities.SOUL_GIVER.get(), SoulGiverEntity.createAttributes().build());
             event.put(ModEntities.BOMBO_BOT.get(), BomboBotEntity.createAttributes().build());
             event.put(ModEntities.CRUSADER_SCIENCE.get(), CrusaderScienceEntity.createAttributes().build());

@@ -174,6 +174,21 @@ public class ClientModEvents {
                 BomboBotRenderer::new
         );
 
+        event.registerEntityRenderer(
+                ModEntities.HAPPINESS.get(),
+                HappinessRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.SADNESS.get(),
+                SadnessRenderer::new
+        );
+
+        event.registerEntityRenderer(
+                ModEntities.ANGER.get(),
+                AngerRenderer::new
+        );
+
 
         event.registerEntityRenderer(
                 Oasiso.OSIRIS_TENTACLE.get(),

@@ -68,6 +68,29 @@
   "scarab_death": { "sounds": [ "oasiso:scarab_death" ] },
   "scarab_step": { "sounds": [ "oasiso:scarab_step" ] },
 
+  "sad_idle1": { "sounds": [ "oasiso:sad_idle1" ] },
+  "sad_idle2": { "sounds": [ "oasiso:sad_idle2" ] },
+  "sad_idle3": { "sounds": [ "oasiso:sad_idle3" ] },
+  "sad_hurt": { "sounds": [ "oasiso:sad_hurt" ] },
+  "sad_cast": { "sounds": [ "oasiso:sad_cast" ] },
+  "sad_stun": { "sounds": [ "oasiso:sad_stun" ] },
+
+  "anger_idle1": { "sounds": [ "oasiso:anger_idle1" ] },
+  "anger_idle2": { "sounds": [ "oasiso:anger_idle2" ] },
+  "anger_idle3": { "sounds": [ "oasiso:anger_idle3" ] },
+  "anger_hurt": { "sounds": [ "oasiso:anger_hurt" ] },
+  "anger_attack": { "sounds": [ "oasiso:anger_attack" ] },
+  "anger_shock": { "sounds": [ "oasiso:anger_shock" ] },
+
+  "happy_idle1": { "sounds": [ "oasiso:happy_idle1" ] },
+  "happy_idle2": { "sounds": [ "oasiso:happy_idle2" ] },
+  "happy_idle3": { "sounds": [ "oasiso:happy_idle3" ] },
+  "happy_hurt": { "sounds": [ "oasiso:happy_hurt" ] },
+  "happy_cast": { "sounds": [ "oasiso:happy_cast" ] },
+  "knife_hit": { "sounds": [ "oasiso:knife_hit" ] },
+
+  "soul_die": { "sounds": [ "oasiso:soul_die" ] },
+
   "espider_idle1": { "sounds": [ "oasiso:espider_idle1" ] },
   "espider_idle2": { "sounds": [ "oasiso:espider_idle2" ] },
   "espider_idle3": { "sounds": [ "oasiso:espider_idle3" ] },

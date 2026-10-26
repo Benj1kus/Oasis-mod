@@ -162,6 +162,7 @@
   "item.oasiso.bombul_bottle": "Karakolite Bottle",
   "item.oasiso.bombul_bottle_empty": "Karakolite Bottle",
   "item.oasiso.science_heart": "Science Heart",
+  "item.oasiso.corerem": "Core of the Remaining Souls",
 
   "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
   "item.oasiso.krombul_spawn_egg": "Krombul Spawn Egg",
@@ -218,6 +219,9 @@
   "entity.oasiso.bombo_bot": "Bombo-bot",
   "entity.oasiso.soul_giver": "Crusader Soulgiver",
   "entity.oasiso.doum_palm_chest_boat": "Doum Palm Chest Boat",
+  "entity.oasiso.happiness": "Happiness",
+  "entity.oasiso.sadness": "Sadness",
+  "entity.oasiso.anger": "Anger",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",

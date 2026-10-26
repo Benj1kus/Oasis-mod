@@ -19,6 +19,11 @@ public final class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Oasiso.MODID);
 
+    public static final RegistryObject<EntityType<HappinessEntity>> HAPPINESS = ENTITIES.register("happiness", () -> EntityType.Builder.of(HappinessEntity::new, MobCategory.CREATURE).sized(0.5f, 1.0625f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "happiness").toString()));
+    public static final RegistryObject<EntityType<SadnessEntity>> SADNESS = ENTITIES.register("sadness", () -> EntityType.Builder.of(SadnessEntity::new, MobCategory.CREATURE).sized(0.875f, 3.75f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "sadness").toString()));
+    public static final RegistryObject<EntityType<AngerEntity>> ANGER = ENTITIES.register("anger", () -> EntityType.Builder.of(AngerEntity::new, MobCategory.CREATURE).sized(1.75f, 2.625f).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "anger").toString()));
+    public static final RegistryObject<EntityType<HappyKnifeEntity>> HAPPY_KNIFE = ENTITIES.register("happy_knife", () -> EntityType.Builder.<HappyKnifeEntity>of(HappyKnifeEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(8).updateInterval(1).noSave().build(ResourceLocation.fromNamespaceAndPath(MODID, "happy_knife").toString()));
+
     public static final RegistryObject<EntityType<SoulGiverEntity>> SOUL_GIVER = ENTITIES.register("soul_giver", () -> EntityType.Builder.of(SoulGiverEntity::new, MobCategory.MONSTER).sized(1.375F, 4.375F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "soul_giver").toString()));
     public static final RegistryObject<EntityType<BomboBotEntity>> BOMBO_BOT = ENTITIES.register("bombo_bot", () -> EntityType.Builder.of(BomboBotEntity::new, MobCategory.MONSTER).sized(0.5F, 1.0F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "bombo_bot").toString()));
     public static final RegistryObject<EntityType<CrusaderScienceEntity>> CRUSADER_SCIENCE = ENTITIES.register("crusader_science", () -> EntityType.Builder.of(CrusaderScienceEntity::new, MobCategory.MONSTER).sized(1.125F, 2.1875F).clientTrackingRange(8).build(ResourceLocation.fromNamespaceAndPath(MODID, "crusader_science").toString()));

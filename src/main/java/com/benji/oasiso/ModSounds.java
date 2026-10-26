@@ -49,6 +49,28 @@ public class ModSounds {
 
     public static final RegistryObject<SoundEvent> ENTROPY_DEATH = registerSoundEvent("entropy_death");
 
+    public static final RegistryObject<SoundEvent> SAD_IDLE1 = registerSoundEvent("sad_idle1");
+    public static final RegistryObject<SoundEvent> SAD_IDLE2 = registerSoundEvent("sad_idle2");
+    public static final RegistryObject<SoundEvent> SAD_IDLE3 = registerSoundEvent("sad_idle3");
+    public static final RegistryObject<SoundEvent> SAD_HURT = registerSoundEvent("sad_hurt");
+    public static final RegistryObject<SoundEvent> SAD_CAST = registerSoundEvent("sad_cast");
+    public static final RegistryObject<SoundEvent> SAD_STUN = registerSoundEvent("sad_stun");
+
+    public static final RegistryObject<SoundEvent> ANGER_IDLE1 = registerSoundEvent("anger_idle1");
+    public static final RegistryObject<SoundEvent> ANGER_IDLE2 = registerSoundEvent("anger_idle2");
+    public static final RegistryObject<SoundEvent> ANGER_IDLE3 = registerSoundEvent("anger_idle3");
+    public static final RegistryObject<SoundEvent> ANGER_HURT = registerSoundEvent("anger_hurt");
+    public static final RegistryObject<SoundEvent> ANGER_ATTACK = registerSoundEvent("anger_attack");
+    public static final RegistryObject<SoundEvent> ANGER_SHOCK = registerSoundEvent("anger_shock");
+
+    public static final RegistryObject<SoundEvent> HAPPY_IDLE1 = registerSoundEvent("happy_idle1");
+    public static final RegistryObject<SoundEvent> HAPPY_IDLE2 = registerSoundEvent("happy_idle2");
+    public static final RegistryObject<SoundEvent> HAPPY_IDLE3 = registerSoundEvent("happy_idle3");
+    public static final RegistryObject<SoundEvent> HAPPY_HURT = registerSoundEvent("happy_hurt");
+    public static final RegistryObject<SoundEvent> HAPPY_CAST = registerSoundEvent("happy_cast");
+    public static final RegistryObject<SoundEvent> KNIFE_HIT = registerSoundEvent("knife_hit");
+
+    public static final RegistryObject<SoundEvent> SOUL_DIE = registerSoundEvent("soul_die");
 
     public static final RegistryObject<SoundEvent> SPRING1 = registerSoundEvent("spring1");
     public static final RegistryObject<SoundEvent> SPRING2 = registerSoundEvent("spring2");
