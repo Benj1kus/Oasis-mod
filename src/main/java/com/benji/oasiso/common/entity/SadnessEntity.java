@@ -22,6 +22,10 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     public static final int CAST_TICKS = 35, RELEASE_TICK = 20, COOLDOWN = 200;
     public static final double RANGE = 15;
     private static final EntityDataAccessor<Boolean> CASTING = SynchedEntityData.defineId(SadnessEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final int SPAWN_TICKS = 60;
+    private static final EntityDataAccessor<Boolean> SUMMONING = SynchedEntityData.defineId(SadnessEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final RawAnimation SPAWN = RawAnimation.begin().thenPlay("spawn");
+    private int summonTicks;
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation CAST = RawAnimation.begin().thenPlay("cast");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -40,7 +44,13 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(SUMMONING, false);
         entityData.define(CASTING, false);
+    }
+
+    public void startSummoning() {
+        summonTicks = SPAWN_TICKS;
+        entityData.set(SUMMONING, true);
     }
 
     @Override
@@ -72,6 +82,10 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
         if (--life <= 0) {
             vanish();
             discard();
+            return;
+        }
+        if (summonTicks > 0) {
+            if (--summonTicks == 0) entityData.set(SUMMONING, false);
             return;
         }
         if (SadnessStun.stunned(this)) {
@@ -137,6 +151,7 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putInt("CoreremSummonTicks", summonTicks);
         tag.putInt("SadnessLife", life);
         tag.putInt("SadnessCooldown", cooldown);
     }
@@ -144,6 +159,8 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        summonTicks = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("CoreremSummonTicks")));
+        entityData.set(SUMMONING, summonTicks > 0);
         if (tag.contains("SadnessLife")) life = Math.max(1, tag.getInt("SadnessLife"));
         cooldown = Math.max(20, tag.getInt("SadnessCooldown"));
         castAge = -1;
@@ -170,7 +187,7 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, event -> event.setAndContinue(entityData.get(CASTING) ? CAST : IDLE)));
+        controllers.add(new AnimationController<>(this, "controller", 0, event -> event.setAndContinue(entityData.get(SUMMONING) ? SPAWN : entityData.get(CASTING) ? CAST : IDLE)));
     }
 
     @Override

@@ -162,7 +162,11 @@
   "item.oasiso.bombul_bottle": "Karakolite Bottle",
   "item.oasiso.bombul_bottle_empty": "Karakolite Bottle",
   "item.oasiso.science_heart": "Science Heart",
-  "item.oasiso.corerem": "Core of the Remaining Souls",
+  "item.oasiso.corerem": "Corerem Amulet",
+
+  "gui.oasiso.corerem.cooldown": "Amulet: %ss",
+  "message.oasiso.corerem.recharging": "All emotions are recharging",
+  "message.oasiso.corerem.no_space": "There is not enough room nearby for this soul",
 
   "item.oasiso.cacto_spawn_egg": "Cacto Spawn Egg",
   "item.oasiso.krombul_spawn_egg": "Krombul Spawn Egg",
@@ -374,6 +378,12 @@
   "tooltip.oasiso.wwings1": "walls",
   "tooltip.oasiso.spear": "Press [RMB] for special attack",
   "tooltip.oasiso.spear1": "[RMB]",
+  "tooltip.oasiso.corerem1": "Amulet of the 3 Souls",
+  "tooltip.oasiso.corerem2": "3",
+  "tooltip.oasiso.soul1": "Happiness Anger Sadness",
+  "tooltip.oasiso.soul2": "Happiness",
+  "tooltip.oasiso.soul3": "Anger",
+  "tooltip.oasiso.soul4": "Sadness",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

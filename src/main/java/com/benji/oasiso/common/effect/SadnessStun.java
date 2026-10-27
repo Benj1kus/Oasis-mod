@@ -1,6 +1,8 @@
 package com.benji.oasiso.common.effect;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.entity.AngerEntity;
+import com.benji.oasiso.common.entity.HappinessEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
@@ -26,6 +28,8 @@ public final class SadnessStun extends MobEffect {
     }
     public static void apply(Mob mob) {
         if (mob.getMaxHealth() >= 200 || !mob.isAlive()) return;
+        if (mob instanceof AngerEntity || mob instanceof HappinessEntity) return;
+
         mob.addEffect(new MobEffectInstance(INSTANCE, 100, 0, false, false, false));
         if (stunned(mob)) lock(mob);
     }
@@ -63,7 +67,6 @@ public final class SadnessStun extends MobEffect {
     public static final class Events {
         @SubscribeEvent public static void tick(LivingEvent.LivingTickEvent event) {
             if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide) return;
-            // Do not cancel LivingTickEvent: effects must keep counting down normally.
             if (stunned(mob)) lock(mob); else unlock(mob);
         }
         @SubscribeEvent public static void endTick(TickEvent.LevelTickEvent event) {

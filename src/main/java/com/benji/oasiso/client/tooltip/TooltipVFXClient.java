@@ -29,14 +29,9 @@ public final class TooltipVFXClient {
     private static final OasisoTextFx.Palette SCISSORS_PLAIN =
             new OasisoTextFx.Palette(0xBFEFFF, 0xBFEFFF, 0xBFEFFF, 0xBFEFFF, 0xFFFFFF);
 
-    private static final OasisoTextFx.Palette YELLOW_GRAD = //YELLOW
-            new OasisoTextFx.Palette(
-                    0xFFD45A,
-                    0xFF982E,
-                    0xFFF0A0,
-                    0xFFE47A,
-                    0xFFFFFF
-            );
+    private static final OasisoTextFx.Palette YELLOW_GRAD = new OasisoTextFx.Palette(0xFFD45A, 0xFF982E, 0xFFF0A0, 0xFFE47A, 0xFFFFFF);
+    private static final OasisoTextFx.Palette RED_GRAD = new OasisoTextFx.Palette(0xFF4A4A, 0xC72828, 0xFF8080, 0xFFA6A6, 0xFFFFFF);
+    private static final OasisoTextFx.Palette BLUE_GRAD = new OasisoTextFx.Palette(0x1A75FF, 0x00A3FF, 0x33CCFF, 0x99EEFF, 0xFFFFFF);
 
     private static final OasisoTextFx.Palette PURPLE_GRAD =
             new OasisoTextFx.Palette(0xB76CFF, 0xFF75BC, 0x6495FF, 0xE7BAFF, 0xFFFFFF); //PURPLE
@@ -48,7 +43,6 @@ public final class TooltipVFXClient {
                     0x00FFC3, 0x2CD3E6, 0x0D89D1, 0x8C7AFF,
                     0xFFFFFF
             );
-
 
 
     private static final OasisoTextFx.Palette WHITE_GRAD = //WHITE GRADIENT
@@ -66,7 +60,8 @@ public final class TooltipVFXClient {
                     0x7DFFFF
             );
 
-    private TooltipVFXClient() {}
+    private TooltipVFXClient() {
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void tooltip(ItemTooltipEvent event) {
@@ -440,7 +435,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  YELLOW_GRAD).withoutShine()
+                    part(Component.literal(fullText), YELLOW_GRAD).withoutShine()
             );
         }
 
@@ -453,7 +448,7 @@ public final class TooltipVFXClient {
 
         parts.add(part(
                 Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
-                 YELLOW_GRAD
+                YELLOW_GRAD
         ).glow());
 
         // after part
@@ -493,7 +488,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  PURPLE_GRAD).withoutShine()
+                    part(Component.literal(fullText), PURPLE_GRAD).withoutShine()
             );
         }
 
@@ -549,7 +544,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  PURPLE_GRAD).withoutShine()
+                    part(Component.literal(fullText), PURPLE_GRAD).withoutShine()
             );
         }
 
@@ -581,7 +576,7 @@ public final class TooltipVFXClient {
         );
     }
 
-// MELT
+    // MELT
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onMeltTooltip(
             RenderTooltipEvent.GatherComponents event
@@ -613,7 +608,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -667,7 +662,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  YELLOW_GRAD).withoutShine()
+                    part(Component.literal(fullText), YELLOW_GRAD).withoutShine()
             );
         }
 
@@ -722,7 +717,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  CYAN_GRAD).withoutShine()
+                    part(Component.literal(fullText), CYAN_GRAD).withoutShine()
             );
         }
 
@@ -775,7 +770,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  CYAN_GRAD).withoutShine()
+                    part(Component.literal(fullText), CYAN_GRAD).withoutShine()
             );
         }
 
@@ -830,7 +825,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -885,7 +880,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -938,7 +933,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -1022,7 +1017,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -1057,7 +1052,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -1126,7 +1121,7 @@ public final class TooltipVFXClient {
 
         parts.add(part(
                 Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
-               PURPLE_GRAD
+                PURPLE_GRAD
         ).glow().sparks(OasisoAnimatedTooltip.Sparks.PURPLE));
 
         // after part
@@ -1148,7 +1143,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  WHITE_GRAD).withoutShine()
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
             );
         }
 
@@ -1166,6 +1161,116 @@ public final class TooltipVFXClient {
 
         // after part
         parts.add(part(Component.literal(after), CYAN_GRAD));
+
+        return new OasisoAnimatedTooltip(parts);
+    }
+
+    //COREREM
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onCoreremTooltip(
+            RenderTooltipEvent.GatherComponents event
+    ) {
+        if (!(event.getItemStack().getItem() instanceof CoreremItem)) {
+            return;
+        }
+
+        var elements = event.getTooltipElements();
+        if (elements.stream().anyMatch(e -> e.right().map(OasisoAnimatedTooltip.class::isInstance).orElse(false))) {
+            return;
+        }
+
+        int index = Math.min(1, elements.size());
+
+        elements.add(index++, Either.right(coreremFirstLine()));
+        elements.add(index++, Either.right(coreremSecondLine()));
+    }
+
+    private static OasisoAnimatedTooltip coreremFirstLine() {
+        //full
+        String fullText = Component.translatable("tooltip.oasiso.corerem1").getString();
+        //part text
+        String selectedText = Component.translatable("tooltip.oasiso.corerem2").getString();
+
+        int start = selectedText.isEmpty() ? -1 : fullText.indexOf(selectedText);
+        if (start < 0) {
+            selectedText = "[SPACE]]";
+            start = fullText.indexOf(selectedText);
+        }
+        if (start < 0) {
+            return OasisoAnimatedTooltip.line(
+                    part(Component.literal(fullText), PURPLE_GRAD).withoutShine()
+            );
+        }
+
+        String before = fullText.substring(0, start);
+        String after = fullText.substring(start + selectedText.length());
+        var parts = new ArrayList<OasisoAnimatedTooltip.Part>();
+
+        // before part
+        parts.add(part(Component.literal(before), CYAN_GRAD));
+
+        parts.add(part(
+                Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
+                PURPLE_GRAD
+        ).glow());
+
+        // after part
+        parts.add(part(Component.literal(after), CYAN_GRAD));
+
+        return new OasisoAnimatedTooltip(parts);
+    }
+
+    private static OasisoAnimatedTooltip coreremSecondLine() {
+        String fullText = Component.translatable("tooltip.oasiso.soul1").getString();
+        String soul2 = Component.translatable("tooltip.oasiso.soul2").getString();
+        String soul3 = Component.translatable("tooltip.oasiso.soul3").getString();
+        String soul4 = Component.translatable("tooltip.oasiso.soul4").getString();
+
+        if (soul2.isEmpty()) soul2 = "soul2";
+        if (soul3.isEmpty()) soul3 = "soul3";
+        if (soul4.isEmpty()) soul4 = "soul4";
+
+        int idx2 = fullText.indexOf(soul2);
+        int idx3 = fullText.indexOf(soul3);
+        int idx4 = fullText.indexOf(soul4);
+
+        if (idx2 < 0 || idx3 < 0 || idx4 < 0) {
+            return OasisoAnimatedTooltip.line(
+                    part(Component.literal(fullText), WHITE_GRAD).withoutShine()
+            );
+        }
+
+        record TargetWord(String word, int index, OasisoTextFx.Palette palette) {
+        }
+
+        java.util.List<TargetWord> targets = new java.util.ArrayList<>();
+        targets.add(new TargetWord(soul2, idx2, YELLOW_GRAD));
+        targets.add(new TargetWord(soul3, idx3, RED_GRAD));
+        targets.add(new TargetWord(soul4, idx4, BLUE_GRAD));
+
+        targets.sort(java.util.Comparator.comparingInt(TargetWord::index));
+
+        var parts = new java.util.ArrayList<OasisoAnimatedTooltip.Part>();
+        int currentPos = 0;
+
+        for (TargetWord target : targets) {
+            if (target.index > currentPos) {
+                String before = fullText.substring(currentPos, target.index);
+                parts.add(part(Component.literal(before), WHITE_GRAD));
+            }
+
+            parts.add(part(
+                    Component.literal(target.word).withStyle(ChatFormatting.ITALIC),
+                    target.palette
+            ).glow());
+
+            currentPos = target.index + target.word.length();
+        }
+
+        if (currentPos < fullText.length()) {
+            String after = fullText.substring(currentPos);
+            parts.add(part(Component.literal(after), WHITE_GRAD));
+        }
 
         return new OasisoAnimatedTooltip(parts);
     }
@@ -1201,7 +1306,7 @@ public final class TooltipVFXClient {
         }
         if (start < 0) {
             return OasisoAnimatedTooltip.line(
-                    part(Component.literal(fullText),  YELLOW_GRAD).withoutShine()
+                    part(Component.literal(fullText), YELLOW_GRAD).withoutShine()
             );
         }
 

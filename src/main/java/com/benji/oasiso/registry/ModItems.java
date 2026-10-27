@@ -153,7 +153,7 @@ public final class ModItems {
     public static final RegistryObject<Item> AZUMALIT_PIECE = ITEMS.register("azumalit_piece", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> CHAOS_SCISSORS = ITEMS.register("chaos_scissors", () -> new ChaosScissorsItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CONFIG_SCROLL = ITEMS.register("config_scroll", () -> new ConfigScrollItem(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> COREREM = ITEMS.register("corerem", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> COREREM = ITEMS.register("corerem", () -> new CoreremItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new ChaosItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new DominanceItem(new Item.Properties().stacksTo(1)));

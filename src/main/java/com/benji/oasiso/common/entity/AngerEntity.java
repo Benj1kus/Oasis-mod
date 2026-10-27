@@ -22,9 +22,13 @@ import net.minecraft.sounds.SoundSource;
 public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity {
     public static final int JUMP_TICK = 5, SHOCK_TICK = 20, ATTACK_TICKS = 30, COOLDOWN = 100;
     public static final double RANGE = 15, SHOCK_RADIUS = 6, LAUNCH_SPEED = .8;
-    public static final float DAMAGE = 6;
+    public static final float DAMAGE = 20;
     private static final EntityDataAccessor<CompoundTag> SHOCK = SynchedEntityData.defineId(AngerEntity.class, EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(AngerEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final int SPAWN_TICKS = 90;
+    private static final EntityDataAccessor<Boolean> SUMMONING = SynchedEntityData.defineId(AngerEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final RawAnimation SPAWN = RawAnimation.begin().thenPlay("spawn");
+    private int summonTicks;
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("attack");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -45,8 +49,14 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(SUMMONING, false);
         entityData.define(ATTACKING, false);
         entityData.define(SHOCK, new CompoundTag());
+    }
+
+    public void startSummoning() {
+        summonTicks = SPAWN_TICKS;
+        entityData.set(SUMMONING, true);
     }
 
     @Override
@@ -96,6 +106,10 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
         if (--life <= 0) {
             vanish();
             discard();
+            return;
+        }
+        if (summonTicks > 0) {
+            if (--summonTicks == 0) entityData.set(SUMMONING, false);
             return;
         }
         if (attackAge >= 0) {
@@ -166,6 +180,8 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
         entityData.set(SHOCK, wave);
         burst(server, 36, .45);
         for (Mob mob : server.getEntitiesOfClass(Mob.class, getBoundingBox().inflate(SHOCK_RADIUS), e -> e != this && e.isAlive() && !e.isSpectator())) {
+            if (mob instanceof HappinessEntity || mob instanceof SadnessEntity) continue;
+
             if (distanceToSqr(mob) > SHOCK_RADIUS * SHOCK_RADIUS) continue;
             if (HappinessEntity.isEnemy(mob, this))
                 mob.hurt(damageSources().mobAttack(this), (float) getAttributeValue(Attributes.ATTACK_DAMAGE));
@@ -211,6 +227,7 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putInt("CoreremSummonTicks", summonTicks);
         tag.putInt("AngerLife", life);
         tag.putInt("AngerCooldown", cooldown);
     }
@@ -218,6 +235,8 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        summonTicks = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("CoreremSummonTicks")));
+        entityData.set(SUMMONING, summonTicks > 0);
         if (tag.contains("AngerLife")) life = Math.max(1, tag.getInt("AngerLife"));
         cooldown = Math.max(20, tag.getInt("AngerCooldown"));
         attackAge = -1;
@@ -245,7 +264,7 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, event -> event.setAndContinue(entityData.get(ATTACKING) ? ATTACK : IDLE)).setCustomInstructionKeyframeHandler(event -> {
+        controllers.add(new AnimationController<>(this, "controller", 0, event -> event.setAndContinue(entityData.get(SUMMONING) ? SPAWN : entityData.get(ATTACKING) ? ATTACK : IDLE)).setCustomInstructionKeyframeHandler(event -> {
         }));
     }
 
