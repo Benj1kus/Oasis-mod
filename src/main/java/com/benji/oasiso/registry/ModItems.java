@@ -117,6 +117,7 @@ public final class ModItems {
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEN_VASE_ITEM = ITEMS.register("gen_vase", () -> new BlockItem(ModBlocks.GEN_VASE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> WAR_SWORD_ITEM = ITEMS.register("war_sword", () -> new BlockItem(ModBlocks.WAR_SWORD.get(), new Item.Properties()));
     public static final RegistryObject<Item> BALL_CACTUS_ITEM = ITEMS.register("ball_cactus", () -> new BlockItem(ModBlocks.BALL_CACTUS.get(), new Item.Properties()));
     public static final RegistryObject<Item> STORM_TOTEM_ITEM = ITEMS.register("storm_totem", () -> new BlockItem(ModBlocks.STORM_TOTEM.get(), new Item.Properties()));
     public static final RegistryObject<Item> AZAZEL_DESERTSTATUE_ITEM = ITEMS.register("azazel_desertstatue", () -> new BlockItem(ModBlocks.AZAZEL_DESERTSTATUE.get(), new Item.Properties()));

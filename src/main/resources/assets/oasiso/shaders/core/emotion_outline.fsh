@@ -29,10 +29,8 @@ void main(){
     float threshold=(float(BAYER[(cell.x&3)+4*(cell.y&3)])+0.5)/16.0;
     if(coverage<threshold)discard;
     float edge=clamp(best/max(width,0.1),0.0,1.0);
-    vec3 dark=EmotionColor*0.30;
     vec3 bright=mix(EmotionColor,vec3(1.0),0.28);
     vec3 color=mix(bright,EmotionColor,smoothstep(0.1,0.5,edge));
-    color=mix(color,dark,smoothstep(0.55,1.0,edge));
     color*=0.92+0.08*sin(p.y*0.16-Time*2.6);
     fragColor=vec4(color,0.92*Opacity);
     gl_FragDepth=max(0.0,depth-0.000002);

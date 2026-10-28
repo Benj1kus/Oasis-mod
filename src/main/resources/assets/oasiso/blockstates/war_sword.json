@@ -1,0 +1,68 @@
+{
+  "variants": {
+    "facing=north,small=false,red=false": {
+      "model": "oasiso:block/war_sword",
+      "y": 0
+    },
+    "facing=east,small=false,red=false": {
+      "model": "oasiso:block/war_sword",
+      "y": 90
+    },
+    "facing=south,small=false,red=false": {
+      "model": "oasiso:block/war_sword",
+      "y": 180
+    },
+    "facing=west,small=false,red=false": {
+      "model": "oasiso:block/war_sword",
+      "y": 270
+    },
+    "facing=north,small=false,red=true": {
+      "model": "oasiso:block/war_sword_red",
+      "y": 0
+    },
+    "facing=east,small=false,red=true": {
+      "model": "oasiso:block/war_sword_red",
+      "y": 90
+    },
+    "facing=south,small=false,red=true": {
+      "model": "oasiso:block/war_sword_red",
+      "y": 180
+    },
+    "facing=west,small=false,red=true": {
+      "model": "oasiso:block/war_sword_red",
+      "y": 270
+    },
+    "facing=north,small=true,red=false": {
+      "model": "oasiso:block/war_sword_small",
+      "y": 0
+    },
+    "facing=east,small=true,red=false": {
+      "model": "oasiso:block/war_sword_small",
+      "y": 90
+    },
+    "facing=south,small=true,red=false": {
+      "model": "oasiso:block/war_sword_small",
+      "y": 180
+    },
+    "facing=west,small=true,red=false": {
+      "model": "oasiso:block/war_sword_small",
+      "y": 270
+    },
+    "facing=north,small=true,red=true": {
+      "model": "oasiso:block/war_sword_small_red",
+      "y": 0
+    },
+    "facing=east,small=true,red=true": {
+      "model": "oasiso:block/war_sword_small_red",
+      "y": 90
+    },
+    "facing=south,small=true,red=true": {
+      "model": "oasiso:block/war_sword_small_red",
+      "y": 180
+    },
+    "facing=west,small=true,red=true": {
+      "model": "oasiso:block/war_sword_small_red",
+      "y": 270
+    }
+  }
+}

@@ -120,6 +120,7 @@
   "block.oasiso.entropy_soil_slab": "Entropy Soil Slab",
   "block.oasiso.entropy_soil_stairs": "Entropy Soil Stairs",
   "block.oasiso.entropy_soil_wall": "Entropy Soil Wall",
+  "block.oasiso.war_sword": "War Sword",
 
   "item.oasiso.kr_water_bucket": "Melted Nephritis Bucket",
   "item.oasiso.entropy_water_bucket": "Entropy Bucket",
@@ -226,10 +227,22 @@
   "entity.oasiso.happiness": "Happiness",
   "entity.oasiso.sadness": "Sadness",
   "entity.oasiso.anger": "Anger",
+  "entity.oasiso.grave_soul": "Grave Soul",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
   "enchantment.oasiso.hammer_power": "Sand Hand",
+
+  "dialogue.oasiso.grave_soul.0": "Save us.",
+  "dialogue.oasiso.grave_soul.1": "Set us free.",
+  "dialogue.oasiso.grave_soul.2": "Do not leave us here.",
+  "dialogue.oasiso.grave_soul.3": "Can you hear us beneath the sand?",
+  "dialogue.oasiso.grave_soul.4": "You walk above our graves.",
+  "dialogue.oasiso.grave_soul.5": "You carry the light. Why do you hide it?",
+  "dialogue.oasiso.grave_soul.6": "We remember every face that turned away.",
+  "dialogue.oasiso.grave_soul.7": "Break the chains. Let us rest.",
+  "dialogue.oasiso.grave_soul.8": "How many more must be forgotten?",
+  "dialogue.oasiso.grave_soul.9": "If you leave, our voices will follow.",
 
   "dialogue.oasiso.azumaal.1": "Wow, so overworld...[br] ...still exist?",
   "dialogue.oasiso.azumaal.2": "Who are you?",

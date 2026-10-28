@@ -103,6 +103,14 @@
   "ezombie_hurt": { "sounds": [ "oasiso:ezombie_hurt" ] },
   "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
 
+
+  "soul_idle1": { "sounds": [ "oasiso:soul_idle1" ] },
+  "soul_idle2": { "sounds": [ "oasiso:soul_idle2" ] },
+  "soul_idle3": { "sounds": [ "oasiso:soul_idle3" ] },
+  "soul_hurt": { "sounds": [ "oasiso:soul_hurt" ] },
+  "soul_death": { "sounds": [ "oasiso:soul_death" ] },
+  "soul_voice": { "sounds": [ "oasiso:soul_voice" ] },
+
   "science_idle1": { "sounds": [ "oasiso:science_idle1" ] },
   "science_idle2": { "sounds": [ "oasiso:science_idle2" ] },
   "science_idle3": { "sounds": [ "oasiso:science_idle3" ] },

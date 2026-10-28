@@ -439,6 +439,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.GRAVE_SOUL.get(), GraveSoulEntity.createAttributes().build());
             event.put(ModEntities.HAPPINESS.get(), HappinessEntity.createAttributes().build());
             event.put(ModEntities.SADNESS.get(), SadnessEntity.createAttributes().build());
             event.put(ModEntities.ANGER.get(), AngerEntity.createAttributes().build());

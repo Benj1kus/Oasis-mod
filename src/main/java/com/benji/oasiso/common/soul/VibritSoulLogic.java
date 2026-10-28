@@ -15,6 +15,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 
 public final class VibritSoulLogic {
     public static final int GRAVE_RADIUS = 10;
+    public static final float GRAVE_SOUL_CHANCE = 0.5F;
 
     private VibritSoulLogic() {
     }
@@ -31,18 +32,23 @@ public final class VibritSoulLogic {
         BlockState old = level.getBlockState(grave);
         if (!(old.getBlock() instanceof GraveBlock)) return;
 
-        Mob mob = ModEntities.ENT_ZOMBIE.get().create(level);
-        if (mob == null) return;
-        mob.moveTo(grave.getX() + 0.5, grave.getY() + 0.05, grave.getZ() + 0.5, level.random.nextFloat() * 360F, 0);
-        ForgeEventFactory.onFinalizeSpawn(mob, level, level.getCurrentDifficultyAt(grave), MobSpawnType.MOB_SUMMONED, null, null);
-        if (mob.isSpawnCancelled()) return;
-        level.playSound(null, grave, SoundEvents.SOUL_ESCAPE, SoundSource.BLOCKS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
+        // Roll once for the selected grave. A failed roll still consumes it and
+        // sends the visual soul to the vibrit, so retries cannot bypass the chance.
+        Mob mob = null;
+        if (level.random.nextFloat() < GRAVE_SOUL_CHANCE) {
+            mob = ModEntities.GRAVE_SOUL.get().create(level);
+            if (mob == null) return;
+            mob.moveTo(grave.getX() + 0.5, grave.getY() + 0.05, grave.getZ() + 0.5, level.random.nextFloat() * 360F, 0);
+            ForgeEventFactory.onFinalizeSpawn(mob, level, level.getCurrentDifficultyAt(grave), MobSpawnType.MOB_SUMMONED, null, null);
+            if (mob.isSpawnCancelled()) return;
+        }
 
         if (!level.destroyBlock(grave, false)) return;
-        if (!level.addFreshEntity(mob)) {
+        if (mob != null && !level.addFreshEntity(mob)) {
             if (level.getBlockState(grave).isAir()) level.setBlock(grave, old, 3);
             return;
         }
+        level.playSound(null, grave, SoundEvents.SOUL_ESCAPE, SoundSource.BLOCKS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
         Vec3 start = new Vec3(grave.getX() + 0.5, grave.getY() + 0.15, grave.getZ() + 0.5);
         Vec3 end = new Vec3(vibrit.getX() + 0.5, vibrit.getY() + top(vibritState), vibrit.getZ() + 0.5);
         VibritSoulNetwork.send(level, vibrit, start, end, level.random.nextInt());

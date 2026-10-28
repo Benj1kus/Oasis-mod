@@ -160,6 +160,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.GRAVE_SOUL.get(),
+                GraveSoulRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 ModEntities.ENT_CREEPER.get(),
                 EntCreeperRenderer::new
         );

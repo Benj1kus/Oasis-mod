@@ -141,6 +141,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> GEYSER_SMALL = BLOCKS.register("geyser_small", () -> new GeyserSmallBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> GEYSER_BIG = BLOCKS.register("geyser_big", () -> new GeyserBigBlock(BlockBehaviour.Properties.copy(Blocks.STONE).lightLevel(state -> 10).sound(SoundType.BASALT).strength(10.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> GRAVE = BLOCKS.register("grave", () -> new GraveBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<Block> WAR_SWORD = BLOCKS.register("war_sword", () -> new WarSwordBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.CHAIN).strength(5.0F).requiresCorrectToolForDrops().noOcclusion()));
 
     public static final RegistryObject<Block> BALL_CACTUS = BLOCKS.register("ball_cactus", () -> new com.benji.oasiso.common.block.BallCactusBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).sound(SoundType.WOOL).instabreak().noOcclusion().randomTicks()));
     public static final RegistryObject<Block> AZAZEL_DESERTSTATUE = BLOCKS.register("azazel_desertstatue", () -> new AzazelDecorateBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.NETHER_BRICKS).strength(2.0F).noOcclusion()));
