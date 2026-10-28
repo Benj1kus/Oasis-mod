@@ -3,6 +3,14 @@ package com.benji.oasiso.common.entity;
 import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.common.gravesoul.GraveSoulScenes;
+import com.benji.oasiso.registry.ModItems;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.Optional;
+import java.util.UUID;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.*;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +43,50 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
     private static final EntityDataAccessor<Boolean> GRABBING = SynchedEntityData.defineId(GraveSoulEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> POSE_ENDED = SynchedEntityData.defineId(GraveSoulEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> SPAWNING = SynchedEntityData.defineId(GraveSoulEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> CAPTURE_AGE = SynchedEntityData.defineId(GraveSoulEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Optional<UUID>> CAPTURE_PLAYER = SynchedEntityData.defineId(GraveSoulEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+
+    public boolean isCapturing() {
+        return entityData.get(CAPTURE_AGE) >= 0;
+    }
+
+    public boolean isDissolving() {
+        return isCapturing() || isDeadOrDying();
+    }
+
+    public UUID getCapturePlayer() {
+        return entityData.get(CAPTURE_PLAYER).orElse(null);
+    }
+
+    @Override
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack empty = player.getItemInHand(hand);
+        if (!empty.is(Oasiso.BOMBUL_BOTTLE_EMPTY.get())) return super.mobInteract(player, hand);
+        if (!isAlive() || isCapturing() || isGrabbing() || player.isSpectator() || !player.isAlive())
+            return InteractionResult.FAIL;
+        if (level().isClientSide) return InteractionResult.SUCCESS;
+
+        ItemStack filled = new ItemStack(ModItems.SOUL_BOTTLE.get());
+        entityData.set(CAPTURE_PLAYER, Optional.of(player.getUUID()));
+        entityData.set(CAPTURE_AGE, 0);
+        spawnTicksRemaining = 0;
+        entityData.set(SPAWNING, false);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        setJumping(false);
+        playSound(ModSounds.SOUL_DEATH.get(), getSoundVolume(), getVoicePitch());
+
+        empty.shrink(1);
+        if (empty.isEmpty()) player.setItemInHand(hand, filled);
+        else if (!player.getInventory().add(filled)) player.drop(filled, false);
+        return InteractionResult.CONSUME;
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        return !isCapturing() && super.hurt(source, amount);
+    }
 
     public static final int SPAWN_TICKS = 42;
     private static final int MOVE_TRANSITION_TICKS = 6;
@@ -49,6 +101,7 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("GraveSoulSpawnTicks", spawnTicksRemaining);
+        tag.putInt("GraveSoulCaptureAge", entityData.get(CAPTURE_AGE));
     }
 
     @Override
@@ -56,6 +109,11 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
         super.readAdditionalSaveData(tag);
         spawnTicksRemaining = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("GraveSoulSpawnTicks")));
         entityData.set(SPAWNING, spawnTicksRemaining > 0);
+        if (tag.contains("GraveSoulCaptureAge") && tag.getInt("GraveSoulCaptureAge") >= 0) {
+            entityData.set(CAPTURE_AGE, DISSOLVE_TICKS - 1);
+            spawnTicksRemaining = 0;
+            entityData.set(SPAWNING, false);
+        }
     }
 
     public void stopAttackPose() {
@@ -79,6 +137,8 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
         entityData.define(GRABBING, false);
         entityData.define(POSE_ENDED, false);
         entityData.define(SPAWNING, true);
+        entityData.define(CAPTURE_AGE, -1);
+        entityData.define(CAPTURE_PLAYER, Optional.empty());
     }
 
     @Override
@@ -88,12 +148,12 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
 
     @Override
     public boolean isPushable() {
-        return !isSpawning() && !isGrabbing() && !isDeadOrDying() && super.isPushable();
+        return !isSpawning() && !isGrabbing() && !isDissolving() && super.isPushable();
     }
 
     @Override
     public void travel(Vec3 input) {
-        if (isSpawning() || isGrabbing() || isDeadOrDying()) {
+        if (isSpawning() || isGrabbing() || isDissolving()) {
             setDeltaMovement(Vec3.ZERO);
             return;
         }
@@ -102,9 +162,11 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
 
     public static final int DISSOLVE_TICKS = 40;
     private int dissolveAge;
+    private int captureVisualAge;
 
     public int getDissolveAge() {
-        return dissolveAge;
+        if (!isCapturing()) return dissolveAge;
+        return level().isClientSide ? Math.max(captureVisualAge, entityData.get(CAPTURE_AGE)) : entityData.get(CAPTURE_AGE);
     }
 
     @Override
@@ -124,17 +186,28 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
 
     @Override
     public void tick() {
-        if (isSpawning()) {
+        if (isSpawning() || isCapturing()) {
             getNavigation().stop();
             setDeltaMovement(Vec3.ZERO);
             setJumping(false);
         }
         super.tick();
+        if (level().isClientSide && isCapturing()) {
+            captureVisualAge = Math.max(captureVisualAge + 1, entityData.get(CAPTURE_AGE));
+        }
+        if (!level().isClientSide && isCapturing()) {
+            int age = entityData.get(CAPTURE_AGE) + 1;
+            if (age >= DISSOLVE_TICKS) {
+                discard();
+                return;
+            }
+            entityData.set(CAPTURE_AGE, age);
+        }
         if (!level().isClientSide && isSpawning()) {
             if (spawnTicksRemaining > 0) spawnTicksRemaining--;
             if (spawnTicksRemaining == 0) entityData.set(SPAWNING, false);
         }
-        if (level().isClientSide && isAlive() && random.nextInt(35) == 0) {
+        if (level().isClientSide && isAlive() && !isCapturing() && random.nextInt(35) == 0) {
             level().addParticle(Oasiso.ENT_SOUL.get(), getX(), getY() + getBbHeight() * (.2 + random.nextDouble() * .7), getZ(), 0, .025, 0);
         }
     }
@@ -160,14 +233,14 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
 
             @Override
             public boolean canUse() {
-                if (isSpawning() || isGrabbing() || isDeadOrDying()) return false;
+                if (isSpawning() || isGrabbing() || isDissolving()) return false;
                 victim = level().getEntitiesOfClass(ServerPlayer.class, getBoundingBox().inflate(30), p -> GraveSoulScenes.eligible(p) && distanceToSqr(p) <= 900 && hasLineOfSight(p)).stream().min(java.util.Comparator.comparingDouble(GraveSoulEntity.this::distanceToSqr)).orElse(null);
                 return victim != null;
             }
 
             @Override
             public boolean canContinueToUse() {
-                return !isSpawning() && !isGrabbing() && !isDeadOrDying() && victim != null && GraveSoulScenes.eligible(victim) && distanceToSqr(victim) < 1024;
+                return !isSpawning() && !isGrabbing() && !isDissolving() && victim != null && GraveSoulScenes.eligible(victim) && distanceToSqr(victim) < 1024;
             }
 
             @Override
@@ -193,18 +266,19 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
         goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, .8) {
             @Override
             public boolean canUse() {
-                return !isSpawning() && !isGrabbing() && !isDeadOrDying() && super.canUse();
+                return !isSpawning() && !isGrabbing() && !isDissolving() && super.canUse();
             }
 
             @Override
             public boolean canContinueToUse() {
-                return !isSpawning() && !isGrabbing() && !isDeadOrDying() && super.canContinueToUse();
+                return !isSpawning() && !isGrabbing() && !isDissolving() && super.canContinueToUse();
             }
         });
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (isCapturing()) return null;
 
         SoundEvent[] sounds = {ModSounds.SOUL_IDLE1.get(), ModSounds.SOUL_IDLE2.get(), ModSounds.SOUL_IDLE3.get()};
 
@@ -224,8 +298,8 @@ public class GraveSoulEntity extends Monster implements GeoEntity, GlowmaskEntit
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", MOVE_TRANSITION_TICKS, event -> {
-            event.getController().transitionLength(isSpawning() || isGrabbing() || isDeadOrDying() ? 0 : MOVE_TRANSITION_TICKS);
-            if (isDeadOrDying()) return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
+            event.getController().transitionLength(isSpawning() || isGrabbing() || isDissolving() ? 0 : MOVE_TRANSITION_TICKS);
+            if (isDissolving()) return event.setAndContinue(RawAnimation.begin().thenLoop("idle"));
             if (isSpawning()) return event.setAndContinue(SPAWN);
             if (isGrabbing())
                 return event.setAndContinue(entityData.get(POSE_ENDED) ? RawAnimation.begin().thenLoop("idle") : ATTACK);

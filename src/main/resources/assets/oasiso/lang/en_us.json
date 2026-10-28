@@ -162,6 +162,7 @@
   "item.oasiso.nephritis_core": "Nephritis Core",
   "item.oasiso.bombul_bottle": "Karakolite Bottle",
   "item.oasiso.bombul_bottle_empty": "Karakolite Bottle",
+  "item.oasiso.soul_bottle": "Karakolite Bottle",
   "item.oasiso.science_heart": "Science Heart",
   "item.oasiso.corerem": "Corerem Amulet",
 
@@ -397,6 +398,10 @@
   "tooltip.oasiso.soul2": "Happiness",
   "tooltip.oasiso.soul3": "Anger",
   "tooltip.oasiso.soul4": "Sadness",
+  "tooltip.oasiso.bb1": "[RMB] on Grave Soul mob",
+  "tooltip.oasiso.bb2": "[RMB]",
+  "tooltip.oasiso.sa": "Bottle with Soul",
+  "tooltip.oasiso.sa1": "Soul",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

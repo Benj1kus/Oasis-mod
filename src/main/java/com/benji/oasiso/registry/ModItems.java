@@ -168,7 +168,7 @@ public final class ModItems {
     public static final RegistryObject<Item> TITANA_HAMMER = ITEMS.register("titana_hammer", () -> new TitanaHammerItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> APOL_SPEAR = ITEMS.register("apol_spear", () -> new ApolSpearItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SCIENCE_HEART = ITEMS.register("science_heart", () -> new com.benji.oasiso.common.item.ScienceHeartItem(new Item.Properties().stacksTo(1)));
-
+    public static final RegistryObject<Item> SOUL_BOTTLE = ITEMS.register("soul_bottle", () -> new SoulBotItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SUPER_GOLD_HELMET = ITEMS.register("super_gold_helmet", () -> new SuperGoldArmorItem(ArmorItem.Type.HELMET, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SUPER_GOLD_CHESTPLATE = ITEMS.register("super_gold_chestplate", () -> new SuperGoldArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SUPER_GOLD_LEGGINGS = ITEMS.register("super_gold_leggings", () -> new SuperGoldArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));

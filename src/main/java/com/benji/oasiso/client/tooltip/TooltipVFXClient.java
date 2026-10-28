@@ -740,6 +740,59 @@ public final class TooltipVFXClient {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onSBmbTooltip(
+            RenderTooltipEvent.GatherComponents event
+    ) {
+        if (!(event.getItemStack().getItem() instanceof SoulBotItem)) {
+            return;
+        }
+
+        var elements = event.getTooltipElements();
+        if (elements.stream().anyMatch(e -> e.right().map(OasisoAnimatedTooltip.class::isInstance).orElse(false))) {
+            return;
+        }
+
+        int index = Math.min(1, elements.size());
+
+        elements.add(index++, Either.right(sbbFirstLine()));
+    }
+
+    private static OasisoAnimatedTooltip sbbFirstLine() {
+        //full
+        String fullText = Component.translatable("tooltip.oasiso.sa").getString();
+        //part text
+        String selectedText = Component.translatable("tooltip.oasiso.sa1").getString();
+
+        int start = selectedText.isEmpty() ? -1 : fullText.indexOf(selectedText);
+        if (start < 0) {
+            selectedText = "Fistus Hammer";
+            start = fullText.indexOf(selectedText);
+        }
+        if (start < 0) {
+            return OasisoAnimatedTooltip.line(
+                    part(Component.literal(fullText), CYAN_GRAD).withoutShine()
+            );
+        }
+
+        String before = fullText.substring(0, start);
+        String after = fullText.substring(start + selectedText.length());
+        var parts = new ArrayList<OasisoAnimatedTooltip.Part>();
+
+        // before part
+        parts.add(part(Component.literal(before), YELLOW_GRAD));
+
+        parts.add(part(
+                Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
+                CYAN_GRAD
+        ).glow());
+
+        // after part
+        parts.add(part(Component.literal(after), YELLOW_GRAD));
+
+        return new OasisoAnimatedTooltip(parts);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onEBmbTooltip(
             RenderTooltipEvent.GatherComponents event
     ) {
@@ -755,6 +808,7 @@ public final class TooltipVFXClient {
         int index = Math.min(1, elements.size());
 
         elements.add(index++, Either.right(ebbFirstLine()));
+        elements.add(index++, Either.right(ebbSecondLine()));
     }
 
     private static OasisoAnimatedTooltip ebbFirstLine() {
@@ -788,6 +842,40 @@ public final class TooltipVFXClient {
 
         // after part
         parts.add(part(Component.literal(after), YELLOW_GRAD));
+
+        return new OasisoAnimatedTooltip(parts);
+    }
+    private static OasisoAnimatedTooltip ebbSecondLine() {
+        //full
+        String fullText = Component.translatable("tooltip.oasiso.bb1").getString();
+        //part text
+        String selectedText = Component.translatable("tooltip.oasiso.bb2").getString();
+
+        int start = selectedText.isEmpty() ? -1 : fullText.indexOf(selectedText);
+        if (start < 0) {
+            selectedText = "Fistus Hammer";
+            start = fullText.indexOf(selectedText);
+        }
+        if (start < 0) {
+            return OasisoAnimatedTooltip.line(
+                    part(Component.literal(fullText), CYAN_GRAD).withoutShine()
+            );
+        }
+
+        String before = fullText.substring(0, start);
+        String after = fullText.substring(start + selectedText.length());
+        var parts = new ArrayList<OasisoAnimatedTooltip.Part>();
+
+        // before part
+        parts.add(part(Component.literal(before), BLUE_GRAD));
+
+        parts.add(part(
+                Component.literal(selectedText).withStyle(ChatFormatting.ITALIC),
+                CYAN_GRAD
+        ).glow());
+
+        // after part
+        parts.add(part(Component.literal(after), BLUE_GRAD));
 
         return new OasisoAnimatedTooltip(parts);
     }

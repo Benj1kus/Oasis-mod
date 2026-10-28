@@ -4,6 +4,8 @@ import com.benji.oasiso.client.layer.GlowmaskLayer;
 import com.benji.oasiso.client.model.GraveSoulModel;
 import com.benji.oasiso.common.entity.GraveSoulEntity;
 import com.benji.oasiso.common.gravesoul.GraveSoulParticles;
+import com.benji.oasiso.client.particle.GraveSoulPixelParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -32,7 +34,7 @@ public class GraveSoulRenderer extends EmotionOutlineRenderer<GraveSoulEntity> {
         addRenderLayer(new GlowmaskLayer<GraveSoulEntity>(this) {
             @Override
             public void render(PoseStack pose, GraveSoulEntity entity, BakedGeoModel model, RenderType type, MultiBufferSource source, VertexConsumer buffer, float partial, int light, int overlay) {
-                if (!entity.isDeadOrDying())
+                if (!entity.isDissolving())
                     super.render(pose, entity, model, type, source, buffer, partial, light, overlay);
             }
         });
@@ -42,15 +44,15 @@ public class GraveSoulRenderer extends EmotionOutlineRenderer<GraveSoulEntity> {
     public void render(GraveSoulEntity entity, float yaw, float partial, PoseStack pose, MultiBufferSource source, int light) {
         drawing = entity;
         faceIndex = emitted = 0;
-        progress = entity.isDeadOrDying() ? Math.min(1, (entity.getDissolveAge() + partial) / GraveSoulEntity.DISSOLVE_TICKS) : 0;
+        progress = entity.isDissolving() ? Math.min(1, (entity.getDissolveAge() + partial) / GraveSoulEntity.DISSOLVE_TICKS) : 0;
         rootInverse = new Matrix4f(pose.last().pose()).invert();
         Emission last = emissions.get(entity);
         previousProgress = last == null ? 0 : last.progress;
-        emit = entity.isDeadOrDying() && source instanceof MultiBufferSource.BufferSource && (last == null || last.tick != entity.tickCount) && entity.position().distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()) < 48 * 48;
+        emit = entity.isDissolving() && source instanceof MultiBufferSource.BufferSource && (last == null || last.tick != entity.tickCount) && entity.position().distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()) < 48 * 48;
         if (emit) emissions.put(entity, new Emission(entity.tickCount, progress));
-        shadowRadius = entity.isDeadOrDying() ? 0 : .3F;
+        shadowRadius = entity.isDissolving() ? 0 : .3F;
         try {
-            super.render(entity, yaw, partial, pose, source, entity.isDeadOrDying() ? 0xF000F0 : light);
+            super.render(entity, yaw, partial, pose, source, entity.isDissolving() ? 0xF000F0 : light);
         } finally {
             drawing = null;
             emit = false;
@@ -64,7 +66,7 @@ public class GraveSoulRenderer extends EmotionOutlineRenderer<GraveSoulEntity> {
 
     @Override
     public void createVerticesOfQuad(GeoQuad quad, Matrix4f pose, Vector3f normal, VertexConsumer buffer, int light, int overlay, float red, float green, float blue, float alpha) {
-        if (drawing == null || !drawing.isDeadOrDying()) {
+        if (drawing == null || !drawing.isDissolving()) {
             super.createVerticesOfQuad(quad, pose, normal, buffer, light, overlay, red, green, blue, alpha);
             return;
         }
@@ -82,7 +84,11 @@ public class GraveSoulRenderer extends EmotionOutlineRenderer<GraveSoulEntity> {
                         pose.transformPosition(center);
                         rootInverse.transformPosition(center);
                         var random = drawing.getRandom();
-                        drawing.level().addParticle(GraveSoulParticles.PIXEL, drawing.getX() + center.x, drawing.getY() + center.y, drawing.getZ() + center.z, (random.nextDouble() - .5) * .025, .025 + random.nextDouble() * .035, (random.nextDouble() - .5) * .025);
+                        if (drawing.isCapturing() && drawing.getCapturePlayer() != null) {
+                            GraveSoulPixelParticle.spawnCapture((ClientLevel) drawing.level(), drawing.getX() + center.x, drawing.getY() + center.y, drawing.getZ() + center.z, drawing.getCapturePlayer());
+                        } else {
+                            drawing.level().addParticle(GraveSoulParticles.PIXEL, drawing.getX() + center.x, drawing.getY() + center.y, drawing.getZ() + center.z, (random.nextDouble() - .5) * .025, .025 + random.nextDouble() * .035, (random.nextDouble() - .5) * .025);
+                        }
                         emitted++;
                     }
                     continue;
