@@ -1,0 +1,112 @@
+{
+  "items": [
+    "oasiso:corerem"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/purple",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "text_2": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "fallback_2": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "happiness": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "anger": {
+      "palette": "oasiso:palettes/red",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "sadness": {
+      "palette": "oasiso:palettes/blue",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.corerem1"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.corerem2"
+          },
+          "fallback": "[SPACE]]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.soul1"
+      },
+      "text_style": "text_2",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.soul2"
+          },
+          "empty_fallback": "soul2",
+          "style": "happiness"
+        },
+        {
+          "match": {
+            "translate": "tooltip.oasiso.soul3"
+          },
+          "empty_fallback": "soul3",
+          "style": "anger"
+        },
+        {
+          "match": {
+            "translate": "tooltip.oasiso.soul4"
+          },
+          "empty_fallback": "soul4",
+          "style": "sadness"
+        }
+      ],
+      "missing_highlight_style": "fallback_2",
+      "require_all_highlights": true
+    }
+  ]
+}

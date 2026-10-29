@@ -1,0 +1,77 @@
+{
+  "items": [
+    "oasiso:apol_wings"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/purple"
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/purple",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight_2": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback_2": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.jwings"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.jwings1"
+          },
+          "fallback": "[SPACE]]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.wwings"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.wwings1"
+          },
+          "fallback": "walls",
+          "style": "highlight_2"
+        }
+      ],
+      "missing_highlight_style": "fallback_2"
+    }
+  ]
+}

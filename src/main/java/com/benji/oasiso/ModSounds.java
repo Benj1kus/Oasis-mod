@@ -88,6 +88,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> SOUL_HURT = registerSoundEvent("soul_hurt");
     public static final RegistryObject<SoundEvent> SOUL_DEATH = registerSoundEvent("soul_death");
     public static final RegistryObject<SoundEvent> SOUL_VOICE = registerSoundEvent("soul_voice");
+    public static final RegistryObject<SoundEvent> GSOUL_VOICE = registerSoundEvent("gsoul_voice");
 
     public static final RegistryObject<SoundEvent> GIVER_IDLE1 = registerSoundEvent("giver_idle1");
     public static final RegistryObject<SoundEvent> GIVER_IDLE2 = registerSoundEvent("giver_idle2");

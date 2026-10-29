@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "oasiso:block/soul_portal_x"
+    },
+    "axis=z": {
+      "model": "oasiso:block/soul_portal_z"
+    }
+  }
+}

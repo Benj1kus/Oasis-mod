@@ -1,0 +1,83 @@
+{
+  "items": [
+    "oasiso:azumalit_chestplate"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "text_2": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight_2": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback_2": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.azumalit_chestplate.line1"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.az.line1"
+          },
+          "fallback": "[SHIFT] + [RMB]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.azumalit_chestplate.line2"
+      },
+      "text_style": "text_2",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.azu.line2"
+          },
+          "fallback": "[H]",
+          "style": "highlight_2"
+        }
+      ],
+      "missing_highlight_style": "fallback_2"
+    }
+  ]
+}

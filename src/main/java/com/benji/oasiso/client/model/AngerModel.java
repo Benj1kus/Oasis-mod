@@ -13,7 +13,7 @@ public class AngerModel extends GeoModel<AngerEntity> {
 
     @Override
     public ResourceLocation getTextureResource(AngerEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/anger.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, animatable.isShrineSoul() ? "textures/entity/anger_soul.png" : "textures/entity/anger.png");
     }
 
     @Override

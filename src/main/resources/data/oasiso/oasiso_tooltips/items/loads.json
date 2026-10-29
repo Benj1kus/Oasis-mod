@@ -1,0 +1,47 @@
+{
+  "items": [
+    "oasiso:chaos_bomb_item",
+    "oasiso:cactus_spike"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.cbm"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.cbm1"
+          },
+          "fallback": "LOADS",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

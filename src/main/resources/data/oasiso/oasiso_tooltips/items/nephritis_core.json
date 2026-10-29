@@ -1,0 +1,70 @@
+{
+  "items": [
+    "oasiso:nephritis_core"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/blue"
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "text_2": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.core1"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.core11"
+          },
+          "fallback": "CORE",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.core2"
+      },
+      "text_style": "text_2",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.core22"
+          },
+          "fallback": "CORE",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

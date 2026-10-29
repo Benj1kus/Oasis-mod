@@ -19,7 +19,56 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.sounds.SoundSource;
 
-public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity {
+public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity, com.benji.oasiso.common.shrine.ShrineSoul {
+    private static final EntityDataAccessor<Boolean> SHRINE = SynchedEntityData.defineId(AngerEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> SOUL_DISSOLVE = SynchedEntityData.defineId(AngerEntity.class, EntityDataSerializers.INT);
+
+    @Override
+    public int soulDissolveAge() {
+        return entityData.get(SOUL_DISSOLVE);
+    }
+
+    @Override
+    public void setSoulDissolveAge(int age) {
+        entityData.set(SOUL_DISSOLVE, age);
+    }
+
+    @Override
+    public void releaseShrineSoul() {
+        if (!level().isClientSide && isShrineSoul() && soulDissolveAge() < 0) {
+            vanish();
+            discard();
+        }
+    }
+
+    @Override
+    public void beginSoulDissolve() {
+        if (level().isClientSide || !isShrineSoul() || soulDissolveAge() >= 0 || !isAlive()) return;
+        vanished = true;
+        entityData.set(SOUL_DISSOLVE, 0);
+        entityData.set(SUMMONING, false);
+        setNoAi(true);
+        setInvulnerable(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        level().playSound(null, getX(), getY(), getZ(), ModSounds.SOUL_DEATH.get(), net.minecraft.sounds.SoundSource.HOSTILE, 1F, com.benji.oasiso.common.shrine.WarCoreRitual.pitch(this));
+    }
+
+    public boolean isShrineSoul() {
+        return entityData.get(SHRINE);
+    }
+
+    public void setShrineSoul() {
+        entityData.set(SHRINE, true);
+        setPersistenceRequired();
+        setNoGravity(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        startSummoning();
+    }
+
     public static final int JUMP_TICK = 5, SHOCK_TICK = 20, ATTACK_TICKS = 30, COOLDOWN = 100;
     public static final double RANGE = 15, SHOCK_RADIUS = 6, LAUNCH_SPEED = .8;
     public static final float DAMAGE = 20;
@@ -49,6 +98,8 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(SHRINE, false);
+        entityData.define(SOUL_DISSOLVE, -1);
         entityData.define(SUMMONING, false);
         entityData.define(ATTACKING, false);
         entityData.define(SHOCK, new CompoundTag());
@@ -75,6 +126,10 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
 
     @Override
     public void travel(Vec3 input) {
+        if (isShrineSoul()) {
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
         if (level().isClientSide && entityData.get(ATTACKING)) {
             setDeltaMovement(Vec3.ZERO);
             return;
@@ -101,8 +156,14 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     public void tick() {
         super.tick();
+        if (com.benji.oasiso.common.shrine.WarCoreRitual.tickSoul(this)) return;
         if (level().isClientSide || !isAlive()) return;
         getNavigation().stop();
+        if (isShrineSoul()) {
+            if (summonTicks > 0 && --summonTicks == 0) entityData.set(SUMMONING, false);
+            com.benji.oasiso.common.shrine.ShrineSouls.lookAtPlayer(this);
+            return;
+        }
         if (--life <= 0) {
             vanish();
             discard();
@@ -227,6 +288,8 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putBoolean("ShrineSoul", isShrineSoul());
+        tag.putInt("WarCoreDissolve", soulDissolveAge());
         tag.putInt("CoreremSummonTicks", summonTicks);
         tag.putInt("AngerLife", life);
         tag.putInt("AngerCooldown", cooldown);
@@ -235,8 +298,19 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        entityData.set(SHRINE, tag.getBoolean("ShrineSoul"));
+        entityData.set(SOUL_DISSOLVE, tag.contains("WarCoreDissolve") && isShrineSoul() ? Math.max(-1, Math.min(com.benji.oasiso.common.shrine.ShrineSoul.DISSOLVE_TICKS - 1, tag.getInt("WarCoreDissolve"))) : -1);
+        if (isShrineSoul()) {
+            setPersistenceRequired();
+            setNoGravity(true);
+        }
         summonTicks = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("CoreremSummonTicks")));
-        entityData.set(SUMMONING, summonTicks > 0);
+        entityData.set(SUMMONING, summonTicks > 0 && !isSoulDissolving());
+        if (isSoulDissolving()) {
+            vanished = true;
+            setNoAi(true);
+            setInvulnerable(true);
+        }
         if (tag.contains("AngerLife")) life = Math.max(1, tag.getInt("AngerLife"));
         cooldown = Math.max(20, tag.getInt("AngerCooldown"));
         attackAge = -1;
@@ -246,6 +320,7 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (isSoulDissolving()) return null;
 
         SoundEvent[] sounds = {ModSounds.ANGER_IDLE1.get(), ModSounds.ANGER_IDLE2.get(), ModSounds.ANGER_IDLE3.get()};
 
@@ -270,7 +345,7 @@ public class AngerEntity extends PathfinderMob implements GeoEntity, GlowmaskEnt
 
     @Override
     public ResourceLocation getGlowmaskTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/anger.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, isShrineSoul() ? "textures/entity/anger_soul.png" : "textures/entity/anger.png");
     }
 
     @Override

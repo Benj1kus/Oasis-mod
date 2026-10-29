@@ -110,6 +110,7 @@
   "soul_hurt": { "sounds": [ "oasiso:soul_hurt" ] },
   "soul_death": { "sounds": [ "oasiso:soul_death" ] },
   "soul_voice": { "sounds": [ "oasiso:soul_voice" ] },
+  "gsoul_voice": { "sounds": [ "oasiso:gsoul_voice" ] },
 
   "science_idle1": { "sounds": [ "oasiso:science_idle1" ] },
   "science_idle2": { "sounds": [ "oasiso:science_idle2" ] },

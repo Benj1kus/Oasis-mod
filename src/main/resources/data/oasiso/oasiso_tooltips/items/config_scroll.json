@@ -1,0 +1,57 @@
+{
+  "items": [
+    "oasiso:config_scroll"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan_purple",
+      "shine": true,
+      "glow": false,
+      "italic": true,
+      "bold": false
+    },
+    "space": {
+      "palette": "oasiso:palettes/cyan_purple",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/gold_orange",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/gold"
+    }
+  },
+  "lines": [
+    {
+      "parts": [
+        {
+          "text": {
+            "translate": "tooltip.oasiso.scroll.mods"
+          },
+          "style": "text"
+        },
+        {
+          "text": {
+            "text": " "
+          },
+          "style": "space"
+        },
+        {
+          "text": {
+            "translate": "tooltip.oasiso.scroll.config"
+          },
+          "style": "highlight"
+        }
+      ]
+    }
+  ],
+  "remove_translations": [
+    "tooltip.oasiso.scroll"
+  ],
+  "remove_matching_lines": true
+}

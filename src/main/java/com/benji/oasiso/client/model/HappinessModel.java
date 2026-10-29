@@ -13,7 +13,7 @@ public class HappinessModel extends GeoModel<HappinessEntity> {
 
     @Override
     public ResourceLocation getTextureResource(HappinessEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/happiness.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, animatable.isShrineSoul() ? "textures/entity/happiness_soul.png" : "textures/entity/happiness.png");
     }
 
     @Override

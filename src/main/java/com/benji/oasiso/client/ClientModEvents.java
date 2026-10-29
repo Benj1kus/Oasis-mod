@@ -194,6 +194,10 @@ public class ClientModEvents {
                 AngerRenderer::new
         );
 
+        event.registerEntityRenderer(
+                ModEntities.SOUL_GUARDIAN.get(),
+                SoulGuardianRenderer::new
+        );
 
         event.registerEntityRenderer(
                 Oasiso.OSIRIS_TENTACLE.get(),

@@ -1,0 +1,47 @@
+{
+  "items": [
+    "oasiso:apollyon_spawn_egg"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/purple"
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/purple",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.apollyon1"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.apollyon2"
+          },
+          "fallback": "Apollyon",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

@@ -180,7 +180,6 @@ final class CutsceneVisuals {
                         boolean outline = outlineThickness > 0 && inset < spiralWidth * outlineThickness;
                         quad(b, m, x, y, qw, qh, outline ? spiralOutline : 0x000000, reveal * (outline ? outlineOpacity : spiralOpacity));
                     }
-                    // Restore the sliding gradient above the decoration, below the bright flare/title/actor.
                     if (py > gradientTop) {
                         double vertical = clamp((py - gradientTop) / gradientHeight);
                         double alpha = Math.pow(vertical, 1.25) * gradientOpacity;
@@ -196,7 +195,6 @@ final class CutsceneVisuals {
                         double glow = clamp((boundary - r) / .24) * clamp(1.4 - r) * intensity;
                         double core = clamp(1 - r / .44) * intensity;
                         double opacity = Math.max(glow, core);
-                        // Four alpha levels, with a stable Bayer pattern on the screen.
                         opacity = Math.floor(opacity * 4 + dither) / 4;
                         int flareTint = mix(light, 0xFFFFFF, clamp(1 - r / .42) * .65);
                         if (opacity > 0) quad(b, m, x, y, qw, qh, flareTint, reveal * clamp(opacity));

@@ -50,6 +50,11 @@ public final class ModItems {
     public static final RegistryObject<Item> KR_COLUMN_ITEM = ITEMS.register("kr_column", () -> new BlockItem(ModBlocks.KR_COLUMN.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_COLUMN_CORE_ITEM = ITEMS.register("kr_column_core", () -> new BlockItem(ModBlocks.KR_COLUMN_CORE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GUILTY_EYE_ITEM = ITEMS.register("guilty_eye", () -> new GeoBlockItem(ModBlocks.GUILTY_EYE.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/guilty_eye.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/guilty_eye.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/guilty_eye.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
+    public static final RegistryObject<Item> SOUL_FRAME_ITEM = ITEMS.register("soul_frame", () -> new BlockItem(ModBlocks.SOUL_FRAME.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SOUL_COLUMN_ITEM = ITEMS.register("soul_column", () -> new BlockItem(ModBlocks.SOUL_COLUMN.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SOUL_PCORE_ITEM = ITEMS.register("soul_pcore", () -> new BlockItem(ModBlocks.SOUL_PCORE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SOUL_CLOUD_ITEM = ITEMS.register("soul_cloud", () -> new BlockItem(ModBlocks.SOUL_CLOUD.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SOUL_PORTAL_ITEM = ITEMS.register("soul_portal", () -> new BlockItem(ModBlocks.SOUL_PORTAL.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> KRS_COLUMN_ITEM = ITEMS.register("krs_column", () -> new BlockItem(ModBlocks.KRS_COLUMN.get(), new Item.Properties()));
     public static final RegistryObject<Item> KRS_BRICKS_ITEM = ITEMS.register("krs_bricks", () -> new BlockItem(ModBlocks.KRS_BRICKS.get(), new Item.Properties()));
@@ -155,6 +160,7 @@ public final class ModItems {
     public static final RegistryObject<Item> CHAOS_SCISSORS = ITEMS.register("chaos_scissors", () -> new ChaosScissorsItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CONFIG_SCROLL = ITEMS.register("config_scroll", () -> new ConfigScrollItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> COREREM = ITEMS.register("corerem", () -> new CoreremItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> WAR_CORE = ITEMS.register("war_core", () -> new WarCoreItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new ChaosItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new DominanceItem(new Item.Properties().stacksTo(1)));

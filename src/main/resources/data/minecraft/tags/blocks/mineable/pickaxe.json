@@ -80,6 +80,9 @@
     "oasiso:krs_stairs",
     "oasiso:grave",
     "oasiso:nephritis_magma",
-    "oasiso:war_sword"
+    "oasiso:war_sword",
+    "oasiso:soul_column",
+    "oasiso:soul_pcore",
+    "oasiso:soul_frame"
   ]
 }

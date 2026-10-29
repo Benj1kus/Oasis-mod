@@ -18,7 +18,56 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity {
+public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity, com.benji.oasiso.common.shrine.ShrineSoul {
+    private static final EntityDataAccessor<Boolean> SHRINE = SynchedEntityData.defineId(SadnessEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> SOUL_DISSOLVE = SynchedEntityData.defineId(SadnessEntity.class, EntityDataSerializers.INT);
+
+    @Override
+    public int soulDissolveAge() {
+        return entityData.get(SOUL_DISSOLVE);
+    }
+
+    @Override
+    public void setSoulDissolveAge(int age) {
+        entityData.set(SOUL_DISSOLVE, age);
+    }
+
+    @Override
+    public void releaseShrineSoul() {
+        if (!level().isClientSide && isShrineSoul() && soulDissolveAge() < 0) {
+            vanish();
+            discard();
+        }
+    }
+
+    @Override
+    public void beginSoulDissolve() {
+        if (level().isClientSide || !isShrineSoul() || soulDissolveAge() >= 0 || !isAlive()) return;
+        vanished = true;
+        entityData.set(SOUL_DISSOLVE, 0);
+        entityData.set(SUMMONING, false);
+        setNoAi(true);
+        setInvulnerable(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        level().playSound(null, getX(), getY(), getZ(), ModSounds.SOUL_DEATH.get(), net.minecraft.sounds.SoundSource.HOSTILE, 1F, com.benji.oasiso.common.shrine.WarCoreRitual.pitch(this));
+    }
+
+    public boolean isShrineSoul() {
+        return entityData.get(SHRINE);
+    }
+
+    public void setShrineSoul() {
+        entityData.set(SHRINE, true);
+        setPersistenceRequired();
+        setNoGravity(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        startSummoning();
+    }
+
     public static final int CAST_TICKS = 35, RELEASE_TICK = 20, COOLDOWN = 200;
     public static final double RANGE = 15;
     private static final EntityDataAccessor<Boolean> CASTING = SynchedEntityData.defineId(SadnessEntity.class, EntityDataSerializers.BOOLEAN);
@@ -44,6 +93,8 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(SHRINE, false);
+        entityData.define(SOUL_DISSOLVE, -1);
         entityData.define(SUMMONING, false);
         entityData.define(CASTING, false);
     }
@@ -64,6 +115,10 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
 
     @Override
     public void travel(Vec3 input) {
+        if (isShrineSoul()) {
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
         setDeltaMovement(0, getDeltaMovement().y, 0);
         super.travel(Vec3.ZERO);
         setDeltaMovement(0, getDeltaMovement().y, 0);
@@ -77,8 +132,14 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     public void tick() {
         super.tick();
+        if (com.benji.oasiso.common.shrine.WarCoreRitual.tickSoul(this)) return;
         if (level().isClientSide || !isAlive()) return;
         getNavigation().stop();
+        if (isShrineSoul()) {
+            if (summonTicks > 0 && --summonTicks == 0) entityData.set(SUMMONING, false);
+            com.benji.oasiso.common.shrine.ShrineSouls.lookAtPlayer(this);
+            return;
+        }
         if (--life <= 0) {
             vanish();
             discard();
@@ -151,6 +212,8 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putBoolean("ShrineSoul", isShrineSoul());
+        tag.putInt("WarCoreDissolve", soulDissolveAge());
         tag.putInt("CoreremSummonTicks", summonTicks);
         tag.putInt("SadnessLife", life);
         tag.putInt("SadnessCooldown", cooldown);
@@ -159,8 +222,19 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        entityData.set(SHRINE, tag.getBoolean("ShrineSoul"));
+        entityData.set(SOUL_DISSOLVE, tag.contains("WarCoreDissolve") && isShrineSoul() ? Math.max(-1, Math.min(com.benji.oasiso.common.shrine.ShrineSoul.DISSOLVE_TICKS - 1, tag.getInt("WarCoreDissolve"))) : -1);
+        if (isShrineSoul()) {
+            setPersistenceRequired();
+            setNoGravity(true);
+        }
         summonTicks = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("CoreremSummonTicks")));
-        entityData.set(SUMMONING, summonTicks > 0);
+        entityData.set(SUMMONING, summonTicks > 0 && !isSoulDissolving());
+        if (isSoulDissolving()) {
+            vanished = true;
+            setNoAi(true);
+            setInvulnerable(true);
+        }
         if (tag.contains("SadnessLife")) life = Math.max(1, tag.getInt("SadnessLife"));
         cooldown = Math.max(20, tag.getInt("SadnessCooldown"));
         castAge = -1;
@@ -169,6 +243,7 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (isSoulDissolving()) return null;
 
         SoundEvent[] sounds = {ModSounds.SAD_IDLE1.get(), ModSounds.SAD_IDLE2.get(), ModSounds.SAD_IDLE3.get()};
 
@@ -192,7 +267,7 @@ public class SadnessEntity extends PathfinderMob implements GeoEntity, GlowmaskE
 
     @Override
     public ResourceLocation getGlowmaskTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/sadness.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, isShrineSoul() ? "textures/entity/sadness_soul.png" : "textures/entity/sadness.png");
     }
 
     @Override

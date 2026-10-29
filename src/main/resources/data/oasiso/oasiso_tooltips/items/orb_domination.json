@@ -1,0 +1,47 @@
+{
+  "items": [
+    "oasiso:orb_domination"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/blue"
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.dom"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.dom1"
+          },
+          "fallback": "Chaos",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

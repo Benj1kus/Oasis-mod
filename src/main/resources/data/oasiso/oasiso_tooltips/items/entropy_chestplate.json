@@ -1,0 +1,47 @@
+{
+  "items": [
+    "oasiso:entropy_chestplate"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false,
+      "sparks": "oasiso:sparks/gold"
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.ebk"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.ebk1"
+          },
+          "fallback": "[G]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "items": [
+    "oasiso:entropy_chestplate_glove"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/white",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.glove"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.n"
+          },
+          "fallback": "[N]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.glove3"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.sh"
+          },
+          "fallback": "[SHIFT] + [RMB]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.glove4"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.k"
+          },
+          "fallback": "[K]",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.glove2"
+      },
+      "text_style": "text"
+    }
+  ]
+}

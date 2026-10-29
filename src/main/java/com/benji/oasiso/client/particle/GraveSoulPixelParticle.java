@@ -34,6 +34,15 @@ public final class GraveSoulPixelParticle extends TextureSheetParticle {
         Minecraft.getInstance().particleEngine.add(particle);
     }
 
+    public static void spawnColored(ClientLevel level, double x, double y, double z, int color) {
+        if (captureSprites == null) return;
+        var random = level.random;
+        GraveSoulPixelParticle particle = new GraveSoulPixelParticle(level, x, y, z, (random.nextDouble() - .5) * .025, .025 + random.nextDouble() * .035, (random.nextDouble() - .5) * .025, captureSprites);
+        if (random.nextBoolean()) particle.setColor(1, 1, 1);
+        else particle.setColor(((color >> 16) & 255) / 255F, ((color >> 8) & 255) / 255F, (color & 255) / 255F);
+        Minecraft.getInstance().particleEngine.add(particle);
+    }
+
     private static Vec3 targetPoint(Player player) {
         double yaw = Math.toRadians(player.getYRot());
         return new Vec3(player.getX() - Math.sin(yaw) * .25, player.getY() + player.getBbHeight() * .55, player.getZ() + Math.cos(yaw) * .25);

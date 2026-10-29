@@ -35,6 +35,9 @@
     "oasiso:e_column",
     "oasiso:entropy_fountain",
     "oasiso:grave",
-    "oasiso:war_sword"
+    "oasiso:war_sword",
+    "oasiso:soul_column",
+    "oasiso:soul_pcore",
+    "oasiso:soul_frame"
   ]
 }

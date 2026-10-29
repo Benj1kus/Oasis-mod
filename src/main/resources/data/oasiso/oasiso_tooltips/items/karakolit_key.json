@@ -1,0 +1,22 @@
+{
+  "items": [
+    "oasiso:karakolit_key"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/purple",
+      "shine": true,
+      "glow": true,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.kkey"
+      },
+      "text_style": "text"
+    }
+  ]
+}

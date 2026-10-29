@@ -1,0 +1,69 @@
+{
+  "items": [
+    "oasiso:bombul_bottle_empty"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/yellow",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": true,
+      "italic": true,
+      "bold": false
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "text_2": {
+      "palette": "oasiso:palettes/blue",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.bmb"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.bmb1"
+          },
+          "fallback": "Fistus Hammer",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.bb1"
+      },
+      "text_style": "text_2",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.bb2"
+          },
+          "fallback": "Fistus Hammer",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

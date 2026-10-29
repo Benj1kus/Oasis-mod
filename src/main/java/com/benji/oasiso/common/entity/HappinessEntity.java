@@ -22,7 +22,56 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class HappinessEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity {
+public class HappinessEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity, com.benji.oasiso.common.shrine.ShrineSoul {
+    private static final EntityDataAccessor<Boolean> SHRINE = SynchedEntityData.defineId(HappinessEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> SOUL_DISSOLVE = SynchedEntityData.defineId(HappinessEntity.class, EntityDataSerializers.INT);
+
+    @Override
+    public int soulDissolveAge() {
+        return entityData.get(SOUL_DISSOLVE);
+    }
+
+    @Override
+    public void setSoulDissolveAge(int age) {
+        entityData.set(SOUL_DISSOLVE, age);
+    }
+
+    @Override
+    public void releaseShrineSoul() {
+        if (!level().isClientSide && isShrineSoul() && soulDissolveAge() < 0) {
+            vanish();
+            discard();
+        }
+    }
+
+    @Override
+    public void beginSoulDissolve() {
+        if (level().isClientSide || !isShrineSoul() || soulDissolveAge() >= 0 || !isAlive()) return;
+        vanished = true;
+        entityData.set(SOUL_DISSOLVE, 0);
+        entityData.set(SUMMONING, false);
+        setNoAi(true);
+        setInvulnerable(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        level().playSound(null, getX(), getY(), getZ(), ModSounds.SOUL_DEATH.get(), net.minecraft.sounds.SoundSource.HOSTILE, 1F, com.benji.oasiso.common.shrine.WarCoreRitual.pitch(this));
+    }
+
+    public boolean isShrineSoul() {
+        return entityData.get(SHRINE);
+    }
+
+    public void setShrineSoul() {
+        entityData.set(SHRINE, true);
+        setPersistenceRequired();
+        setNoGravity(true);
+        setTarget(null);
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
+        startSummoning();
+    }
+
     public static final int CAST_TICKS = 47, RELEASE_TICK = 36, COOLDOWN = 100;
     public static final double RANGE = 24;
     public static final TagKey<EntityType<?>> IGNORE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "happiness_ignored"));
@@ -50,6 +99,8 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        entityData.define(SHRINE, false);
+        entityData.define(SOUL_DISSOLVE, -1);
         entityData.define(SUMMONING, false);
         entityData.define(CASTING, false);
     }
@@ -70,6 +121,10 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
 
     @Override
     public void travel(Vec3 input) {
+        if (isShrineSoul()) {
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
         setDeltaMovement(0, getDeltaMovement().y, 0);
         super.travel(Vec3.ZERO);
         setDeltaMovement(0, getDeltaMovement().y, 0);
@@ -81,6 +136,7 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
     }
 
     public static boolean isEnemy(LivingEntity target, Entity source) {
+        if (target instanceof SoulGuardianEntity) return false;
         if (!target.isAlive() || target.isSpectator() || target instanceof Player || target instanceof HappinessEntity || target.getType().is(IGNORE) || target instanceof TamableAnimal pet && pet.isTame() || source != null && (target == source || source.isAlliedTo(target)))
             return false;
         if (target instanceof Mob mob && mob.getTarget() instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator())
@@ -97,8 +153,14 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
     @Override
     public void tick() {
         super.tick();
+        if (com.benji.oasiso.common.shrine.WarCoreRitual.tickSoul(this)) return;
         if (level().isClientSide || !isAlive()) return;
         getNavigation().stop();
+        if (isShrineSoul()) {
+            if (summonTicks > 0 && --summonTicks == 0) entityData.set(SUMMONING, false);
+            com.benji.oasiso.common.shrine.ShrineSouls.lookAtPlayer(this);
+            return;
+        }
         if (--life <= 0) {
             vanish();
             discard();
@@ -178,6 +240,8 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
+        tag.putBoolean("ShrineSoul", isShrineSoul());
+        tag.putInt("WarCoreDissolve", soulDissolveAge());
         tag.putInt("CoreremSummonTicks", summonTicks);
         tag.putInt("HappyLife", life);
         tag.putInt("HappyCooldown", cooldown);
@@ -186,8 +250,19 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        entityData.set(SHRINE, tag.getBoolean("ShrineSoul"));
+        entityData.set(SOUL_DISSOLVE, tag.contains("WarCoreDissolve") && isShrineSoul() ? Math.max(-1, Math.min(com.benji.oasiso.common.shrine.ShrineSoul.DISSOLVE_TICKS - 1, tag.getInt("WarCoreDissolve"))) : -1);
+        if (isShrineSoul()) {
+            setPersistenceRequired();
+            setNoGravity(true);
+        }
         summonTicks = Math.max(0, Math.min(SPAWN_TICKS, tag.getInt("CoreremSummonTicks")));
-        entityData.set(SUMMONING, summonTicks > 0);
+        entityData.set(SUMMONING, summonTicks > 0 && !isSoulDissolving());
+        if (isSoulDissolving()) {
+            vanished = true;
+            setNoAi(true);
+            setInvulnerable(true);
+        }
         if (tag.contains("HappyLife")) life = Math.max(1, tag.getInt("HappyLife"));
         cooldown = Math.max(20, tag.getInt("HappyCooldown"));
         castAge = -1;
@@ -196,6 +271,7 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (isSoulDissolving()) return null;
 
         SoundEvent[] sounds = {ModSounds.HAPPY_IDLE1.get(), ModSounds.HAPPY_IDLE2.get(), ModSounds.HAPPY_IDLE3.get()};
 
@@ -220,7 +296,7 @@ public class HappinessEntity extends PathfinderMob implements GeoEntity, Glowmas
 
     @Override
     public ResourceLocation getGlowmaskTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "textures/entity/happiness.png");
+        return ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, isShrineSoul() ? "textures/entity/happiness_soul.png" : "textures/entity/happiness.png");
     }
 
     @Override

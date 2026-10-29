@@ -28,8 +28,10 @@ public final class GraveSoulScenes {
         return p.serverLevel().getServer().overworld().getGameTime();
     }
 
+    public static boolean isInScene(Player p) { return ACTIVE.containsKey(p.getUUID()); }
+
     public static boolean eligible(Player p) {
-        return p instanceof ServerPlayer s && p.isAlive() && !p.isCreative() && !p.isSpectator() && !p.isPassenger() && !p.isSleeping() && !ACTIVE.containsKey(p.getUUID()) && clock(s) >= p.getPersistentData().getLong(READY);
+        return !com.benji.oasiso.common.shrine.GuardianScenes.busy(p) && p instanceof ServerPlayer s && p.isAlive() && !p.isCreative() && !p.isSpectator() && !p.isPassenger() && !p.isSleeping() && !ACTIVE.containsKey(p.getUUID()) && clock(s) >= p.getPersistentData().getLong(READY);
     }
 
     public static void begin(GraveSoulEntity soul, ServerPlayer player) {
