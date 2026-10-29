@@ -17,6 +17,7 @@ public final class ModEffects {
     public static final RegistryObject<MobEffect> CHAOS_CHAMBER_EFFECT = MOB_EFFECTS.register("chaos_chamber", ChaosChamberEffect::new);
     public static final RegistryObject<MobEffect> SMELL_OF_SIN_EFFECT = MOB_EFFECTS.register("smell_of_sin", SmellOfSinEffect::new);
     public static final RegistryObject<MobEffect> DOOM = MOB_EFFECTS.register("doom", DoomEffect::new);
+    public static final RegistryObject<MobEffect> FAULT = MOB_EFFECTS.register("fault", FaultEffect::new);
 
     private ModEffects() {
     }

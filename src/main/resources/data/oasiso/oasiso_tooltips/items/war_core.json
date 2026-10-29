@@ -1,0 +1,55 @@
+{
+  "items": [
+    "oasiso:war_core"
+  ],
+  "styles": {
+    "white": {
+      "palette": "oasiso:palettes/white",
+      "shine": true,
+      "glow": true,
+      "italic": false,
+      "bold": false
+    },
+    "def": {
+      "palette": "oasiso:palettes/cyan",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.wc1"
+      },
+      "text_style": "def",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.wc2"
+          },
+          "fallback": "[RMB]",
+          "style": "white"
+        }
+      ],
+      "missing_highlight_style": "white"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.wcc1"
+      },
+      "text_style": "def",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.wcc2"
+          },
+          "fallback": "Fistus Hammer",
+          "style": "white"
+        }
+      ],
+      "missing_highlight_style": "white"
+    }
+  ]
+}

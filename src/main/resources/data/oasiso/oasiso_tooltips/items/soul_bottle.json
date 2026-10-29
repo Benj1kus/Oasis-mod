@@ -41,6 +41,22 @@
         }
       ],
       "missing_highlight_style": "fallback"
+    },
+    {
+      "text": {
+        "translate": "tooltip.oasiso.sol1"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.sol2"
+          },
+          "fallback": "Fistus Hammer",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
     }
   ]
 }

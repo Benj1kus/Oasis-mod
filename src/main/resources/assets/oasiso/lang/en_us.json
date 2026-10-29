@@ -425,6 +425,12 @@
   "tooltip.oasiso.bb2": "[RMB]",
   "tooltip.oasiso.sa": "Bottle with Soul",
   "tooltip.oasiso.sa1": "Soul",
+  "tooltip.oasiso.wc1": "Hold [RMB] to banish Souls",
+  "tooltip.oasiso.wc2": "[RMB]",
+  "tooltip.oasiso.wcc1": "[SHIFT] + [RMB] to set souls free",
+  "tooltip.oasiso.wcc2": "[SHIFT] + [RMB]",
+  "tooltip.oasiso.sol1": "Drink 8 Souls to Relieve Your Guilt",
+  "tooltip.oasiso.sol2": "8 Souls",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",
@@ -432,6 +438,7 @@
   "bossbar.oasiso.azumaal_stage2": "",
 
   "effect.oasiso.doom": "Doom",
+  "effect.oasiso.fault": "Fault",
   "effect.oasiso.chaos_chamber": "Chaos Chamber",
   "effect.oasiso.entropy": "Entropy",
   "effect.oasiso.smell_of_sin": "Smell of Sin",

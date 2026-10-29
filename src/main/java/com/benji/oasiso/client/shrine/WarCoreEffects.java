@@ -25,34 +25,52 @@ public final class WarCoreEffects {
     private static int flashAge = -1;
 
     public static void flash() {
+        flash(ModSounds.SOUL_DIE.get());
+    }
+
+    public static void flash(net.minecraft.sounds.SoundEvent sound) {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
         flashWorld = mc.level;
         flashAge = 0;
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SOUL_DIE.get(), 1F, 1F));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1F, 1F));
     }
-    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) { clear(); }
-    private static void clear() { flashWorld = null; flashAge = -1; }
-    @SubscribeEvent public static void tick(TickEvent.ClientTickEvent event) {
+
+    @SubscribeEvent
+    public static void logout(ClientPlayerNetworkEvent.LoggingOut event) {
+        clear();
+    }
+
+    private static void clear() {
+        flashWorld = null;
+        flashAge = -1;
+    }
+
+    @SubscribeEvent
+    public static void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         var mc = Minecraft.getInstance();
-        if (mc.level != flashWorld || mc.player == null || !mc.player.isAlive()) { clear(); return; }
+        if (mc.level != flashWorld || mc.player == null || !mc.player.isAlive()) {
+            clear();
+            return;
+        }
         if (!mc.isPaused() && flashAge >= 0 && ++flashAge >= FLASH_TICKS) clear();
     }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void camera(ViewportEvent.ComputeCameraAngles event) {
         var mc = Minecraft.getInstance();
         var p = mc.player;
-        if (p == null || !p.isAlive() || !p.isUsingItem() || mc.getCameraEntity() != p
-                || !(p.getUseItem().getItem() instanceof WarCoreItem)) return;
+        if (p == null || !p.isAlive() || !p.isUsingItem() || mc.getCameraEntity() != p || !(p.getUseItem().getItem() instanceof WarCoreItem))
+            return;
         float ticks = p.getTicksUsingItem() + (float) event.getPartialTick();
         float charge = Mth.clamp(ticks / WarCoreItem.CHARGE_TICKS, 0, 1);
         float strength = charge * charge * SHAKE_STRENGTH;
-        // Only rendered camera angles change; player aim and the server remain untouched.
         event.setYaw(event.getYaw() + strength * (float) (Math.sin(ticks * 2.17) * 1.2 + Math.sin(ticks * .83) * .6));
         event.setPitch(event.getPitch() + strength * (float) (Math.sin(ticks * 1.73 + 1) * 1.4));
         event.setRoll(event.getRoll() + strength * (float) (Math.sin(ticks * 1.31) * 2.2));
     }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void overlay(RenderGuiEvent.Post event) {
         var mc = Minecraft.getInstance();
@@ -80,7 +98,9 @@ public final class WarCoreEffects {
                 graphics.pose().translate(0, 0, 1000);
                 graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), alpha << 24 | 0x5FFFCC);
                 graphics.flush();
-            } finally { graphics.pose().popPose(); }
+            } finally {
+                graphics.pose().popPose();
+            }
         }
     }
 }
