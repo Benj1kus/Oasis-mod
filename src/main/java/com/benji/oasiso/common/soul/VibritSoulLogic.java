@@ -31,9 +31,6 @@ public final class VibritSoulLogic {
         if (grave == null) return;
         BlockState old = level.getBlockState(grave);
         if (!(old.getBlock() instanceof GraveBlock)) return;
-
-        // Roll once for the selected grave. A failed roll still consumes it and
-        // sends the visual soul to the vibrit, so retries cannot bypass the chance.
         Mob mob = null;
         if (level.random.nextFloat() < GRAVE_SOUL_CHANCE) {
             mob = ModEntities.GRAVE_SOUL.get().create(level);

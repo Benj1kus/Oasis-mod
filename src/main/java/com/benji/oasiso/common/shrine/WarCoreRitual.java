@@ -42,6 +42,7 @@ public final class WarCoreRitual {
         if (release) give(player, ModItems.COREREM.get());
         else {
             com.benji.oasiso.common.fault.FaultSystem.punish(player);
+            com.benji.oasiso.common.cloud.SoulCloudShutdown.begin(player);
             give(player, ModItems.AZUMALIT_UPGRADE.get());
             give(player, ModItems.AZUMALIT_SHARD.get());
             give(player, ModItems.AZUMALIT_PIECE.get());

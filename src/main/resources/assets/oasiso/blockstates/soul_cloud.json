@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "oasiso:block/soul_cloud" }
+    "off=false,souls=false": {
+      "model": "oasiso:block/soul_cloud"
+    },
+    "off=false,souls=true": {
+      "model": "oasiso:block/soul_cloud"
+    },
+    "off=true,souls=false": {
+      "model": "oasiso:block/soul_cloud_off"
+    },
+    "off=true,souls=true": {
+      "model": "oasiso:block/soul_cloud_off"
+    }
   }
 }
