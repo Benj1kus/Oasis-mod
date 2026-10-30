@@ -1,13 +1,29 @@
 {
   "variants": {
-    "sand_layer=0": {
+    "horiz=false,sand_layer=0": {
       "model": "oasiso:block/kr_stone"
     },
-    "sand_layer=1": {
+    "horiz=false,sand_layer=1": {
       "model": "oasiso:block/kr_stone_fullsand"
     },
-    "sand_layer=2": {
+    "horiz=false,sand_layer=2": {
       "model": "oasiso:block/kr_stone_partsand"
+    },
+    "horiz=true,facing=north,sand_layer=0": {
+      "model": "oasiso:block/kr_stone_sandhoriz",
+      "y": 0
+    },
+    "horiz=true,facing=east,sand_layer=0": {
+      "model": "oasiso:block/kr_stone_sandhoriz",
+      "y": 90
+    },
+    "horiz=true,facing=south,sand_layer=0": {
+      "model": "oasiso:block/kr_stone_sandhoriz",
+      "y": 180
+    },
+    "horiz=true,facing=west,sand_layer=0": {
+      "model": "oasiso:block/kr_stone_sandhoriz",
+      "y": 270
     }
   }
 }

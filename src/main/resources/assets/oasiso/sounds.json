@@ -17,6 +17,8 @@
   "spring2": { "sounds": [ "oasiso:spring2" ] },
   "spring3": { "sounds": [ "oasiso:spring3" ] },
 
+  "soul_ambient": { "sounds": [ "oasiso:soul_ambient" ] },
+
   "entropy1": { "sounds": [ "oasiso:entropy1" ] },
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },

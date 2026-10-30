@@ -437,6 +437,15 @@
 
   "bossbar.oasiso.azumaal_stage2": "",
 
+  "message.oasiso_portal.closing": "The sanctuary is still disappearing. Leave the portal and try again in a moment.",
+  "message.oasiso_portal.frame": "This portal needs a complete 5x6 frame.",
+  "message.oasiso_portal.exit": "No complete 5x6 portal was found in soul_storage. Check its frame and clear opening.",
+  "message.oasiso_portal.blocked": "The sanctuary entrance is obstructed. Clear space around its portal.",
+  "message.oasiso_portal.template": "Could not load structure oasiso:soul_storage.",
+  "message.oasiso_portal.size": "The soul_storage template must be 48x15x48 blocks.",
+  "message.oasiso_portal.space": "No empty 48x15x48 space was found 40–50 blocks above the portal. Build the entrance lower or elsewhere.",
+  "message.oasiso_portal.return_blocked": "The return point is obstructed. Clear the original portal or the ground beside it.",
+
   "effect.oasiso.doom": "Doom",
   "effect.oasiso.fault": "Fault",
   "effect.oasiso.chaos_chamber": "Chaos Chamber",

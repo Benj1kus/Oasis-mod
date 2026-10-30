@@ -24,7 +24,7 @@ import java.util.*;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT)
 public final class SoulCloudEffects {
-    public static final int BEAM_RADIUS = 20, AMBIENT_RADIUS = 10;
+    public static final int BEAM_RADIUS = 40, AMBIENT_RADIUS = 40;
     public static final float BEAM_HEIGHT = 25F;
     public static final float OUTER_WIDTH = .32F, INNER_WIDTH = .115F;
     public static final int CYAN = 0x07F09D;
@@ -83,7 +83,6 @@ public final class SoulCloudEffects {
             FADING_BEAMS.remove(pos);
             return 1F;
         }
-        // Only beams actually seen enabled fade. Already-off blocks never flash on chunk load.
         if (LIT_BEAMS.remove(pos)) FADING_BEAMS.put(pos, clock);
         Long started = FADING_BEAMS.get(pos);
         return started == null ? 0F : 1F - CloudMotion.smooth((float) ((now - started) / BEAM_FADE_TICKS));
@@ -118,7 +117,6 @@ public final class SoulCloudEffects {
             scanCenter = center;
             cursor = 0;
         }
-        // Amortized discovery: no entities, block entities, network packets, or full cube scan every frame.
         for (int i = 0; i < SCAN_BUDGET; i++) {
             if (cursor >= SCAN_VOLUME) {
                 cursor = 0;
@@ -169,7 +167,7 @@ public final class SoulCloudEffects {
         return 1 - CloudMotion.smooth((float) ((distance - radius + 2) / 2));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGH)
     public static void render(RenderLevelStageEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (world == null || mc.level != world || mc.player == null) return;
@@ -178,7 +176,7 @@ public final class SoulCloudEffects {
             projection = new Matrix4f(RenderSystem.getProjectionMatrix());
             return;
         }
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) return;
         Matrix4f matrix = view, proj = projection;
         view = projection = null;
         if (matrix == null || proj == null) return;

@@ -1,10 +1,8 @@
 package com.benji.oasiso.common.block;
 
-import com.benji.oasiso.common.dimension.ChaosPortalTeleporter;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -65,7 +63,7 @@ public class SoulPortalBlock extends Block {
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        ChaosPortalTeleporter.handleInside(level, pos, state.getValue(AXIS), entity);
+        com.benji.oasiso.common.portal.SoulPortalTravel.inside(level, pos, entity);
     }
 
 }
