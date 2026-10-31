@@ -1,0 +1,13 @@
+{
+  "conditions": [
+    {
+      "type": "health",
+      "min": 0,
+      "max": 6
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

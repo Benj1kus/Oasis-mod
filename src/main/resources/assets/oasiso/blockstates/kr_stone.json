@@ -1,29 +1,712 @@
 {
-  "variants": {
-    "horiz=false,sand_layer=0": {
-      "model": "oasiso:block/kr_stone"
+  "multipart": [
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_base_0"
+      }
     },
-    "horiz=false,sand_layer=1": {
-      "model": "oasiso:block/kr_stone_fullsand"
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_base_1"
+      }
     },
-    "horiz=false,sand_layer=2": {
-      "model": "oasiso:block/kr_stone_partsand"
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_base_2"
+      }
     },
-    "horiz=true,facing=north,sand_layer=0": {
-      "model": "oasiso:block/kr_stone_sandhoriz",
-      "y": 0
+    {
+      "when": {
+        "link_up": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_up_2"
+      }
     },
-    "horiz=true,facing=east,sand_layer=0": {
-      "model": "oasiso:block/kr_stone_sandhoriz",
-      "y": 90
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_east_2"
+      }
     },
-    "horiz=true,facing=south,sand_layer=0": {
-      "model": "oasiso:block/kr_stone_sandhoriz",
-      "y": 180
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "0|1",
+        "link_west": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_west_2"
+      }
     },
-    "horiz=true,facing=west,sand_layer=0": {
-      "model": "oasiso:block/kr_stone_sandhoriz",
-      "y": 270
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "0|1",
+        "link_west": "0|1",
+        "link_down": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_down_2"
+      }
+    },
+    {
+      "when": {
+        "link_east": "0|1",
+        "link_west": "0|1",
+        "link_down": "0|1",
+        "link_up": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_up_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_west": "0|1",
+        "link_down": "0|1",
+        "link_east": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_east_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_east": "0",
+        "link_down": "0|1",
+        "link_west": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_west_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/north_down_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_base_0"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_base_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_base_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_up_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_east_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "0|1",
+        "link_west": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_west_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_east": "0|1",
+        "link_west": "0|1",
+        "link_down": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_down_2"
+      }
+    },
+    {
+      "when": {
+        "link_east": "0|1",
+        "link_west": "0|1",
+        "link_down": "0|1",
+        "link_up": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_up_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_west": "0|1",
+        "link_down": "0|1",
+        "link_east": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_east_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_east": "0",
+        "link_down": "0|1",
+        "link_west": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_west_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_east": "0",
+        "link_west": "0",
+        "link_down": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/south_down_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_base_0"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_base_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_base_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_up_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_north_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "0|1",
+        "link_south": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_south_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "0|1",
+        "link_south": "0|1",
+        "link_down": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_down_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_south": "0|1",
+        "link_down": "0|1",
+        "link_up": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_up_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_south": "0|1",
+        "link_down": "0|1",
+        "link_north": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_north_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_north": "0",
+        "link_down": "0|1",
+        "link_south": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_south_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/east_down_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_base_0"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_base_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_base_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_up_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_north_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "0|1",
+        "link_south": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_south_2"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0|1",
+        "link_north": "0|1",
+        "link_south": "0|1",
+        "link_down": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_down_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_south": "0|1",
+        "link_down": "0|1",
+        "link_up": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_up_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_south": "0|1",
+        "link_down": "0|1",
+        "link_north": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_north_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_north": "0",
+        "link_down": "0|1",
+        "link_south": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_south_1"
+      }
+    },
+    {
+      "when": {
+        "link_up": "0",
+        "link_north": "0",
+        "link_south": "0",
+        "link_down": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/west_down_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_base_0"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_base_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_base_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_north_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_east_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "0|1",
+        "link_south": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_south_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "0|1",
+        "link_south": "0|1",
+        "link_west": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_west_2"
+      }
+    },
+    {
+      "when": {
+        "link_east": "0|1",
+        "link_south": "0|1",
+        "link_west": "0|1",
+        "link_north": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_north_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_south": "0|1",
+        "link_west": "0|1",
+        "link_east": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_east_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_east": "0",
+        "link_west": "0|1",
+        "link_south": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_south_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/up_west_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "0",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_base_0"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "1",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_base_1"
+      }
+    },
+    {
+      "when": {
+        "sand_layer": "2",
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "0"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_base_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_north_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_east_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "0|1",
+        "link_south": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_south_2"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0|1",
+        "link_east": "0|1",
+        "link_south": "0|1",
+        "link_west": "2"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_west_2"
+      }
+    },
+    {
+      "when": {
+        "link_east": "0|1",
+        "link_south": "0|1",
+        "link_west": "0|1",
+        "link_north": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_north_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_south": "0|1",
+        "link_west": "0|1",
+        "link_east": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_east_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_east": "0",
+        "link_west": "0|1",
+        "link_south": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_south_1"
+      }
+    },
+    {
+      "when": {
+        "link_north": "0",
+        "link_east": "0",
+        "link_south": "0",
+        "link_west": "1"
+      },
+      "apply": {
+        "model": "oasiso:block/kr_stone_edges/down_west_1"
+      }
     }
-  }
+  ]
 }

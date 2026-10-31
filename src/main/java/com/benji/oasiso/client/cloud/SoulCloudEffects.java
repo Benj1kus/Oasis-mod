@@ -25,7 +25,7 @@ import java.util.*;
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT)
 public final class SoulCloudEffects {
     public static final int BEAM_RADIUS = 40, AMBIENT_RADIUS = 40;
-    public static final float BEAM_HEIGHT = 25F;
+    public static final float BEAM_HEIGHT = 40F;
     public static final float OUTER_WIDTH = .32F, INNER_WIDTH = .115F;
     public static final int CYAN = 0x07F09D;
     public static final int SCAN_BUDGET = 4096, MAX_RIBBONS = 96, MAX_SOULS = 24;

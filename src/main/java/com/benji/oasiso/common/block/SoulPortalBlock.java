@@ -66,4 +66,9 @@ public class SoulPortalBlock extends Block {
         com.benji.oasiso.common.portal.SoulPortalTravel.inside(level, pos, entity);
     }
 
+    @Override
+    @net.minecraftforge.api.distmarker.OnlyIn(net.minecraftforge.api.distmarker.Dist.CLIENT)
+    public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        com.benji.oasiso.client.cloud.SoulPortalVisuals.emit(level, pos, state.getValue(AXIS), random);
+    }
 }

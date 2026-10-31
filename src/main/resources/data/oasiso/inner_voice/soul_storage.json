@@ -1,0 +1,14 @@
+{
+  "conditions": [
+    {
+      "type": "structure",
+      "id": "oasiso:soul_storage"
+    }
+  ],
+  "phrases": [
+    "inner_voice.oasiso.soul_storage.flowers",
+    "inner_voice.oasiso.soul_storage.cool",
+    "inner_voice.oasiso.soul_storage.headache"
+  ],
+  "cooldown_seconds": 10
+}

@@ -1,0 +1,12 @@
+{
+  "conditions": [
+    {
+      "type": "structure",
+      "id": "minecraft:village_desert"
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

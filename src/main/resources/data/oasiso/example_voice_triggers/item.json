@@ -1,0 +1,13 @@
+{
+  "conditions": [
+    {
+      "type": "item",
+      "id": "oasiso:war_core",
+      "count": 1
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

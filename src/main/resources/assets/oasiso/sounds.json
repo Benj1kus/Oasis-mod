@@ -19,6 +19,18 @@
 
   "soul_ambient": { "sounds": [ "oasiso:soul_ambient" ] },
 
+  "soul_angry": { "sounds": [ "oasiso:soul_angry" ] },
+  "soul_kid": { "sounds": [ "oasiso:soul_kid" ] },
+  "soul_sad": { "sounds": [ "oasiso:soul_sad" ] },
+  "bong": { "sounds": [ "oasiso:bong" ] },
+  "bob": { "sounds": [ "oasiso:bob" ] },
+  "mechanical": { "sounds": [ "oasiso:mechanical" ] },
+  "tun": { "sounds": [ "oasiso:tun" ] },
+  "ehh": { "sounds": [ "oasiso:ehh" ] },
+  "grandpa": { "sounds": [ "oasiso:grandpa" ] },
+  "springv": { "sounds": [ "oasiso:springv" ] },
+  "beast": { "sounds": [ "oasiso:beast" ] },
+
   "entropy1": { "sounds": [ "oasiso:entropy1" ] },
   "entropy2": { "sounds": [ "oasiso:entropy2" ] },
   "entropy3": { "sounds": [ "oasiso:entropy3" ] },

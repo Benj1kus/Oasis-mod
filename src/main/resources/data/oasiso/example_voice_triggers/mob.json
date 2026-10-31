@@ -1,0 +1,13 @@
+{
+  "conditions": [
+    {
+      "type": "mob",
+      "id": "oasiso:grave_soul",
+      "radius": 5
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

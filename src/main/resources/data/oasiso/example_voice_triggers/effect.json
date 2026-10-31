@@ -1,0 +1,13 @@
+{
+  "conditions": [
+    {
+      "type": "effect",
+      "id": "oasiso:fault",
+      "min_amplifier": 0
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

@@ -1,0 +1,12 @@
+{
+  "conditions": [
+    {
+      "type": "biome",
+      "id": "minecraft:desert"
+    }
+  ],
+  "phrases": [
+    "inner_voice.my_pack.example"
+  ],
+  "cooldown_seconds": 300
+}

@@ -365,6 +365,8 @@
   "key.oasiso.azumalit_chain": "Azumalite Chain Attack",
   "key.oasiso.glove_fill_mode": "Fill mode",
   "key.oasiso.glove_grapple_mode": "Grapple Mode",
+  "key.oasiso_voice.settings": "Inner Voice settings",
+  "key.categories.oasiso_voice": "Osiris: Inner Voice",
 
   "tooltip.oasiso.azumalit_chestplate.line1": "[SHIFT] + [RMB] create Waypoint",
   "tooltip.oasiso.az.line1": "[SHIFT] + [RMB]",
@@ -434,8 +436,23 @@
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",
+  "gui.oasiso_voice.title": "Inner Voice",
+  "gui.oasiso_voice.vignette": "Vignette color (HEX)",
+  "gui.oasiso_voice.text": "Text color (HEX)",
+  "gui.oasiso_voice.voice": "Voice",
+  "gui.oasiso_voice.save": "Save",
+  "gui.oasiso_voice.error": "Could not save settings",
+  "gui.oasiso_voice.hex": "6-digit HEX/HTML color",
+  "gui.oasiso_voice_ui.local": "Your inner voice",
+  "gui.oasiso_voice_ui.preview": "Click the voice name to listen",
+  "gui.oasiso_voice_ui.footer": "Save to apply/Esc to cancel",
+  "gui.oasiso_voice_ui.wheel": "Wheel:voices",
 
   "bossbar.oasiso.azumaal_stage2": "",
+
+  "inner_voice.oasiso.soul_storage.flowers": "It smells like flowers here",
+  "inner_voice.oasiso.soul_storage.cool": "It's cool here",
+  "inner_voice.oasiso.soul_storage.headache": "This place is giving me a headache",
 
   "message.oasiso_portal.closing": "The sanctuary is still disappearing. Leave the portal and try again in a moment.",
   "message.oasiso_portal.frame": "This portal needs a complete 5x6 frame.",

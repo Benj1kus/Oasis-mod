@@ -1,0 +1,34 @@
+{
+  "ambientocclusion": true,
+  "textures": {
+    "particle": "oasiso:block/kr_stone",
+    "face": "oasiso:block/kr_stone_sandhoriz"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#face",
+          "rotation": 180,
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

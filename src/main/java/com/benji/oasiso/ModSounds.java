@@ -19,6 +19,20 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP = registerSoundEvent("entropy_water_loop");
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP_UNDER = registerSoundEvent("entropy_water_loop_under");
 
+    //CUSTOM INNER VOICES
+    public static final RegistryObject<SoundEvent> BEAST = registerSoundEvent("beast");
+    public static final RegistryObject<SoundEvent> SPRINGV = registerSoundEvent("springv");
+    public static final RegistryObject<SoundEvent> GRANDPA = registerSoundEvent("grandpa");
+    public static final RegistryObject<SoundEvent> EHH = registerSoundEvent("ehh");
+    public static final RegistryObject<SoundEvent> MECHANICAL = registerSoundEvent("mechanical");
+    public static final RegistryObject<SoundEvent> TUN = registerSoundEvent("tun");
+    public static final RegistryObject<SoundEvent> BOB = registerSoundEvent("bob");
+    public static final RegistryObject<SoundEvent> SOUL_ANGRY = registerSoundEvent("soul_angry");
+    public static final RegistryObject<SoundEvent> SOUL_KID = registerSoundEvent("soul_kid");
+    public static final RegistryObject<SoundEvent> SOUL_SAD = registerSoundEvent("soul_sad");
+    public static final RegistryObject<SoundEvent> BONG = registerSoundEvent("bong");
+
+
     public static final RegistryObject<SoundEvent> FIGHT = registerSoundEvent("fight");
     public static final RegistryObject<SoundEvent> APOLLYON_THEME = registerSoundEvent("apollyon_theme");
     public static final RegistryObject<SoundEvent> CUTSCENE_THEME = registerSoundEvent("cutscene_theme");
