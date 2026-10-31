@@ -10,5 +10,5 @@
     "inner_voice.oasiso.soul_storage.cool",
     "inner_voice.oasiso.soul_storage.headache"
   ],
-  "cooldown_seconds": 10
+  "cooldown_seconds": 80
 }
