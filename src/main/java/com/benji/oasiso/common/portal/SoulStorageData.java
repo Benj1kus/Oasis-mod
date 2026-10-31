@@ -27,6 +27,7 @@ public final class SoulStorageData extends SavedData {
         final Set<UUID> visitors = new HashSet<>();
         boolean closing;
         int cursor;
+        long emptySince = -1;
 
         Visit(UUID id, BlockPos source, Direction.Axis sourceAxis, BlockPos origin, BlockPos size) {
             this.id = id;

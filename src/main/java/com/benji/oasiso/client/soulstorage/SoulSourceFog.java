@@ -156,8 +156,6 @@ public final class SoulSourceFog {
             RenderSystem.colorMask(true, true, true, false);
             RenderSystem.setShaderColor(1, 1, 1, 1);
             RenderSystem.setShader(() -> shader);
-            // AFTER_WEATHER can have a different global RenderSystem matrix.
-            // Camera-relative vertices need the world render event's view, exactly once.
             shader.safeGetUniform("CameraView").set(new Matrix4f(e.getPoseStack().last().pose()));
             shader.safeGetUniform("CameraProjection").set(e.getProjectionMatrix());
             shader.safeGetUniform("DebugMode").set(debug ? 1F : 0F);

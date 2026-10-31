@@ -39,6 +39,8 @@ public final class SoulPortalTravel {
     private static final ResourceLocation TEMPLATE = ResourceLocation.fromNamespaceAndPath("oasiso", "soul_storage");
     private static final String LOCK = "OasisoSoulPortalExitLock";
     private static final String ENTITY_TAG = "oasiso_storage:";
+    private static final ThreadLocal<Visit> PLACING = new ThreadLocal<>();
+    private static final int EMPTY_GRACE_TICKS = 100;
     private static final Map<UUID, Charge> CHARGES = new HashMap<>();
 
     private static final class Charge {
@@ -102,10 +104,6 @@ public final class SoulPortalTravel {
         SoulStorageData data = SoulStorageData.get(level);
         for (Visit v : data.visits.values())
             if (v.bounds().contains(Vec3.atCenterOf(portal))) {
-                if (v.closing) {
-                    fail(p, "closing");
-                    return;
-                }
                 leave(level, data, v, p);
                 return;
             }
@@ -127,9 +125,11 @@ public final class SoulPortalTravel {
         }
         if (visit == null) visit = create(level, data, source, axis, p);
         if (visit == null) return;
+        holdChunks(level, visit);
         loadChunks(level, visit.origin, visit.max());
         if (visit.exit == null || !SoulPortalFrames.activate(level, visit.exit, visit.exitAxis)) {
             fail(p, "exit");
+            visit.visitors.remove(p.getUUID());
             if (visit.visitors.isEmpty()) {
                 visit.closing = true;
                 data.setDirty();
@@ -138,6 +138,8 @@ public final class SoulPortalTravel {
         }
         Vec3 target = landing(level, p, visit.exit, visit.exitAxis);
         if (target == null) {
+            visit.visitors.remove(p.getUUID());
+            data.setDirty();
             fail(p, "blocked");
             return;
         }
@@ -146,6 +148,8 @@ public final class SoulPortalTravel {
         Vec3 middle = visit.bounds().getCenter();
         float yaw = visit.exitAxis == Direction.Axis.X ? (middle.z >= target.z ? 0 : 180) : (middle.x >= target.x ? -90 : 90);
         move(level, p, target, yaw);
+        visit.emptySince = -1;
+        SoulAtmosphereNetwork.sendArea(p, visit.bounds());
     }
 
     private static Visit create(ServerLevel level, SoulStorageData data, BlockPos source, Direction.Axis axis, ServerPlayer p) {
@@ -183,16 +187,22 @@ public final class SoulPortalTravel {
             return null;
         }
         Visit placed = v;
+        v.visitors.add(p.getUUID());
         data.visits.put(v.id, v);
+        holdChunks(level, v);
         data.setDirty();
         boolean[] ok = {false};
         try {
+            PLACING.set(placed);
             SoulPortalFrames.withoutChecks(() -> ok[0] = template.placeInWorld(level, placed.origin, placed.origin, new StructurePlaceSettings().setIgnoreEntities(false).setFinalizeEntities(true).setKeepLiquids(false), level.random, 18));
             if (ok[0]) findExit(level, v);
         } catch (RuntimeException ex) {
             LogUtils.getLogger().error("Cannot place soul_storage at {}", v.origin, ex);
+        } finally {
+            PLACING.remove();
         }
         if (!ok[0] || v.exit == null) {
+            v.visitors.clear();
             v.closing = true;
             data.setDirty();
             fail(p, "exit");
@@ -239,6 +249,7 @@ public final class SoulPortalTravel {
         }
         move(level, p, target, p.getYRot());
         v.visitors.remove(p.getUUID());
+        SoulAtmosphereNetwork.sendArea(p, null);
         data.setDirty();
     }
 
@@ -284,11 +295,33 @@ public final class SoulPortalTravel {
             for (int z = min.getZ() >> 4; z <= max.getZ() >> 4; z++) level.getChunk(x, z);
     }
 
+    private static void holdChunks(ServerLevel level, Visit v) {
+        for (int x = v.origin.getX() >> 4; x <= v.max().getX() >> 4; x++)
+            for (int z = v.origin.getZ() >> 4; z <= v.max().getZ() >> 4; z++)
+                level.getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,
+                        new net.minecraft.world.level.ChunkPos(x, z), 2, v.origin);
+    }
+
+    private static void releaseChunks(ServerLevel level, Visit v) {
+        for (int x = v.origin.getX() >> 4; x <= v.max().getX() >> 4; x++)
+            for (int z = v.origin.getZ() >> 4; z <= v.max().getZ() >> 4; z++)
+                level.getChunkSource().removeRegionTicket(net.minecraft.server.level.TicketType.PORTAL,
+                        new net.minecraft.world.level.ChunkPos(x, z), 2, v.origin);
+    }
+
     @SubscribeEvent
     public static void entityJoin(EntityJoinLevelEvent e) {
         if (!(e.getLevel() instanceof ServerLevel level) || e.getEntity() instanceof Player) return;
         Entity entity = e.getEntity();
         SoulStorageData data = SoulStorageData.get(level);
+        Visit placing = PLACING.get();
+        if (placing != null && placing.bounds().contains(entity.position())) {
+            // A template saved from a previous visit can contain its obsolete cleanup tag.
+            for (String tag : new HashSet<>(entity.getTags()))
+                if (tag.startsWith(ENTITY_TAG)) entity.removeTag(tag);
+            entity.addTag(ENTITY_TAG + placing.id);
+            return;
+        }
         for (String tag : entity.getTags())
             if (tag.startsWith(ENTITY_TAG)) {
                 try {
@@ -317,18 +350,37 @@ public final class SoulPortalTravel {
         SoulStorageData data = SoulStorageData.get(level);
         int[] budget = {ERASE_BUDGET};
         for (Visit v : new ArrayList<>(data.visits.values())) {
+            boolean occupied = occupied(level, v);
+            if (occupied) {
+                v.emptySince = -1;
+                if (level.getGameTime() % 100 == 0) holdChunks(level, v);
+                // Safe recovery only before the first block has been erased.
+                if (v.closing && v.cursor == 0 && v.exit != null) {
+                    v.closing = false;
+                    LogUtils.getLogger().warn("Recovered occupied soul_storage {} before cleanup started", v.id);
+                    data.setDirty();
+                }
+                if (!v.closing) {
+                    for (ServerPlayer player : level.players())
+                        if (player.isAlive() && v.bounds().inflate(2).contains(player.position()))
+                            if (v.visitors.add(player.getUUID())) data.setDirty();
+                }
+            }
             if (!v.closing) {
                 boolean changed = v.visitors.removeIf(id -> {
                     ServerPlayer p = level.getServer().getPlayerList().getPlayer(id);
                     return p != null && (!p.isAlive() || p.serverLevel() != level || !v.bounds().inflate(8).contains(p.position()));
                 });
                 if (changed) data.setDirty();
-                if (v.visitors.isEmpty() && !occupied(level, v)) {
-                    v.closing = true;
-                    data.setDirty();
-                }
+                if (v.visitors.isEmpty() && !occupied) {
+                    if (v.emptySince < 0) v.emptySince = level.getGameTime();
+                    if (level.getGameTime() - v.emptySince >= EMPTY_GRACE_TICKS) {
+                        v.closing = true;
+                        data.setDirty();
+                    }
+                } else v.emptySince = -1;
             }
-            if (!v.closing || occupied(level, v) || budget[0] <= 0) continue;
+            if (!v.closing || occupied || budget[0] <= 0) continue;
             loadChunks(level, v.origin, v.max());
             if (v.cursor == 0) removeEntities(level, v);
             SoulPortalFrames.withoutChecks(() -> {
@@ -344,6 +396,7 @@ public final class SoulPortalTravel {
             data.setDirty();
             if (v.cursor == v.volume()) {
                 removeEntities(level, v);
+                releaseChunks(level, v);
                 data.visits.remove(v.id);
             }
         }

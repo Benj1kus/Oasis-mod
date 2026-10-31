@@ -99,7 +99,7 @@ public final class SoulAtmosphere {
         if (mc.isPaused()) return;
         clock++;
         previous = blend;
-        if (clock - packetAt > 40) wanted = false;
+        if (clock - packetAt > 200 || (region != null && !region.inflate(2).contains(mc.player.position()))) wanted = false;
         float target = wanted && mc.player.isAlive() ? 1 : 0;
         blend = Mth.approach(blend, target, 1F / 40F);
         updateAmbient();

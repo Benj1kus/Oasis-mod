@@ -81,9 +81,6 @@ public final class EntropyBlockRender {
             h.safeGetUniform("FieldSize").set((float) horizontal.width, (float) horizontal.height);
             RenderSystem.setShader(() -> h);
             quad();
-
-            // The mask and horizontal field belong to this frame. Only the final
-            // screen-space overlay must wait until clouds/transparency are finished.
             TextureTarget field = horizontal;
             LateOutlineQueue.submit(() -> composite(main, field, tick, partial));
         } finally {

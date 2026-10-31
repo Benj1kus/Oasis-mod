@@ -40,6 +40,10 @@ public final class SoulAtmosphereNetwork {
                 break;
             }
         }
+        sendArea(p, area);
+    }
+
+    public static void sendArea(ServerPlayer p, AABB area) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new Area(area));
     }
 
