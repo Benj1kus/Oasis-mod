@@ -28,7 +28,7 @@ public final class SoulCloudEffects {
     public static final float BEAM_HEIGHT = 40F;
     public static final float OUTER_WIDTH = .32F, INNER_WIDTH = .115F;
     public static final int CYAN = 0x07F09D;
-    public static final int SCAN_BUDGET = 4096, MAX_RIBBONS = 96, MAX_SOULS = 24;
+    public static final int SCAN_BUDGET = 4096, MAX_RIBBONS = 200, MAX_SOULS = 64;
     private static final int DIAMETER = BEAM_RADIUS * 2 + 1;
     private static final int SCAN_VOLUME = DIAMETER * DIAMETER * DIAMETER;
     private static final BufferBuilder BUFFER = new BufferBuilder(262144);

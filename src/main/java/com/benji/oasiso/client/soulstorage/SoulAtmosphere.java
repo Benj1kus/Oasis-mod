@@ -35,8 +35,6 @@ import java.util.*;
 @Mod.EventBusSubscriber(modid = "oasiso", value = Dist.CLIENT)
 public final class SoulAtmosphere {
     private static final float AMBIENT_VOLUME = 0.45F;
-    private static final float GROUND_ALPHA = 0.005F;
-    private static final int GROUND_LAYERS = 1;
     private static final float FOG_START = 7F;
     private static final float FOG_END = 12F;
     private static final float FOG_COLOR_BLEND = 1.0F;
@@ -50,7 +48,6 @@ public final class SoulAtmosphere {
     private static long clock, packetAt;
     private static final Random RANDOM = new Random();
     private static final List<Ash> ASH = new ArrayList<>();
-    private static final List<Vec3> FLOOR = new ArrayList<>();
 
     private record Ash(Vec3 origin, long born, int life, float size, float bright, float phase) {
     }
@@ -59,7 +56,9 @@ public final class SoulAtmosphere {
         ClientLevel now = Minecraft.getInstance().level;
         if (now != world) reset(now);
         wanted = box != null;
-        if (box != null) region = box;
+        if (box != null) {
+            region = box;
+        }
         packetAt = clock;
     }
 
@@ -72,7 +71,6 @@ public final class SoulAtmosphere {
         blend = previous = 0;
         clock = packetAt = 0;
         ASH.clear();
-        FLOOR.clear();
     }
 
     public static float strength() {
@@ -86,6 +84,7 @@ public final class SoulAtmosphere {
         @SubscribeEvent
         public static void register(RegisterShadersEvent e) throws IOException {
             e.registerShader(new ShaderInstance(e.getResourceProvider(), ResourceLocation.fromNamespaceAndPath("oasiso", "soul_atmosphere"), DefaultVertexFormat.POSITION_COLOR_TEX), s -> shader = s);
+            SoulSourceFog.registerShader(e);
         }
     }
 
@@ -107,29 +106,12 @@ public final class SoulAtmosphere {
         ASH.removeIf(a -> clock - a.born > a.life);
         if (blend <= 0) {
             ASH.clear();
-            FLOOR.clear();
             return;
         }
         if (wanted && region != null && ASH.size() < 110) {
             Vec3 p = mc.player.position().add((RANDOM.nextDouble() - .5) * 24, RANDOM.nextDouble() * 10 - 2, (RANDOM.nextDouble() - .5) * 24);
             if (region.contains(p))
                 ASH.add(new Ash(p, clock, 100 + RANDOM.nextInt(100), .018F + RANDOM.nextFloat() * .04F, .35F + RANDOM.nextFloat() * .65F, RANDOM.nextFloat() * 6.283F));
-        }
-        if (clock % 10 == 0 && region != null) {
-            FLOOR.clear();
-            BlockPos c = mc.player.blockPosition();
-            for (int dx = -14; dx <= 14; dx += 2)
-                for (int dz = -14; dz <= 14; dz += 2) {
-                    for (int dy = 2; dy >= -7; dy--) {
-                        BlockPos p = c.offset(dx, dy, dz);
-                        if (!region.contains(Vec3.atCenterOf(p)) || !world.hasChunkAt(p)) continue;
-                        var shape = world.getBlockState(p).getCollisionShape(world, p);
-                        if (shape.isEmpty() || !world.getBlockState(p.above()).getCollisionShape(world, p.above()).isEmpty())
-                            continue;
-                        FLOOR.add(new Vec3(p.getX() + .5, p.getY() + shape.max(net.minecraft.core.Direction.Axis.Y) + .08, p.getZ() + .5));
-                        break;
-                    }
-                }
         }
     }
 
@@ -161,21 +143,7 @@ public final class SoulAtmosphere {
             }
             RenderSystem.enableDepthTest();
             RenderSystem.depthFunc(515);
-            shader.safeGetUniform("Kind").set(1F);
             BufferBuilder b = Tesselator.getInstance().getBuilder();
-            b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
-            for (Vec3 p : FLOOR) {
-                float distance = (float) p.distanceTo(mc.player.position());
-                float a = Math.max(0, 1 - distance / 18) * GROUND_ALPHA;
-                for (int layer = 0; layer < GROUND_LAYERS; layer++) {
-                    double y = p.y + layer * .48;
-                    fogVertex(b, p.x - 1, y, p.z - 1, camera, a);
-                    fogVertex(b, p.x - 1, y, p.z + 1, camera, a);
-                    fogVertex(b, p.x + 1, y, p.z + 1, camera, a);
-                    fogVertex(b, p.x + 1, y, p.z - 1, camera, a);
-                }
-            }
-            BufferUploader.drawWithShader(b.end());
             shader.safeGetUniform("Kind").set(2F);
             b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
             Vector3f right = new Vector3f(1, 0, 0).rotate(e.getCamera().rotation()), up = new Vector3f(0, 1, 0).rotate(e.getCamera().rotation());
@@ -190,10 +158,6 @@ public final class SoulAtmosphere {
             }
             BufferUploader.drawWithShader(b.end());
         }
-    }
-
-    private static void fogVertex(BufferBuilder b, double x, double y, double z, Vec3 c, float a) {
-        b.vertex(x - c.x, y - c.y, z - c.z).color(0F, .8F, .60F, a).uv((float) x, (float) z).endVertex();
     }
 
     private static void drawSky() {

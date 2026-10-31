@@ -77,6 +77,14 @@
       "values": [
         0
       ]
+    },
+    {
+      "name": "GroundOpacity",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0.06
+      ]
     }
   ]
 }

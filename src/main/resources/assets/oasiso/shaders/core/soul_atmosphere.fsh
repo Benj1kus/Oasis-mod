@@ -2,6 +2,7 @@
 uniform float Time;
 uniform float Fade;
 uniform float Kind;
+uniform float GroundOpacity;
 in vec3 direction;
 in vec4 tint;
 in vec2 uv;
@@ -24,9 +25,10 @@ void main(){
   vec2 p=floor(uv*5.0)/5.0;
   float n=noise(vec3(p*.32+vec2(Time*.10,-Time*.07),2.0));
   n+=noise(vec3(p*.67+vec2(-Time*.06,Time*.04),8.0))*.35;
-  float edge=clamp((n-.62)*2.2,0.0,1.0);
-  if(edge<dither)discard;
-  fragColor=vec4(tint.rgb*(.65+floor(n*4.0)/8.0),tint.a*Fade);return;
+  float density=smoothstep(.18,1.05,n);
+  density=(floor(density*7.0+dither)+.5)/8.0;
+  float opacity=GroundOpacity*tint.a*Fade*density;
+  fragColor=vec4(tint.rgb*(.65+floor(n*4.0)/8.0),opacity);return;
  }
  vec3 d=normalize(direction);
  vec3 pixel= floor(d*150.0)/150.0;
