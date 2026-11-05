@@ -185,6 +185,12 @@ public final class ModItems {
     public static final RegistryObject<Item> AZUMALIT_LEGGINGS = ITEMS.register("azumalit_leggings", () -> new AzumalitArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AZUMALIT_BOOTS = ITEMS.register("azumalit_boots", () -> new AzumalitArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1)));
 
+
+    public static final RegistryObject<Item> SOUL_HELMET = ITEMS.register("soul_helmet", () -> new SoulArmorItem(ArmorItem.Type.HELMET, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SOUL_CHESTPLATE = ITEMS.register("soul_chestplate", () -> new SoulArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SOUL_LEGGINGS = ITEMS.register("soul_leggings", () -> new SoulArmorItem(ArmorItem.Type.LEGGINGS, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SOUL_BOOTS = ITEMS.register("soul_boots", () -> new SoulArmorItem(ArmorItem.Type.BOOTS, new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> APOL_WINGS = ITEMS.register("apol_wings", () -> new ApolWingsArmorItem(ArmorItem.Type.CHESTPLATE, new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> ENTROPY_CHESTPLATE = ITEMS.register("entropy_chestplate", () -> new EntropyChestplateItem(new Item.Properties().stacksTo(1).fireResistant()));
