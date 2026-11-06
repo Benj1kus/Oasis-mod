@@ -372,6 +372,10 @@
   "key.oasiso_voice.settings": "Inner Voice settings",
   "key.categories.oasiso_voice": "Osiris: Inner Voice",
 
+  "title.oasiso.sanctuary_of_souls": "SANCTUARY OF SOULS",
+  "title.oasiso.eggman": "EGG MAN?",
+  "title.oasiso.osirisarena": "OSIRIS' ARENA",
+
   "tooltip.oasiso.azumalit_chestplate.line1": "[SHIFT] + [RMB] create Waypoint",
   "tooltip.oasiso.az.line1": "[SHIFT] + [RMB]",
   "tooltip.oasiso.azumalit_chestplate.line2": "Press [H] for chain attack",
