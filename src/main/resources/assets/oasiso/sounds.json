@@ -17,6 +17,11 @@
   "spring2": { "sounds": [ "oasiso:spring2" ] },
   "spring3": { "sounds": [ "oasiso:spring3" ] },
 
+  "soul_crack1": { "sounds": [ "oasiso:soul_crack1" ] },
+  "soul_crack2": { "sounds": [ "oasiso:soul_crack2" ] },
+  "soul_crack3": { "sounds": [ "oasiso:soul_crack3" ] },
+  "soul_impact": { "sounds": [ "oasiso:soul_impact" ] },
+
   "soul_ambient": { "sounds": [ "oasiso:soul_ambient" ] },
 
   "soul_angry": { "sounds": [ "oasiso:soul_angry" ] },

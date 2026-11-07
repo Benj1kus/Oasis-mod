@@ -187,12 +187,27 @@ vec3 departingMotes(vec2 p, float despawn, float aa) {
     return result;
 }
 
+const float PIXELS_PER_BLOCK = 24.0;
+const int BAYER[16] = int[16](0,8,2,10, 12,4,14,6, 3,11,1,9, 15,7,13,5);
+
+float stepped(float value, float levels, float threshold, float detail) {
+    float steppedValue = floor(value * levels + threshold) / levels;
+    return mix(value, steppedValue, detail);
+}
+
 void main() {
     float reveal = clamp(Reveal, 0.0, 1.0);
     float despawn = clamp(Despawn, 0.0, 1.0);
     if (reveal <= 0.0 || despawn >= 1.0) discard;
 
-    vec2 p = (texCoord - 0.5) * vec2(2.20, 2.695);
+    vec2 raw = (texCoord - 0.5) * vec2(2.20, 2.695);
+    float cellSize = 0.55 / PIXELS_PER_BLOCK;
+    float footprint = max(length(dFdx(raw)), length(dFdy(raw)));
+    float detail = 1.0 - smoothstep(0.45, 1.25, footprint / cellSize);
+    vec2 cell = floor(raw / cellSize);
+    vec2 p = mix(raw, (cell + 0.5) * cellSize, detail);
+    ivec2 bayerCell = ivec2(mod(cell, 4.0));
+    float threshold = (float(BAYER[bayerCell.x + 4 * bayerCell.y]) + 0.5) / 16.0;
     float spin = -Time * SHAPE_SPEED;
     vec2 q = rotation(-spin) * p;
     float d = silhouette(q);
@@ -204,10 +219,10 @@ void main() {
         d = max(d, (threshold - breakup) * 0.23);
     }
 
-    float pixel = max(length(fwidth(p)) * 0.55, 0.0008);
-    float aa = clamp(fwidth(d) * 0.65, pixel * 0.5, pixel * 1.5);
+    float pixel = max(footprint * 0.55, cellSize * 0.38);
+    float aa = pixel;
     float body = 1.0 - smoothstep(-aa, aa, d);
-    float line = 1.0 - smoothstep(EDGE_WIDTH - aa, EDGE_WIDTH + aa, abs(d));
+    float line = 1.0 - smoothstep(max(EDGE_WIDTH, cellSize * 0.52) - aa, max(EDGE_WIDTH, cellSize * 0.52) + aa, abs(d));
     float fade = smoothstep(0.0, 0.065, reveal) * (1.0 - smoothstep(0.86, 1.0, despawn));
     vec2 frame = abs(texCoord * 2.0 - 1.0);
     float frameFade = 1.0 - smoothstep(0.91, 0.995, max(frame.x, frame.y));
@@ -234,7 +249,10 @@ void main() {
         emission = clamp(emission * fade * GLOW_STRENGTH, 0.0, 1.0);
         float alpha = max(emission.r, max(emission.g, emission.b));
         if (alpha < 0.001) discard;
-        fragColor = vec4(emission / alpha, alpha);
+        vec3 tint = emission / alpha;
+        alpha = stepped(alpha, 12.0, threshold, detail);
+        if (alpha < 0.001) discard;
+        fragColor = vec4(tint, alpha);
         return;
     }
 
@@ -245,8 +263,8 @@ void main() {
     float cloudA = clouds(flow * 3.1 + vec2(Time * 0.025, 2.1));
     float cloudB = clouds(rotation(0.9) * flow * 3.7 + vec2(7.4, -Time * 0.022));
     vec3 interior = INK;
-    interior += vec3(0.018, 0.030, 0.115) * smoothstep(0.28, 0.76, cloudA);
-    interior += vec3(0.008, 0.075, 0.095) * smoothstep(0.42, 0.83, cloudB);
+    interior += vec3(0.018, 0.030, 0.115) * stepped(smoothstep(0.28, 0.76, cloudA), 4.0, threshold, detail);
+    interior += vec3(0.008, 0.075, 0.095) * stepped(smoothstep(0.42, 0.83, cloudB), 4.0, threshold, detail);
     interior *= 0.76 + 0.24 * smoothstep(0.03, 0.60, length(p));
     interior += borderColor * exp(-abs(d) * 24.0) * 0.085;
     vec3 discs, halos;
@@ -254,5 +272,8 @@ void main() {
     interior += discs * settled;
     vec3 edgeCore = mix(borderColor, vec3(0.84, 0.99, 1.0), 0.27);
     vec3 premultiplied = (interior * body * 0.992 * (1.0 - line) + edgeCore * line) * fade;
-    fragColor = vec4(clamp(premultiplied / max(alpha, 0.0001), 0.0, 1.0), alpha);
+    vec3 tint = clamp(premultiplied / alpha, 0.0, 1.0);
+    alpha = stepped(alpha, 6.0, threshold, detail);
+    if (alpha < 0.001) discard;
+    fragColor = vec4(tint, alpha);
 }

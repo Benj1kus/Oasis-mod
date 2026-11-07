@@ -21,6 +21,10 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
+import java.util.function.DoubleFunction;
+
+import com.benji.oasiso.common.soulcast.SoulPossessionSync;
+import net.minecraft.world.entity.Mob;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, value = Dist.CLIENT)
 public final class SoulCloudEffects {
@@ -47,6 +51,48 @@ public final class SoulCloudEffects {
                           boolean white) {
     }
 
+    private static final Map<UUID, SoulPossessionSync.State> possession = new HashMap<>();
+    private static ClientLevel possessionWorld;
+
+    public static void receivePossession(SoulPossessionSync.State state) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null || !level.dimension().location().equals(state.dimension())) return;
+        if (possessionWorld != level) possession.clear();
+        possessionWorld = level;
+        possession.put(state.target(), state);
+    }
+
+    public static long controlEnd(Mob mob) {
+        if (possessionWorld != mob.level()) return 0;
+        var state = possession.get(mob.getUUID());
+        return state == null ? 0 : state.end();
+    }
+
+    private static void drawPossession(SoulPossessionSync.State state, double now, float partial, Matrix4f viewMatrix, Vec3 camera) {
+        if (state.end() != 0 || now < state.launch() || now >= state.arrival()) return;
+        if (!(world.getEntity(state.id()) instanceof Mob mob) || !mob.isAlive() || !mob.getUUID().equals(state.target()))
+            return;
+        Vec3 end = mob.getPosition(partial).add(0, mob.getBbHeight() * .55, 0);
+        Vec3 origin = state.origin();
+        Vec3 delta = end.subtract(origin);
+        Vec3 side = new Vec3(-delta.z, 0, delta.x).normalize();
+        if (side.lengthSqr() < .001) side = new Vec3(1, 0, 0);
+        final Vec3 lateral = side;
+        int seed = state.target().hashCode() ^ (int) state.launch();
+        double phase = noise(seed) * Math.PI * 2;
+        double amplitude = Math.min(1.5, .35 + delta.length() * .08);
+        double life = state.arrival() - state.launch();
+        float age = (float) (now - state.launch()), progress = (float) (age / life);
+        DoubleFunction<Vec3> path = t -> {
+            double u = Math.max(0, Math.min(1, t / life));
+            double envelope = Math.sin(Math.PI * u);
+            double wave = phase + u * Math.PI * 4;
+            return origin.lerp(end, u).add(lateral.scale(amplitude * envelope * Math.sin(wave))).add(0, envelope * (.7 + .35 * Math.cos(wave)), 0);
+        };
+        float alpha = CloudMotion.smooth(age / 3F) * (1 - CloudMotion.smooth((progress - .68F) / .32F));
+        if (alpha > .005F) drawSoulPath(path, seed, age, progress, alpha, 10, viewMatrix, camera);
+    }
+
     private static void clear() {
         SOURCES.clear();
         LIT_BEAMS.clear();
@@ -63,6 +109,10 @@ public final class SoulCloudEffects {
     @SubscribeEvent
     public static void unload(LevelEvent.Unload event) {
         if (event.getLevel() == world) clear();
+        if (event.getLevel() == possessionWorld) {
+            possession.clear();
+            possessionWorld = null;
+        }
     }
 
     private static boolean exposed(BlockPos pos) {
@@ -106,6 +156,8 @@ public final class SoulCloudEffects {
         }
         if (mc.isPaused()) return;
         clock++;
+        long gameTime = world.getGameTime();
+        possession.values().removeIf(s -> gameTime >= (s.end() == 0 ? s.arrival() : s.end()));
         Vec3 player = mc.player.position();
         BlockPos center = mc.player.blockPosition();
         if (scanCenter == null || scanCenter.distSqr(center) > 32 * 32) {
@@ -224,13 +276,15 @@ public final class SoulCloudEffects {
                 }
                 BufferUploader.drawWithShader(BUFFER.end());
             }
-            if (VibritSoulShaders.shader != null && !SOULS.isEmpty()) {
+            if (VibritSoulShaders.shader != null && (!SOULS.isEmpty() || !possession.isEmpty())) {
                 var soulShader = VibritSoulShaders.shader;
                 soulShader.safeGetUniform("SoulProjection").set(proj);
                 RenderSystem.setShader(() -> soulShader);
                 RenderSystem.setShaderTexture(0, VibritSoulEffects.HEAD);
                 BUFFER.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
                 for (Flight f : SOULS) drawSoul(f, now, player, matrix, camera);
+                for (var state : possession.values())
+                    drawPossession(state, world.getGameTime() + partial, partial, matrix, camera);
                 BufferUploader.drawWithShader(BUFFER.end());
             }
         }
@@ -306,14 +360,18 @@ public final class SoulCloudEffects {
         if (age < 0 || progress >= 1) return;
         float alpha = CloudMotion.opacity(age, f.life) * distanceFade(f.origin, player, AMBIENT_RADIUS);
         if (alpha <= .005F) return;
-        drawChips(f, age, progress, alpha, matrix, camera);
+        drawSoulPath(t -> point(f, t, true), f.seed, age, progress, alpha, 36, matrix, camera);
+    }
+
+    private static void drawSoulPath(DoubleFunction<Vec3> path, int seed, float age, float progress, float alpha, int trailTicks, Matrix4f matrix, Vec3 camera) {
+        drawChips(path, seed, age, progress, alpha, matrix, camera);
         final int segments = 32;
 
         Vector3f[] points = new Vector3f[segments + 1], sides = new Vector3f[segments + 1];
 
-        double first = Math.max(0, age - 36);
+        double first = Math.max(0, age - trailTicks);
         for (int i = 0; i <= segments; i++)
-            points[i] = toView(point(f, first + (age - first) * i / segments, true), matrix, camera);
+            points[i] = toView(path.apply(first + (age - first) * i / segments), matrix, camera);
         Vector3f previous = new Vector3f(1, 0, 0);
         for (int i = 0; i <= segments; i++) {
             Vector3f tangent = new Vector3f(points[Math.min(segments, i + 1)]).sub(points[Math.max(0, i - 1)]);
@@ -326,10 +384,10 @@ public final class SoulCloudEffects {
         }
         for (int i = 0; i < segments; i++) {
             float a = i / (float) segments, b = (i + 1F) / segments;
-            soulVertex(new Vector3f(points[i]).sub(sides[i]), 0, a, progress, 0, f.seed, alpha);
-            soulVertex(new Vector3f(points[i]).add(sides[i]), 1, a, progress, 0, f.seed, alpha);
-            soulVertex(new Vector3f(points[i + 1]).add(sides[i + 1]), 1, b, progress, 0, f.seed, alpha);
-            soulVertex(new Vector3f(points[i + 1]).sub(sides[i + 1]), 0, b, progress, 0, f.seed, alpha);
+            soulVertex(new Vector3f(points[i]).sub(sides[i]), 0, a, progress, 0, seed, alpha);
+            soulVertex(new Vector3f(points[i]).add(sides[i]), 1, a, progress, 0, seed, alpha);
+            soulVertex(new Vector3f(points[i + 1]).add(sides[i + 1]), 1, b, progress, 0, seed, alpha);
+            soulVertex(new Vector3f(points[i + 1]).sub(sides[i + 1]), 0, b, progress, 0, seed, alpha);
         }
         Vector3f head = points[segments];
         Vector3f up = new Vector3f(head).sub(points[segments - 1]);
@@ -338,20 +396,20 @@ public final class SoulCloudEffects {
         else up.normalize();
         Vector3f side = new Vector3f(up.y, -up.x, 0).mul(.29F);
         up.mul(.29F);
-        soulVertex(new Vector3f(head).sub(side).add(up), 0, 0, progress, 255, f.seed, alpha);
-        soulVertex(new Vector3f(head).sub(side).sub(up), 0, 1, progress, 255, f.seed, alpha);
-        soulVertex(new Vector3f(head).add(side).sub(up), 1, 1, progress, 255, f.seed, alpha);
-        soulVertex(new Vector3f(head).add(side).add(up), 1, 0, progress, 255, f.seed, alpha);
+        soulVertex(new Vector3f(head).sub(side).add(up), 0, 0, progress, 255, seed, alpha);
+        soulVertex(new Vector3f(head).sub(side).sub(up), 0, 1, progress, 255, seed, alpha);
+        soulVertex(new Vector3f(head).add(side).sub(up), 1, 1, progress, 255, seed, alpha);
+        soulVertex(new Vector3f(head).add(side).add(up), 1, 0, progress, 255, seed, alpha);
     }
 
-    private static void drawChips(Flight f, float age, float progress, float alpha, Matrix4f matrix, Vec3 camera) {
+    private static void drawChips(DoubleFunction<Vec3> path, int seed, float age, float progress, float alpha, Matrix4f matrix, Vec3 camera) {
         int last = (int) Math.floor(age / 3);
         int first = Math.max(4, (int) Math.ceil((age - 14) / 3));
         for (int emission = first; emission <= last; emission++) {
             float elapsed = age - emission * 3;
-            int key = f.seed ^ emission * 73428767;
+            int key = seed ^ emission * 73428767;
             float rx = noise(key), ry = noise(key + 1), rz = noise(key + 2);
-            Vec3 origin = point(f, Math.max(0, emission * 3 - 12), true);
+            Vec3 origin = path.apply(Math.max(0, emission * 3 - 12));
             Vec3 centre = origin.add((rx - .5) * (.20 + elapsed * .02), .04 + elapsed * (.01 + ry * .015), (rz - .5) * (.20 + elapsed * .02));
             float fade = CloudMotion.smooth(elapsed / 2) * (1 - CloudMotion.smooth(elapsed / 14));
             cube(centre, .025F + .035F * ry, rx * 6.28F + elapsed * .03F, rz + elapsed * .02F, progress, alpha * fade, matrix, camera);

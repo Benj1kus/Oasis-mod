@@ -371,6 +371,8 @@
   "key.oasiso.glove_grapple_mode": "Grapple Mode",
   "key.oasiso_voice.settings": "Inner Voice settings",
   "key.categories.oasiso_voice": "Osiris: Inner Voice",
+  "key.oasiso_soulcast.summon": "Soul Armor",
+  "key.categories.oasiso_soulcast": "Oasiso-Soul Armor",
 
   "title.oasiso.sanctuary_of_souls": "SANCTUARY OF SOULS",
   "title.oasiso.eggman": "EGG MAN?",
@@ -441,6 +443,8 @@
   "tooltip.oasiso.wcc2": "[SHIFT] + [RMB]",
   "tooltip.oasiso.sol1": "Drink 8 Souls to Relieve Your Guilt",
   "tooltip.oasiso.sol2": "8 Souls",
+  "tooltip.oasiso.schest": "[H] for a special attack",
+  "tooltip.oasiso.schest1": "[H]",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

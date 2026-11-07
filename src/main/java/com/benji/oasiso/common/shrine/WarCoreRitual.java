@@ -43,10 +43,10 @@ public final class WarCoreRitual {
         else {
             com.benji.oasiso.common.fault.FaultSystem.punish(player);
             com.benji.oasiso.common.cloud.SoulCloudShutdown.begin(player);
-            give(player, ModItems.AZUMALIT_UPGRADE.get());
-            give(player, ModItems.AZUMALIT_SHARD.get());
-            give(player, ModItems.AZUMALIT_PIECE.get());
-            give(player, ModItems.NEPHRITIS_CORE.get());
+            give(player, ModItems.SOUL_HELMET.get());
+            give(player, ModItems.SOUL_CHESTPLATE.get());
+            give(player, ModItems.SOUL_LEGGINGS.get());
+            give(player, ModItems.SOUL_BOOTS.get());
             WarCoreNetwork.flash(player);
         }
     }

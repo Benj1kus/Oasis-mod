@@ -1,0 +1,7 @@
+{
+  "targets": ["strike_swap"],
+  "passes": [
+    {"name": "oasiso:soul_strike_frame", "intarget": "minecraft:main", "outtarget": "strike_swap"},
+    {"name": "blit", "intarget": "strike_swap", "outtarget": "minecraft:main"}
+  ]
+}

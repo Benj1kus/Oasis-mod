@@ -38,6 +38,12 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> CUTSCENE_THEME = registerSoundEvent("cutscene_theme");
     public static final RegistryObject<SoundEvent> SOUL_AMBIENT = registerSoundEvent("soul_ambient");
 
+    public static final RegistryObject<SoundEvent> SOUL_CRACK1 = registerSoundEvent("soul_crack1");
+    public static final RegistryObject<SoundEvent> SOUL_CRACK2 = registerSoundEvent("soul_crack2");
+    public static final RegistryObject<SoundEvent> SOUL_CRACK3 = registerSoundEvent("soul_crack3");
+
+    public static final RegistryObject<SoundEvent> SOUL_IMPACT = registerSoundEvent("soul_impact");
+
     public static final RegistryObject<SoundEvent> WELL_IDLE = registerSoundEvent("well_idle");
     public static final RegistryObject<SoundEvent> WELL_PUNCH = registerSoundEvent("well_punch");
     public static final RegistryObject<SoundEvent> ENTROPY_EXPLODE = registerSoundEvent("entropy_explode");
