@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cross",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "cross": "oasiso:block/tooth_vine",
+    "particle": "oasiso:block/tooth_vine"
+  }
+}

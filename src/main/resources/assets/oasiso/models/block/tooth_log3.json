@@ -1,0 +1,7 @@
+{
+  "parent": "oasiso:block/tooth_log",
+  "textures": {
+    "side": "oasiso:block/tooth_log3",
+    "particle": "oasiso:block/tooth_log3"
+  }
+}

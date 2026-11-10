@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "flowered=false": { "model": "oasiso:block/tooth_leaves" },
+    "flowered=true": { "model": "oasiso:block/tooth_leaves_flowered" }
+  }
+}

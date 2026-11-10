@@ -36,6 +36,8 @@
     "oasiso:krs_wall",
     "oasiso:krs_slab",
     "oasiso:krs_stairs",
-    "oasiso:nephritis_magma"
+    "oasiso:nephritis_magma",
+    "oasiso:tooth_log",
+    "oasiso:tooth_roots"
   ]
 }

@@ -118,6 +118,20 @@ public final class ModItems {
     public static final RegistryObject<Item> ANGER_FLOWER_ITEM = ITEMS.register("anger_flower", () -> new BlockItem(ModBlocks.ANGER_FLOWER.get(), new Item.Properties()));
     public static final RegistryObject<Item> HAPPY_FLOWER_ITEM = ITEMS.register("happy_flower", () -> new BlockItem(ModBlocks.HAPPY_FLOWER.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> SAD_BUSH_ITEM = ITEMS.register("sad_bush", () -> new BlockItem(ModBlocks.SAD_BUSH.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ANGER_BUSH_ITEM = ITEMS.register("anger_bush", () -> new BlockItem(ModBlocks.ANGER_BUSH.get(), new Item.Properties()));
+    public static final RegistryObject<Item> HAPPY_BUSH_ITEM = ITEMS.register("happy_bush", () -> new BlockItem(ModBlocks.HAPPY_BUSH.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> TOOTH_BUSH_ITEM = ITEMS.register("tooth_bush", () -> new BlockItem(ModBlocks.TOOTH_BUSH.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TONGUE_PLANT_ITEM = ITEMS.register("tongue_plant", () -> new BlockItem(ModBlocks.TONGUE_PLANT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTHY_PLANT_ITEM = ITEMS.register("toothy_plant", () -> new BlockItem(ModBlocks.TOOTHY_PLANT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_SMALLGRASS_ITEM = ITEMS.register("tooth_smallgrass", () -> new BlockItem(ModBlocks.TOOTH_SMALLGRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_VINE_ITEM = ITEMS.register("tooth_vine", () -> new BlockItem(ModBlocks.TOOTH_VINE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_ROOTS_ITEM = ITEMS.register("tooth_roots", () -> new BlockItem(ModBlocks.TOOTH_ROOTS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_GRASS_ITEM = ITEMS.register("tooth_grass", () -> new BlockItem(ModBlocks.TOOTH_GRASS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_LOG_ITEM = ITEMS.register("tooth_log", () -> new BlockItem(ModBlocks.TOOTH_LOG.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TOOTH_LEAVES_ITEM = ITEMS.register("tooth_leaves", () -> new BlockItem(ModBlocks.TOOTH_LEAVES.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> GRAVE_ITEM = ITEMS.register("grave", () -> new BlockItem(ModBlocks.GRAVE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));

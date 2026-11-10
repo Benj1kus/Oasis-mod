@@ -100,6 +100,16 @@
   "block.oasiso.grave": "Grave of the Entropy War",
   "block.oasiso.vibrit": "Vibrit Plant",
 
+  "block.oasiso.tooth_log": "Feral Log",
+  "block.oasiso.tooth_grass": "Feral Grass Block",
+  "block.oasiso.tooth_smallgrass": "Feral Grass",
+  "block.oasiso.toothy_plant": "Toothy Plant",
+  "block.oasiso.tongue_plant": "Tongue Plant",
+  "block.oasiso.tooth_bush": "Feral Bush",
+  "block.oasiso.tooth_leaves": "Feral Leaves",
+  "block.oasiso.tooth_roots": "Feral Roots",
+  "block.oasiso.tooth_vine": "Feral Vine",
+
 
   "block.oasiso.kr_grass": "Karak Grass",
   "block.oasiso.kr_biggrass": "Karak Tall Grass",
@@ -140,6 +150,9 @@
   "block.oasiso.sad_flower": "Sad Soul Plant",
   "block.oasiso.happy_flower": "Happy Soul Plant",
   "block.oasiso.anger_flower": "Angry Soul Plant",
+  "block.oasiso.sad_bush": "Sad Soul Bush",
+  "block.oasiso.happy_bush": "Happy Soul Bush",
+  "block.oasiso.anger_bush": "Angry Soul Bush",
 
   "item.oasiso.titana_hammer": "Fistus Hammer",
   "item.oasiso.doum_palm_boat": "Doum Palm Boat",

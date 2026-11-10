@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "oasiso:block/tooth_grass"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t1_s2"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t2_s1"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t2_s2"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t3_s1"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t3_s2"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t4_s1"
+      },
+      {
+        "model": "oasiso:block/tooth_grass_t4_s2"
+      }
+    ]
+  }
+}

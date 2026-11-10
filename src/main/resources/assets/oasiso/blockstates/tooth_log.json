@@ -1,0 +1,74 @@
+{
+  "variants": {
+    "axis=y,leafy=false": [
+      {
+        "model": "oasiso:block/tooth_log"
+      },
+      {
+        "model": "oasiso:block/tooth_log2"
+      },
+      {
+        "model": "oasiso:block/tooth_log3"
+      }
+    ],
+    "axis=z,leafy=false": [
+      {
+        "model": "oasiso:block/tooth_log",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log2",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log3",
+        "x": 90
+      }
+    ],
+    "axis=x,leafy=false": [
+      {
+        "model": "oasiso:block/tooth_log",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log2",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log3",
+        "x": 90,
+        "y": 90
+      }
+    ],
+    "axis=y,leafy=true": {
+      "model": "oasiso:block/tooth_log_leafy_y"
+    },
+    "axis=x,leafy=true": [
+      {
+        "model": "oasiso:block/tooth_log_leafy_z",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log_leafy_z2",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/tooth_log_leafy_z3",
+        "y": 90
+      }
+    ],
+    "axis=z,leafy=true": [
+      {
+        "model": "oasiso:block/tooth_log_leafy_z"
+      },
+      {
+        "model": "oasiso:block/tooth_log_leafy_z2"
+      },
+      {
+        "model": "oasiso:block/tooth_log_leafy_z3"
+      }
+    ]
+  }
+}

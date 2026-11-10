@@ -121,6 +121,16 @@ public final class ModBlocks {
     public static final RegistryObject<Block> KARAK_LOG = BLOCKS.register("karak_log", () -> new KarakLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> ENTROPY_LOG = BLOCKS.register("entropy_log", () -> new EntropyLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops()));
 
+    public static final RegistryObject<Block> TOOTH_LEAVES = BLOCKS.register("tooth_leaves", () -> new ToothLeavesBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.GRASS).noOcclusion().strength(0.2F)));
+    public static final RegistryObject<Block> TOOTH_GRASS = BLOCKS.register("tooth_grass", () -> new ToothGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).sound(SoundType.ROOTED_DIRT).noOcclusion().strength(0.5F)));
+    public static final RegistryObject<Block> TOOTH_LOG = BLOCKS.register("tooth_log", () -> new ToothLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops(), TOOTH_LEAVES));
+    public static final RegistryObject<Block> TOOTH_ROOTS = BLOCKS.register("tooth_roots", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.MANGROVE_ROOTS).noOcclusion().strength(0.2F)));
+    public static final RegistryObject<Block> TOOTH_BUSH = BLOCKS.register("tooth_bush", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).replaceable().instabreak().noOcclusion()));
+    public static final RegistryObject<Block> TOOTHY_PLANT = BLOCKS.register("toothy_plant", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> TONGUE_PLANT = BLOCKS.register("tongue_plant", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> TOOTH_SMALLGRASS = BLOCKS.register("tooth_smallgrass", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).replaceable().instabreak().noOcclusion()));
+    public static final RegistryObject<Block> TOOTH_VINE = BLOCKS.register("tooth_vine", () -> new ToothVineBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));
     public static final RegistryObject<Block> ENTROPY_VEIN = BLOCKS.register("entropy_vein", () -> new EntropyVeinBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_VEIN).sound(SoundType.SMALL_AMETHYST_BUD).lightLevel(state -> 10).noCollission().noOcclusion().replaceable().strength(0.2F)));
@@ -137,6 +147,10 @@ public final class ModBlocks {
     public static final RegistryObject<Block> ANGER_FLOWER = BLOCKS.register("anger_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> SAD_FLOWER = BLOCKS.register("sad_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> HAPPY_FLOWER = BLOCKS.register("happy_flower", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+
+    public static final RegistryObject<Block> ANGER_BUSH = BLOCKS.register("anger_bush", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> SAD_BUSH = BLOCKS.register("sad_bush", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> HAPPY_BUSH = BLOCKS.register("happy_bush", () -> new GenFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> POTTED_ANGER = BLOCKS.register("potted_anger", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, ANGER_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> POTTED_SAD = BLOCKS.register("potted_sad", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SAD_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_DANDELION).instabreak().noOcclusion()));
