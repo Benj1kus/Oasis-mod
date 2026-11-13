@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "oasiso:block/feral_petals_bottom"
+    },
+    "half=upper": {
+      "model": "oasiso:block/feral_petals_top"
+    }
+  }
+}

@@ -36,6 +36,7 @@ public final class OasisoLightStyles {
         register("not_azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
         register("azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
         register("nephritis_lamp", new Style(0x0FFFBB, 0x0FFFEB,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1.5F));
+        register("gluminus", new Style(0xFFCA38, 0xFA6D2D,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1F));
         // register("karak_lamp", new Style(0x88FFFF, 0xD899FF,5.0F, 0.8F, 2.0F, 0.15F, 0.20F, 0.5F)); btw this is example tho
     }
 

@@ -62,12 +62,7 @@ public class GraveBlock extends HorizontalDirectionalBlock {
         if (!state.is(newState.getBlock()) && !moving && level instanceof ServerLevel server) {
             level.playSound(null, pos, SoundEvents.SOUL_ESCAPE, SoundSource.BLOCKS, 2.0F, 0.8F + level.random.nextFloat() * 0.4F);
             for (int i = 0, count = 5 + level.random.nextInt(4); i < count; i++) {
-                server.sendParticles(Oasiso.ENT_SOUL.get(),
-                        pos.getX() + 0.2 + level.random.nextDouble() * 0.6,
-                        pos.getY() + 0.08, pos.getZ() + 0.2 + level.random.nextDouble() * 0.6,
-                        0, (level.random.nextDouble() - 0.5) * 0.012,
-                        0.018 + level.random.nextDouble() * 0.016,
-                        (level.random.nextDouble() - 0.5) * 0.012, 1.0);
+                server.sendParticles(Oasiso.ENT_SOUL.get(), pos.getX() + 0.2 + level.random.nextDouble() * 0.6, pos.getY() + 0.08, pos.getZ() + 0.2 + level.random.nextDouble() * 0.6, 0, (level.random.nextDouble() - 0.5) * 0.012, 0.018 + level.random.nextDouble() * 0.016, (level.random.nextDouble() - 0.5) * 0.012, 1.0);
             }
         }
         super.onRemove(state, level, pos, newState, moving);

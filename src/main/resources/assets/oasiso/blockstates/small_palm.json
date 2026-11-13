@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "oasiso:block/small_palm_bottom"
+    },
+    "half=upper": {
+      "model": "oasiso:block/small_palm_top"
+    }
+  }
+}

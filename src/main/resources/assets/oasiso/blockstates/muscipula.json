@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,closed=false": {
+      "model": "oasiso:block/muscipula",
+      "y": 0
+    },
+    "facing=north,closed=true": {
+      "model": "oasiso:block/muscipula_bite",
+      "y": 0
+    },
+    "facing=east,closed=false": {
+      "model": "oasiso:block/muscipula",
+      "y": 90
+    },
+    "facing=east,closed=true": {
+      "model": "oasiso:block/muscipula_bite",
+      "y": 90
+    },
+    "facing=south,closed=false": {
+      "model": "oasiso:block/muscipula",
+      "y": 180
+    },
+    "facing=south,closed=true": {
+      "model": "oasiso:block/muscipula_bite",
+      "y": 180
+    },
+    "facing=west,closed=false": {
+      "model": "oasiso:block/muscipula",
+      "y": 270
+    },
+    "facing=west,closed=true": {
+      "model": "oasiso:block/muscipula_bite",
+      "y": 270
+    }
+  }
+}

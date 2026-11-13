@@ -132,6 +132,12 @@ public final class ModItems {
     public static final RegistryObject<Item> TOOTH_LOG_ITEM = ITEMS.register("tooth_log", () -> new BlockItem(ModBlocks.TOOTH_LOG.get(), new Item.Properties()));
     public static final RegistryObject<Item> TOOTH_LEAVES_ITEM = ITEMS.register("tooth_leaves", () -> new BlockItem(ModBlocks.TOOTH_LEAVES.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> MUSCIPULA_ITEM = ITEMS.register("muscipula", () -> new BlockItem(ModBlocks.MUSCIPULA.get(), new Item.Properties()));
+    public static final RegistryObject<Item> FERAL_PETALS_ITEM = ITEMS.register("feral_petals", () -> new BlockItem(ModBlocks.FERAL_PETALS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SMALL_PALM_ITEM = ITEMS.register("small_palm", () -> new BlockItem(ModBlocks.SMALL_PALM.get(), new Item.Properties()));
+    public static final RegistryObject<Item> PROTOTAXITES_ITEM = ITEMS.register("prototaxites", () -> new BlockItem(ModBlocks.PROTOTAXITES.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GLUMINUS_ITEM = ITEMS.register("gluminus", () -> new BlockItem(ModBlocks.GLUMINUS.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> GRAVE_ITEM = ITEMS.register("grave", () -> new BlockItem(ModBlocks.GRAVE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_BIG_ITEM = ITEMS.register("geyser_big", () -> new BlockItem(ModBlocks.GEYSER_BIG.get(), new Item.Properties()));
