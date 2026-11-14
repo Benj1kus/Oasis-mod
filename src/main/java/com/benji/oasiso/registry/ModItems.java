@@ -137,6 +137,8 @@ public final class ModItems {
     public static final RegistryObject<Item> SMALL_PALM_ITEM = ITEMS.register("small_palm", () -> new BlockItem(ModBlocks.SMALL_PALM.get(), new Item.Properties()));
     public static final RegistryObject<Item> PROTOTAXITES_ITEM = ITEMS.register("prototaxites", () -> new BlockItem(ModBlocks.PROTOTAXITES.get(), new Item.Properties()));
     public static final RegistryObject<Item> GLUMINUS_ITEM = ITEMS.register("gluminus", () -> new BlockItem(ModBlocks.GLUMINUS.get(), new Item.Properties()));
+    public static final RegistryObject<Item> LILY_ITEM = ITEMS.register("lily", () -> new PlaceOnWaterBlockItem(ModBlocks.LILY.get(), new Item.Properties()));
+    public static final RegistryObject<Item> PIPUS_ITEM = ITEMS.register("pipus", () -> new BlockItem(ModBlocks.PIPUS.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> GRAVE_ITEM = ITEMS.register("grave", () -> new BlockItem(ModBlocks.GRAVE.get(), new Item.Properties()));
     public static final RegistryObject<Item> GEYSER_SMALL_ITEM = ITEMS.register("geyser_small", () -> new BlockItem(ModBlocks.GEYSER_SMALL.get(), new Item.Properties()));

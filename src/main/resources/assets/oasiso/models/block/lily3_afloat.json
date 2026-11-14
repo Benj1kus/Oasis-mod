@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/lily_afloat",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "0": "oasiso:block/lily3",
+    "particle": "oasiso:block/lily3"
+  }
+}

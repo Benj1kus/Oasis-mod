@@ -23,6 +23,7 @@
   "soul_impact": { "sounds": [ "oasiso:soul_impact" ] },
 
   "soul_ambient": { "sounds": [ "oasiso:soul_ambient" ] },
+  "lily_jump": { "sounds": [ "oasiso:lily_jump" ] },
 
   "soul_angry": { "sounds": [ "oasiso:soul_angry" ] },
   "soul_kid": { "sounds": [ "oasiso:soul_kid" ] },

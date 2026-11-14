@@ -32,6 +32,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> SOUL_SAD = registerSoundEvent("soul_sad");
     public static final RegistryObject<SoundEvent> BONG = registerSoundEvent("bong");
 
+    public static final RegistryObject<SoundEvent> LILY_JUMP = registerSoundEvent("lily_jump");
 
     public static final RegistryObject<SoundEvent> FIGHT = registerSoundEvent("fight");
     public static final RegistryObject<SoundEvent> APOLLYON_THEME = registerSoundEvent("apollyon_theme");

@@ -1,0 +1,33 @@
+{
+  "variants": {
+    "afloat=false,variant=1,facing=north": { "model": "oasiso:block/lily" },
+    "afloat=false,variant=1,facing=east":  { "model": "oasiso:block/lily", "y": 90 },
+    "afloat=false,variant=1,facing=south": { "model": "oasiso:block/lily", "y": 180 },
+    "afloat=false,variant=1,facing=west":  { "model": "oasiso:block/lily", "y": 270 },
+
+    "afloat=false,variant=2,facing=north": { "model": "oasiso:block/lily2" },
+    "afloat=false,variant=2,facing=east":  { "model": "oasiso:block/lily2", "y": 90 },
+    "afloat=false,variant=2,facing=south": { "model": "oasiso:block/lily2", "y": 180 },
+    "afloat=false,variant=2,facing=west":  { "model": "oasiso:block/lily2", "y": 270 },
+
+    "afloat=false,variant=3,facing=north": { "model": "oasiso:block/lily3" },
+    "afloat=false,variant=3,facing=east":  { "model": "oasiso:block/lily3", "y": 90 },
+    "afloat=false,variant=3,facing=south": { "model": "oasiso:block/lily3", "y": 180 },
+    "afloat=false,variant=3,facing=west":  { "model": "oasiso:block/lily3", "y": 270 },
+
+    "afloat=true,variant=1,facing=north": { "model": "oasiso:block/lily_afloat" },
+    "afloat=true,variant=1,facing=east":  { "model": "oasiso:block/lily_afloat", "y": 90 },
+    "afloat=true,variant=1,facing=south": { "model": "oasiso:block/lily_afloat", "y": 180 },
+    "afloat=true,variant=1,facing=west":  { "model": "oasiso:block/lily_afloat", "y": 270 },
+
+    "afloat=true,variant=2,facing=north": { "model": "oasiso:block/lily2_afloat" },
+    "afloat=true,variant=2,facing=east":  { "model": "oasiso:block/lily2_afloat", "y": 90 },
+    "afloat=true,variant=2,facing=south": { "model": "oasiso:block/lily2_afloat", "y": 180 },
+    "afloat=true,variant=2,facing=west":  { "model": "oasiso:block/lily2_afloat", "y": 270 },
+
+    "afloat=true,variant=3,facing=north": { "model": "oasiso:block/lily3_afloat" },
+    "afloat=true,variant=3,facing=east":  { "model": "oasiso:block/lily3_afloat", "y": 90 },
+    "afloat=true,variant=3,facing=south": { "model": "oasiso:block/lily3_afloat", "y": 180 },
+    "afloat=true,variant=3,facing=west":  { "model": "oasiso:block/lily3_afloat", "y": 270 }
+  }
+}
