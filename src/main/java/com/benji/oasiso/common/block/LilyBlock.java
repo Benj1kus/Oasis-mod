@@ -24,6 +24,13 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraftforge.event.TickEvent;
+
+import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Mod.EventBusSubscriber(modid = "oasiso")
 public class LilyBlock extends HorizontalDirectionalBlock {
@@ -34,12 +41,49 @@ public class LilyBlock extends HorizontalDirectionalBlock {
     private static final IntegerProperty VARIANT = IntegerProperty.create("variant", 1, 3);
     private static final double JUMP_Y = .80, FORWARD = .49;
 
+    private static final int BREAK_DELAY = 20;
+    private static final Map<ServerPlayer, LilyStand> STANDING = new WeakHashMap<>();
+
+    private record LilyStand(ServerLevel level, BlockPos pos, long since) {
+    }
+
+    private static boolean hasFullArmor(Player player) {
+        for (var stack : player.getArmorSlots()) {
+            if (!(stack.getItem() instanceof ArmorItem)) return false;
+        }
+        return true;
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player)) return;
+
+        if (!player.isAlive() || !player.onGround() || player.isPassenger() || player.getAbilities().flying || !hasFullArmor(player)) {
+            STANDING.remove(player);
+            return;
+        }
+
+        BlockPos pos = findLilyUnderFeet(player);
+        if (pos == null) {
+            STANDING.remove(player);
+            return;
+        }
+
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        LilyStand stand = STANDING.get(player);
+
+        if (stand == null || stand.level() != level || !stand.pos().equals(pos)) {
+            STANDING.put(player, new LilyStand(level, pos, now));
+        } else if (now - stand.since() >= BREAK_DELAY) {
+            STANDING.remove(player);
+            level.destroyBlock(pos, true, player);
+        }
+    }
+
     public LilyBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState()
-                .setValue(VARIANT, 1)
-                .setValue(AFLOAT, false)
-                .setValue(FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(VARIANT, 1).setValue(AFLOAT, false).setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -49,10 +93,7 @@ public class LilyBlock extends HorizontalDirectionalBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return defaultBlockState()
-                .setValue(VARIANT, 1 + ctx.getLevel().random.nextInt(3))
-                .setValue(AFLOAT, onWater(ctx.getLevel(), ctx.getClickedPos()))
-                .setValue(FACING, ctx.getHorizontalDirection());
+        return defaultBlockState().setValue(VARIANT, 1 + ctx.getLevel().random.nextInt(3)).setValue(AFLOAT, onWater(ctx.getLevel(), ctx.getClickedPos())).setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
@@ -81,24 +122,52 @@ public class LilyBlock extends HorizontalDirectionalBlock {
         return super.updateShape(state, dir, neighbor, level, pos, neighborPos);
     }
 
+    @Nullable
+    private static BlockPos findLilyUnderFeet(Player player) {
+        var feet = player.getBoundingBox();
+        int y = (int) Math.floor(feet.minY - .001);
+        BlockPos from = BlockPos.containing(feet.minX + .001, y, feet.minZ + .001);
+        BlockPos to = BlockPos.containing(feet.maxX - .001, y + 1, feet.maxZ - .001);
+        BlockPos nearest = null;
+        double bestDistance = Double.MAX_VALUE;
+
+        for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
+            BlockState state = player.level().getBlockState(pos);
+            if (!(state.getBlock() instanceof LilyBlock)) continue;
+
+            double drop = state.getValue(AFLOAT) ? WATER_DROP : 0;
+            double top = pos.getY() + (1 - drop) / 16.0;
+            if (Math.abs(feet.minY - top) > .025) continue;
+
+            double dx = player.getX() - (pos.getX() + .5);
+            double dz = player.getZ() - (pos.getZ() + .5);
+            double distance = dx * dx + dz * dz;
+            if (distance < bestDistance) {
+                nearest = pos.immutable();
+                bestDistance = distance;
+            }
+        }
+        return nearest;
+    }
+
     @SubscribeEvent
     public static void onJump(LivingEvent.LivingJumpEvent event) {
         if (!(event.getEntity() instanceof Player player) || player.isPassenger() || player.getAbilities().flying)
             return;
-        var feet = player.getBoundingBox();
-        int y = (int) Math.floor(feet.minY - .001);
 
-        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(feet.minX + .001, y, feet.minZ + .001), BlockPos.containing(feet.maxX - .001, y + 1, feet.maxZ - .001))) {
-            if (!(player.level().getBlockState(pos).getBlock() instanceof LilyBlock)) continue;
-            double top = pos.getY() + (1 - (player.level().getBlockState(pos).getValue(AFLOAT) ? WATER_DROP : 0)) / 16.0;
-            if (Math.abs(feet.minY - top) > .025) continue;
-            double yaw = Math.toRadians(player.getYRot());
-            player.setDeltaMovement(-Math.sin(yaw) * FORWARD, JUMP_Y, Math.cos(yaw) * FORWARD);
-            if (player.level() instanceof ServerLevel server) {
-                server.sendParticles(ParticleTypes.POOF, player.getX(), feet.minY + .05, player.getZ(), 9, .20, .035, .20, .035);
-                server.playSound(null, pos, ModSounds.LILY_JUMP.get(), SoundSource.BLOCKS, .65F, .9F + server.random.nextFloat() * .25F);
-            }
-            return;
+        if (player instanceof ServerPlayer serverPlayer) {
+            STANDING.remove(serverPlayer);
+        }
+
+        BlockPos pos = findLilyUnderFeet(player);
+        if (pos == null) return;
+
+        double yaw = Math.toRadians(player.getYRot());
+        player.setDeltaMovement(-Math.sin(yaw) * FORWARD, JUMP_Y, Math.cos(yaw) * FORWARD);
+
+        if (player.level() instanceof ServerLevel server) {
+            server.sendParticles(ParticleTypes.POOF, player.getX(), player.getBoundingBox().minY + .05, player.getZ(), 9, .20, .035, .20, .035);
+            server.playSound(null, pos, ModSounds.LILY_JUMP.get(), SoundSource.BLOCKS, .65F, .9F + server.random.nextFloat() * .25F);
         }
     }
 }
