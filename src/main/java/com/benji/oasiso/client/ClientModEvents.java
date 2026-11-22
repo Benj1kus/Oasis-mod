@@ -424,6 +424,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.FLUWIRUS_BE.get(),
+                FluwirusRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.WINDMILL_BE.get(),
                 WindmillRenderer::new
         );
