@@ -33,12 +33,12 @@ public class MuscipulaBlock extends Block {
 
     public MuscipulaBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(CLOSED, false));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(CLOSED, false).setValue(FeralDrying.DRY, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, CLOSED);
+        builder.add(FeralDrying.DRY, FACING, CLOSED);
     }
 
     @Override

@@ -124,7 +124,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> TOOTH_LEAVES = BLOCKS.register("tooth_leaves", () -> new ToothLeavesBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.GRASS).noOcclusion().strength(0.2F)));
     public static final RegistryObject<Block> TOOTH_GRASS = BLOCKS.register("tooth_grass", () -> new ToothGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS_BLOCK).sound(SoundType.ROOTED_DIRT).noOcclusion().strength(0.5F)));
     public static final RegistryObject<Block> TOOTH_LOG = BLOCKS.register("tooth_log", () -> new ToothLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3.0F).requiresCorrectToolForDrops(), TOOTH_LEAVES));
-    public static final RegistryObject<Block> TOOTH_ROOTS = BLOCKS.register("tooth_roots", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.MANGROVE_ROOTS).noOcclusion().strength(0.2F)));
+    public static final RegistryObject<Block> TOOTH_ROOTS = BLOCKS.register("tooth_roots", () -> new FeralRootsBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.MANGROVE_ROOTS).noOcclusion().strength(0.2F)));
     public static final RegistryObject<Block> TOOTH_BUSH = BLOCKS.register("tooth_bush", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).replaceable().instabreak().noOcclusion()));
     public static final RegistryObject<Block> TOOTHY_PLANT = BLOCKS.register("toothy_plant", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> TONGUE_PLANT = BLOCKS.register("tongue_plant", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
@@ -193,7 +193,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> FACTORY_CORE = BLOCKS.register("factory_core", () -> new FactoryCoreBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion()));
     public static final RegistryObject<Block> FACTORY_CORE_PART = BLOCKS.register("factory_core_part", () -> new FactoryCorePartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion().noLootTable()));
 
-    public static final RegistryObject<Block> FLUWIRUS = BLOCKS.register("fluwirus", () -> new FluwirusBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.FLOWERING_AZALEA).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> FLUWIRUS = BLOCKS.register("fluwirus", () -> new FluwirusBlock(BlockBehaviour.Properties.copy(Blocks.STONE).noCollission().sound(SoundType.FLOWERING_AZALEA).instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> VIBRIT = BLOCKS.register("vibrit", () -> new VibritBlock(BlockBehaviour.Properties.of().sound(SoundType.BASALT).instabreak().noOcclusion()));
 

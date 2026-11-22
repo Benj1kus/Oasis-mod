@@ -1,10 +1,28 @@
 {
   "variants": {
-    "half=lower": {
+    "half=lower,dry=0": {
       "model": "oasiso:block/small_palm_bottom"
     },
-    "half=upper": {
+    "half=lower,dry=1": {
+      "model": "oasiso:block/wilting1_small_palm_bottom"
+    },
+    "half=lower,dry=2": {
+      "model": "oasiso:block/wilting2_small_palm_bottom"
+    },
+    "half=lower,dry=3": {
+      "model": "oasiso:block/dry_small_palm_bottom"
+    },
+    "half=upper,dry=0": {
       "model": "oasiso:block/small_palm_top"
+    },
+    "half=upper,dry=1": {
+      "model": "oasiso:block/wilting1_small_palm_top"
+    },
+    "half=upper,dry=2": {
+      "model": "oasiso:block/wilting2_small_palm_top"
+    },
+    "half=upper,dry=3": {
+      "model": "oasiso:block/dry_small_palm_top"
     }
   }
 }

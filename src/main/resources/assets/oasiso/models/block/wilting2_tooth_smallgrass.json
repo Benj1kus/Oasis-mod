@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/tooth_smallgrass",
+  "textures": {
+    "cross": "oasiso:block/wilting2_tooth_smallgrass",
+    "particle": "oasiso:block/wilting2_tooth_smallgrass"
+  },
+  "render_type": "minecraft:cutout"
+}

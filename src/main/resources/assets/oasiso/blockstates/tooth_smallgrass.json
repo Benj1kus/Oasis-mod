@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "oasiso:block/tooth_smallgrass" }
+    "dry=0": {
+      "model": "oasiso:block/tooth_smallgrass"
+    },
+    "dry=1": {
+      "model": "oasiso:block/wilting1_tooth_smallgrass"
+    },
+    "dry=2": {
+      "model": "oasiso:block/wilting2_tooth_smallgrass"
+    },
+    "dry=3": {
+      "model": "oasiso:block/dry_tooth_smallgrass"
+    }
   }
 }

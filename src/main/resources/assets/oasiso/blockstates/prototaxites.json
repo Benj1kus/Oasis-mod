@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "oasiso:block/prototaxites" }
+    "dry=0": {
+      "model": "oasiso:block/prototaxites"
+    },
+    "dry=1": {
+      "model": "oasiso:block/wilting1_prototaxites"
+    },
+    "dry=2": {
+      "model": "oasiso:block/wilting2_prototaxites"
+    },
+    "dry=3": {
+      "model": "oasiso:block/dry_prototaxites"
+    }
   }
 }

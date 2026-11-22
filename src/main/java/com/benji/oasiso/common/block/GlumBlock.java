@@ -21,12 +21,12 @@ public class GlumBlock extends HorizontalDirectionalBlock {
 
     public GlumBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FeralDrying.DRY, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FeralDrying.DRY, FACING);
     }
 
     @Override

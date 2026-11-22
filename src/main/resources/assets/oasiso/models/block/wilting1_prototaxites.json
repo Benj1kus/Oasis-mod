@@ -1,0 +1,7 @@
+{
+  "parent": "oasiso:block/prototaxites",
+  "textures": {
+    "0": "oasiso:block/wilting1_prototaxites",
+    "particle": "oasiso:block/wilting1_prototaxites"
+  }
+}

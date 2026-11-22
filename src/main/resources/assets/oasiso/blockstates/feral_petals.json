@@ -1,10 +1,28 @@
 {
   "variants": {
-    "half=lower": {
+    "half=lower,dry=0": {
       "model": "oasiso:block/feral_petals_bottom"
     },
-    "half=upper": {
+    "half=lower,dry=1": {
+      "model": "oasiso:block/wilting1_feral_petals_bottom"
+    },
+    "half=lower,dry=2": {
+      "model": "oasiso:block/wilting2_feral_petals_bottom"
+    },
+    "half=lower,dry=3": {
+      "model": "oasiso:block/dry_feral_petals_bottom"
+    },
+    "half=upper,dry=0": {
       "model": "oasiso:block/feral_petals_top"
+    },
+    "half=upper,dry=1": {
+      "model": "oasiso:block/wilting1_feral_petals_top"
+    },
+    "half=upper,dry=2": {
+      "model": "oasiso:block/wilting2_feral_petals_top"
+    },
+    "half=upper,dry=3": {
+      "model": "oasiso:block/dry_feral_petals_top"
     }
   }
 }

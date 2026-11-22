@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/tongue_plant",
+  "textures": {
+    "cross": "oasiso:block/wilting2_tongue_plant",
+    "particle": "oasiso:block/wilting2_tongue_plant"
+  },
+  "render_type": "minecraft:cutout"
+}

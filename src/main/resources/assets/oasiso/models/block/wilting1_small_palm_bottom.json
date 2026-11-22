@@ -1,0 +1,7 @@
+{
+  "parent": "oasiso:block/small_palm_bottom",
+  "textures": {
+    "cross": "oasiso:block/wilting1_small_palm_bottom"
+  },
+  "render_type": "minecraft:cutout"
+}

@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "oasiso:block/tongue_plant" }
+    "dry=0": {
+      "model": "oasiso:block/tongue_plant"
+    },
+    "dry=1": {
+      "model": "oasiso:block/wilting1_tongue_plant"
+    },
+    "dry=2": {
+      "model": "oasiso:block/wilting2_tongue_plant"
+    },
+    "dry=3": {
+      "model": "oasiso:block/dry_tongue_plant"
+    }
   }
 }

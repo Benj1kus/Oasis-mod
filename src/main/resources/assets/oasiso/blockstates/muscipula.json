@@ -1,35 +1,131 @@
 {
   "variants": {
-    "facing=north,closed=false": {
+    "facing=north,closed=false,dry=0": {
       "model": "oasiso:block/muscipula",
       "y": 0
     },
-    "facing=north,closed=true": {
+    "facing=north,closed=false,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula",
+      "y": 0
+    },
+    "facing=north,closed=false,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula",
+      "y": 0
+    },
+    "facing=north,closed=false,dry=3": {
+      "model": "oasiso:block/dry_muscipula",
+      "y": 0
+    },
+    "facing=north,closed=true,dry=0": {
       "model": "oasiso:block/muscipula_bite",
       "y": 0
     },
-    "facing=east,closed=false": {
+    "facing=north,closed=true,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula_bite",
+      "y": 0
+    },
+    "facing=north,closed=true,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula_bite",
+      "y": 0
+    },
+    "facing=north,closed=true,dry=3": {
+      "model": "oasiso:block/dry_muscipula_bite",
+      "y": 0
+    },
+    "facing=east,closed=false,dry=0": {
       "model": "oasiso:block/muscipula",
       "y": 90
     },
-    "facing=east,closed=true": {
+    "facing=east,closed=false,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula",
+      "y": 90
+    },
+    "facing=east,closed=false,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula",
+      "y": 90
+    },
+    "facing=east,closed=false,dry=3": {
+      "model": "oasiso:block/dry_muscipula",
+      "y": 90
+    },
+    "facing=east,closed=true,dry=0": {
       "model": "oasiso:block/muscipula_bite",
       "y": 90
     },
-    "facing=south,closed=false": {
+    "facing=east,closed=true,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula_bite",
+      "y": 90
+    },
+    "facing=east,closed=true,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula_bite",
+      "y": 90
+    },
+    "facing=east,closed=true,dry=3": {
+      "model": "oasiso:block/dry_muscipula_bite",
+      "y": 90
+    },
+    "facing=south,closed=false,dry=0": {
       "model": "oasiso:block/muscipula",
       "y": 180
     },
-    "facing=south,closed=true": {
+    "facing=south,closed=false,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula",
+      "y": 180
+    },
+    "facing=south,closed=false,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula",
+      "y": 180
+    },
+    "facing=south,closed=false,dry=3": {
+      "model": "oasiso:block/dry_muscipula",
+      "y": 180
+    },
+    "facing=south,closed=true,dry=0": {
       "model": "oasiso:block/muscipula_bite",
       "y": 180
     },
-    "facing=west,closed=false": {
+    "facing=south,closed=true,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula_bite",
+      "y": 180
+    },
+    "facing=south,closed=true,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula_bite",
+      "y": 180
+    },
+    "facing=south,closed=true,dry=3": {
+      "model": "oasiso:block/dry_muscipula_bite",
+      "y": 180
+    },
+    "facing=west,closed=false,dry=0": {
       "model": "oasiso:block/muscipula",
       "y": 270
     },
-    "facing=west,closed=true": {
+    "facing=west,closed=false,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula",
+      "y": 270
+    },
+    "facing=west,closed=false,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula",
+      "y": 270
+    },
+    "facing=west,closed=false,dry=3": {
+      "model": "oasiso:block/dry_muscipula",
+      "y": 270
+    },
+    "facing=west,closed=true,dry=0": {
       "model": "oasiso:block/muscipula_bite",
+      "y": 270
+    },
+    "facing=west,closed=true,dry=1": {
+      "model": "oasiso:block/wilting1_muscipula_bite",
+      "y": 270
+    },
+    "facing=west,closed=true,dry=2": {
+      "model": "oasiso:block/wilting2_muscipula_bite",
+      "y": 270
+    },
+    "facing=west,closed=true,dry=3": {
+      "model": "oasiso:block/dry_muscipula_bite",
       "y": 270
     }
   }

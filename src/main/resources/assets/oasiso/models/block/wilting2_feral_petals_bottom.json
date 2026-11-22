@@ -1,0 +1,7 @@
+{
+  "parent": "oasiso:block/feral_petals_bottom",
+  "textures": {
+    "cross": "oasiso:block/wilting2_feral_petals_bottom"
+  },
+  "render_type": "minecraft:cutout"
+}

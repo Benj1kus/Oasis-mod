@@ -1,0 +1,7 @@
+{
+  "parent": "oasiso:block/tooth_leaves",
+  "textures": {
+    "all": "oasiso:block/wilting2_tooth_leaves"
+  },
+  "render_type": "minecraft:cutout"
+}

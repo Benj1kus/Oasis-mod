@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/tooth_bush",
+  "textures": {
+    "cross": "oasiso:block/dry_tooth_bush",
+    "particle": "oasiso:block/dry_tooth_bush"
+  },
+  "render_type": "minecraft:cutout"
+}

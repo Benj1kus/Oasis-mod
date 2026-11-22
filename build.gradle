@@ -202,3 +202,26 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
+// Build the two intermediate colour stages from the artist's current dry_ sprites.
+def feralOutput = layout.buildDirectory.dir('generated/feralResources')
+def feralSource = file('src/main/resources/assets/oasiso/textures/block')
+def feralList = file('gradle/feral-textures.txt')
+def feralTool = file('gradle/GenerateFeralTextures.java')
+def feralTextures = tasks.register('generateFeralTextures', Exec) {
+    inputs.files(feralList, feralTool)
+    inputs.files(fileTree(feralSource) {
+        feralList.readLines().each { texture ->
+            include "${texture}.png", "${texture}.png.mcmeta", "dry_${texture}.png", "dry_${texture}.png.mcmeta"
+        }
+    })
+    outputs.dir(feralOutput)
+    doFirst {
+        def output = feralOutput.get().asFile
+        project.delete(output)
+        def javaExe = new File(System.getProperty('java.home'), 'bin/' + (System.getProperty('os.name').startsWith('Windows') ? 'java.exe' : 'java'))
+        commandLine javaExe, feralTool, feralSource, new File(output, 'assets/oasiso/textures/block'), feralList
+    }
+}
+sourceSets.main.resources.srcDir(feralOutput)
+tasks.named('processResources').configure { dependsOn feralTextures }

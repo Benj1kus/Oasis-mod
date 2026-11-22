@@ -83,12 +83,12 @@ public class LilyBlock extends HorizontalDirectionalBlock {
 
     public LilyBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(VARIANT, 1).setValue(AFLOAT, false).setValue(FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(VARIANT, 1).setValue(AFLOAT, false).setValue(FACING, Direction.NORTH).setValue(FeralDrying.DRY, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(VARIANT, AFLOAT, FACING);
+        builder.add(FeralDrying.DRY, VARIANT, AFLOAT, FACING);
     }
 
     @Override

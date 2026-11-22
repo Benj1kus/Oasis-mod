@@ -1,0 +1,10 @@
+{
+  "parent": "oasiso:block/tooth_grass_t2_s2",
+  "textures": {
+    "particle": "oasiso:block/wilting2_tooth_grass_side2",
+    "bottom": "oasiso:block/kr_stone",
+    "top": "oasiso:block/wilting2_tooth_grass_top2",
+    "side": "oasiso:block/wilting2_tooth_grass_side2",
+    "overlay": "oasiso:block/wilting2_tooth_grass_overlay"
+  }
+}

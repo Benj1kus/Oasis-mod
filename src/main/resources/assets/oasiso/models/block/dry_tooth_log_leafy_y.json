@@ -1,0 +1,9 @@
+{
+  "parent": "oasiso:block/tooth_log_leafy_y",
+  "textures": {
+    "end": "oasiso:block/dry_tooth_log_top",
+    "top": "oasiso:block/dry_tooth_grass_top",
+    "grass": "oasiso:block/dry_tooth_log_grass_vert",
+    "particle": "oasiso:block/dry_tooth_log_grass_vert"
+  }
+}

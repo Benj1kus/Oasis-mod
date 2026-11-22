@@ -1,6 +1,28 @@
 {
   "variants": {
-    "flowered=false": { "model": "oasiso:block/tooth_leaves" },
-    "flowered=true": { "model": "oasiso:block/tooth_leaves_flowered" }
+    "flowered=false,dry=0": {
+      "model": "oasiso:block/tooth_leaves"
+    },
+    "flowered=false,dry=1": {
+      "model": "oasiso:block/wilting1_tooth_leaves"
+    },
+    "flowered=false,dry=2": {
+      "model": "oasiso:block/wilting2_tooth_leaves"
+    },
+    "flowered=false,dry=3": {
+      "model": "oasiso:block/dry_tooth_leaves"
+    },
+    "flowered=true,dry=0": {
+      "model": "oasiso:block/tooth_leaves_flowered"
+    },
+    "flowered=true,dry=1": {
+      "model": "oasiso:block/wilting1_tooth_leaves_flowered"
+    },
+    "flowered=true,dry=2": {
+      "model": "oasiso:block/wilting2_tooth_leaves_flowered"
+    },
+    "flowered=true,dry=3": {
+      "model": "oasiso:block/dry_tooth_leaves_flowered"
+    }
   }
 }

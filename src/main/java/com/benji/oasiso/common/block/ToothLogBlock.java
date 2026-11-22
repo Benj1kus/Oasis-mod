@@ -20,13 +20,13 @@ public class ToothLogBlock extends RotatedPillarBlock {
     public ToothLogBlock(Properties properties, Supplier<? extends Block> leaves) {
         super(properties);
         this.leaves = leaves;
-        registerDefaultState(defaultBlockState().setValue(LEAFY, false));
+        registerDefaultState(defaultBlockState().setValue(LEAFY, false).setValue(FeralDrying.DRY, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(LEAFY);
+        builder.add(FeralDrying.DRY, LEAFY);
     }
 
     @Override

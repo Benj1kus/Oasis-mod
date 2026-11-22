@@ -21,12 +21,12 @@ public class ToothLeavesBlock extends Block {
 
     public ToothLeavesBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(FLOWERED, false).setValue(INITIALIZED, false));
+        registerDefaultState(defaultBlockState().setValue(FLOWERED, false).setValue(INITIALIZED, false).setValue(FeralDrying.DRY, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FLOWERED, INITIALIZED);
+        builder.add(FeralDrying.DRY, FLOWERED, INITIALIZED);
     }
 
     private BlockState initialize(BlockState state, RandomSource random) {

@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/tooth_log2",
+  "textures": {
+    "particle": "oasiso:block/wilting2_tooth_log2",
+    "end": "oasiso:block/wilting2_tooth_log_top",
+    "side": "oasiso:block/wilting2_tooth_log2"
+  }
+}

@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "dry=0": {
       "model": "oasiso:block/tooth_roots"
+    },
+    "dry=1": {
+      "model": "oasiso:block/wilting1_tooth_roots"
+    },
+    "dry=2": {
+      "model": "oasiso:block/wilting2_tooth_roots"
+    },
+    "dry=3": {
+      "model": "oasiso:block/dry_tooth_roots"
     }
   }
 }

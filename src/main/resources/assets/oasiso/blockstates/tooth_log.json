@@ -1,6 +1,6 @@
 {
   "variants": {
-    "axis=y,leafy=false": [
+    "axis=y,leafy=false,dry=0": [
       {
         "model": "oasiso:block/tooth_log"
       },
@@ -11,7 +11,40 @@
         "model": "oasiso:block/tooth_log3"
       }
     ],
-    "axis=z,leafy=false": [
+    "axis=y,leafy=false,dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_log"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log2"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log3"
+      }
+    ],
+    "axis=y,leafy=false,dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_log"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log2"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log3"
+      }
+    ],
+    "axis=y,leafy=false,dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_log"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log2"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log3"
+      }
+    ],
+    "axis=z,leafy=false,dry=0": [
       {
         "model": "oasiso:block/tooth_log",
         "x": 90
@@ -25,7 +58,49 @@
         "x": 90
       }
     ],
-    "axis=x,leafy=false": [
+    "axis=z,leafy=false,dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_log",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log2",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log3",
+        "x": 90
+      }
+    ],
+    "axis=z,leafy=false,dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_log",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log2",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log3",
+        "x": 90
+      }
+    ],
+    "axis=z,leafy=false,dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_log",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log2",
+        "x": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log3",
+        "x": 90
+      }
+    ],
+    "axis=x,leafy=false,dry=0": [
       {
         "model": "oasiso:block/tooth_log",
         "x": 90,
@@ -42,10 +117,70 @@
         "y": 90
       }
     ],
-    "axis=y,leafy=true": {
+    "axis=x,leafy=false,dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_log",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log2",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log3",
+        "x": 90,
+        "y": 90
+      }
+    ],
+    "axis=x,leafy=false,dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_log",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log2",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log3",
+        "x": 90,
+        "y": 90
+      }
+    ],
+    "axis=x,leafy=false,dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_log",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log2",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log3",
+        "x": 90,
+        "y": 90
+      }
+    ],
+    "axis=y,leafy=true,dry=0": {
       "model": "oasiso:block/tooth_log_leafy_y"
     },
-    "axis=x,leafy=true": [
+    "axis=y,leafy=true,dry=1": {
+      "model": "oasiso:block/wilting1_tooth_log_leafy_y"
+    },
+    "axis=y,leafy=true,dry=2": {
+      "model": "oasiso:block/wilting2_tooth_log_leafy_y"
+    },
+    "axis=y,leafy=true,dry=3": {
+      "model": "oasiso:block/dry_tooth_log_leafy_y"
+    },
+    "axis=x,leafy=true,dry=0": [
       {
         "model": "oasiso:block/tooth_log_leafy_z",
         "y": 90
@@ -59,7 +194,49 @@
         "y": 90
       }
     ],
-    "axis=z,leafy=true": [
+    "axis=x,leafy=true,dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z2",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z3",
+        "y": 90
+      }
+    ],
+    "axis=x,leafy=true,dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z2",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z3",
+        "y": 90
+      }
+    ],
+    "axis=x,leafy=true,dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z2",
+        "y": 90
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z3",
+        "y": 90
+      }
+    ],
+    "axis=z,leafy=true,dry=0": [
       {
         "model": "oasiso:block/tooth_log_leafy_z"
       },
@@ -68,6 +245,39 @@
       },
       {
         "model": "oasiso:block/tooth_log_leafy_z3"
+      }
+    ],
+    "axis=z,leafy=true,dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z2"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_log_leafy_z3"
+      }
+    ],
+    "axis=z,leafy=true,dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z2"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_log_leafy_z3"
+      }
+    ],
+    "axis=z,leafy=true,dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z2"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_log_leafy_z3"
       }
     ]
   }

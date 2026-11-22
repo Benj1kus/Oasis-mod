@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.block;
 
+import net.minecraft.world.level.block.state.StateDefinition;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.registry.ModKarakFluids;
 import net.minecraft.core.BlockPos;
@@ -20,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 public class PipusBlock extends Block {
     public PipusBlock(Properties properties) {
         super(properties);
+        registerDefaultState(defaultBlockState().setValue(FeralDrying.DRY, 0));
     }
 
     private static boolean isKarak(FluidState fluid) {
@@ -29,6 +31,12 @@ public class PipusBlock extends Block {
     private void wake(LevelAccessor level, BlockPos pos) {
         if (!level.isClientSide() && isKarak(level.getFluidState(pos.above())) && !level.getBlockTicks().hasScheduledTick(pos, this))
             level.scheduleTick(pos, this, 1);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(FeralDrying.DRY);
     }
 
     @Override

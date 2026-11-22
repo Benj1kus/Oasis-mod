@@ -1,0 +1,10 @@
+{
+  "parent": "oasiso:block/tooth_log_leafy_z",
+  "textures": {
+    "end": "oasiso:block/wilting2_tooth_log_top",
+    "top": "oasiso:block/wilting2_tooth_grass_top",
+    "grass": "oasiso:block/wilting2_tooth_log_grass_horiz",
+    "bark": "oasiso:block/wilting2_tooth_log",
+    "particle": "oasiso:block/wilting2_tooth_log"
+  }
+}

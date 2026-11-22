@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/gluminus",
+  "textures": {
+    "0": "oasiso:block/wilting2_gluminus",
+    "particle": "oasiso:block/wilting2_gluminus"
+  },
+  "render_type": "minecraft:cutout"
+}

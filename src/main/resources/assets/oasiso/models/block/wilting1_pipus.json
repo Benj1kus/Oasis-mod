@@ -1,0 +1,8 @@
+{
+  "parent": "oasiso:block/pipus",
+  "textures": {
+    "0": "oasiso:block/wilting1_pipus",
+    "particle": "oasiso:block/wilting1_pipus"
+  },
+  "render_type": "minecraft:cutout"
+}

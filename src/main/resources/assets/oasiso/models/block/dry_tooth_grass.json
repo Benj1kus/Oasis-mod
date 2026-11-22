@@ -1,0 +1,11 @@
+{
+  "parent": "oasiso:block/tooth_grass",
+  "textures": {
+    "particle": "oasiso:block/dry_tooth_grass_side",
+    "bottom": "oasiso:block/kr_stone",
+    "top": "oasiso:block/dry_tooth_grass_top",
+    "side": "oasiso:block/dry_tooth_grass_side",
+    "overlay": "oasiso:block/dry_tooth_grass_overlay"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

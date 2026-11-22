@@ -78,8 +78,13 @@
 					]
 				},
 				{
-					"name": "head",
+					"name": "head_look",
 					"parent": "neck",
+					"pivot": [0, 15, -1]
+				},
+				{
+					"name": "head",
+					"parent": "head_look",
 					"pivot": [0, 15, -1],
 					"cubes": [
 						{"origin": [-4, 12, -3], "size": [8, 8, 2], "uv": [20, 0]}

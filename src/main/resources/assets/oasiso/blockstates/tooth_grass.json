@@ -1,6 +1,6 @@
 {
   "variants": {
-    "": [
+    "dry=0": [
       {
         "model": "oasiso:block/tooth_grass"
       },
@@ -24,6 +24,84 @@
       },
       {
         "model": "oasiso:block/tooth_grass_t4_s2"
+      }
+    ],
+    "dry=1": [
+      {
+        "model": "oasiso:block/wilting1_tooth_grass"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t1_s2"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t2_s1"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t2_s2"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t3_s1"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t3_s2"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t4_s1"
+      },
+      {
+        "model": "oasiso:block/wilting1_tooth_grass_t4_s2"
+      }
+    ],
+    "dry=2": [
+      {
+        "model": "oasiso:block/wilting2_tooth_grass"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t1_s2"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t2_s1"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t2_s2"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t3_s1"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t3_s2"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t4_s1"
+      },
+      {
+        "model": "oasiso:block/wilting2_tooth_grass_t4_s2"
+      }
+    ],
+    "dry=3": [
+      {
+        "model": "oasiso:block/dry_tooth_grass"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t1_s2"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t2_s1"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t2_s2"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t3_s1"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t3_s2"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t4_s1"
+      },
+      {
+        "model": "oasiso:block/dry_tooth_grass_t4_s2"
       }
     ]
   }

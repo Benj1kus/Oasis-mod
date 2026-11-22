@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "oasiso:tooth_leaves",
+    "oasiso:tooth_grass",
+    "oasiso:tooth_log",
+    "oasiso:tooth_roots",
+    "oasiso:tooth_bush",
+    "oasiso:toothy_plant",
+    "oasiso:tongue_plant",
+    "oasiso:tooth_smallgrass",
+    "oasiso:tooth_vine",
+    "oasiso:feral_petals",
+    "oasiso:small_palm",
+    "oasiso:muscipula",
+    "oasiso:prototaxites",
+    "oasiso:gluminus",
+    "oasiso:lily",
+    "oasiso:pipus"
+  ]
+}
