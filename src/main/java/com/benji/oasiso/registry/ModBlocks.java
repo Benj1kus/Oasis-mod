@@ -130,15 +130,16 @@ public final class ModBlocks {
     public static final RegistryObject<Block> TONGUE_PLANT = BLOCKS.register("tongue_plant", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
     public static final RegistryObject<Block> TOOTH_SMALLGRASS = BLOCKS.register("tooth_smallgrass", () -> new ToothFlowerBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).replaceable().instabreak().noOcclusion()));
     public static final RegistryObject<Block> TOOTH_VINE = BLOCKS.register("tooth_vine", () -> new ToothVineBlock(MobEffects.SATURATION, 1, BlockBehaviour.Properties.copy(Blocks.DANDELION).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> FERAL_SAPLING = BLOCKS.register("feral_sapling", () -> new com.benji.oasiso.common.block.FeralSaplingBlock(BlockBehaviour.Properties.copy(Blocks.DANDELION).replaceable().instabreak().noOcclusion().randomTicks()));
 
     public static final RegistryObject<Block> FERAL_PETALS = BLOCKS.register("feral_petals", () -> new FeralBigGrassBlock(BlockBehaviour.Properties.copy(Blocks.TALL_GRASS).noCollission().instabreak().noOcclusion()));
     public static final RegistryObject<Block> SMALL_PALM = BLOCKS.register("small_palm", () -> new FeralBigGrassBlock(BlockBehaviour.Properties.copy(Blocks.TALL_GRASS).noCollission().instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> MUSCIPULA = BLOCKS.register("muscipula", () -> new MuscipulaBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.GRASS).noCollission().noOcclusion().randomTicks().strength(0.2F)));
     public static final RegistryObject<Block> PROTOTAXITES = BLOCKS.register("prototaxites", () -> new ProtoBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).noOcclusion().strength(0.5F)));
-    public static final RegistryObject<Block> GLUMINUS = BLOCKS.register("gluminus", () -> new GlumBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTS).lightLevel(state -> 5).noOcclusion().strength(0.2F)));
-    public static final RegistryObject<Block> LILY = BLOCKS.register("lily", () -> new LilyBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTS).noOcclusion().instabreak())
-    );    public static final RegistryObject<Block> PIPUS = BLOCKS.register("pipus", () -> new PipusBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTS).noOcclusion().randomTicks().strength(0.5F)));
+    public static final RegistryObject<Block> GLUMINUS = BLOCKS.register("gluminus", () -> new GlumBlock(BlockBehaviour.Properties.of().sound(SoundType.ROOTS).lightLevel(state -> 5).noOcclusion().instabreak()));
+    public static final RegistryObject<Block> LILY = BLOCKS.register("lily", () -> new LilyBlock(BlockBehaviour.Properties.of().sound(SoundType.ROOTS).noOcclusion().instabreak()));
+    public static final RegistryObject<Block> PIPUS = BLOCKS.register("pipus", () -> new PipusBlock(BlockBehaviour.Properties.of().sound(SoundType.ROOTS).noOcclusion().randomTicks().instabreak()));
 
     public static final RegistryObject<Block> ENTROPY_BLOCK = BLOCKS.register("entropy_block", () -> new EntropyBlock(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK).lightLevel(state -> 20).strength(10.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> CHAOS_PORTAL = BLOCKS.register("chaos_portal", () -> new ChaosPortalBlock(BlockBehaviour.Properties.copy(Blocks.NETHER_PORTAL)));

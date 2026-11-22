@@ -1,0 +1,46 @@
+{
+  "items": [
+    "oasiso:fluwirus_head"
+  ],
+  "styles": {
+    "text": {
+      "palette": "oasiso:palettes/gold_orange",
+      "shine": true,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    },
+    "highlight": {
+      "palette": "oasiso:palettes/red",
+      "shine": true,
+      "glow": true,
+      "italic": false,
+      "bold": true
+    },
+    "fallback": {
+      "palette": "oasiso:palettes/red",
+      "shine": false,
+      "glow": false,
+      "italic": false,
+      "bold": false
+    }
+  },
+  "lines": [
+    {
+      "text": {
+        "translate": "tooltip.oasiso.fl"
+      },
+      "text_style": "text",
+      "highlights": [
+        {
+          "match": {
+            "translate": "tooltip.oasiso.fl1"
+          },
+          "fallback": "sort",
+          "style": "highlight"
+        }
+      ],
+      "missing_highlight_style": "fallback"
+    }
+  ]
+}

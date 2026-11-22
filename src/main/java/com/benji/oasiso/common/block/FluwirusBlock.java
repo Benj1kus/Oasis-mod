@@ -33,13 +33,17 @@ import java.util.function.BiFunction;
 @Mod.EventBusSubscriber(modid = "oasiso")
 public class FluwirusBlock extends BaseEntityBlock {
     public static final BooleanProperty CUTTING = BooleanProperty.create("cutting");
+    public static final BooleanProperty AWAKE = BooleanProperty.create("awake");
     private static final int CUT_TICKS = 65;
     private final BiFunction<BlockPos, BlockState, BlockEntity> blockEntityProvider;
 
     public FluwirusBlock(Properties properties, BiFunction<BlockPos, BlockState, BlockEntity> provider) {
         super(properties);
         blockEntityProvider = provider;
-        registerDefaultState(defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(CUTTING, false));
+        registerDefaultState(defaultBlockState()
+                .setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH)
+                .setValue(CUTTING, false)
+                .setValue(AWAKE, false));
     }
 
     public FluwirusBlock(Properties properties) {
@@ -58,7 +62,7 @@ public class FluwirusBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(HorizontalDirectionalBlock.FACING, CUTTING);
+        builder.add(HorizontalDirectionalBlock.FACING, CUTTING, AWAKE);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class FluwirusBlock extends BaseEntityBlock {
         if (!player.isShiftKeyDown()) return InteractionResult.PASS;
         if (level instanceof ServerLevel server && !state.getValue(CUTTING) && level.getBlockEntity(pos) instanceof FluwirusBlockEntity flower) {
             flower.setCollector(player.getUUID());
-            server.setBlock(pos, state.setValue(CUTTING, true), Block.UPDATE_CLIENTS);
+            server.setBlock(pos, state.setValue(CUTTING, true).setValue(AWAKE, false), Block.UPDATE_CLIENTS);
             server.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
             server.scheduleTick(pos, this, CUT_TICKS);
         }
@@ -98,7 +102,7 @@ public class FluwirusBlock extends BaseEntityBlock {
         if (!state.getValue(CUTTING) || !(level.getBlockEntity(pos) instanceof FluwirusBlockEntity flower)) return;
         Player player = flower.getCollector() == null ? null : level.getServer().getPlayerList().getPlayer(flower.getCollector());
         if (!level.removeBlock(pos, false)) return;
-        ItemStack reward = new ItemStack(ModItems.FLUWIRUS_ITEM.get());
+        ItemStack reward = new ItemStack(ModItems.FLUWIRUS_HEAD.get());
         if (player == null || !player.isAlive()) {
             popResource(level, pos, reward);
         } else if (!player.getInventory().add(reward)) {
@@ -116,7 +120,7 @@ public class FluwirusBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? createTickerHelper(type, ModBlockEntities.FLUWIRUS_BE.get(), FluwirusBlockEntity::lookTick) : null;
+        return createTickerHelper(type, ModBlockEntities.FLUWIRUS_BE.get(), FluwirusBlockEntity::lookTick);
     }
 
     @Override

@@ -43,6 +43,9 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> SOUL_CRACK2 = registerSoundEvent("soul_crack2");
     public static final RegistryObject<SoundEvent> SOUL_CRACK3 = registerSoundEvent("soul_crack3");
 
+    public static final RegistryObject<SoundEvent> FLUWIRUS_BOP = registerSoundEvent("fluwirus_bop");
+    public static final RegistryObject<SoundEvent> FLUWIRUS_CLEAN = registerSoundEvent("fluwirus_clean");
+
     public static final RegistryObject<SoundEvent> SOUL_IMPACT = registerSoundEvent("soul_impact");
 
     public static final RegistryObject<SoundEvent> WELL_IDLE = registerSoundEvent("well_idle");

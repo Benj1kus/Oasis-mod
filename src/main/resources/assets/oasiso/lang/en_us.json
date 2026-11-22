@@ -75,6 +75,7 @@
   "block.oasiso.soul_column": "Karak Stone Portal Column",
   "block.oasiso.soul_portal": "Soul Portal",
   "block.oasiso.fluwirus": "Fluwirus",
+  "block.oasiso.feral_sapling": "Feral Tree Sapling",
 
   "block.oasiso.nephritis_bricks": "Nephritis Bricks",
   "block.oasiso.nephritis_spiral": "Nephritis Spiral Block",
@@ -146,6 +147,7 @@
 
   "item.oasiso.kr_water_bucket": "Melted Nephritis Bucket",
   "item.oasiso.entropy_water_bucket": "Entropy Bucket",
+  "item.oasiso.fluwirus_head": "Fluwirus Head",
 
   "item.oasiso.seemless_curve_banner": "Hanging Order Banner",
   "block.oasiso.seemless_curve_banner": "Hanging Order Banner",
@@ -366,7 +368,7 @@
   "dialogue.oasiso.fluwirus.9": "Though my roots have spread across hundreds of blocks",
   "dialogue.oasiso.fluwirus.10": "so if you destroy me, the swamp will dry up :O",
   "dialogue.oasiso.fluwirus.11": "at least most of it... I hope...[br]I hate this place...",
-  "dialogue.oasiso.fluwirus.12": "But you can just pluck my head off [RMB],[br]and I\u0027ll always be with you!",
+  "dialogue.oasiso.fluwirus.12": "But you can just pluck my head off [SHIFT + RMB],[br]and I\u0027ll always be with you!",
   "dialogue.oasiso.fluwirus.13": "It\u0027s pretty boring down here,[br]so I like the second option better...",
 
   "gui.oasiso.science_store.title": "Science Store",
@@ -481,6 +483,8 @@
   "tooltip.oasiso.sol2": "8 Souls",
   "tooltip.oasiso.schest": "[H] for a special attack",
   "tooltip.oasiso.schest1": "[H]",
+  "tooltip.oasiso.fl": "Can sort items",
+  "tooltip.oasiso.fl1": "sort",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

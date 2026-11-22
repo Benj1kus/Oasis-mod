@@ -27,8 +27,11 @@ public class FluwirusModel extends GeoModel<FluwirusBlockEntity> {
         super.setCustomAnimations(flower, id, state);
         var look = getAnimationProcessor().getBone("head_look");
         if (look != null) {
-            look.setRotY(flower.lookYaw(state.getPartialTick()));
-            look.setRotX(flower.lookPitch(state.getPartialTick()));
+            boolean tracking = flower.isPlayingAwakeIdle(id);
+            float partial = state.getPartialTick();
+
+            look.setRotY(tracking ? flower.lookYaw(partial) : 0.0F);
+            look.setRotX(tracking ? flower.lookPitch(partial) : 0.0F);
         }
     }
 }

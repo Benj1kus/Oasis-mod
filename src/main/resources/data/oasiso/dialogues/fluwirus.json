@@ -39,7 +39,7 @@
   "source_invulnerable": true,
   "cancel_if_source_missing": true,
   "exclusive_source": true,
-  "once": "player",
+  "once": "session",
   "layout": {
     "canvas_width": 192,
     "canvas_height": 108,

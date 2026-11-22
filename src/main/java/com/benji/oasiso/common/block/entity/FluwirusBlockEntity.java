@@ -30,7 +30,6 @@ public final class FluwirusBlockEntity extends BlockEntity implements GeoBlockEn
     private static final RawAnimation CUT = RawAnimation.begin().thenPlayAndHold("cut");
 
     private UUID collector;
-    private boolean awake;
     private float previousYaw, yaw, previousPitch, pitch;
 
     public UUID getCollector() {
@@ -67,7 +66,20 @@ public final class FluwirusBlockEntity extends BlockEntity implements GeoBlockEn
                 }
             }
         }
-        flower.awake = nearest != null;
+        if (!level.isClientSide) {
+            boolean shouldWake = nearest != null;
+            if (state.getValue(FluwirusBlock.AWAKE) != shouldWake) {
+                level.setBlock(pos, state.setValue(FluwirusBlock.AWAKE, shouldWake),
+                        net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+            }
+            return;
+        }
+
+        if (!state.getValue(FluwirusBlock.AWAKE) || state.getValue(FluwirusBlock.CUTTING)) {
+            flower.previousYaw = flower.yaw = 0;
+            flower.previousPitch = flower.pitch = 0;
+            return;
+        }
         float targetYaw = 0, targetPitch = 0;
         if (nearest != null) {
             Direction facing = state.getValue(HorizontalDirectionalBlock.FACING);
@@ -100,10 +112,27 @@ public final class FluwirusBlockEntity extends BlockEntity implements GeoBlockEn
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "flower", 6, state -> {
-            boolean cutting = getBlockState().getValue(FluwirusBlock.CUTTING);
+            BlockState block = getBlockState();
+            boolean cutting = block.getValue(FluwirusBlock.CUTTING);
+            RawAnimation clip = cutting ? CUT : block.getValue(FluwirusBlock.AWAKE) ? AWAKE : SLEEP;
+
             state.getController().transitionLength(cutting ? 0 : 6);
-            return state.setAndContinue(cutting ? CUT : (awake ? AWAKE : SLEEP));
+            return state.setAndContinue(clip);
         }));
+    }
+
+    public boolean isPlayingAwakeIdle(long instanceId) {
+        BlockState block = getBlockState();
+        if (!block.getValue(FluwirusBlock.AWAKE) || block.getValue(FluwirusBlock.CUTTING)) {
+            return false;
+        }
+
+        var controller = cache.getManagerForId(instanceId)
+                .getAnimationControllers().get("flower");
+
+        return controller != null
+                && controller.getAnimationState() == AnimationController.State.RUNNING
+                && AWAKE.equals(controller.getCurrentRawAnimation());
     }
 
     @Override

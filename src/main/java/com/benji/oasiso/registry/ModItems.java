@@ -131,6 +131,7 @@ public final class ModItems {
     public static final RegistryObject<Item> TOOTH_GRASS_ITEM = ITEMS.register("tooth_grass", () -> new BlockItem(ModBlocks.TOOTH_GRASS.get(), new Item.Properties()));
     public static final RegistryObject<Item> TOOTH_LOG_ITEM = ITEMS.register("tooth_log", () -> new BlockItem(ModBlocks.TOOTH_LOG.get(), new Item.Properties()));
     public static final RegistryObject<Item> TOOTH_LEAVES_ITEM = ITEMS.register("tooth_leaves", () -> new BlockItem(ModBlocks.TOOTH_LEAVES.get(), new Item.Properties()));
+    public static final RegistryObject<Item> FERAL_SAPLING_ITEM = ITEMS.register("feral_sapling", () -> new BlockItem(ModBlocks.FERAL_SAPLING.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> MUSCIPULA_ITEM = ITEMS.register("muscipula", () -> new BlockItem(ModBlocks.MUSCIPULA.get(), new Item.Properties()));
     public static final RegistryObject<Item> FERAL_PETALS_ITEM = ITEMS.register("feral_petals", () -> new BlockItem(ModBlocks.FERAL_PETALS.get(), new Item.Properties()));
@@ -173,6 +174,7 @@ public final class ModItems {
     public static final RegistryObject<Item> VIBRIT_ITEM = ITEMS.register("vibrit", () -> new GeoBlockItem(ModBlocks.VIBRIT.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/vibrit.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/vibrit.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/vibrit.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
 
     public static final RegistryObject<Item> FLUWIRUS_ITEM = ITEMS.register("fluwirus", () -> new GeoBlockItem(ModBlocks.FLUWIRUS.get(), new Item.Properties(), ResourceLocation.fromNamespaceAndPath(MODID, "geo/fluwirus.geo.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/fluwirus.png"), ResourceLocation.fromNamespaceAndPath(MODID, "animations/fluwirus.animation.json"), ResourceLocation.fromNamespaceAndPath(MODID, "textures/block/empty.png")));
+    public static final RegistryObject<Item> FLUWIRUS_HEAD = ITEMS.register("fluwirus_head", () -> new FluwirusHeadItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> KARAKOLIT_INGOT = ITEMS.register("karakolit_ingot", () -> new Item(new Item.Properties().stacksTo(64)));
     public static final RegistryObject<Item> NEPHRITIS = ITEMS.register("nephritis", () -> new Item(new Item.Properties().stacksTo(16)));
