@@ -19,7 +19,7 @@ public final class RelaxFluidType extends FluidType {
         super(Properties.create()
                 .descriptionId("fluid_type.oasiso.relax_water")
                 .canSwim(true).canPushEntity(true).motionScale(0.014D)
-                .canDrown(true)
+                .canDrown(false)
                 .fallDistanceModifier(0.0F).supportsBoating(true)
                 .canExtinguish(true).canHydrate(false)
                 .canConvertToSource(true)

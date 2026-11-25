@@ -15,7 +15,7 @@ public final class RelaxFluidDamage {
     private static final int DAMAGE_INTERVAL = 0;
     private static final float DAMAGE = 0.0F;
 
-    @SubscribeEvent
+    
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide) return;
