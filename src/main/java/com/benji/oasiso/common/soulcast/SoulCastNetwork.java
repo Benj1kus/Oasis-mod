@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = "oasiso", bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class SoulCastNetwork {
-    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(ResourceLocation.fromNamespaceAndPath("oasiso", "soul_player_cast"), () -> "1", "1"::equals, "1"::equals);
+    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(ResourceLocation.fromNamespaceAndPath("oasiso", "soul_player_cast"), () -> "2", "2"::equals, "2"::equals);
 
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent e) {
@@ -48,16 +48,29 @@ public final class SoulCastNetwork {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), s);
     }
 
-    public record State(UUID player, long start, float yaw, boolean active) {
+    public record State(UUID player, long start, float yaw, boolean active, boolean chill) {
+        public State(UUID player, long start, float yaw, boolean active) {
+            this(player, start, yaw, active, false);
+        }
+
+        public int duration() {
+            return chill ? RelaxBath.DURATION : SoulCast.DURATION;
+        }
+
+        public int poseDuration() {
+            return chill ? RelaxBath.POSE_TICKS : SoulCast.DURATION;
+        }
+
         static void encode(State s, FriendlyByteBuf b) {
             b.writeUUID(s.player);
             b.writeLong(s.start);
             b.writeFloat(s.yaw);
             b.writeBoolean(s.active);
+            b.writeBoolean(s.chill);
         }
 
         static State decode(FriendlyByteBuf b) {
-            return new State(b.readUUID(), b.readLong(), b.readFloat(), b.readBoolean());
+            return new State(b.readUUID(), b.readLong(), b.readFloat(), b.readBoolean(), b.readBoolean());
         }
 
         static void handle(State s, Supplier<NetworkEvent.Context> c) {

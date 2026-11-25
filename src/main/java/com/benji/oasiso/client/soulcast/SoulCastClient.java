@@ -72,9 +72,9 @@ public final class SoulCastClient {
 
     private static SoulPlayerVisual visual(AbstractClientPlayer p) {
         var s = STATES.get(p.getUUID());
-        if (s == null || !p.isAlive() || !SoulCast.fullSet(p) || p.level().getGameTime() - s.start() >= SoulCast.DURATION)
+        if (s == null || !p.isAlive() || (!s.chill() && !SoulCast.fullSet(p)) || p.level().getGameTime() - s.start() >= s.poseDuration())
             return null;
-        return VISUALS.computeIfAbsent(p.getUUID(), k -> new SoulPlayerVisual(p, s.start(), s.yaw()));
+        return VISUALS.computeIfAbsent(p.getUUID(), k -> new SoulPlayerVisual(p, s.start(), s.yaw(), s.chill()));
     }
 
     @SubscribeEvent
@@ -83,7 +83,7 @@ public final class SoulCastClient {
         checkWorld();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
-        STATES.values().removeIf(s -> mc.level.getGameTime() - s.start() >= SoulCast.DURATION);
+        STATES.values().removeIf(s -> mc.level.getGameTime() - s.start() >= s.duration());
         VISUALS.keySet().removeIf(id -> !STATES.containsKey(id));
         while (KEY.consumeClick()) {
             if (mc.screen == null && mc.getCameraEntity() == mc.player && !STATES.containsKey(mc.player.getUUID()) && SoulCast.fullSet(mc.player) && mc.level.getGameTime() - requestAt >= 5) {
@@ -93,10 +93,9 @@ public final class SoulCastClient {
         }
         // A tracked player may be outside the view frustum at the marker.
         for (var id : STATES.keySet()) {
-            if (mc.level.getPlayerByUUID(id) instanceof AbstractClientPlayer actor
-                    && actor.distanceToSqr(mc.player) <= SoulStrikeEffects.VIEW_DISTANCE_SQR) {
+            if (mc.level.getPlayerByUUID(id) instanceof AbstractClientPlayer actor && actor.distanceToSqr(mc.player) <= SoulStrikeEffects.VIEW_DISTANCE_SQR) {
                 var cast = visual(actor);
-                if (cast != null && !cast.strikePlayed) cast.prepare();
+                if (cast != null && !cast.chill && !cast.strikePlayed) cast.prepare();
             }
         }
         if (visual(mc.player) == null) restore();
@@ -113,7 +112,7 @@ public final class SoulCastClient {
             restore();
             return;
         }
-        if (!a.strikePlayed) a.prepare();
+        if (!a.chill && !a.strikePlayed) a.prepare();
         if (camera == null) {
             if (mc.getCameraEntity() != mc.player) return;
             oldCamera = mc.getCameraEntity();
@@ -138,7 +137,7 @@ public final class SoulCastClient {
         Vector3f up = head.transformDirection(new Vector3f(0, 1, 0)).normalize();
         float yaw = (float) Math.toDegrees(Math.atan2(-forward.x, forward.z));
         float pitch = (float) Math.toDegrees(-Math.asin(Mth.clamp(forward.y, -1, 1)));
-        float age = (float) a.age(), mix = Math.min(1, Math.min(age / 3F, (SoulCast.DURATION - age) / 3F));
+        float age = (float) a.age(), mix = Math.min(1, Math.min(age / 3F, ((a.chill ? RelaxBath.POSE_TICKS : SoulCast.DURATION) - age) / 3F));
         mix = Mth.clamp(mix, 0, 1);
         mix = mix * mix * (3 - 2 * mix);
         float part = mc.getFrameTime();
@@ -154,6 +153,14 @@ public final class SoulCastClient {
         moveCamera(target, yaw, pitch);
         mc.player.setYRot(a.yaw);
         mc.player.setXRot(oldPitch);
+    }
+
+    static float blinkClosure(float partialTick) {
+        Minecraft mc = Minecraft.getInstance();
+        if (level != mc.level || mc.player == null || !mc.player.isAlive()) return 0;
+        var state = STATES.get(mc.player.getUUID());
+        if (state == null || !state.chill()) return 0;
+        return RelaxBath.closure((level.getGameTime() - state.start()) + partialTick);
     }
 
     private static void moveCamera(Vec3 eye, float yaw, float pitch) {

@@ -73,6 +73,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> KR_SMALLGRASS = BLOCKS.register("kr_smallgrass", () -> new KarakSmallGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).instabreak().noOcclusion()));
     public static final RegistryObject<LiquidBlock> ENTROPY_WATER = BLOCKS.register("entropy_water", () -> new LiquidBlock(ModKarakFluids.ENTROPY_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).emissiveRendering((state, level, pos) -> true).hasPostProcess((state, level, pos) -> true).lightLevel(state -> 10).noLootTable()));
     public static final RegistryObject<Block> ENTROPY_LANTERN = BLOCKS.register("entropy_lantern", () -> new EntropyLanternBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.BASALT).strength(5.0F).lightLevel(state -> 20).requiresCorrectToolForDrops().noOcclusion()));
+    public static final RegistryObject<LiquidBlock> RELAX_WATER = BLOCKS.register("relax_water", () -> new LiquidBlock(ModKarakFluids.RELAX_WATER, BlockBehaviour.Properties.copy(Blocks.WATER).lightLevel(state -> 10).noLootTable()));
 
     public static final RegistryObject<Block> NEPHRITIS_COLUMN = BLOCKS.register("nephritis_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(6.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> NEPHRITIS_BRICKS = BLOCKS.register("nephritis_bricks", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(8.0F).requiresCorrectToolForDrops()));

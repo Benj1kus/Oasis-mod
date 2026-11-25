@@ -17,6 +17,7 @@ import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 
@@ -49,8 +50,10 @@ public final class JadeSmoke {
     }
 
     private static boolean exposed(BlockPos p) {
-        return world.getFluidState(p).getFluidType() == ModKarakFluids.KR_WATER_TYPE.get() && world.getBlockState(p.above()).isAir();
+        FluidType type = world.getFluidState(p).getFluidType();
+        return (type == ModKarakFluids.KR_WATER_TYPE.get() || type == ModKarakFluids.RELAX_WATER_TYPE.get()) && world.getBlockState(p.above()).isAir();
     }
+
 
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) {

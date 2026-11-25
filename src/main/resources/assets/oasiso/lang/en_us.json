@@ -148,6 +148,7 @@
   "item.oasiso.kr_water_bucket": "Melted Nephritis Bucket",
   "item.oasiso.entropy_water_bucket": "Entropy Bucket",
   "item.oasiso.fluwirus_head": "Fluwirus Head",
+  "item.oasiso.relax_water_bucket": "Melted Relaxit Bucket",
 
   "item.oasiso.seemless_curve_banner": "Hanging Order Banner",
   "block.oasiso.seemless_curve_banner": "Hanging Order Banner",
@@ -262,6 +263,7 @@
   "entity.oasiso.anger": "Anger",
   "entity.oasiso.grave_soul": "Grave Soul",
   "entity.oasiso.soul_guardian": "Soul Guardian",
+  "entity.oasiso.qui": "Qui",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",

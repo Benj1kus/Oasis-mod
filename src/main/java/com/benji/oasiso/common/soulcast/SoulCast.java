@@ -28,11 +28,15 @@ public final class SoulCast {
         return p.getItemBySlot(EquipmentSlot.HEAD).is(ModItems.SOUL_HELMET.get()) && p.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.SOUL_CHESTPLATE.get()) && p.getItemBySlot(EquipmentSlot.LEGS).is(ModItems.SOUL_LEGGINGS.get()) && p.getItemBySlot(EquipmentSlot.FEET).is(ModItems.SOUL_BOOTS.get());
     }
 
+    static boolean isCasting(ServerPlayer p) {
+        return ACTIVE.containsKey(p.getUUID());
+    }
+
     public static void start(ServerPlayer p) {
         var chestplate = ModItems.SOUL_CHESTPLATE.get();
         var cooldowns = p.getCooldowns();
 
-        if (cooldowns.isOnCooldown(chestplate) || ACTIVE.containsKey(p.getUUID()) || !fullSet(p) || !p.isAlive() || p.isSpectator() || p.isPassenger() || p.isSleeping() || p.isFallFlying()) {
+        if (RelaxBath.isActive(p) || cooldowns.isOnCooldown(chestplate) || ACTIVE.containsKey(p.getUUID()) || !fullSet(p) || !p.isAlive() || p.isSpectator() || p.isPassenger() || p.isSleeping() || p.isFallFlying()) {
             return;
         }
 

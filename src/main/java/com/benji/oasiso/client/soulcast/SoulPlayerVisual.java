@@ -27,11 +27,15 @@ final class SoulPlayerVisual implements GeoAnimatable {
     final long id = IDS.incrementAndGet(), start;
     final float yaw;
     final AbstractClientPlayer player;
+    private static final RawAnimation SUMMON = RawAnimation.begin().thenPlay("summon_souls");
+    private static final RawAnimation CHILL = RawAnimation.begin().thenPlayAndHold("chill");
+    final boolean chill;
     boolean priming = true;
     boolean strikePlayed;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    SoulPlayerVisual(AbstractClientPlayer p, long start, float yaw) {
+    SoulPlayerVisual(AbstractClientPlayer p, long start, float yaw, boolean chill) {
+        this.chill = chill;
         this.player = p;
         this.start = start;
         this.yaw = yaw;
@@ -53,7 +57,7 @@ final class SoulPlayerVisual implements GeoAnimatable {
     }
 
     public void registerControllers(AnimatableManager.ControllerRegistrar c) {
-        c.add(new AnimationController<SoulPlayerVisual>(this, "summon", 0, s -> s.setAndContinue(RawAnimation.begin().thenPlay("summon_souls"))) {
+        c.add(new AnimationController<SoulPlayerVisual>(this, "summon", 0, s -> s.setAndContinue(chill ? CHILL : SUMMON)) {
             @Override
             protected double adjustTick(double tick) {
                 super.adjustTick(tick);
@@ -61,7 +65,7 @@ final class SoulPlayerVisual implements GeoAnimatable {
             }
         }.setCustomInstructionKeyframeHandler(event -> {
             var key = event.getKeyframeData();
-            if (!strikePlayed && !priming) {
+            if (!chill && !strikePlayed && !priming) {
                 for (String instruction : key.getInstructions().split(";")) {
                     if ("soul_summon".equals(instruction.trim())) {
                         strikePlayed = true;

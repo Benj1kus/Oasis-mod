@@ -269,6 +269,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.QUI.get(),
+                QuiRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 ModEntities.ENTROPY_CREATURE.get(),
                 EntropyCreatureRenderer::new
         );

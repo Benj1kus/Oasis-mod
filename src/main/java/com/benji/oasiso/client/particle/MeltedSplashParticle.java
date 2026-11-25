@@ -9,11 +9,6 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 
-/**
- * Six-frame 8x8 molten-nephritis splash animation.
- * The supplied sprite art already moves lower-left -> upper-right; physics only
- * gives the droplet a small ballistic arc and fade.
- */
 public class MeltedSplashParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;

@@ -1,0 +1,11 @@
+{
+  "vertex": "oasiso:relax_blink",
+  "fragment": "oasiso:relax_blink",
+  "attributes": ["Position", "UV0"],
+  "samplers": [{"name":"Sampler0"}],
+  "blend": {"func":"add","srcrgb":"srcalpha","dstrgb":"1-srcalpha"},
+  "uniforms": [
+    {"name":"Closure","type":"float","count":1,"values":[0]},
+    {"name":"HasTexture","type":"float","count":1,"values":[0]}
+  ]
+}

@@ -443,6 +443,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.QUI.get(), QuiEntity.createAttributes().build());
             event.put(ModEntities.SOUL_GUARDIAN.get(), SoulGuardianEntity.createAttributes().build());
             event.put(ModEntities.GRAVE_SOUL.get(), GraveSoulEntity.createAttributes().build());
             event.put(ModEntities.HAPPINESS.get(), HappinessEntity.createAttributes().build());

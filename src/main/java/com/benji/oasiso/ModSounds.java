@@ -19,6 +19,8 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP = registerSoundEvent("entropy_water_loop");
     public static final RegistryObject<SoundEvent> ENTROPY_WATER_LOOP_UNDER = registerSoundEvent("entropy_water_loop_under");
 
+    public static final RegistryObject<SoundEvent> HEAL = registerSoundEvent("heal");
+
     //CUSTOM INNER VOICES
     public static final RegistryObject<SoundEvent> BEAST = registerSoundEvent("beast");
     public static final RegistryObject<SoundEvent> SPRINGV = registerSoundEvent("springv");

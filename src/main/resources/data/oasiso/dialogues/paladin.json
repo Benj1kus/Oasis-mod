@@ -158,7 +158,7 @@
   "lines": [
     {
       "text": "dialogue.oasiso.paladin.1",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_idle.png",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_a.png",
       "markdown": false,
       "rich_regions": [
         {
@@ -181,7 +181,7 @@
     },
     {
       "text": "dialogue.oasiso.paladin.2",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_move1.png",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_c.png",
       "rich_regions": [
         {
           "name": "Region 1",
@@ -201,7 +201,7 @@
     },
     {
       "text": "dialogue.oasiso.paladin.3",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_stink.png",
+      "sprite": "oasiso:textures/gui/dialogue/paladin_b.png",
       "rich_regions": [
         {
           "name": "Something stinks...",
@@ -224,15 +224,15 @@
     },
     {
       "text": "dialogue.oasiso.paladin.4",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_oops.png"
+      "sprite": "oasiso:textures/gui/dialogue/paladin_a.png"
     },
     {
       "text": "dialogue.oasiso.paladin.5",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_move1.png"
+      "sprite": "oasiso:textures/gui/dialogue/paladin_b.png"
     },
     {
       "text": "dialogue.oasiso.paladin.6",
-      "sprite": "oasiso:textures/gui/dialogue/paladin_sprite_move2.png"
+      "sprite": "oasiso:textures/gui/dialogue/paladin_d.png"
     }
   ],
   "graph_enabled": false,

@@ -171,7 +171,7 @@
   "lines": [
     {
       "text": "dialogue.oasiso.scien.1",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist.gif",
+      "sprite": "oasiso:textures/gui/dialogue/science_def.png",
       "rich_regions": [
         {
           "name": "enemy",
@@ -195,17 +195,17 @@
     },
     {
       "text": "dialogue.oasiso.scien.2",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist2.gif",
+      "sprite": "oasiso:textures/gui/dialogue/science_upset.png",
       "sprite_position": "left"
     },
     {
       "text": "dialogue.oasiso.scien.3",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist3.gif",
+      "sprite": "oasiso:textures/gui/dialogue/science_torg.png",
       "sprite_position": "right"
     },
     {
       "text": "dialogue.oasiso.scien.4",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist.gif",
+      "sprite": "oasiso:textures/gui/dialogue/science_happy.png",
       "markdown": true,
       "rich_regions": [
         {
@@ -239,11 +239,11 @@
     },
     {
       "text": "dialogue.oasiso.scien.5",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist2.gif"
+      "sprite": "oasiso:textures/gui/dialogue/science_torg.png"
     },
     {
       "text": "dialogue.oasiso.scien.6",
-      "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist3.gif"
+      "sprite": "oasiso:textures/gui/dialogue/science_def.png"
     }
   ],
   "graph_enabled": true,
@@ -253,7 +253,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.1",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist.gif",
+        "sprite": "oasiso:textures/gui/dialogue/science_def.png",
         "rich_regions": [
           {
             "name": "enemy",
@@ -284,7 +284,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.2",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist2.gif",
+        "sprite": "oasiso:textures/gui/dialogue/science_upset.png",
         "sprite_position": "left"
       },
       "next": "line_3",
@@ -296,7 +296,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.3",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist3.gif",
+        "sprite": "oasiso:textures/gui/dialogue/science_torg.png",
         "sprite_position": "right"
       },
       "next": "line_4",
@@ -308,7 +308,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.4",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist.gif",
+        "sprite": "oasiso:textures/gui/dialogue/science_happy.png",
         "markdown": true,
         "rich_regions": [
           {
@@ -345,7 +345,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.5",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist2.gif"
+        "sprite": "oasiso:textures/gui/dialogue/science_torg.png"
       },
       "next": "line_6",
       "choices": [],
@@ -356,7 +356,7 @@
       "type": "line",
       "line": {
         "text": "dialogue.oasiso.scien.6",
-        "sprite": "oasiso:textures/gui/dialogue/crusader_sciencist3.gif"
+        "sprite": "oasiso:textures/gui/dialogue/science_def.png"
       },
       "next": "event",
       "choices": [],

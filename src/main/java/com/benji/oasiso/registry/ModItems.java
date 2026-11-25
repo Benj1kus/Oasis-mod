@@ -55,6 +55,7 @@ public final class ModItems {
     public static final RegistryObject<Item> SOUL_PCORE_ITEM = ITEMS.register("soul_pcore", () -> new BlockItem(ModBlocks.SOUL_PCORE.get(), new Item.Properties()));
     public static final RegistryObject<Item> SOUL_CLOUD_ITEM = ITEMS.register("soul_cloud", () -> new BlockItem(ModBlocks.SOUL_CLOUD.get(), new Item.Properties()));
     public static final RegistryObject<Item> SOUL_PORTAL_ITEM = ITEMS.register("soul_portal", () -> new BlockItem(ModBlocks.SOUL_PORTAL.get(), new Item.Properties()));
+    public static final RegistryObject<Item> RELAX_WATER_BUCKET = ITEMS.register("relax_water_bucket", () -> new BucketItem(ModKarakFluids.RELAX_WATER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
     public static final RegistryObject<Item> KRS_COLUMN_ITEM = ITEMS.register("krs_column", () -> new BlockItem(ModBlocks.KRS_COLUMN.get(), new Item.Properties()));
     public static final RegistryObject<Item> KRS_BRICKS_ITEM = ITEMS.register("krs_bricks", () -> new BlockItem(ModBlocks.KRS_BRICKS.get(), new Item.Properties()));
