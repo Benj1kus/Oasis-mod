@@ -196,6 +196,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> FACTORY_CORE_PART = BLOCKS.register("factory_core_part", () -> new FactoryCorePartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion().noLootTable()));
 
     public static final RegistryObject<Block> FLUWIRUS = BLOCKS.register("fluwirus", () -> new FluwirusBlock(BlockBehaviour.Properties.copy(Blocks.STONE).noCollission().sound(SoundType.FLOWERING_AZALEA).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> CRUSADER_SKEL = BLOCKS.register("crusader_skel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).noCollission().sound(SoundType.BONE_BLOCK).instabreak().noOcclusion()));
 
     public static final RegistryObject<Block> VIBRIT = BLOCKS.register("vibrit", () -> new VibritBlock(BlockBehaviour.Properties.of().sound(SoundType.BASALT).instabreak().noOcclusion()));
 

@@ -129,6 +129,12 @@
   "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
 
 
+  "qui_idle1": { "sounds": [ "oasiso:qui_idle1" ] },
+  "qui_idle2": { "sounds": [ "oasiso:qui_idle2" ] },
+  "qui_idle3": { "sounds": [ "oasiso:qui_idle3" ] },
+  "qui_hurt": { "sounds": [ "oasiso:qui_hurt" ] },
+  "qui_death": { "sounds": [ "oasiso:qui_death" ] },
+
   "soul_idle1": { "sounds": [ "oasiso:soul_idle1" ] },
   "soul_idle2": { "sounds": [ "oasiso:soul_idle2" ] },
   "soul_idle3": { "sounds": [ "oasiso:soul_idle3" ] },

@@ -1,12 +1,23 @@
 package com.benji.oasiso.common.entity;
 
+import com.benji.oasiso.registry.ModItems;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemUtils;
+import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
@@ -77,6 +88,17 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
         entityData.define(TO_TILT, 0.0F);
         entityData.define(TURN_START, -1L);
         entityData.define(START, -1L);
+    }
+
+    @Override
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+        if (!held.is(Items.BUCKET)) return super.mobInteract(player, hand);
+        if (!level().isClientSide) {
+            playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);
+            player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, new ItemStack(ModItems.QUI_MILK_BUCKET.get())));
+        }
+        return InteractionResult.sidedSuccess(level().isClientSide);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -301,6 +323,24 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
             lastIdleCycle = cycle;
             return state.setAndContinue(asleep ? SLEEP : IDLE);
         }));
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+
+        SoundEvent[] sounds = {ModSounds.QUI_IDLE1.get(), ModSounds.QUI_IDLE2.get(), ModSounds.QUI_IDLE3.get()};
+
+        return sounds[this.random.nextInt(sounds.length)];
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return ModSounds.QUI_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.QUI_DEATH.get();
     }
 
     @Override

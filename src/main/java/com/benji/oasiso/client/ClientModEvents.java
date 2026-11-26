@@ -434,6 +434,11 @@ public class ClientModEvents {
         );
 
         event.registerBlockEntityRenderer(
+                ModBlockEntities.CRUSADER_SKEL_BE.get(),
+                CrusaderSkelRenderer::new
+        );
+
+        event.registerBlockEntityRenderer(
                 ModBlockEntities.WINDMILL_BE.get(),
                 WindmillRenderer::new
         );

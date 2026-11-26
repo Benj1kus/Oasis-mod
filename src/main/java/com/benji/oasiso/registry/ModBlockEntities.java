@@ -13,6 +13,7 @@ public final class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Oasiso.MODID);
 
     public static final RegistryObject<BlockEntityType<KrColumnCoreBlockEntity>> KR_COLUMN_CORE_BE = BLOCK_ENTITIES.register("kr_column_core", () -> BlockEntityType.Builder.of(KrColumnCoreBlockEntity::new, ModBlocks.KR_COLUMN_CORE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CrusaderSkelBlockEntity>> CRUSADER_SKEL_BE = BLOCK_ENTITIES.register("crusader_skel", () -> BlockEntityType.Builder.of(CrusaderSkelBlockEntity::new, ModBlocks.CRUSADER_SKEL.get()).build(null));
     public static final RegistryObject<BlockEntityType<CleanGeoBlockEntity>> CLEAN_GEO_BE = BLOCK_ENTITIES.register("clean_geo", () -> BlockEntityType.Builder.of(CleanGeoBlockEntity::new, ModBlocks.GUILTY_EYE.get()).build(null));
     public static final RegistryObject<BlockEntityType<FluwirusBlockEntity>> FLUWIRUS_BE = BLOCK_ENTITIES.register("fluwirus", () -> BlockEntityType.Builder.of(FluwirusBlockEntity::new, ModBlocks.FLUWIRUS.get()).build(null));
     public static final RegistryObject<BlockEntityType<VibritBlockEntity>> VIBRIT_BE = BLOCK_ENTITIES.register("vibrit", () -> BlockEntityType.Builder.of(VibritBlockEntity::new, ModBlocks.VIBRIT.get()).build(null));

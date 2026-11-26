@@ -144,6 +144,7 @@
   "block.oasiso.entropy_soil_stairs": "Entropy Soil Stairs",
   "block.oasiso.entropy_soil_wall": "Entropy Soil Wall",
   "block.oasiso.war_sword": "War Sword",
+  "block.oasiso.crusader_skel": "Pile of Bones",
 
   "item.oasiso.kr_water_bucket": "Melted Nephritis Bucket",
   "item.oasiso.entropy_water_bucket": "Entropy Bucket",
@@ -198,6 +199,7 @@
   "item.oasiso.science_heart": "Science Heart",
   "item.oasiso.corerem": "Corerem Amulet",
   "item.oasiso.war_core": "Core of the War's Souls",
+  "item.oasiso.qui_milk_bucket": "Qui Milk Bucket",
 
   "gui.oasiso.corerem.cooldown": "Amulet: %ss",
   "message.oasiso.corerem.recharging": "All emotions are recharging",
@@ -223,6 +225,7 @@
   "item.oasiso.apollyon_spawn_egg": "Apollyon Spawn Egg",
   "item.oasiso.cscience_spawn_egg": "Crusader Scientist Spawn Egg",
   "item.oasiso.giver_spawn_egg": "Soulgiver Spawn Egg",
+  "item.oasiso.qui_spawn_egg": "Qui Spawn Egg",
 
   "item.oasiso.config_scroll": "Config Scroll",
 
@@ -517,6 +520,7 @@
   "message.oasiso_portal.space": "No empty 48x15x48 space was found 40–50 blocks above the portal. Build the entrance lower or elsewhere.",
   "message.oasiso_portal.return_blocked": "The return point is obstructed. Clear the original portal or the ground beside it.",
 
+  "effect.oasiso.air_rush": "Air Rush",
   "effect.oasiso.doom": "Doom",
   "effect.oasiso.fault": "Fault",
   "effect.oasiso.chaos_chamber": "Chaos Chamber",
