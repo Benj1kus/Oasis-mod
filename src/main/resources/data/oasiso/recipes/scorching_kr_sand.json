@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "experience": 5,
+  "cookingtime": 40,
+  "ingredient":{
+    "item":"oasiso:kr_sand"
+  },
+  "result": "oasiso:scorching_kr_sand"
+}

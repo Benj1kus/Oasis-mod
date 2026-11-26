@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "minecraft:smooth_sandstone"
+      "item": "oasiso:scorching_kr_sand"
     },
     {
       "item": "minecraft:brown_dye"

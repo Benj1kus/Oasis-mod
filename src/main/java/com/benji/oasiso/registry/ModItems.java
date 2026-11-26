@@ -40,6 +40,7 @@ public final class ModItems {
 
 
     public static final RegistryObject<Item> KR_SAND_ITEM = ITEMS.register("kr_sand", () -> new BlockItem(ModBlocks.KR_SAND.get(), new Item.Properties()));
+    public static final RegistryObject<Item> SCORCHING_KR_SAND_ITEM = ITEMS.register("scorching_kr_sand", () -> new BlockItem(ModBlocks.SCORCHING_KR_SAND.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_GRASS_ITEM = ITEMS.register("kr_grass", () -> new BlockItem(ModBlocks.KR_GRASS.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_STONE_ITEM = ITEMS.register("kr_stone", () -> new BlockItem(ModBlocks.KR_STONE.get(), new Item.Properties()));
     public static final RegistryObject<Item> KR_SANDGRASS_ITEM = ITEMS.register("kr_sandgrass", () -> new BlockItem(ModBlocks.KR_SANDGRASS.get(), new Item.Properties()));

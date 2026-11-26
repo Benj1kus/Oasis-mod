@@ -2,7 +2,7 @@
   "parent": "minecraft:block/cube_column",
   "textures": {
     "particle": "oasiso:block/sandstone_azazel",
-    "end": "minecraft:block/sandstone_top",
+    "end": "oasiso:block/scorching_kr_sand",
     "side": "oasiso:block/sandstone_azazel"
   }
 }

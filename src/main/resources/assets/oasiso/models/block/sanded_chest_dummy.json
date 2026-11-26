@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "oasiso:block/sandstone_column"
+    "particle": "oasiso:block/scorching_kr_sand"
   }
 }

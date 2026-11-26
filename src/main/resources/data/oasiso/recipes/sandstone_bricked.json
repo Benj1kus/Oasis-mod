@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "minecraft:sandstone"
+      "item": "oasiso:kr_bricks"
     }
   ],
   "result": {

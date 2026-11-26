@@ -44,6 +44,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> ENTROPY_CONNECTOR = BLOCKS.register("entropy_connector", () -> new EntropyConnectorBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.HONEY_BLOCK).lightLevel(state -> 10).strength(6.0F).noOcclusion().requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> KR_SAND = BLOCKS.register("kr_sand", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(0.5F)));
+    public static final RegistryObject<Block> SCORCHING_KR_SAND = BLOCKS.register("scorching_kr_sand", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.ROOTED_DIRT).strength(0.2F)));
     public static final RegistryObject<Block> KR_STONE = BLOCKS.register("kr_stone", () -> new KarakStoneBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KR_BRICKS = BLOCKS.register("kr_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> KR_COLUMN = BLOCKS.register("kr_column", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STONE).sound(SoundType.STONE).strength(3.0F).requiresCorrectToolForDrops()));
@@ -196,7 +197,7 @@ public final class ModBlocks {
     public static final RegistryObject<Block> FACTORY_CORE_PART = BLOCKS.register("factory_core_part", () -> new FactoryCorePartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(100.0F).requiresCorrectToolForDrops().noOcclusion().noLootTable()));
 
     public static final RegistryObject<Block> FLUWIRUS = BLOCKS.register("fluwirus", () -> new FluwirusBlock(BlockBehaviour.Properties.copy(Blocks.STONE).noCollission().sound(SoundType.FLOWERING_AZALEA).instabreak().noOcclusion()));
-    public static final RegistryObject<Block> CRUSADER_SKEL = BLOCKS.register("crusader_skel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).noCollission().sound(SoundType.BONE_BLOCK).instabreak().noOcclusion()));
+    public static final RegistryObject<Block> CRUSADER_SKEL = BLOCKS.register("crusader_skel", () -> new CrusaderSkelBlock(BlockBehaviour.Properties.of().noCollission().noOcclusion().sound(SoundType.BONE_BLOCK).instabreak()));
 
     public static final RegistryObject<Block> VIBRIT = BLOCKS.register("vibrit", () -> new VibritBlock(BlockBehaviour.Properties.of().sound(SoundType.BASALT).instabreak().noOcclusion()));
 

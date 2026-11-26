@@ -1,5 +1,6 @@
 package com.benji.oasiso.common.block;
 
+import com.benji.oasiso.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,7 +49,7 @@ public class BallCactusBlock extends Block {
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockBelow = level.getBlockState(pos.below());
-        return blockBelow.is(BlockTags.SAND);
+        return blockBelow.is(ModBlocks.KR_SAND.get());
     }
 
     @Override
