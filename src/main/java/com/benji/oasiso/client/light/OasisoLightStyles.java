@@ -9,6 +9,7 @@ import com.benji.oasiso.config.OsirisRealmConfig;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import net.minecraft.world.entity.EntityType;
 
 public final class OasisoLightStyles {
     public static final int MAX_LIGHTS = 6;
@@ -29,7 +30,12 @@ public final class OasisoLightStyles {
 
     private static final Map<ResourceLocation, Style> STYLES = new HashMap<>();
 
+    private static final Map<ResourceLocation, Map<String, Style>> BONE_STYLES = new HashMap<>();
+    private static final Map<EntityType<?>, Map<String, Style>> BONE_CACHE = new IdentityHashMap<>();
+    public static final Style COWRIT_GLOW = new Style(0xFF954A, 0xFDFFA8, 2F, 2.0F, 2F, 0.15F, 0.22F, 0F);
+
     static {
+        registerBone("cowrit", "bott", COWRIT_GLOW);
         // registering blocks:
         register("entropy_lantern", ENTROPY);
         register("apol_altar", ENTROPY);
@@ -46,6 +52,19 @@ public final class OasisoLightStyles {
     public static void register(String blockId, Style style) {
         ResourceLocation id = blockId.contains(":") ? ResourceLocation.parse(blockId) : ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, blockId);
         STYLES.put(id, style);
+    }
+
+    /** For bones, height is a vertical offset in blocks above the animated pivot. */
+    public static void registerBone(String entityId, String bone, Style style) {
+        ResourceLocation id = entityId.contains(":") ? ResourceLocation.parse(entityId)
+                : ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, entityId);
+        BONE_STYLES.computeIfAbsent(id, ignored -> new HashMap<>()).put(bone, style);
+        BONE_CACHE.clear();
+    }
+
+    static Style boneStyle(EntityType<?> type, String name) {
+        return BONE_CACHE.computeIfAbsent(type, key ->
+                BONE_STYLES.getOrDefault(ForgeRegistries.ENTITY_TYPES.getKey(key), Map.of())).get(name);
     }
 
     static Map<Block, Style> resolved() {

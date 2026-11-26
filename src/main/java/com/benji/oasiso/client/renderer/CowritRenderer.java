@@ -3,6 +3,8 @@ package com.benji.oasiso.client.renderer;
 import com.benji.oasiso.client.layer.GlowmaskLayer;
 import com.benji.oasiso.common.entity.CowritEntity;
 import com.benji.oasiso.client.model.CowritModel;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import net.minecraft.world.entity.Entity;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -19,11 +21,13 @@ import org.joml.Vector4f;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoQuad;
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.renderer.GeoEntityRenderer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import com.benji.oasiso.client.light.BoneLightEntityRenderer;
 
 import java.util.ArrayList;
 
-public class CowritRenderer extends GeoEntityRenderer<CowritEntity> {
+public class CowritRenderer extends BoneLightEntityRenderer<CowritEntity> {
     public static final float OUTLINE_OPACITY = .95F;
     public static final double OUTLINE_DISTANCE = 48;
     private static final int[] TRIANGLES = {0, 1, 2, 0, 2, 3};

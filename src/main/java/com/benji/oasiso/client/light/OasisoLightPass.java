@@ -80,7 +80,7 @@ final class OasisoLightPass {
                 positions.put((float) (source.center.x - camera.x)).put((float) (source.center.y - camera.y)).put((float) (source.center.z - camera.z)).put(style.radius());
                 color(colors, style.color(), style.strength() * fade);
                 color(accents, style.accent(), style.fogRadius());
-                settings.put(style.fogDensity()).put(style.halo()).put(fade).put((source.pos.asLong() & 1023L) * 0.137F);
+                settings.put(style.fogDensity()).put(style.halo()).put(fade).put((source.seed & 1023L) * 0.137F);
             }
             positions.flip();
             colors.flip();
