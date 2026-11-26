@@ -155,6 +155,22 @@ public final class SoulCastClient {
         mc.player.setXRot(oldPitch);
     }
 
+    @SubscribeEvent
+    public static void onAttackInput(InputEvent.InteractionKeyMappingTriggered event) {
+        if (!event.isAttack()) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        boolean sceneCameraActive = camera != null && mc.getCameraEntity() == camera;
+        boolean targetsSelf = mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit && hit.getEntity() == mc.player;
+
+        if (sceneCameraActive || targetsSelf) {
+            event.setSwingHand(false);
+            event.setCanceled(true);
+        }
+    }
+
     static float blinkClosure(float partialTick) {
         Minecraft mc = Minecraft.getInstance();
         if (level != mc.level || mc.player == null || !mc.player.isAlive()) return 0;

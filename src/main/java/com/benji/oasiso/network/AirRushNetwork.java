@@ -4,7 +4,8 @@ import com.benji.oasiso.ModSounds;
 import com.benji.oasiso.Oasiso;
 import com.benji.oasiso.registry.ModEffects;
 
-import java.util.Optional;
+import com.benji.oasiso.client.AirRushWaves;
+import net.minecraftforge.network.PacketDistributor;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -19,12 +20,15 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 @Mod.EventBusSubscriber(modid = Oasiso.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class AirRushNetwork {
-    private static final String VERSION = "1";
+    private static final String VERSION = "2";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "air_rush"), () -> VERSION, VERSION::equals, VERSION::equals);
     private static final int COOLDOWN = 5;
     private static final String NEXT_JUMP = "oasiso_air_rush_next_jump";
 
     private record Jump() {
+    }
+
+    private record Wave(double x, double y, double z) {
     }
 
     @SubscribeEvent
@@ -37,6 +41,12 @@ public final class AirRushNetwork {
                     jump(player);
                 }
             }).add();
+
+            CHANNEL.messageBuilder(Wave.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder((wave, buf) -> {
+                buf.writeDouble(wave.x());
+                buf.writeDouble(wave.y());
+                buf.writeDouble(wave.z());
+            }).decoder(buf -> new Wave(buf.readDouble(), buf.readDouble(), buf.readDouble())).consumerMainThread((wave, context) -> AirRushWaves.spawn(wave.x(), wave.y(), wave.z())).add();
         });
     }
 
@@ -55,6 +65,7 @@ public final class AirRushNetwork {
         player.setDeltaMovement(-Math.sin(yaw) * 0.28, 0.54, Math.cos(yaw) * 0.28);
         player.fallDistance = 0;
         player.hurtMarked = true;
+        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new Wave(player.getX(), player.getY() - 0.04, player.getZ()));
         level.sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() - 0.04, player.getZ(), 12, 0.19, 0.04, 0.19, 0.035);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.LILY_JUMP.get(), SoundSource.PLAYERS, 0.85F, 0.88F + player.getRandom().nextFloat() * 0.34F);
     }

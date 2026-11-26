@@ -227,6 +227,7 @@
   "item.oasiso.cscience_spawn_egg": "Crusader Scientist Spawn Egg",
   "item.oasiso.giver_spawn_egg": "Soulgiver Spawn Egg",
   "item.oasiso.qui_spawn_egg": "Qui Spawn Egg",
+  "item.oasiso.cowrit_spawn_egg": "Cowritus Spawn Egg",
 
   "item.oasiso.config_scroll": "Config Scroll",
 
@@ -268,6 +269,7 @@
   "entity.oasiso.grave_soul": "Grave Soul",
   "entity.oasiso.soul_guardian": "Soul Guardian",
   "entity.oasiso.qui": "Qui",
+  "entity.oasiso.cowrit": "Cowritus",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",

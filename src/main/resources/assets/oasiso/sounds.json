@@ -128,12 +128,17 @@
   "ezombie_hurt": { "sounds": [ "oasiso:ezombie_hurt" ] },
   "ezombie_death": { "sounds": [ "oasiso:ezombie_death" ] },
 
-
   "qui_idle1": { "sounds": [ "oasiso:qui_idle1" ] },
   "qui_idle2": { "sounds": [ "oasiso:qui_idle2" ] },
   "qui_idle3": { "sounds": [ "oasiso:qui_idle3" ] },
   "qui_hurt": { "sounds": [ "oasiso:qui_hurt" ] },
   "qui_death": { "sounds": [ "oasiso:qui_death" ] },
+
+  "cowr_idle1": { "sounds": [ "oasiso:cowr_idle1" ] },
+  "cowr_idle2": { "sounds": [ "oasiso:cowr_idle2" ] },
+  "cowr_idle3": { "sounds": [ "oasiso:cowr_idle3" ] },
+  "cowr_hurt": { "sounds": [ "oasiso:cowr_hurt" ] },
+  "cowr_death": { "sounds": [ "oasiso:cowr_death" ] },
 
   "soul_idle1": { "sounds": [ "oasiso:soul_idle1" ] },
   "soul_idle2": { "sounds": [ "oasiso:soul_idle2" ] },
