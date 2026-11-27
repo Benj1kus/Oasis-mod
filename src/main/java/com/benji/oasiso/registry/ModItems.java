@@ -235,6 +235,7 @@ public final class ModItems {
     public static final RegistryObject<Item> SEEMLESS_CURVE_BANNER_ITEM = ITEMS.register("seemless_curve_banner", () -> new SeamlessCurveBannerItem(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> SEEMLESS_CURVE_CHAIN_ITEM = ITEMS.register("seemless_curve_chain", () -> new SeamlessCurveChainItem(new Item.Properties().stacksTo(16)));
 
+    public static final RegistryObject<Item> KWORM_SPAWN_EGG = ITEMS.register("kworm_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.KARAK_WORM, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> COWRIT_SPAWN_EGG = ITEMS.register("cowrit_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.COWRIT, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> QUI_SPAWN_EGG = ITEMS.register("qui_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.QUI, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));
     public static final RegistryObject<Item> GIVER_SPAWN_EGG = ITEMS.register("giver_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.SOUL_GIVER, 0xFFFFFF, 0xFFFFFF, new Item.Properties()));

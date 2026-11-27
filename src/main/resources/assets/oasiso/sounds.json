@@ -146,6 +146,13 @@
   "bcowr_hurt": { "sounds": [ "oasiso:bcowr_hurt" ] },
   "bcowr_death": { "sounds": [ "oasiso:bcowr_death" ] },
 
+  "kworm_idle1": { "sounds": [ "oasiso:kworm_idle1" ] },
+  "kworm_idle2": { "sounds": [ "oasiso:kworm_idle2" ] },
+  "kworm_idle3": { "sounds": [ "oasiso:kworm_idle3" ] },
+  "kworm_hurt": { "sounds": [ "oasiso:kworm_hurt" ] },
+  "kworm_death": { "sounds": [ "oasiso:kworm_death" ] },
+  "kworm_dirt": { "sounds": [ "oasiso:kworm_dirt" ] },
+
   "soul_idle1": { "sounds": [ "oasiso:soul_idle1" ] },
   "soul_idle2": { "sounds": [ "oasiso:soul_idle2" ] },
   "soul_idle3": { "sounds": [ "oasiso:soul_idle3" ] },

@@ -21,7 +21,7 @@
 				{
 					"name": "worm_head",
 					"parent": "worm",
-					"pivot": [0, 1, -29.5],
+					"pivot": [0, 2, -55.5],
 					"cubes": [
 						{"origin": [-2, -1, -55.5], "size": [4, 6, 20], "uv": [89, 33]}
 					]
