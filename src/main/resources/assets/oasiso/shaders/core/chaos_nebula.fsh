@@ -14,7 +14,7 @@ float hash31(vec3 p) {
     return fract((p.x + p.y) * p.z);
 }
 
-float noise3(vec3 p) {
+float oasisoNebulaNoise(vec3 p) {
     vec3 i = floor(p);
     vec3 f = fract(p);
     f = f*f*(3.0-2.0*f);
@@ -25,7 +25,7 @@ float noise3(vec3 p) {
 }
 
 float clouds(vec3 p) {
-    return 0.70*noise3(p) + 0.30*noise3(p*2.03+17.7);
+    return 0.70*oasisoNebulaNoise(p) + 0.30*oasisoNebulaNoise(p*2.03+17.7);
 }
 
 mat2 rotate2(float a) {
@@ -51,18 +51,18 @@ void main() {
     p = swirl(p, normalize(vec3(-0.50,0.65,0.57)), 0.025, 2.4);
 
     vec3 drift = vec3(t*0.012,t*0.005,-t*0.009);
-    float broad = noise3(p*2.8 + drift*0.22 + 4.6);
+    float broad = oasisoNebulaNoise(p*2.8 + drift*0.22 + 4.6);
     vec3 flow = vec3(sin(p.y*4.2+t*0.024),
                      sin(p.z*4.8-t*0.020), sin(p.x*4.0+t*0.018));
     float gas = clouds(p*4.6 + flow*0.72 + drift);
 
     float bank = smoothstep(0.27,0.68,broad);
     float density = smoothstep(0.30,0.69,gas) * bank;
-    float voids = smoothstep(0.42,0.78,noise3(p*3.7-drift*0.35-12.0));
+    float voids = smoothstep(0.42,0.78,oasisoNebulaNoise(p*3.7-drift*0.35-12.0));
     density *= 1.0 - 0.84*voids;
 
     vec3 deep = vec3(0.008,0.029,0.043);
-    float jade = smoothstep(0.38,0.70,noise3(p*2.2+8.2));
+    float jade = smoothstep(0.38,0.70,oasisoNebulaNoise(p*2.2+8.2));
     vec3 color = deep;
     color = mix(color, mix(vec3(0.020,0.080,0.125),vec3(0.015,0.100,0.105),jade),
                 smoothstep(0.070,0.082,density));

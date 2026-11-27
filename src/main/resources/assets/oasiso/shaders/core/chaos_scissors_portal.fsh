@@ -45,7 +45,7 @@ vec2 direction(float angle) {
     return vec2(cos(angle), sin(angle));
 }
 
-float noise2(vec2 p) {
+float oasisoPortalNoise(vec2 p) {
     vec2 cell = floor(p), f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
     float seed = random(73.8) * 19.0;
@@ -57,11 +57,11 @@ float noise2(vec2 p) {
 }
 
 float clouds(vec2 p) {
-    float n = noise2(p) * 0.57;
+    float n = oasisoPortalNoise(p) * 0.57;
     p = rotation(0.65) * p * 2.03 + vec2(7.1, 3.6);
-    n += noise2(p) * 0.28;
+    n += oasisoPortalNoise(p) * 0.28;
     p = rotation(0.65) * p * 2.03 + vec2(7.1, 3.6);
-    return n + noise2(p) * 0.15;
+    return n + oasisoPortalNoise(p) * 0.15;
 }
 
 float smoothUnion(float a, float b, float k) {
