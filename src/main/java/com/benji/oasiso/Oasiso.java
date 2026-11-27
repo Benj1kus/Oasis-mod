@@ -443,6 +443,7 @@ public class Oasiso {
 
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.KARAK_WORM.get(), KarakWormEntity.createAttributes().build());
             event.put(ModEntities.BABY_COWRIT.get(), BabyCowritEntity.createAttributes().build());
             event.put(ModEntities.COWRIT.get(), CowritEntity.createAttributes().build());
             event.put(ModEntities.QUI.get(), QuiEntity.createAttributes().build());

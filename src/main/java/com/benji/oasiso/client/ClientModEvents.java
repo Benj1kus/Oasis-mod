@@ -274,6 +274,11 @@ public class ClientModEvents {
         );
 
         event.registerEntityRenderer(
+                ModEntities.KARAK_WORM.get(),
+                KarakWormRenderer::new
+        );
+
+        event.registerEntityRenderer(
                 ModEntities.COWRIT.get(),
                 CowritRenderer::new
         );
