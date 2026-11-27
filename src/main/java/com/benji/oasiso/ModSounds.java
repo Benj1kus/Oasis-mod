@@ -135,6 +135,12 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> COWR_HURT = registerSoundEvent("cowr_hurt");
     public static final RegistryObject<SoundEvent> COWR_DEATH = registerSoundEvent("cowr_death");
 
+    public static final RegistryObject<SoundEvent> BCOWR_IDLE1 = registerSoundEvent("bcowr_idle1");
+    public static final RegistryObject<SoundEvent> BCOWR_IDLE2 = registerSoundEvent("bcowr_idle2");
+    public static final RegistryObject<SoundEvent> BCOWR_IDLE3 = registerSoundEvent("bcowr_idle3");
+    public static final RegistryObject<SoundEvent> BCOWR_HURT = registerSoundEvent("bcowr_hurt");
+    public static final RegistryObject<SoundEvent> BCOWR_DEATH = registerSoundEvent("bcowr_death");
+
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE1 = registerSoundEvent("espider_idle1");
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE2 = registerSoundEvent("espider_idle2");
     public static final RegistryObject<SoundEvent> ESPIDER_IDLE3 = registerSoundEvent("espider_idle3");

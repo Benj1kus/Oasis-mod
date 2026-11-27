@@ -140,6 +140,12 @@
   "cowr_hurt": { "sounds": [ "oasiso:cowr_hurt" ] },
   "cowr_death": { "sounds": [ "oasiso:cowr_death" ] },
 
+  "bcowr_idle1": { "sounds": [ "oasiso:bcowr_idle1" ] },
+  "bcowr_idle2": { "sounds": [ "oasiso:bcowr_idle2" ] },
+  "bcowr_idle3": { "sounds": [ "oasiso:bcowr_idle3" ] },
+  "bcowr_hurt": { "sounds": [ "oasiso:bcowr_hurt" ] },
+  "bcowr_death": { "sounds": [ "oasiso:bcowr_death" ] },
+
   "soul_idle1": { "sounds": [ "oasiso:soul_idle1" ] },
   "soul_idle2": { "sounds": [ "oasiso:soul_idle2" ] },
   "soul_idle3": { "sounds": [ "oasiso:soul_idle3" ] },

@@ -201,6 +201,10 @@
   "item.oasiso.corerem": "Corerem Amulet",
   "item.oasiso.war_core": "Core of the War's Souls",
   "item.oasiso.qui_milk_bucket": "Qui Milk Bucket",
+  "item.oasiso.cowrit_fat": "Cowritus Fat",
+  "item.oasiso.cowrit_meat": "Cowritus Meat",
+  "item.oasiso.smoked_cowrit_meat": "Smoked Cowritus Meat",
+  "item.oasiso.relax_bottle": "Relaxit bottle",
 
   "gui.oasiso.corerem.cooldown": "Amulet: %ss",
   "message.oasiso.corerem.recharging": "All emotions are recharging",
@@ -270,6 +274,7 @@
   "entity.oasiso.soul_guardian": "Soul Guardian",
   "entity.oasiso.qui": "Qui",
   "entity.oasiso.cowrit": "Cowritus",
+  "entity.oasiso.baby_cowrit": "Cowritus Larva",
 
   "item.oasiso.enchanted_book_hammer": "Enchanted Book",
   "tooltip.oasiso.enchanted_book_hammer": "Sand Hand",
@@ -493,6 +498,8 @@
   "tooltip.oasiso.schest1": "[H]",
   "tooltip.oasiso.fl": "Can sort items",
   "tooltip.oasiso.fl1": "sort",
+  "tooltip.oasiso.cow": "Removes blocks lighting",
+  "tooltip.oasiso.cow1": "blocks",
 
   "gui.oasiso.paladin.title": "RAMIEL",
   "gui.oasiso.paladin.subtitle": "PALADIN",

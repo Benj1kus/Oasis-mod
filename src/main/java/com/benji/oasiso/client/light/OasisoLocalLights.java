@@ -1,6 +1,7 @@
 package com.benji.oasiso.client.light;
 
 import com.benji.oasiso.Oasiso;
+import com.benji.oasiso.common.cowrit.FatCoatings;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -87,6 +88,7 @@ public final class OasisoLocalLights {
         KNOWN.values().removeIf(s -> !mc.level.hasChunkAt(s.pos) || mc.level.getBlockState(s.pos).getBlock() != s.block);
         MOVING.values().removeIf(source -> source.owner.isRemoved() || source.owner.level() != currentLevel || source.owner.position().distanceToSqr(eye) > (currentRadius + 8) * (currentRadius + 8));
         List<Source> nearest = new ArrayList<>(KNOWN.values());
+        nearest.removeIf(source -> FatCoatings.has(mc.level, source.pos));
         for (Source source : MOVING.values()) {
             source.follow(1.0F);
             if (!source.owner.isInvisible()) nearest.add(source);
@@ -106,9 +108,6 @@ public final class OasisoLocalLights {
         }
     }
 
-    /**
-     * Called with the parent bone's pose at the entrance to renderRecursively.
-     */
     public static void captureBone(Entity owner, GeoBone bone, PoseStack pose, float partial) {
         if (inverseEntityView == null || owner.level() != currentLevel || owner.isInvisible() || bone.isHidden())
             return;
@@ -168,7 +167,7 @@ public final class OasisoLocalLights {
                                 var style = styles.get(block);
                                 if (style == null) continue;
                                 test.set(cx * 16 + x, by + y, cz * 16 + z);
-                                if (test.distSqr(camera) > radius * radius) continue;
+                                if (test.distSqr(camera) > radius * radius || FatCoatings.has(level, test)) continue;
                                 BlockPos pos = test.immutable();
                                 found.add(pos);
                                 Source old = KNOWN.get(pos);

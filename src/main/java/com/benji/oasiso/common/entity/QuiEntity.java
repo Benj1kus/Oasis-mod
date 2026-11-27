@@ -21,7 +21,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.ClipContext;
@@ -38,7 +41,7 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntity {
+public class QuiEntity extends TamableAnimal implements GeoEntity, GlowmaskEntity {
     private enum Phase {DRIFT, APPROACH, DESCEND, SLEEP, WAKE}
 
     private static final ResourceLocation RELAX_WATER = ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, "relax_water");
@@ -71,7 +74,7 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
     private Vec3 plannedDash = Vec3.ZERO;
     private boolean turnFromWall;
 
-    public QuiEntity(EntityType<? extends PathfinderMob> type, Level level) {
+    public QuiEntity(EntityType<? extends TamableAnimal> type, Level level) {
         super(type, level);
         setNoGravity(true);
         heading = random.nextDouble() * Math.PI * 2;
@@ -91,14 +94,35 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
     }
 
     @Override
-    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
+        if (held.is(ModItems.RELAX_BOTTLE.get())) {
+            if (isTame() || !isAlive()) return InteractionResult.PASS;
+            if (!level().isClientSide) {
+                if (net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) return InteractionResult.FAIL;
+                tame(player);
+                setPersistenceRequired();
+                level().broadcastEntityEvent(this, (byte) 7);
+                player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, new ItemStack(Items.GLASS_BOTTLE)));
+            }
+            return InteractionResult.sidedSuccess(level().isClientSide);
+        }
         if (!held.is(Items.BUCKET)) return super.mobInteract(player, hand);
         if (!level().isClientSide) {
             playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);
             player.setItemInHand(hand, ItemUtils.createFilledResult(held, player, new ItemStack(ModItems.QUI_MILK_BUCKET.get())));
         }
         return InteractionResult.sidedSuccess(level().isClientSide);
+    }
+
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob mate) {
+        return null;
+    }
+
+    @Override
+    public boolean isFood(ItemStack stack) {
+        return false;
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -119,7 +143,17 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
     public void travel(Vec3 input) {
         if (!isEffectiveAi()) return;
         if (entityData.get(START) < 0) restartCycle();
-        if (phase == Phase.DRIFT) drift();
+        var owner = getOwner();
+        if (owner != null && owner.isAlive() && !owner.isSpectator() && !isLeashed() && !isPassenger()) {
+            if (distanceToSqr(owner) > 16 * 16 && tickCount % 10 == 0 && teleportNear(owner.position())) {
+                leavePool();
+                setDeltaMovement(Vec3.ZERO);
+                restartCycle();
+            }
+        } else {
+            owner = null;
+        }
+        if (phase == Phase.DRIFT) drift(owner == null ? null : owner.position().add(0, 2, 0));
         else visitPool();
 
         move(MoverType.SELF, getDeltaMovement());
@@ -163,7 +197,23 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
         return Math.max(0, level().getGameTime() - entityData.get(START));
     }
 
-    private void drift() {
+    private boolean teleportNear(Vec3 center) {
+        for (int i = 0; i < 12; i++) {
+            int dx = random.nextInt(7) - 3, dz = random.nextInt(7) - 3;
+            if (Math.abs(dx) < 2 && Math.abs(dz) < 2) continue;
+            var target = BlockPos.containing(center).offset(dx, 1 + random.nextInt(3), dz);
+            if (!level().hasChunkAt(target) || level().isOutsideBuildHeight(target)) continue;
+            Vec3 feet = Vec3.atBottomCenterOf(target);
+            AABB box = getBoundingBox().move(feet.subtract(position()));
+            if (!level().getWorldBorder().isWithinBounds(box) || !level().noCollision(this, box)
+                    || level().containsAnyLiquid(box)) continue;
+            teleportTo(feet.x, feet.y, feet.z);
+            return true;
+        }
+        return false;
+    }
+
+    private void drift(Vec3 followTarget) {
         Vec3 pos = position();
         var floor = level().clip(new ClipContext(pos, pos.add(0, -8, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, this));
         double clearance = floor.getType() == HitResult.Type.MISS ? 8 : getY() - floor.getLocation().y;
@@ -179,6 +229,12 @@ public class QuiEntity extends PathfinderMob implements GeoEntity, GlowmaskEntit
             hoverHeight = 2.6 + random.nextDouble() * 1.8;
             double lift = Mth.clamp((hoverHeight - clearance) * 0.12 + 0.05, -0.16, 0.20);
             plannedDash = new Vec3(Math.cos(heading) * 0.31, lift, Math.sin(heading) * 0.31);
+            if (followTarget != null && pos.distanceToSqr(followTarget) > 16) {
+                Vec3 toward = followTarget.subtract(pos);
+                double speed = Mth.clamp(toward.length() * 0.075, 0.32, 0.78);
+                plannedDash = toward.normalize().scale(speed);
+                heading = Math.atan2(plannedDash.z, plannedDash.x);
+            }
             aimAlong(plannedDash);
         }
 

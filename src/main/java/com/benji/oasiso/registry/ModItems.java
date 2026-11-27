@@ -4,6 +4,7 @@ import com.benji.oasiso.Oasiso;
 
 import static com.benji.oasiso.Oasiso.MODID;
 
+import com.benji.oasiso.common.cowrit.CowritFoods;
 import com.benji.oasiso.common.item.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
@@ -191,6 +192,10 @@ public final class ModItems {
     public static final RegistryObject<Item> CONFIG_SCROLL = ITEMS.register("config_scroll", () -> new ConfigScrollItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> COREREM = ITEMS.register("corerem", () -> new CoreremItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WAR_CORE = ITEMS.register("war_core", () -> new WarCoreItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> COWRIT_FAT = ITEMS.register("cowrit_fat", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> COWRIT_MEAT = ITEMS.register("cowrit_meat", () -> new Item(new Item.Properties().stacksTo(64).food(CowritFoods.RAW)));
+    public static final RegistryObject<Item> SMOKED_COWRIT_MEAT = ITEMS.register("smoked_cowrit_meat", () -> new Item(new Item.Properties().stacksTo(64).food(CowritFoods.SMOKED)));
+    public static final RegistryObject<Item> RELAX_BOTTLE = ITEMS.register("relax_bottle", () -> new Item(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<Item> ORB_CHAOS = ITEMS.register("orb_chaos", () -> new ChaosItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ORB_DOMINATION = ITEMS.register("orb_domination", () -> new DominanceItem(new Item.Properties().stacksTo(1)));
