@@ -1,6 +1,9 @@
 package com.benji.oasiso.client.light;
 
 import net.minecraft.world.phys.Vec3;
+
+import static com.benji.oasiso.config.OsirisRealmConfig.LIGHT_CAPACITY;
+
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
@@ -10,7 +13,7 @@ import java.util.List;
 
 final class OasisoLightPass {
     private static int sceneTexture, depthTexture, shadowTexture, vao, vbo, width, height;
-    private static final FloatBuffer SHADOW_ATLAS = org.lwjgl.BufferUtils.createFloatBuffer(OasisoLightStyles.SHADOW_SIZE * OasisoLightStyles.SHADOW_SIZE * 6 * OasisoLightStyles.MAX_LIGHTS);
+    private static final FloatBuffer SHADOW_ATLAS = org.lwjgl.BufferUtils.createFloatBuffer(OasisoLightStyles.SHADOW_SIZE * OasisoLightStyles.SHADOW_SIZE * 6 * LIGHT_CAPACITY);
 
     private OasisoLightPass() {
     }
@@ -40,10 +43,10 @@ final class OasisoLightPass {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, shadowTexture);
             int size = OasisoLightStyles.SHADOW_SIZE;
             int atlasWidth = size * 6;
-            int atlasHeight = size * OasisoLightStyles.MAX_LIGHTS;
+            int atlasHeight = size * sources.size();
             FloatBuffer atlas = SHADOW_ATLAS;
             atlas.clear();
-            for (int i = 0; i < atlasWidth * atlasHeight; i++) atlas.put(i, 0.0F);
+            atlas.limit(atlasWidth * atlasHeight);
             for (int light = 0; light < sources.size(); light++) {
                 float[] data = sources.get(light).shadow;
                 for (int face = 0; face < 6; face++)
@@ -72,10 +75,11 @@ final class OasisoLightPass {
             FloatBuffer accents = memory.mallocFloat(components);
             FloatBuffer settings = memory.mallocFloat(components);
 
+            int searchRadius = OasisoLightStyles.searchRadius();
             for (var source : sources) {
                 var style = source.style;
                 float distance = (float) source.center.distanceTo(camera);
-                float fade = Math.max(0, Math.min(1, (24.0F - distance) / 4.0F));
+                float fade = Math.max(0, Math.min(1, (searchRadius - distance) / 4.0F));
                 fade *= Math.max(0, Math.min(1, (ticks - source.firstReady) / 10.0F));
                 positions.put((float) (source.center.x - camera.x)).put((float) (source.center.y - camera.y)).put((float) (source.center.z - camera.z)).put(style.radius());
                 color(colors, style.color(), style.strength() * fade);
@@ -141,7 +145,7 @@ final class OasisoLightPass {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         sceneTexture = texture(GL11.GL_RGBA8, w, h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         depthTexture = texture(GL30.GL_DEPTH_COMPONENT32F, w, h, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT);
-        shadowTexture = texture(GL30.GL_R32F, OasisoLightStyles.SHADOW_SIZE * 6, OasisoLightStyles.SHADOW_SIZE * OasisoLightStyles.MAX_LIGHTS, GL11.GL_RED, GL11.GL_FLOAT);
+        shadowTexture = texture(GL30.GL_R32F, OasisoLightStyles.SHADOW_SIZE * 6, OasisoLightStyles.SHADOW_SIZE * LIGHT_CAPACITY, GL11.GL_RED, GL11.GL_FLOAT);
     }
 
     private static int texture(int internal, int w, int h, int format, int type) {

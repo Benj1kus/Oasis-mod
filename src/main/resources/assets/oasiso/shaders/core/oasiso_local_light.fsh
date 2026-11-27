@@ -1,5 +1,4 @@
 #version 150
-#define MAX_LIGHTS 6
 uniform sampler2D Scene;
 uniform sampler2D Depth;
 uniform sampler2D Shadows;
@@ -8,10 +7,11 @@ uniform vec2 Resolution;
 uniform vec3 CameraCell;
 uniform float Time;
 uniform int Count;
-uniform vec4 LightPosition[MAX_LIGHTS];
-uniform vec4 LightColor[MAX_LIGHTS];
-uniform vec4 LightAccent[MAX_LIGHTS];
-uniform vec4 LightSettings[MAX_LIGHTS];
+const int LIGHT_CAPACITY = 16;
+uniform vec4 LightPosition[LIGHT_CAPACITY];
+uniform vec4 LightColor[LIGHT_CAPACITY];
+uniform vec4 LightAccent[LIGHT_CAPACITY];
+uniform vec4 LightSettings[LIGHT_CAPACITY];
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -68,11 +68,12 @@ float visibility(int index,vec3 offset) {
     }
     vec2 cell=clamp(floor((uv*0.5+0.5)*SHADOW_SIZE),vec2(0),vec2(SHADOW_SIZE-1.0));
     vec2 atlas=(vec2(face*SHADOW_SIZE,float(index)*SHADOW_SIZE)+cell+0.5)
-    /vec2(SHADOW_SIZE*6.0, SHADOW_SIZE*float(MAX_LIGHTS));
+            /vec2(textureSize(Shadows,0));
     float wall=texture(Shadows,atlas).r;
     float bias=0.09+distance*0.038;
     return 1.0-smoothstep(wall+bias,wall+bias+0.10,distance);
 }
+
 
 vec3 surfaceNormal(vec3 p) {
     vec2 px=1.0/Resolution;
@@ -94,8 +95,7 @@ void main() {
     vec3 p=reconstruct(texCoord,min(depth,0.99999));
     vec3 normal=vec3(0);
     bool needNormal=false;
-    for(int i=0;i<MAX_LIGHTS;++i) {
-        if(i>=Count) break;
+    for(int i=0;i<Count;++i) {
         if(surface && distance(p,LightPosition[i].xyz)<LightPosition[i].w) needNormal=true;
     }
     if(needNormal) normal=surfaceNormal(p);
@@ -117,8 +117,7 @@ void main() {
     vec3 added=vec3(0),fogColor=vec3(0);
     float fogAlpha=0.0;
 
-    for(int i=0;i<MAX_LIGHTS;++i) {
-        if(i>=Count) break;
+    for(int i=0;i<Count;++i) {
         vec3 light=LightPosition[i].xyz;
         float radius=LightPosition[i].w;
         vec3 primary=LightColor[i].rgb,accent=LightAccent[i].rgb;

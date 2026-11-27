@@ -9,11 +9,17 @@ import com.benji.oasiso.config.OsirisRealmConfig;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.world.entity.EntityType;
 
 public final class OasisoLightStyles {
-    public static final int MAX_LIGHTS = 6;
-    public static final int SEARCH_RADIUS = 24;
+    public static int maxLights() {
+        return OsirisRealmConfig.MAX_LIGHTS.get();
+    }
+    public static int searchRadius() {
+        return OsirisRealmConfig.SEARCH_RADIUS.get();
+    }
+
     public static final int SHADOW_SIZE = 16;
     public static final int RAYS_PER_TICK = 256;
 
@@ -39,10 +45,10 @@ public final class OasisoLightStyles {
         // registering blocks:
         register("entropy_lantern", ENTROPY);
         register("apol_altar", ENTROPY);
-        register("not_azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
-        register("azumalit_crystal", new Style(0xE817FF, 0xFF87F4,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
-        register("nephritis_lamp", new Style(0x0FFFBB, 0x0FFFEB,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1.5F));
-        register("gluminus", new Style(0xFFCA38, 0xFA6D2D,5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1F));
+        register("not_azumalit_crystal", new Style(0xE817FF, 0xFF87F4, 5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
+        register("azumalit_crystal", new Style(0xE817FF, 0xFF87F4, 5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 0.5F));
+        register("nephritis_lamp", new Style(0x0FFFBB, 0x0FFFEB, 5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1.5F));
+        register("gluminus", new Style(0xFFCA38, 0xFA6D2D, 5.0F, 1.8F, 2.0F, 0.15F, 0.20F, 1F));
         // register("karak_lamp", new Style(0x88FFFF, 0xD899FF,5.0F, 0.8F, 2.0F, 0.15F, 0.20F, 0.5F)); btw this is example tho
     }
 
@@ -54,17 +60,15 @@ public final class OasisoLightStyles {
         STYLES.put(id, style);
     }
 
-    /** For bones, height is a vertical offset in blocks above the animated pivot. */
+
     public static void registerBone(String entityId, String bone, Style style) {
-        ResourceLocation id = entityId.contains(":") ? ResourceLocation.parse(entityId)
-                : ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, entityId);
+        ResourceLocation id = entityId.contains(":") ? ResourceLocation.parse(entityId) : ResourceLocation.fromNamespaceAndPath(Oasiso.MODID, entityId);
         BONE_STYLES.computeIfAbsent(id, ignored -> new HashMap<>()).put(bone, style);
         BONE_CACHE.clear();
     }
 
     static Style boneStyle(EntityType<?> type, String name) {
-        return BONE_CACHE.computeIfAbsent(type, key ->
-                BONE_STYLES.getOrDefault(ForgeRegistries.ENTITY_TYPES.getKey(key), Map.of())).get(name);
+        return BONE_CACHE.computeIfAbsent(type, key -> BONE_STYLES.getOrDefault(ForgeRegistries.ENTITY_TYPES.getKey(key), Map.of())).get(name);
     }
 
     static Map<Block, Style> resolved() {

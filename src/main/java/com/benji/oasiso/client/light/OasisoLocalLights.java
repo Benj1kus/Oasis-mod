@@ -2,6 +2,7 @@ package com.benji.oasiso.client.light;
 
 import com.benji.oasiso.Oasiso;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -43,6 +44,7 @@ public final class OasisoLocalLights {
     private static final Map<BoneKey, Source> MOVING = new HashMap<>();
     private static Matrix4f inverseEntityView;
     private static long ticks;
+    private static int currentRadius;
     private static int roundRobin;
     private static boolean failed;
     private static Matrix4f worldView, worldProjection;
@@ -75,10 +77,15 @@ public final class OasisoLocalLights {
         }
 
         if (mc.isPaused()) return;
-        if ((ticks++ % 10L) == 0L) discover(mc);
+        int radius = OasisoLightStyles.searchRadius();
+        int maxLights = OasisoLightStyles.maxLights();
+        if ((ticks++ % 10L) == 0L || currentRadius != radius) {
+            currentRadius = radius;
+            discover(mc);
+        }
         Vec3 eye = mc.gameRenderer.getMainCamera().getPosition();
         KNOWN.values().removeIf(s -> !mc.level.hasChunkAt(s.pos) || mc.level.getBlockState(s.pos).getBlock() != s.block);
-        MOVING.values().removeIf(source -> source.owner.isRemoved() || source.owner.level() != currentLevel || source.owner.position().distanceToSqr(eye) > 32 * 32);
+        MOVING.values().removeIf(source -> source.owner.isRemoved() || source.owner.level() != currentLevel || source.owner.position().distanceToSqr(eye) > (currentRadius + 8) * (currentRadius + 8));
         List<Source> nearest = new ArrayList<>(KNOWN.values());
         for (Source source : MOVING.values()) {
             source.follow(1.0F);
@@ -87,9 +94,9 @@ public final class OasisoLocalLights {
         nearest.sort(Comparator.comparingDouble(s -> s.center.distanceToSqr(eye)));
         ACTIVE.clear();
         for (Source source : nearest) {
-            if (source.center.distanceToSqr(eye) > 24.0 * 24.0) continue;
+            if (source.center.distanceToSqr(eye) > radius * radius) continue;
             ACTIVE.add(source);
-            if (ACTIVE.size() >= OasisoLightStyles.MAX_LIGHTS) break;
+            if (ACTIVE.size() >= maxLights) break;
         }
         for (int i = 0; i < OasisoLightStyles.RAYS_PER_TICK && !ACTIVE.isEmpty(); ++i) {
             Source source = ACTIVE.get(Math.floorMod(roundRobin++, ACTIVE.size()));
@@ -99,13 +106,16 @@ public final class OasisoLocalLights {
         }
     }
 
+    /**
+     * Called with the parent bone's pose at the entrance to renderRecursively.
+     */
     public static void captureBone(Entity owner, GeoBone bone, PoseStack pose, float partial) {
         if (inverseEntityView == null || owner.level() != currentLevel || owner.isInvisible() || bone.isHidden())
             return;
         var style = OasisoLightStyles.boneStyle(owner.getType(), bone.getName());
         if (style == null) return;
         var eye = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        if (owner.position().distanceToSqr(eye) > 32 * 32) return;
+        if (owner.position().distanceToSqr(eye) > (currentRadius + 8) * (currentRadius + 8)) return;
 
         pose.pushPose();
         Vector3f point;
@@ -137,7 +147,7 @@ public final class OasisoLocalLights {
         }
         var level = mc.level;
         BlockPos camera = BlockPos.containing(mc.gameRenderer.getMainCamera().getPosition());
-        int radius = OasisoLightStyles.SEARCH_RADIUS;
+        int radius = currentRadius;
         Set<BlockPos> found = new HashSet<>();
         BlockPos.MutableBlockPos test = new BlockPos.MutableBlockPos();
         int low = Math.max(0, (camera.getY() - radius - level.getMinBuildHeight()) >> 4);

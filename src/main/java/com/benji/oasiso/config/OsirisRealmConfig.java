@@ -12,6 +12,9 @@ public final class OsirisRealmConfig {
     public static final ForgeConfigSpec.BooleanValue APOL_WINGS_WALL_COLLISION_DAMAGE;
     // CUSTOM LIGHT
     public static final ForgeConfigSpec.BooleanValue CUSTOM_LIGHTING_ENABLED;
+    public static final int LIGHT_CAPACITY = 16;
+    public static final ForgeConfigSpec.IntValue MAX_LIGHTS;
+    public static final ForgeConfigSpec.IntValue SEARCH_RADIUS;
 
     // Super Gold armor
     public static final ForgeConfigSpec.IntValue SUPER_GOLD_HELMET_DEFENSE;
@@ -143,6 +146,8 @@ public final class OsirisRealmConfig {
 
         BUILDER.push("Custom Color Light");
         CUSTOM_LIGHTING_ENABLED = BUILDER.comment("CCL").define("custom_lighting_enabled", true);
+        MAX_LIGHTS = BUILDER.comment("Max lights from blocks and mob bones.").defineInRange("max_lights", 6, 1, LIGHT_CAPACITY);
+        SEARCH_RADIUS = BUILDER.comment("Distance in blocks to search for light sources around the camera.").defineInRange("search_radius", 24, 4, 48);
         BUILDER.pop();
 
         BUILDER.push("Apollyon Wings");
